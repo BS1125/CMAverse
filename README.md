@@ -1,1 +1,1 @@
-# CMed
+# CausalMediation
