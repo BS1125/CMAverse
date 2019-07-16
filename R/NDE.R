@@ -1,15 +1,9 @@
 total_NDE_binbin <- function(betas, thetas, treatment, mediator, covariates, vecc,
                              a_star, a, interaction) {
   covariatesTerm <- 0
-  if (is.null(vecc)) {
-    for (c in covariates) {
-      covariatesTerm <- covariatesTerm + betas[c] * apply(df[c], 2, mean, na.rm = TRUE)
-    }
-  } else {
-    for (i in 1:length(covariates)) {
+  for (i in 1:length(covariates)) {
       covariatesTerm <- covariatesTerm + betas[covariates[i]] * vecc[i]
     }
-  }
 
   interactionTerm <- ifelse(is.na(thetas[paste(treatment, mediator, sep = ":")]),
                             0, thetas[paste(treatment, mediator, sep = ":")])
@@ -24,19 +18,12 @@ total_NDE_binbin <- function(betas, thetas, treatment, mediator, covariates, vec
   unname(ORnde)
 }
 
-
 pure_NDE_binbin <- function(betas, thetas, treatment, mediator, covariates, vecc,
                             a_star, a, interaction) {
   covariatesTerm <- 0
-  if (is.null(vecc)) {
-    for (c in covariates) {
-      covariatesTerm <- covariatesTerm + betas[c] * apply(df[c], 2, mean, na.rm = TRUE)
-    }
-  } else {
-    for (i in 1:length(covariates)) {
+  for (i in 1:length(covariates)) {
       covariatesTerm <- covariatesTerm + betas[covariates[i]] * vecc[i]
     }
-  }
 
   interactionTerm <- ifelse(is.na(thetas[paste(treatment, mediator, sep = ":")]),
                             0, thetas[paste(treatment, mediator, sep = ":")])
@@ -51,19 +38,12 @@ pure_NDE_binbin <- function(betas, thetas, treatment, mediator, covariates, vecc
   unname(ORnde)
 }
 
-
 pure_NDE_bincont <- function(betas, thetas, treatment, mediator, covariates, vecc,
                              a_star, a, interaction) {
   covariatesTerm <- 0
-  if (is.null(vecc)) {
-    for (c in covariates) {
-      covariatesTerm <- covariatesTerm + betas[c] * apply(df[c], 2, mean, na.rm = TRUE)
-    }
-  } else {
-    for (i in 1:length(covariates)) {
+  for (i in 1:length(covariates)) {
       covariatesTerm <- covariatesTerm + betas[covariates[i]] * vecc[i]
     }
-  }
 
   interactionTerm <- ifelse(is.na(thetas[paste(treatment, mediator, sep = ":")]),
                             0, thetas[paste(treatment, mediator, sep = ":")])
@@ -76,19 +56,12 @@ pure_NDE_bincont <- function(betas, thetas, treatment, mediator, covariates, vec
   unname(nde)
 }
 
-
 total_NDE_bincont <- function(betas, thetas, treatment, mediator, covariates, vecc,
                               a_star, a, interaction) {
   covariatesTerm <- 0
-  if (is.null(vecc)) {
-    for (c in covariates) {
-      covariatesTerm <- covariatesTerm + betas[c] * apply(df[c], 2, mean, na.rm = TRUE)
-    }
-  } else {
-    for (i in 1:length(covariates)) {
+  for (i in 1:length(covariates)) {
       covariatesTerm <- covariatesTerm + betas[covariates[i]] * vecc[i]
     }
-  }
 
   interactionTerm <- ifelse(is.na(thetas[paste(treatment, mediator, sep = ":")]), 0 , thetas[paste(treatment, mediator, sep = ":")])
 
@@ -99,19 +72,13 @@ total_NDE_bincont <- function(betas, thetas, treatment, mediator, covariates, ve
   unname(nde)
 }
 
-
 pure_NDE_contbin <- function(betas, thetas, treatment, mediator, covariates, vecc,
                              variance, a_star, a, interaction) {
   covariatesTerm <- 0
-  if (is.null(vecc)) {
-    for (c in covariates) {
-      covariatesTerm <- covariatesTerm + betas[c] * apply(df[c], 2, mean, na.rm = TRUE)
-    }
-  } else {
-    for (i in 1:length(covariates)) {
+  for (i in 1:length(covariates)) {
       covariatesTerm <- covariatesTerm + betas[covariates[i]] * vecc[i]
     }
-  }
+
   interactionTerm <- ifelse(is.na(thetas[paste(treatment, mediator, sep = ":")]),
                             0,
                             thetas[paste(treatment, mediator, sep = ":")])
@@ -126,15 +93,10 @@ pure_NDE_contbin <- function(betas, thetas, treatment, mediator, covariates, vec
 total_NDE_contbin <- function(betas, thetas, treatment, mediator, covariates, vecc,
                               variance, a_star, a, interaction){
   covariatesTerm <- 0
-  if (is.null(vecc)) {
-    for (c in covariates) {
-      covariatesTerm <- covariatesTerm + betas[c] * apply(df[c], 2, mean, na.rm = TRUE)
-    }
-  } else {
-    for (i in 1:length(covariates)) {
+  for (i in 1:length(covariates)) {
       covariatesTerm <- covariatesTerm + betas[covariates[i]] * vecc[i]
     }
-  }
+
   interactionTerm <- ifelse(is.na(thetas[paste(treatment, mediator, sep = ":")]),
                             0, thetas[paste(treatment, mediator, sep = ":")])
 
@@ -150,15 +112,10 @@ total_NDE_contbin <- function(betas, thetas, treatment, mediator, covariates, ve
 pure_NDE_contcont <- function(betas, thetas, treatment, mediator, covariates, vecc,
                               a_star, a, interaction){
   covariatesTerm <- 0
-  if (is.null(vecc)) {
-    for (c in covariates) {
-      covariatesTerm <- covariatesTerm + betas[c] * apply(df[c], 2, mean, na.rm = TRUE)
-    }
-  } else {
-    for (i in 1:length(covariates)) {
+  for (i in 1:length(covariates)) {
       covariatesTerm <- covariatesTerm + betas[covariates[i]] * vecc[i]
     }
-  }
+
   interactionTerm <- ifelse(is.na(thetas[paste(treatment, mediator, sep = ":")]),
                             0, thetas[paste(treatment, mediator, sep = ":")])
 
@@ -170,15 +127,10 @@ pure_NDE_contcont <- function(betas, thetas, treatment, mediator, covariates, ve
 total_NDE_contcont <- function(betas, thetas, treatment, mediator, covariates, vecc,
                                a_star, a, interaction){
   covariatesTerm <- 0
-  if (is.null(vecc)) {
-    for (c in covariates) {
-      covariatesTerm <- covariatesTerm + betas[c] * apply(df[c], 2, mean, na.rm = TRUE)
-    }
-  } else {
-    for (i in 1:length(covariates)) {
+  for (i in 1:length(covariates)) {
       covariatesTerm <- covariatesTerm + betas[covariates[i]] * vecc[i]
     }
-  }
+
   interactionTerm <- ifelse(is.na(thetas[paste(treatment, mediator, sep = ":")]),
                             0, thetas[paste(treatment, mediator, sep = ":")])
 
@@ -186,10 +138,8 @@ total_NDE_contcont <- function(betas, thetas, treatment, mediator, covariates, v
   unname(nde)
 }
 
-
 pure_NDE_contcont_delta <- function(thetas, vecc, interaction = TRUE,
                                     a_star, a) {
-
   j <- length(vecc)
   k <- length(thetas)
 
@@ -221,7 +171,6 @@ pure_NDE_contcont_delta <- function(thetas, vecc, interaction = TRUE,
 
   return(as.formula(s))
 }
-
 
 total_NDE_contcont_delta <- function(thetas, vecc, interaction = TRUE,
                                      a_star, a) {
@@ -467,7 +416,6 @@ pure_NDE_binbin_delta <- function(thetas, vecc, interaction,
   return(as.formula(s))
 }
 
-
 total_NDE_binbin_delta <- function(thetas, vecc, interaction, a_star, a) {
   j <- length(vecc)
   k <- length(thetas)
@@ -535,10 +483,9 @@ total_NDE_binbin_delta <- function(thetas, vecc, interaction, a_star, a) {
   return(as.formula(s))
 }
 
-
 NDE_boot_function <- function(betas, thetas, treatment, mediator, covariates, vecc,
                               m, interaction, a_star, a, variance,
-                              mreg = "linear", yreg = "linear") {
+                              mreg, yreg) {
   if (mreg != "linear" & yreg != "linear") {
     pnde <- pure_NDE_binbin(betas = betas, thetas = thetas, treatment = treatment, mediator = mediator,
                             covariates = covariates, vecc = vecc, interaction = interaction, a_star = a_star, a = a)
@@ -566,7 +513,7 @@ NDE_boot_function <- function(betas, thetas, treatment, mediator, covariates, ve
 
 NDE_delta_function <- function(thetas, treatment, mediator, m, interaction,
                                vecc, a_star, a, variance,
-                               mreg = "linear", yreg = "linear") {
+                               mreg, yreg) {
   if (mreg != "linear" & yreg != "linear") {
     pnded <- pure_NDE_binbin_delta(thetas = thetas, vecc = vecc, interaction = interaction, a_star = a_star, a = a)
     tnded <- total_NDE_binbin_delta(thetas = thetas, vecc = vecc, interaction = interaction, a_star = a_star, a = a)
@@ -582,7 +529,6 @@ NDE_delta_function <- function(thetas, treatment, mediator, m, interaction,
   }
   return(list(pnded = pnded, tnded = tnded))
 }
-
 
 NDE_boot <- function(coef=list(), vecc = c(), m = NULL, a_star = NULL, a = NULL) {
 
@@ -617,4 +563,4 @@ NDE_delta <- function(coef=list(), vecc = c(), m = NULL, a_star = NULL, a = NULL
   return(list(se_pnde_delta=se_pnde_delta,se_tnde_delta=se_tnde_delta))
 }
 
-#NDE_delta(coef,m=1,a_star=2,a=3)
+#NDE_delta(coef1,m=1,a_star=0,a=1)

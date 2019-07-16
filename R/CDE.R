@@ -53,7 +53,7 @@ CDE_boot_function <- function(thetas, treatment, mediator, m, a_star, a, interac
   else if (mreg == "linear" & yreg == "linear")
     cde <- CDE_cont(thetas = thetas, treatment = treatment, mediator = mediator, interaction = interaction, m = m, a_star = a_star, a = a)
 
-  return(cde)
+  cde
 }
 
 CDE_delta_function <- function(thetas, treatment, mediator, m, a_star, a, interaction,
@@ -71,7 +71,7 @@ CDE_delta_function <- function(thetas, treatment, mediator, m, a_star, a, intera
   else if (mreg == "linear" & yreg == "linear")
     cded <- CDE_cont_delta(thetas = thetas, treatment = treatment, mediator = mediator, interaction = interaction, m = m, a_star = a_star, a = a)
 
-  return(cded)
+  cded
 }
 
 CDE_boot <- function(coef=list(), m = NULL, a_star = NULL, a = NULL) {
@@ -82,10 +82,12 @@ CDE_boot <- function(coef=list(), m = NULL, a_star = NULL, a = NULL) {
 
   interaction <- coef$interaction
 
-  return(CDE_boot_function(coef$thetas, treatment, mediator, m, a_star, a, interaction))
+  cde_boot <- CDE_boot_function(coef$thetas, treatment, mediator, m, a_star, a, interaction)
+
+  cde_boot
 }
 
-#CDE_boot(coef, m = 1, a_star = 0, a = 1)
+#CDE_boot(coef=coef1, m = 1, a_star = 0, a = 1)
 
 CDE_delta <- function(coef=list(), m = NULL, a_star = NULL, a = NULL) {
 
@@ -97,7 +99,7 @@ CDE_delta <- function(coef=list(), m = NULL, a_star = NULL, a = NULL) {
 
   cde_delta <- CDE_delta_function(coef$thetas, treatment, mediator, m, a_star, a, interaction)
 
-  return(msm::deltamethod(cde_delta, coef$thetas, coef$vcov_thetas))
+  msm::deltamethod(cde_delta, coef$thetas, coef$vcov_thetas)
 }
 
 #CDE_delta(coef, m = 1, a_star = 0, a = 1)

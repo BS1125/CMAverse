@@ -4,6 +4,7 @@ create_formulas <- function(outcome = NULL, treatment = NULL, mediator = NULL, c
                            yreg = c("linear", "logistic", "loglinear", "poisson","quasipoisson",
                                     "negbin", "coxph", "aft_exp", "aft_weibull")) {
 
+
   mediator_formula_basic <- paste(mediator, treatment, sep = " ~ ")
 
   outcome_formula_basic  <- paste(paste(outcome, treatment, sep = " ~ "),
@@ -43,14 +44,8 @@ create_formulas <- function(outcome = NULL, treatment = NULL, mediator = NULL, c
     outcome_formula <- paste(l[[1]][1], l[[1]][2], sep = " ~ ")
   }
 
-  formulas <- list(outcome = outcome, treatment = treatment, mediator = mediator,
-                  covariates = covariates, interaction = interaction, event = event,
-                  outcome_reg = yreg,
-                  mediator_reg = mreg,
-                  outcome_formula = outcome_formula,
+  formulas <- list(outcome_formula = outcome_formula,
                   mediator_formula = mediator_formula)
 
   return(formulas)
 }
-
-#formulas = create_formulas(outcome = "a", treatment = "b", mediator = "c", interaction = TRUE, mreg = "linear", yreg = "linear")

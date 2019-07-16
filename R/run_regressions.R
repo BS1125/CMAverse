@@ -1,30 +1,9 @@
-run_regressions <- function(formulas = NULL, data = NULL, vecc = NULL) {
-
-  outcome <- formulas$outcome
-
-  treatment <- formulas$treatment
-
-  mediator <- formulas$mediator
-
-  covariates <- formulas$covariates
-
-  interaction <- formulas$interaction
-
-  event <- formulas$event
-
-  yreg <- formulas$outcome_reg
+run_regressions <- function(formulas = NULL, outcome, treatment, mediator, covariates,
+                            interaction, event, yreg, mreg, data = NULL) {
 
   outcome_formula <- formulas$outcome_formula
 
-  mreg <- formulas$mediator_reg
-
   mediator_formula<- formulas$mediator_formula
-
-  if (is.null(covariates) & !is.null(vecc)) {
-    warning("Incompatible arguments")
-  } else if (!is.null(covariates) & is.null(vecc)) {
-    vecc <- colMeans(as.data.frame(data[, covariates]))
-  }
 
   if (yreg == "linear") {
     outcome_regression  <- lm(outcome_formula, data = data)
@@ -70,16 +49,8 @@ run_regressions <- function(formulas = NULL, data = NULL, vecc = NULL) {
     mediator_regression <- glm(mediator_formula, family = binomial(), data = data)
   }
 
-  regressions <- list(outcome = outcome, treatment = treatment, mediator = mediator,
-              covariates = covariates, interaction = interaction, event = event,
-              outcome_reg = yreg,
-              mediator_reg = mreg,
-              outcome_formula = outcome_formula,
-              mediator_formula = mediator_formula,
-              mediator_regression = mediator_regression,
+  regressions <- list(mediator_regression = mediator_regression,
               outcome_regression = outcome_regression)
 
   return(regressions)
 }
-
-#regressions = run_regressions(formulas, data)

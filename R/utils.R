@@ -1,29 +1,30 @@
-add_columns <- function(s, n) {
+function(s, n) {
   s$z <- s$estimate / (s$std.error / sqrt(n))
   s$pval <- 2 * pt(-abs(s$z), n - 1)
   return(data.frame(z = s$z, pval = s$pval))
 }
 
-format_row_boot <- function(boot.out, index = 1, conf = 0.95) {
-  ci <- boot::boot.ci(boot.out, index = index, type = "perc", conf = conf)
-  d <- cbind(as.data.frame(t(tail(ci$percent[1, ], 2))))
-  return(d)
-}
 
-format_df_boot <- function(boot.out, conf = 0.95, n = 1000) {
-  d_all <- NULL
-  for (i in 1:7) {
-    d <- format_row_boot(boot.out, i, conf = conf)
-    d_all <- rbind(d_all, d)
-  }
-  estimate <- boot.out$t0
-  bias <- apply(boot.out$t, 2, mean) - estimate
-  std.error <- apply(boot.out$t, 2, sd)
-  d_all <- cbind(estimate, bias, std.error, d_all)
+format_df_boot <- function(boot.out, conf = 0.95) {
+  CI_lower <- apply(boot.out$boot_results, 2, function(x) quantile(x, (1-conf)/2))
+
+  CI_upper <- apply(boot.out$boot_results, 2, function(x) quantile(x, conf+(1-conf)/2))
+
+  estimate <- boot.out$estimate
+
+  bias <- apply(boot.out$boot_results, 2, mean) - estimate
+
+  std.error <- apply(boot.out$boot_results, 2, sd)
+
+  d_all <- cbind(estimate, bias, std.error, CI_lower, CI_upper)
+
   label_CI <- paste0(round(conf * 100, 2), c("% CIL", "% CIU"))
+
   colnames(d_all) <- c("estimate", "bias", "std.error", label_CI[1], label_CI[2])
+
   rownames(d_all) <- c("cde", "pnde", "tnde", "pnie", "tnie", "te", "pm")
-  return(cbind(d_all, add_columns(d_all, n = n)))
+
+  return(d_all)
 }
 
 format_df_delta <- function(delta.out, conf = 0.95, n) {
