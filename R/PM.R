@@ -1,74 +1,67 @@
-proportion_mediated_boot_function <- function(pnde, tnie, te, ycont = FALSE) {
-  res <- 0
-  if (ycont) {
-    res <- tnie / (pnde + te)
+pm_function <- function(pnde, tnie, te, yreg) {
+
+  if (yreg == "linear") {
+
+    pm <- tnie / (pnde + te)
+
   } else {
-    res <-  (pnde * (tnie - 1)) / (pnde * tnie - 1)
+
+    pm <-  (pnde * (tnie - 1)) / (pnde * tnie - 1)
+
   }
-  res
+
+  return(pm)
+
 }
 
-proportion_mediated_delta_function  <- function(ycont = FALSE) {
-  res <- 0
-  if (ycont) {
-    res <- "~x2 / (x1 + x3)"
+pm_se_delta  <- function(betas, thetas, variance, vcov_block, treatment, mediator,
+                         covariates, vecc, interaction, m,  a_star, a, mreg, yreg) {
+
+  if (yreg == "linear") {
+
+    pm_formula <- as.formula("~x2 / (x1 + x3)")
+
+    pnde <- nde_function(betas, thetas, variance, vcov_block, treatment, mediator,
+                         covariates, vecc, interaction, m,  a_star, a, mreg, yreg)["pnde"]
+
+    tnie <- nie_function(betas, thetas, treatment, mediator, covariates, vecc,
+                         m, interaction, a_star, a, mreg, yreg)["tnie"]
+
+    te <- te_function(pnde, tnie, yreg)
+
   } else {
-    res <-  "~(x1 * (x2 - 1)) / (x1 * x2 - 1)"
+
+    pm_formula <-  as.formula("~(x1 * (x2 - 1)) / (x1 * x2 - 1)")
+
+    pnde <- nde_function(betas, thetas, variance, vcov_block, treatment, mediator,
+                         covariates, vecc, interaction, m,  a_star, a, mreg, yreg)["ORpnde"]
+
+    tnie <- nie_function(betas, thetas, treatment, mediator, covariates, vecc,
+                         m, interaction, a_star, a, mreg, yreg)["ORtnie"]
+
+    te <- te_function(pnde, tnie, yreg)
+
+    pm <- pm_function(pnde, tnie, te, yreg)
+
   }
-  as.formula(res)
+
+
+  pnde_se_delta <- nde_se_delta(thetas, betas, vcov_block, treatment, mediator, interaction,
+                                m, vecc, a_star, a, variance, mreg, yreg)["pnde_se_delta"]
+
+  tnie_se_delta <- nie_se_delta(thetas, betas, vcov_block, treatment, mediator, m, vecc, interaction,
+                                a_star, a, mreg, yreg)["tnie_se_delta"]
+
+  te_se_delta <- te_se_delta(betas, thetas, variance, vcov_block, treatment, mediator,
+                             covariates, vecc, interaction, m,  a_star, a, mreg, yreg)
+
+  pm_se_delta <- msm::deltamethod(pm_formula, c(pnde, tnie, te),
+                                  Matrix::bdiag(pnde_se_delta^2, tnie_se_delta^2, te_se_delta^2))
+
+  return(c(pm_se_delta = pm_se_delta))
+
 }
 
-
-proportion_mediated_boot = function(coef = list(), vecc = c(), m = NULL, a_star = NULL, a = NULL) {
-
-  treatment = coef$treatment
-  mediator = coef$mediator
-  covariates = coef$covariates
-  interaction = coef$interaction
-  yreg <- coef$outcome_reg
-  mreg <- coef$mediator_reg
-
-  nde_boot <- NDE_boot(coef, vecc, m, a_star, a)
-
-  nie_boot <- NIE_boot(coef, vecc, m, a_star, a)
-
-  te_boot <- total_effect_boot(coef, vecc, m, a_star, a)
-
-  pm_boot <- proportion_mediated_boot_function(nde_boot$pnde, nie_boot$tnie, te_boot,
-                                               ycont = (yreg == "linear"))
-
-  pm_boot
-}
-
-#proportion_mediated_boot(coef, m = 1, a_star = 2, a = 3)
-
-proportion_mediated_delta = function(coef, vecc = c(), m = NULL, a_star = NULL, a = NULL) {
-
-  treatment = coef$treatment
-  mediator = coef$mediator
-  covariates = coef$covariates
-  interaction = coef$interaction
-  yreg <- coef$outcome_reg
-  mreg <- coef$mediator_reg
-
-  nde_boot <- NDE_boot(coef, vecc, m, a_star, a)
-
-  nie_boot <- NIE_boot(coef, vecc, m, a_star, a)
-
-  te_boot <- total_effect_boot(coef, vecc, m, a_star, a)
-
-  se_pnde_delta <- NDE_delta(coef = coef, vecc = vecc, m = m, a_star = a_star, a = a)$se_pnde_delta
-
-  se_tnie_delta <- NIE_delta(coef = coef, vecc = vecc, m = m, a_star = a_star, a = a)$se_tnie_delta
-
-  se_te_delta <- total_effect_delta(coef = coef, vecc = vecc, m = m, a_star = a_star, a = a)
-
-  pm_delta <- proportion_mediated_delta_function(ycont = (yreg == "linear"))
-
-  se_pm_delta <- msm::deltamethod(pm_delta, c(nde_boot$pnde, nie_boot$tnie, te_boot),
-                                  Matrix::bdiag(se_pnde_delta^2, se_tnie_delta^2, se_te_delta^2))
-
-  se_pm_delta
-}
-
-#proportion_mediated_delta(coef = coef, m = 1, a_star = 2, a = 3)
+pm_se_delta(thetas=coef1$thetas, betas=coef1$betas,variance=coef1$variance,vcov_block=coef1$vcov_block,
+            treatment, mediator,
+            covariates, vecc, interaction, m,  a_star, a, mreg, yreg)

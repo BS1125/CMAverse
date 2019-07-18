@@ -1,7 +1,7 @@
 nde_function <- function(betas, thetas, variance, vcov_block, treatment, mediator,
                          covariates, vecc, interaction, m,  a_star, a, mreg, yreg) {
 
-  covariatesTerm <- sum(betas[covariates]*t(vecc))
+  covariatesTerm <- ifelse(!is.null(vecc), sum(betas[covariates]*t(vecc)), 0)
 
   interactionTerm <- ifelse(interaction, thetas[paste(treatment, mediator, sep = ":")], 0)
 
@@ -154,16 +154,17 @@ nde_se_delta <- function(thetas, betas, vcov_block, treatment, mediator, interac
 
       } else { pnde_formula <- tnde_formula <- paste0(" ~ x2 * (a - a_star)") }
 
-      pnde_formula <- stringr::str_replace_all(pnde_formula,
-                                             pattern = c("\\ba_star\\b" = as.character(a_star),
-                                                         "\\ba\\b" = as.character(a)))
-
-      tnde_formula <- stringr::str_replace_all(tnde_formula,
-                                               pattern = c("\\ba_star\\b" = as.character(a_star),
-                                                           "\\ba\\b" = as.character(a)))
     }
 
+  pnde_formula <- stringr::str_replace_all(pnde_formula,
+                                           pattern = c("\\ba_star\\b" = as.character(a_star),
+                                                       "\\ba\\b" = as.character(a)))
 
+  tnde_formula <- stringr::str_replace_all(tnde_formula,
+                                           pattern = c("\\ba_star\\b" = as.character(a_star),
+                                                       "\\ba\\b" = as.character(a)))
+
+ if (j>0) {
   for (i in 1:j) {
 
         pnde_formula <- stringr::str_replace_all(pnde_formula,
@@ -172,7 +173,8 @@ nde_se_delta <- function(thetas, betas, vcov_block, treatment, mediator, interac
         tnde_formula <- stringr::str_replace_all(tnde_formula,
                                                  paste("vecc", i, sep = "_"), as.character(vecc[i]))
 
-      }
+  }
+ }
 
       pnde_formula <- as.formula(pnde_formula)
 

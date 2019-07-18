@@ -1,69 +1,58 @@
-total_effect_boot_function <- function(pnde, tnie, ycont = FALSE) {
-  res <- 0
-  if (ycont) {
-    res <- tnie + pnde
+te_function <- function(pnde, tnie, yreg) {
+
+  if (yreg == "linear") {
+
+    te <- tnie + pnde
+
+    return(c(te = te))
+
   } else {
-    res <- tnie * pnde
+
+    ORte <- tnie * pnde
+
+    return(c(ORte = ORte))
   }
-  res
 }
 
 
-total_effect_delta_function <- function(ycont = FALSE) {
-  res <- 0
-  if (ycont) {
-    res <- "~x1 + x2"
+te_se_delta <- function(betas, thetas, variance, vcov_block, treatment, mediator,
+                        covariates, vecc, interaction, m,  a_star, a, mreg, yreg) {
+
+  if (yreg == "linear") {
+
+    te_formula <- as.formula("~x1 + x2")
+
+    pnde <- nde_function(betas, thetas, variance, vcov_block, treatment, mediator,
+                         covariates, vecc, interaction, m,  a_star, a, mreg, yreg)["pnde"]
+
+    tnie <- nie_function(betas, thetas, treatment, mediator, covariates, vecc,
+                         m, interaction, a_star, a, mreg, yreg)["tnie"]
+
   } else {
-    res <- "~x1 * x2"
+
+    te_formula <- as.formula("~x1 * x2")
+
+    pnde <- nde_function(betas, thetas, variance, vcov_block, treatment, mediator,
+                         covariates, vecc, interaction, m,  a_star, a, mreg, yreg)["ORpnde"]
+
+    tnie <- nie_function(betas, thetas, treatment, mediator, covariates, vecc = vecc,
+                         m, interaction, a_star, a, mreg, yreg)["ORtnie"]
+
   }
-  as.formula(res)
-}
 
+  se_pnde_delta <- nde_se_delta(thetas, betas, vcov_block, treatment, mediator, interaction,
+                                m, vecc, a_star, a, variance, mreg, yreg)["pnde_se_delta"]
 
-total_effect_boot = function(coef = list(), vecc = c(), m = NULL, a_star = NULL, a = NULL) {
+  se_tnie_delta <- nie_se_delta(thetas, betas, vcov_block, treatment, mediator, m, vecc, interaction,
+                                a_star, a, mreg, yreg)["tnie_se_delta"]
 
-  treatment <- coef$treatment
-  mediator <- coef$mediator
-  covariates <- coef$covariates
-  interaction <- coef$interaction
-  yreg <- coef$outcome_reg
-  mreg <- coef$mediator_reg
-
-
-  nde_boot <- NDE_boot(coef, vecc, m, a_star, a)
-
-  nie_boot <- NIE_boot(coef, vecc, m, a_star, a)
-
-  te_boot <- total_effect_boot_function(nde_boot$pnde, nie_boot$tnie, ycont = (yreg == "linear"))
-
-  return(te_boot)
-}
-
-#total_effect_boot(coef, m = 1, a_star = 2, a = 3)
-
-total_effect_delta = function(coef = list(), vecc = c(), m = NULL, a_star = NULL, a = NULL) {
-
-  treatment <- coef$treatment
-  mediator <- coef$mediator
-  covariates <- coef$covariates
-  interaction <- coef$interaction
-  yreg <- coef$outcome_reg
-  mreg <- coef$mediator_reg
-
-  nde_boot <- NDE_boot(coef, vecc, m, a_star, a)
-
-  nie_boot <- NIE_boot(coef, vecc, m, a_star, a)
-
-  se_pnde_delta <- NDE_delta(coef = coef, vecc = vecc, m = m, a_star = a_star, a = a)$se_pnde_delta
-
-  se_tnie_delta <- NIE_delta(coef = coef, vecc = vecc, m = m, a_star = a_star, a = a)$se_tnie_delta
-
-  te_delta <- total_effect_delta_function(ycont = (yreg == "linear"))
-
-  se_te_delta <- msm::deltamethod(te_delta, c(nde_boot$pnde, nie_boot$tnie),
+  te_se_delta <- msm::deltamethod(te_formula, c(pnde, tnie),
                                   Matrix::bdiag(se_pnde_delta^2, se_tnie_delta^2))
 
-  return(se_te_delta)
+  return(c(te_se_delta = te_se_delta))
 }
 
-#total_effect_delta(coef, m = 1, a_star = 2, a = 3)
+
+te_se_delta(thetas=coef1$thetas, betas=coef1$betas,variance=coef1$variance,vcov_block=coef1$vcov_block,
+            treatment, mediator,
+            covariates, vecc, interaction, m,  a_star, a, mreg, yreg)
