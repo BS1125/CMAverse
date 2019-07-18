@@ -26,37 +26,39 @@ decomp_4way_step <- function(data, outcome, treatment, mediator, covariates, vec
 
   betas <- coef1$betas
 
+  theta_interaction <- ifelse(interaction, thetas[paste(treatment, mediator, sep = ":")], 0)
+
   if (yreg == "linear") {
 
     if (mreg == "linear") {
 
-      cde <- unname((thetas[treatment]+thetas[paste(treatment, mediator, sep = ":")]*m)*(a-a_star))
+      cde <- unname((thetas[treatment]+theta_interaction*m)*(a-a_star))
 
-      intref <- unname(thetas[paste(treatment, mediator, sep = ":")]*
+      intref <- unname(theta_interaction*
         (betas['(Intercept)']+betas[treatment]*a_star+sum(betas[covariates]*t(vecc))-m)*(a-a_star))
 
-      intmed <- unname(thetas[paste(treatment, mediator, sep = ":")]*betas[treatment]*(a-a_star)^2)
+      intmed <- unname(theta_interaction*betas[treatment]*(a-a_star)^2)
 
       pie <- unname((thetas[mediator]*betas[treatment]+
-              thetas[paste(treatment, mediator, sep = ":")]*betas[treatment]*a_star)*(a-a_star))
+              theta_interaction*betas[treatment]*a_star)*(a-a_star))
 
     }
 
     else if (mreg=="logistic") {
 
-      cde <- unname((thetas[treatment]+thetas[paste(treatment, mediator, sep = ":")]*m)*(a-a_star))
+      cde <- unname((thetas[treatment]+theta_interaction*m)*(a-a_star))
 
-      intref <- unname(thetas[paste(treatment, mediator, sep = ":")]*(a-a_star)*
+      intref <- unname(theta_interaction*(a-a_star)*
         (exp(betas['(Intercept)']+betas[treatment]*a_star+sum(betas[covariates]*t(vecc)))/
-           (1+exp(betas['(Intercept)']+betas[treatment]*a_star+sum(betas[covariates]*t(vecc)))) - m))
+        (1+exp(betas['(Intercept)']+betas[treatment]*a_star+sum(betas[covariates]*t(vecc)))) - m))
 
-      intmed <- unname(thetas[paste(treatment, mediator, sep = ":")]*(a-a_star)*
+      intmed <- unname(theta_interaction*(a-a_star)*
                    (exp(betas['(Intercept)']+betas[treatment]*a+sum(betas[covariates]*t(vecc)))/
                     (1+exp(betas['(Intercept)']+betas[treatment]*a+sum(betas[covariates]*t(vecc)))) -
                       exp(betas['(Intercept)']+betas[treatment]*a_star+sum(betas[covariates]*t(vecc)))/
                       (1+exp(exp(betas['(Intercept)']+betas[treatment]*a_star+sum(betas[covariates]*t(vecc)))))))
 
-      pie <- unname((thetas[mediator]+thetas[paste(treatment, mediator, sep = ":")]*a_star)*
+      pie <- unname((thetas[mediator]+theta_interaction*a_star)*
                 (exp(betas['(Intercept)']+betas[treatment]*a+sum(betas[covariates]*t(vecc)))/
                    (1+exp(betas['(Intercept)']+betas[treatment]*a+sum(betas[covariates]*t(vecc)))) -
                    exp(betas['(Intercept)']+betas[treatment]*a_star+sum(betas[covariates]*t(vecc)))/
@@ -95,118 +97,118 @@ decomp_4way_step <- function(data, outcome, treatment, mediator, covariates, vec
 
     if (mreg=="linear") {
       cde_comp <- unname(exp(thetas[treatment]*(a-a_star)+thetas[mediator]*m+
-                   thetas[paste(treatment, mediator, sep = ":")]*a*m-
-                  (thetas[mediator]+thetas[paste(treatment, mediator, sep = ":")]*a_star)*
+                   theta_interaction*a*m-
+                  (thetas[mediator]+theta_interaction*a_star)*
                   (betas['(Intercept)']+betas[treatment]*a_star+sum(betas[covariates]*t(vecc)))-
-                   0.5*(thetas[mediator]+thetas[paste(treatment, mediator, sep = ":")]*a_star)^2*
-                   coef$variance)-exp(thetas[mediator]*m+thetas[paste(treatment, mediator, sep = ":")]*
-                   a_star*m-(thetas[mediator]+thetas[paste(treatment, mediator, sep = ":")]*a_star)*
+                   0.5*(thetas[mediator]+theta_interaction*a_star)^2*
+                   coef$variance)-exp(thetas[mediator]*m+theta_interaction*
+                   a_star*m-(thetas[mediator]+theta_interaction*a_star)*
                    (betas['(Intercept)']+betas[treatment]*a_star+sum(betas[covariates]*t(vecc)))-
-                   0.5*(thetas[mediator]+thetas[paste(treatment, mediator, sep = ":")]*a_star)^2*
+                   0.5*(thetas[mediator]+theta_interaction*a_star)^2*
                    coef$variance))
 
-      intref_comp <- unname(exp((thetas[treatment]+thetas[paste(treatment, mediator, sep = ":")]*
+      intref_comp <- unname(exp((thetas[treatment]+theta_interaction*
                      (betas['(Intercept)']+betas[treatment]*a_star+sum(betas[covariates]*t(vecc))+
                       thetas[mediator]*coef$variance))*(a-a_star)+
-                      0.5*thetas[paste(treatment, mediator, sep = ":")]^2*coef$variance*(a^2-a_star^2))-1-
+                      0.5*theta_interaction^2*coef$variance*(a^2-a_star^2))-1-
                       exp(thetas[treatment]*(a-a_star)+thetas[mediator]*m+
-                      thetas[paste(treatment, mediator, sep = ":")]*a*m-
-                      (thetas[mediator]+thetas[paste(treatment, mediator, sep = ":")]*a_star)*
+                      theta_interaction*a*m-
+                      (thetas[mediator]+theta_interaction*a_star)*
                       (betas['(Intercept)']+betas[treatment]*a_star+sum(betas[covariates]*t(vecc)))-
-                      0.5*(thetas[mediator]+thetas[paste(treatment, mediator, sep = ":")]*a_star)^2*
-                      coef$variance)+exp(thetas[mediator]*m+thetas[paste(treatment, mediator, sep = ":")]*
-                      a_star*m-(thetas[mediator]+thetas[paste(treatment, mediator, sep = ":")]*a_star)*
+                      0.5*(thetas[mediator]+theta_interaction*a_star)^2*
+                      coef$variance)+exp(thetas[mediator]*m+theta_interaction*
+                      a_star*m-(thetas[mediator]+theta_interaction*a_star)*
                       (betas['(Intercept)']+betas[treatment]*a_star+sum(betas[covariates]*t(vecc)))-
-                      0.5*(thetas[mediator]+thetas[paste(treatment, mediator, sep = ":")]*a_star)^2*
+                      0.5*(thetas[mediator]+theta_interaction*a_star)^2*
                       coef$variance))
 
       intmed_comp <- unname(exp((thetas[treatment]+thetas[mediator]*betas[treatment]+
-                     thetas[paste(treatment, mediator, sep = ":")]*(betas['(Intercept)']+
+                     theta_interaction*(betas['(Intercept)']+
                      betas[treatment]*a_star+betas[treatment]*a+sum(betas[covariates]*t(vecc))+
                      thetas[mediator]*coef$variance))*(a-a_star)+
-                     0.5*thetas[paste(treatment, mediator, sep = ":")]^2*coef$variance*(a^2-a_star^2))-
-                     exp((thetas[mediator]*betas[treatment]+thetas[paste(treatment, mediator, sep = ":")]*
+                     0.5*theta_interaction^2*coef$variance*(a^2-a_star^2))-
+                     exp((thetas[mediator]*betas[treatment]+theta_interaction*
                      betas[treatment]*a_star)*(a-a_star))-exp((thetas[treatment]+
-                     thetas[paste(treatment, mediator, sep = ":")]*(betas['(Intercept)']+
+                     theta_interaction*(betas['(Intercept)']+
                      betas[treatment]*a_star+sum(betas[covariates]*t(vecc))+thetas[mediator]*coef$variance))*
-                     (a-a_star)+0.5*thetas[paste(treatment, mediator, sep = ":")]^2*
+                     (a-a_star)+0.5*theta_interaction^2*
                      coef$variance*(a^2-a_star^2))+1)
 
-      pie_comp <- unname(exp((thetas[mediator]*betas[treatment]+thetas[paste(treatment, mediator, sep = ":")]*
+      pie_comp <- unname(exp((thetas[mediator]*betas[treatment]+theta_interaction*
                           betas[treatment]*a_star)*(a-a_star))-1)
 
       tcomp <- cde_comp+intref_comp+intmed_comp+pie_comp
 
-      total_rr <- unname(exp((thetas[treatment]+thetas[paste(treatment, mediator, sep = ":")]*
+      total_rr <- unname(exp((thetas[treatment]+theta_interaction*
                (betas['(Intercept)']+betas[treatment]*a_star+sum(betas[covariates]*t(vecc))+
                 thetas[mediator]*coef$variance))*(a-a_star)+
-                0.5*thetas[paste(treatment, mediator, sep = ":")]^2*coef$variance*(a^2-a_star^2))*
-                exp((thetas[mediator]*betas[treatment]+thetas[paste(treatment, mediator, sep = ":")]*
+                0.5*theta_interaction^2*coef$variance*(a^2-a_star^2))*
+                exp((thetas[mediator]*betas[treatment]+theta_interaction*
                 betas[treatment]*a)*(a-a_star)))
      }
 
     else if (mreg=="logistic") {
 
       cde_comp <- unname((exp(thetas[treatment]*(a-a_star)+thetas[mediator]*m+
-                  thetas[paste(treatment, mediator, sep = ":")]*a*m)*(1+exp(betas['(Intercept)']+
+                  theta_interaction*a*m)*(1+exp(betas['(Intercept)']+
                   betas[treatment]*a_star+sum(betas[covariates]*t(vecc))))/(1+exp(betas['(Intercept)']+
                   betas[treatment]*a_star+sum(betas[covariates]*t(vecc))+thetas[mediator]+
-                  thetas[paste(treatment, mediator, sep = ":")]*a_star))-exp(thetas[mediator]*m+
-                  thetas[paste(treatment, mediator, sep = ":")]*a_star*m)*(1+exp(betas['(Intercept)']+
+                  theta_interaction*a_star))-exp(thetas[mediator]*m+
+                  theta_interaction*a_star*m)*(1+exp(betas['(Intercept)']+
                   betas[treatment]*a_star+sum(betas[covariates]*t(vecc))))/(1+exp(betas['(Intercept)']+
                   betas[treatment]*a_star+sum(betas[covariates]*t(vecc))+thetas[mediator]+
-                  thetas[paste(treatment, mediator, sep = ":")]*a_star))))
+                  theta_interaction*a_star))))
 
       intref_comp <- unname(exp(thetas[treatment]*(a-a_star))*(1+exp(betas['(Intercept)']+
                      betas[treatment]*a_star+sum(betas[covariates]*t(vecc))+thetas[mediator]+
-                     thetas[paste(treatment, mediator, sep = ":")]*a))/(1+exp(betas['(Intercept)']+
+                     theta_interaction*a))/(1+exp(betas['(Intercept)']+
                      betas[treatment]*a_star+sum(betas[covariates]*t(vecc))+thetas[mediator]+
-                     thetas[paste(treatment, mediator, sep = ":")]*a_star))-1-exp(thetas[treatment]*(a-a_star)+
-                     thetas[mediator]*m+thetas[paste(treatment, mediator, sep = ":")]*a*m)*(1+
+                     theta_interaction*a_star))-1-exp(thetas[treatment]*(a-a_star)+
+                     thetas[mediator]*m+theta_interaction*a*m)*(1+
                      exp(betas['(Intercept)']+betas[treatment]*a_star+sum(betas[covariates]*t(vecc))))*
-                     exp((thetas[treatment]+thetas[paste(treatment, mediator, sep = ":")]*m)*(a-a_star))/
+                     exp((thetas[treatment]+theta_interaction*m)*(a-a_star))/
                      (1+exp(betas['(Intercept)']+betas[treatment]*a_star+
                      sum(betas[covariates]*t(vecc))+thetas[mediator]+
-                     thetas[paste(treatment, mediator, sep = ":")]*a_star))+exp(thetas[mediator]*m+
-                     thetas[paste(treatment, mediator, sep = ":")]*a_star*m)*(1+exp(betas['(Intercept)']+
+                     theta_interaction*a_star))+exp(thetas[mediator]*m+
+                     theta_interaction*a_star*m)*(1+exp(betas['(Intercept)']+
                      betas[treatment]*a_star+sum(betas[covariates]*t(vecc))))/(1+exp(betas['(Intercept)']+
                      betas[treatment]*a_star+sum(betas[covariates]*t(vecc))+thetas[mediator]+
-                     thetas[paste(treatment, mediator, sep = ":")]*a_star)))
+                     theta_interaction*a_star)))
 
       intmed_comp <- unname(exp(thetas[treatment]*(a-a_star))*(1+exp(betas['(Intercept)']+betas[treatment]*a+
                      sum(betas[covariates]*t(vecc))+thetas[mediator]+
-                     thetas[paste(treatment, mediator, sep = ":")]*a))*(1+exp(betas['(Intercept)']+
+                     theta_interaction*a))*(1+exp(betas['(Intercept)']+
                      betas[treatment]*a_star+sum(betas[covariates]*t(vecc))))/((1+exp(betas['(Intercept)']+
                      betas[treatment]*a_star+sum(betas[covariates]*t(vecc))+thetas[mediator]+
-                     thetas[paste(treatment, mediator, sep = ":")]*a_star))*(1+exp(betas['(Intercept)']+
+                     theta_interaction*a_star))*(1+exp(betas['(Intercept)']+
                      betas[treatment]*a+sum(betas[covariates]*t(vecc)))))-(1+exp(betas['(Intercept)']+
                      betas[treatment]*a+sum(betas[covariates]*t(vecc))+thetas[mediator]+
-                     thetas[paste(treatment, mediator, sep = ":")]*a_star))*(1+exp(betas['(Intercept)']+
+                     theta_interaction*a_star))*(1+exp(betas['(Intercept)']+
                      betas[treatment]*a_star+sum(betas[covariates]*t(vecc))))/((1+exp(betas['(Intercept)']+
                      betas[treatment]*a_star+sum(betas[covariates]*t(vecc))+thetas[mediator]+
-                     thetas[paste(treatment, mediator, sep = ":")]*a_star))*(1+exp(betas['(Intercept)']+
+                     theta_interaction*a_star))*(1+exp(betas['(Intercept)']+
                      betas[treatment]*a+sum(betas[covariates]*t(vecc)))))-exp(thetas[treatment]*(a-a_star))*(1+
                      exp(betas['(Intercept)']+betas[treatment]*a_star+sum(betas[covariates]*t(vecc))+
-                     thetas[mediator]+thetas[paste(treatment, mediator, sep = ":")]*a))/(1+
+                     thetas[mediator]+theta_interaction*a))/(1+
                      exp(betas['(Intercept)']+betas[treatment]*a_star+sum(betas[covariates]*t(vecc))+
-                     thetas[mediator]+thetas[paste(treatment, mediator, sep = ":")]*a_star))+1)
+                     thetas[mediator]+theta_interaction*a_star))+1)
 
       pie_comp <- unname((1+exp(betas['(Intercept)']+betas[treatment]*a_star+sum(betas[covariates]*t(vecc))))*(1+
                    exp(betas['(Intercept)']+betas[treatment]*a+sum(betas[covariates]*t(vecc))+thetas[mediator]+
-                   thetas[paste(treatment, mediator, sep = ":")]*a_star))/((1+exp(betas['(Intercept)']+
+                   theta_interaction*a_star))/((1+exp(betas['(Intercept)']+
                    betas[treatment]*a+sum(betas[covariates]*t(vecc))))*(1+exp(betas['(Intercept)']+
                    betas[treatment]*a_star+sum(betas[covariates]*t(vecc))+thetas[mediator]+
-                   thetas[paste(treatment, mediator, sep = ":")]*a_star)))-1)
+                   theta_interaction*a_star)))-1)
 
       tcomp <- cde_comp+intref_comp+intmed_comp+pie_comp
 
       total_rr <- unname(exp(thetas[treatment]*a)*(1+exp(betas['(Intercept)']+betas[treatment]*a_star+
                   sum(betas[covariates]*t(vecc))))*(1+exp(betas['(Intercept)']+betas[treatment]*a+
                   sum(betas[covariates]*t(vecc))+thetas[mediator]+
-                  thetas[paste(treatment, mediator, sep = ":")]*a))/(exp(thetas[treatment]*a_star)*(1+
+                  theta_interaction*a))/(exp(thetas[treatment]*a_star)*(1+
                   exp(betas['(Intercept)']+betas[treatment]*a+sum(betas[covariates]*t(vecc))))*(1+
                   exp(betas['(Intercept)']+betas[treatment]*a_star+sum(betas[covariates]*t(vecc))+
-                  thetas[mediator]+thetas[paste(treatment, mediator, sep = ":")]*a_star))))
+                  thetas[mediator]+theta_interaction*a_star))))
        }
 
       total_err <- total_rr-1

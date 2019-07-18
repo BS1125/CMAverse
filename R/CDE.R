@@ -1,105 +1,47 @@
-CDE_bin <- function(thetas, treatment, mediator, m, a_star, a, interaction) {
+cde_function <- function(thetas, treatment, mediator, interaction, m, a_star, a, yreg) {
 
-  ORcde <- exp(thetas[treatment] + ifelse(interaction, thetas[paste(treatment, mediator, sep = ":")] * m, 0) * (a - a_star))
+  if (yreg != "linear")
+    cde <- unname(exp(thetas[treatment] + ifelse(interaction,
+           thetas[paste(treatment, mediator, sep = ":")] * m, 0) * (a - a_star)))
 
-  unname(ORcde)
+  else if (yreg == "linear")
+    cde <- unname((thetas[treatment] + ifelse(interaction,
+           thetas[paste(treatment, mediator, sep = ":")] * m, 0)) * (a - a_star))
+
+  return(cde)
+
 }
 
-CDE_cont <- function(thetas, treatment, mediator, m, a_star, a, interaction) {
 
-  cde <- (thetas[treatment] + ifelse(interaction, thetas[paste(treatment, mediator, sep = ":")] * m, 0)) * (a - a_star)
+cde_se_delta <- function(thetas, vcov_thetas, treatment, mediator, m, a_star, a, interaction,
+                         yreg ) {
 
-  unname(cde)
+  if (yreg != "linear")
+    cde_formula <- as.formula(stringr::str_replace_all(
+      ifelse(interaction,
+             paste0("~ exp((x2 + x", length(thetas), " * m) * (a - a_star))"),
+             paste0(" ~exp(x2 * (a - a_star))")),
+      pattern = c("\\ba_star\\b" = as.character(a_star),
+                  "\\ba\\b" = as.character(a),
+                  "\\bm\\b" = as.character(m))))
+
+  else if (yreg == "linear")
+    cde_formula <- as.formula(stringr::str_replace_all(
+      ifelse(interaction,
+             paste0("~ (x2 + x", length(thetas), " * m) * (a - a_star)"),
+             paste0(" ~ x2 * (a - a_star)")),
+      pattern = c("\\ba_star\\b" = as.character(a_star),
+                  "\\ba\\b" = as.character(a),
+                  "\\bm\\b" = as.character(m))))
+
+  cde_se_delta <- msm::deltamethod(cde_formula, thetas, vcov_thetas)
+
+  return(cde_se_delta)
+
 }
 
-CDE_bin_delta <- function(thetas, treatment, mediator, m, a_star, a, interaction) {
+cde_se_delta(thetas=coef1$thetas, vcov_thetas=coef1$vcov_thetas,treatment, mediator, interaction,
+             m, a_star, a, yreg)
 
-  s <- ifelse(interaction,
-              paste0("~ exp((x2 + x", length(thetas), " * m) * (a - a_star))"),
-              paste0(" ~exp(x2 * (a - a_star))"))
-
-  s <- stringr::str_replace_all(s, pattern = c("\\ba_star\\b" = as.character(a_star),
-                                               "\\ba\\b" = as.character(a),
-                                               "\\bm\\b" = as.character(m)))
-
-  return(as.formula(s))
-}
-
-CDE_cont_delta <- function(thetas, treatment, mediator, m, a_star, a, interaction) {
-
-  s <- ifelse(interaction,
-              paste0("~ (x2 + x", length(thetas), " * m) * (a - a_star)"),
-              paste0(" ~ x2 * (a - a_star)"))
-
-  s <- stringr::str_replace_all(s, pattern = c("\\ba_star\\b" = as.character(a_star),
-                                               "\\ba\\b" = as.character(a),
-                                               "\\bm\\b" = as.character(m)))
-
-  return(as.formula(s))
-}
-
-CDE_boot_function <- function(thetas, treatment, mediator, m, a_star, a, interaction,
-                              mreg = "linear", yreg = "linear") {
-
-  if (mreg != "linear" & yreg != "linear")
-    cde <- CDE_bin(thetas = thetas, treatment = treatment, mediator = mediator, interaction = interaction, m = m, a_star = a_star, a = a)
-
-  else if (mreg != "linear" & yreg == "linear")
-    cde <- CDE_cont(thetas = thetas, treatment = treatment, mediator = mediator, interaction = interaction, m = m, a_star = a_star, a = a)
-
-  else if (mreg == "linear" & yreg != "linear")
-    cde <- CDE_bin(thetas = thetas, treatment = treatment, mediator = mediator, interaction = interaction, m = m, a_star = a_star, a = a)
-
-  else if (mreg == "linear" & yreg == "linear")
-    cde <- CDE_cont(thetas = thetas, treatment = treatment, mediator = mediator, interaction = interaction, m = m, a_star = a_star, a = a)
-
-  cde
-}
-
-CDE_delta_function <- function(thetas, treatment, mediator, m, a_star, a, interaction,
-                               mreg = "linear", yreg = "linear") {
-
-  if (mreg != "linear" & yreg != "linear")
-    cded <- CDE_bin_delta(thetas = thetas, treatment = treatment, mediator = mediator, interaction = interaction, m = m, a_star = a_star, a = a)
-
-  else if (mreg != "linear" & yreg == "linear")
-    cded <- CDE_cont_delta(thetas = thetas, treatment = treatment, mediator = mediator, interaction = interaction, m = m, a_star = a_star, a = a)
-
-  else if (mreg == "linear" & yreg != "linear")
-    cded <- CDE_bin_delta(thetas = thetas, treatment = treatment, mediator = mediator, interaction = interaction, m = m, a_star = a_star, a = a)
-
-  else if (mreg == "linear" & yreg == "linear")
-    cded <- CDE_cont_delta(thetas = thetas, treatment = treatment, mediator = mediator, interaction = interaction, m = m, a_star = a_star, a = a)
-
-  cded
-}
-
-CDE_boot <- function(coef=list(), m = NULL, a_star = NULL, a = NULL) {
-
-  treatment <- coef$treatment
-
-  mediator <- coef$mediator
-
-  interaction <- coef$interaction
-
-  cde_boot <- CDE_boot_function(coef$thetas, treatment, mediator, m, a_star, a, interaction)
-
-  cde_boot
-}
-
-#CDE_boot(coef=coef1, m = 1, a_star = 0, a = 1)
-
-CDE_delta <- function(coef=list(), m = NULL, a_star = NULL, a = NULL) {
-
-  treatment <- coef$treatment
-
-  mediator <- coef$mediator
-
-  interaction <- coef$interaction
-
-  cde_delta <- CDE_delta_function(coef$thetas, treatment, mediator, m, a_star, a, interaction)
-
-  msm::deltamethod(cde_delta, coef$thetas, coef$vcov_thetas)
-}
-
-#CDE_delta(coef, m = 1, a_star = 0, a = 1)
+cde_function(thetas=coef1$thetas, treatment, mediator, interaction,
+            m, a_star, a, yreg)
