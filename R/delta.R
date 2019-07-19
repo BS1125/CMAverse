@@ -1,43 +1,65 @@
 delta <- function(coef = NULL, vecc = c(), m = NULL, a_star = NULL, a = NULL) {
 
-  cde_boot <- CDE_boot(coef = coef, m = m, a_star = a_star, a = a)
+  betas <- coef$betas
 
-  nde_boot <- NDE_boot(coef = coef, vecc = vecc, m = m, a_star = a_star, a = a)
+  thetas <- coef$thetas
 
-  nie_boot <- NIE_boot(coef = coef, vecc = vecc, m = m, a_star = a_star, a = a)
+  variance <- coef$variance
 
-  te_boot <- total_effect_boot(coef = coef, vecc = vecc, m = m, a_star = a_star, a = a)
+  vcov_block <- coef$vcov_block
 
-  nde_delta <- NDE_delta(coef = coef, vecc = vecc, m = m, a_star = a_star, a = a)
+  treatment <- coef$treatment
 
-  nie_delta <- NIE_delta(coef = coef, vecc = vecc, m = m, a_star = a_star, a = a)
+  mediator <- coef$mediator
 
-  te_delta <- total_effect_delta(coef = coef, vecc = vecc, m = m, a_star = a_star, a = a)
+  covariates <- coef$covariates
 
-  cde_delta <- CDE_delta(coef = coef, m = m, a_star = a_star, a = a)
+  interaction <- coef$interaction
 
-  pm_boot <- proportion_mediated_boot(coef = coef, vecc = vecc, m = m, a_star = a_star, a = a)
+  mreg <- coef$mediator_reg
 
-  pm_delta <- proportion_mediated_delta(coef = coef,vecc = vecc, m = m, a_star = a_star, a = a)
+  yreg <- coef$outcome_reg
 
-  out <- list( cded = cde_boot, se_cded = cde_delta,
-               pnde = nde_boot$pnde, se_pnde = nde_delta$se_pnde_delta,
-               tnde = nde_boot$tnde, se_tnde = nie_delta$se_pnie_delta,
-               pnie = nie_boot$pnie, se_pnie = nie_delta$se_pnie_delta,
-               tnie = nie_boot$tnie, se_tnie = nie_delta$se_tnie_delta,
-               te = te_boot, se_te = te_delta,
-               pm = pm_boot, se_pm = pm_delta)
+  cde <- cde_function(thetas, treatment, mediator, interaction, m, a_star, a, yreg)
 
-  class(out) <- "delta_out"
+  nde <- nde_function(betas, thetas, variance, vcov_block, treatment, mediator,
+                      covariates, vecc, interaction, m,  a_star, a, mreg, yreg)
+
+  nie <- nie_function(betas, thetas, treatment, mediator, covariates, vecc = vecc,
+                      m, interaction, a_star, a, mreg, yreg)
+
+  te <- te_function(betas, thetas, variance, vcov_block, treatment, mediator,
+                    covariates, vecc, interaction, m,  a_star, a, mreg, yreg)
+
+  pm <- pm_function(betas, thetas, variance, vcov_block, treatment, mediator,
+                    covariates, vecc, interaction, m,  a_star, a, mreg, yreg)
+
+  se_cde <- cde_se_delta(thetas, vcov_thetas, treatment, mediator, m, a_star, a,
+                            interaction, yreg)
+
+  se_nde <- nde_se_delta(thetas, betas, vcov_block, treatment, mediator, interaction,
+                            m, vecc, a_star, a, variance, mreg, yreg)
+
+  se_nie <- nie_se_delta(thetas, betas, vcov_block, treatment, mediator, m, vecc, interaction,
+                         a_star, a, mreg, yreg)
+
+  se_te <- te_se_delta(betas, thetas, variance, vcov_block, treatment, mediator,
+                                 covariates, vecc, interaction, m,  a_star, a, mreg, yreg)
+
+  se_pm <- pm_se_delta(betas, thetas, variance, vcov_block, treatment, mediator,
+                             covariates, vecc, interaction, m,  a_star, a, mreg, yreg)
+
+  out <- list(cde = cde, se_cde = se_cde,
+           pnde = nde$pnde, se_pnde = se_nde$pnde_se_delta,
+           tnde = nde$tnde, se_tnde = se_nde$tnde_se_delta,
+           pnie = nie$pnie, se_pnie = se_nie$pnie_se_delta,
+           tnie = nie$tnie, se_tnie = se_nie$tnie_se_delta,
+           te = te, se_te = se_te,
+           pm = pm, se_pm = se_pm)
 
   return(out)
-}
-
-#try=delta(coef = coef, m = 1, a_star = 2, a = 3)
-
-print.delta_out <- function(delta_out, digits = 2, conf = 0.95) {
-
-  printCoefmat(format_df_delta(delta_out, conf = conf, n = nrow(data)),
-               digits = digits, has.Pvalue = TRUE)
 
 }
+
+#try=delta(coef = coef1, vecc=c(1,1,1),m = 1, a_star = 0, a = 1)
+

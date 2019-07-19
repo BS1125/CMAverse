@@ -23,14 +23,27 @@ causal_mediation <- function(data, outcome, treatment, mediator, covariates, vec
                    mediator = mediator, covariates = covariates, interaction = interaction,
                    event = event, mreg = mreg, yreg = yreg)
 
+  n=nrow(data)
+
   if (type == "delta") {
-    effect_estimate <- delta(coef = coef, vecc = vecc, m = m, a_star = a_star, a = a)
+
+    effect_estimate <- format_df_delta(delta(coef = coef, vecc = vecc, m = m, a_star = a_star, a = a),
+                                       conf = conf, n = n, yreg  = yreg)
+
+    class(effect_estimate)=c("delta_out","data.frame")
+
   }else if (type == "bootstrap") {
-    effect_estimate <- bootstrap(formulas = formulas, outcome = outcome, treatment = treatment,
+
+    effect_estimate <- format_df_boot(bootstrap(formulas = formulas, outcome = outcome, treatment = treatment,
                                  mediator = mediator, covariates = covariates, interaction = interaction,
                                  event = event, mreg = mreg, yreg = yreg, data = data,
                                  nboot = nboot, vecc = vecc,
-                                 m = m, a_star = a_star, a = a)}
+                                 m = m, a_star = a_star, a = a),
+                                 conf = conf, n = n, yreg  = yreg)
+
+    class(effect_estimate)=c("boot_out","data.frame")
+
+    }
 
 
 

@@ -1,5 +1,5 @@
 nde_function <- function(betas, thetas, variance, vcov_block, treatment, mediator,
-                         covariates, vecc, interaction, m,  a_star, a, mreg, yreg) {
+                         covariates, vecc, interaction, a_star, a, mreg, yreg) {
 
   covariatesTerm <- ifelse(!is.null(vecc), sum(betas[covariates]*t(vecc)), 0)
 
@@ -7,17 +7,15 @@ nde_function <- function(betas, thetas, variance, vcov_block, treatment, mediato
 
   if (mreg != "linear" & yreg != "linear") {
 
-    ORpnde <- unname((exp(thetas[treatment] * (a - a_star)) * (1 + exp(thetas[mediator] +
+    pnde <- unname((exp(thetas[treatment] * (a - a_star)) * (1 + exp(thetas[mediator] +
                       interactionTerm * a + betas[1] + betas[treatment] * a_star +
                       covariatesTerm))) /(1 + exp(thetas[mediator] + interactionTerm * a_star +
                       betas[1] + betas[treatment] * a_star + covariatesTerm)))
 
-    ORtnde <- unname((exp(thetas[treatment] * (a - a_star)) * (1 + exp(thetas[mediator] +
+    tnde <- unname((exp(thetas[treatment] * (a - a_star)) * (1 + exp(thetas[mediator] +
                       interactionTerm * a + betas[1] + betas[treatment] * a + covariatesTerm))) /
                      (1 + exp(thetas[mediator] + interactionTerm * a_star +  betas[1] +
                       betas[treatment] * a + covariatesTerm)))
-
-    return(c(ORpnde = ORpnde, ORtnde = ORtnde))
 
   } else if (mreg != "linear" & yreg == "linear") {
 
@@ -34,16 +32,14 @@ nde_function <- function(betas, thetas, variance, vcov_block, treatment, mediato
 
     } else if (mreg == "linear" & yreg != "linear") {
 
-    ORpnde <- unname(exp((thetas[treatment] + interactionTerm * (betas[1] + betas[treatment] * a_star +
+    pnde <- unname(exp((thetas[treatment] + interactionTerm * (betas[1] + betas[treatment] * a_star +
                         covariatesTerm + thetas[mediator]  * variance)) * (a - a_star) +
                         0.5 * interactionTerm ^ 2 * variance * (a^2 - a_star ^ 2)))
 
 
-    ORtnde <- unname(exp((thetas[treatment] + interactionTerm * (betas[1] + betas[treatment] * a +
+    tnde <- unname(exp((thetas[treatment] + interactionTerm * (betas[1] + betas[treatment] * a +
                         covariatesTerm + thetas[mediator]  * variance)) * (a - a_star) +
                         0.5 * interactionTerm ^ 2 * variance * (a^2 - a_star ^ 2)))
-
-    return(c(ORpnde = ORpnde, ORtnde = ORtnde))
 
     } else if (mreg == "linear" & yreg == "linear") {
 
@@ -54,14 +50,15 @@ nde_function <- function(betas, thetas, variance, vcov_block, treatment, mediato
     tnde <- unname((thetas[treatment] + interactionTerm * (betas[1] + betas[treatment] * a +
                                                              covariatesTerm))*(a - a_star))
 
-    return(c(pnde = pnde, tnde = tnde))
+    }
 
-  }
+  return(list(pnde = pnde, tnde = tnde))
+
 }
 
 
 nde_se_delta <- function(thetas, betas, vcov_block, treatment, mediator, interaction,
-                         m, vecc, a_star, a, variance, mreg, yreg) {
+                         vecc, a_star, a, variance, mreg, yreg) {
 
   j <- length(vecc)
   k <- length(thetas)
@@ -184,9 +181,9 @@ nde_se_delta <- function(thetas, betas, vcov_block, treatment, mediator, interac
 
       tnde_se_delta<- msm::deltamethod(tnde_formula, c(thetas, betas), vcov_block)
 
-      return(c(pnde_se_delta = pnde_se_delta, tnde_se_delta = tnde_se_delta))
+      return(list(pnde_se_delta = pnde_se_delta, tnde_se_delta = tnde_se_delta))
 
 }
 
-#nde_se_delta(thetas=coef1$thetas, betas=coef1$betas,vcov_block=coef1$vcov_block,treatment, mediator, interaction,
-#            m, vecc, a_star, a, variance, mreg, yreg)
+nde_se_delta(thetas=coef1$thetas, betas=coef1$betas,vcov_block=coef1$vcov_block,treatment, mediator, interaction,
+            vecc, a_star, a, variance, mreg, yreg)
