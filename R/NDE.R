@@ -155,11 +155,13 @@ nde_se_delta <- function(thetas, betas, vcov_block, treatment, mediator, interac
 
   pnde_formula <- stringr::str_replace_all(pnde_formula,
                                            pattern = c("\\ba_star\\b" = as.character(a_star),
-                                                       "\\ba\\b" = as.character(a)))
+                                                       "\\ba\\b" = as.character(a),
+                                                       "\\bvariance\\b" = as.character(variance)))
 
   tnde_formula <- stringr::str_replace_all(tnde_formula,
                                            pattern = c("\\ba_star\\b" = as.character(a_star),
-                                                       "\\ba\\b" = as.character(a)))
+                                                       "\\ba\\b" = as.character(a),
+                                                       "\\bvariance\\b" = as.character(variance)))
 
  if (j>0) {
   for (i in 1:j) {

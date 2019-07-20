@@ -23,7 +23,7 @@ cde_se_delta <- function(thetas, vcov_thetas, treatment, mediator, m_star, a_sta
              paste0(" ~exp(x2 * (a - a_star))")),
       pattern = c("\\ba_star\\b" = as.character(a_star),
                   "\\ba\\b" = as.character(a),
-                  "\\bm\\b" = as.character(m_star))))
+                  "\\bm_star\\b" = as.character(m_star))))
 
   else if (yreg == "linear")
     cde_formula <- as.formula(stringr::str_replace_all(
@@ -32,7 +32,7 @@ cde_se_delta <- function(thetas, vcov_thetas, treatment, mediator, m_star, a_sta
              paste0(" ~ x2 * (a - a_star)")),
       pattern = c("\\ba_star\\b" = as.character(a_star),
                   "\\ba\\b" = as.character(a),
-                  "\\bm\\b" = as.character(m_star))))
+                  "\\bm_star\\b" = as.character(m_star))))
 
   cde_se_delta <- msm::deltamethod(cde_formula, thetas, vcov_thetas)
 
