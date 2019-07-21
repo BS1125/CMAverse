@@ -148,6 +148,10 @@ get_coef <- function(regressions = NULL, outcome, treatment, mediator, covariate
 
 z_p <- function(s, n, nway, yreg) {
 
+  z <- NULL
+
+  pval <- NULL
+
   if (nway == 3) {
 
     if (yreg == "linear") {
@@ -158,7 +162,9 @@ z_p <- function(s, n, nway, yreg) {
 
       } else {
 
-      z <- (s$estimate-1) / s$std.error
+      z[1:6] <- (s$estimate[1:6]-1) / s$std.error[1:6]
+
+      z[7] <- s$estimate[7] / s$std.error[7]
 
       pval <- 2 * pt(-abs(z), n - 1)
 
