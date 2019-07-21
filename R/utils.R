@@ -146,21 +146,30 @@ get_coef <- function(regressions = NULL, outcome, treatment, mediator, covariate
 }
 
 
-z_p <- function(s, n, yreg) {
+z_p <- function(s, n, nway, yreg) {
 
-  if (yreg == "linear") {
+  if (nway == 3) {
 
-  z <- s$estimate / s$std.error
+    if (yreg == "linear") {
 
-  pval <- 2 * pt(-abs(z), n - 1)
+      z <- s$estimate / s$std.error
 
-  } else {
+      pval <- 2 * pt(-abs(z), n - 1)
 
-    z <- (s$estimate-1) / s$std.error
+      } else {
 
-    pval <- 2 * pt(-abs(z), n - 1)
+      z <- (s$estimate-1) / s$std.error
 
-  }
+      pval <- 2 * pt(-abs(z), n - 1)
+
+      }
+    } else if (nway == 4) {
+
+        z <- s$estimate / s$std.error
+
+        pval <- 2 * pt(-abs(z), n - 1)
+
+        }
 
   return(data.frame(z = z, pval = pval))
 
@@ -173,11 +182,11 @@ format_row_boot <- function(boot.out, index = 1, conf = 0.95) {
 }
 
 
-format_df_boot <- function(boot.out, conf = 0.95, n, yreg) {
+format_df_boot <- function(boot.out, conf = 0.95, n, nway, yreg) {
 
   d_all <- NULL
 
-  for (i in 1:7) {
+  for (i in 1:length(boot.out$t0)) {
 
     d <- format_row_boot(boot.out, i, conf = conf)
 
@@ -193,20 +202,20 @@ format_df_boot <- function(boot.out, conf = 0.95, n, yreg) {
 
   d_all <- cbind(estimate, bias, std.error, d_all)
 
+  rownames(d_all) <- names(boot.out$t0)
+
   label_CI <- paste0(round(conf * 100, 2), c("% CIL", "% CIU"))
 
   colnames(d_all) <- c("estimate", "bias", "std.error", label_CI[1], label_CI[2])
 
-  if (yreg == "linear") { rownames(d_all) <- c("cde", "pnde", "tnde", "pnie", "tnie", "te", "pm")
-  } else { rownames(d_all) <- c("ORcde", "ORpnde", "ORtnde", "ORpnie", "ORtnie", "ORte", "ORpm") }
 
-  return(cbind(d_all, z_p(d_all, n = n, yreg = yreg)))
+  return(cbind(d_all, z_p(d_all, n = n, nway = nway, yreg = yreg)))
 
 }
 
-format_df_delta <- function(delta.out, conf = 0.95, n, yreg) {
+format_df_delta <- function(delta.out, conf = 0.95, n, nway, yreg) {
 
-  d_all <- data.frame(matrix(NA, 7, 4))
+  d_all <- data.frame(matrix(NA, length(delta.out)/2, 4))
 
   alpha <- (1 - conf) / 2
 
@@ -216,40 +225,17 @@ format_df_delta <- function(delta.out, conf = 0.95, n, yreg) {
 
   colnames(d_all) <- c("estimate", "std.error", label_CI[1], label_CI[2])
 
-  rownames(d_all) <- c("cde", "pnde", "tnde", "pnie", "tnie", "te", "pm")
+  rownames(d_all) <- names(delta.out)[2*(1:(length(delta.out)/2))-1]
 
-  d_all["cde", ] <- c(delta.out$cde, delta.out$se_cde,
-                      delta.out$cde - z * delta.out$se_cde,
-                      delta.out$cde + z * delta.out$se_cde)
+  for (name in rownames(d_all)) {
 
-  d_all["pnde", ] <- c(delta.out$pnde, delta.out$se_pnde,
-                       delta.out$pnde - z * delta.out$se_pnde,
-                       delta.out$pnde + z * delta.out$se_pnde)
+    d_all[name, ] <- c(unname(delta.out[name]), unname(delta.out[stringr::str_c(name,"se_delta",sep="_")]),
+                       unname(delta.out[name]-z*delta.out[stringr::str_c(name,"se_delta",sep="_")]),
+                       unname(delta.out[name]+z*delta.out[stringr::str_c(name,"se_delta",sep="_")]))
 
-  d_all["tnde", ] <- c(delta.out$tnde, delta.out$se_tnde,
-                       delta.out$tnde - z * delta.out$se_tnde,
-                       delta.out$tnde + z * delta.out$se_tnde)
+  }
 
-  d_all["pnie", ] <- c(delta.out$pnie, delta.out$se_pnie,
-                       delta.out$pnie - z * delta.out$se_pnie,
-                       delta.out$pnie + z * delta.out$se_pnie)
-
-  d_all["tnie", ] <- c(delta.out$tnie, delta.out$se_tnie,
-                       delta.out$tnie - z * delta.out$se_tnie,
-                       delta.out$tnie + z * delta.out$se_tnie)
-
-  d_all["te", ] <- c(delta.out$te, delta.out$se_te,
-                     delta.out$te - z * delta.out$se_te,
-                     delta.out$te + z * delta.out$se_te)
-
-  d_all["pm", ] <- c(delta.out$pm, delta.out$se_pm,
-                     delta.out$pm - z * delta.out$se_pm,
-                     delta.out$pm + z * delta.out$se_pm)
-
-  if (yreg == "linear") { rownames(d_all) <- c("cde", "pnde", "tnde", "pnie", "tnie", "te", "pm")
-   } else { rownames(d_all) <- c("ORcde", "ORpnde", "ORtnde", "ORpnie", "ORtnie", "ORte", "ORpm") }
-
-  return(cbind(d_all, z_p(d_all, n = n, yreg = yreg)))
+  return(cbind(d_all, z_p(d_all, n = n, nway = nway, yreg = yreg)))
 
 }
 
