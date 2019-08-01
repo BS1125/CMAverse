@@ -792,9 +792,7 @@ causal_mediation <- function(data, nway = c(3,4), method = c("delta", "bootstrap
      mdesign_a_star <- as.matrix(cbind(data.frame(intercept = rep(1,n),treatment = c(rep(a_star,n))),
                                          data[,covariates]))
 
-     if (yreg != "coxph") {
-
-       thetas_sim <- as.matrix(mvtnorm::rmvnorm(nsims, mean = thetas, sigma = vcov_thetas))
+     thetas_sim <- as.matrix(mvtnorm::rmvnorm(nsims, mean = thetas, sigma = vcov_thetas))
 
        betas_sim <- as.matrix(mvtnorm::rmvnorm(nsims, mean = betas, sigma = vcov_betas))
 
@@ -886,23 +884,8 @@ causal_mediation <- function(data, nway = c(3,4), method = c("delta", "bootstrap
 
          }
 
-         if (yreg == "negbin") {
-
-           y0m <- regressions$outcome_regression$theta^2/exp(y0m)
-
-           y1m <- regressions$outcome_regression$theta^2/exp(y1m)
-
-           y00 <- regressions$outcome_regression$theta^2/exp(y00)
-
-           y01 <- regressions$outcome_regression$theta^2/exp(y01)
-
-           y10 <- regressions$outcome_regression$theta^2/exp(y10)
-
-           y11 <- regressions$outcome_regression$theta^2/exp(y11)
-
-         }
-
-         if (yreg %in% c("loglinear", "poisson", "quasipoisson", "aft_exp", "aft_weibull")) {
+         if (yreg %in% c("loglinear", "poisson", "quasipoisson", "negbin",
+                         "coxph", "aft_exp", "aft_weibull")) {
 
            y0m <- exp(y0m)
 
@@ -918,100 +901,205 @@ causal_mediation <- function(data, nway = c(3,4), method = c("delta", "bootstrap
 
          }
 
-         cde_sim <- c(cde_sim, sum(y1m-y0m)/n)
+         EY0m_sim <- c(EY0m_sim, sum(y0m)/n)
 
-         pnde_sim <- c(pnde_sim, sum(y10-y00)/(n*nsims))
+         EY1m_sim <- c(EY1m_sim, sum(y1m)/n)
 
-         tnie_sim <- c(tnie_sim, sum(y11-y10)/(n*nsims))
+         EY00_sim <- c(EY00_sim, sum(y00)/(n*nsims))
 
-         tnde_sim <- c(tnde_sim, sum(y11-y01)/(n*nsims))
+         EY10_sim <- c(EY10_sim, sum(y10)/(n*nsims))
 
-         pnie_sim <- c(pnie_sim, sum(y01-y00)/(n*nsims))
+         EY01_sim <- c(EY01_sim, sum(y01)/(n*nsims))
+
+         EY11_sim <- c(EY11_sim, sum(y11)/(n*nsims))
 
        }
-     }
 
-    if (yreg == "coxph") {
+       if (yreg == "linear") {
 
-      stop("Unsupported outcome model")
+         cde_sim <- EY1m_sim - EY0m_sim
 
-      }
+         pnde_sim <- EY10_sim - EY00_sim
 
+         tnie_sim <- EY11_sim - EY10_sim
 
-      te_sim <- tnie_sim + pnde_sim
+         tnde_sim <- EY11_sim - EY01_sim
 
-      pm_sim <- tnie_sim / (pnde_sim + te_sim)
+         pnie_sim <- EY01_sim - EY00_sim
 
-      intref_sim <- pnde_sim - cde_sim
+         te_sim <- tnie_sim + pnde_sim
 
-      intmed_sim <- tnie_sim - pnie_sim
+         pm_sim <- tnie_sim / (pnde_sim + te_sim)
 
-      cde_prop_sim <- cde_sim/te_sim
+         intref_sim <- pnde_sim - cde_sim
 
-      intref_prop_sim <- intref_sim/te_sim
+         intmed_sim <- tnie_sim - pnie_sim
 
-      intmed_prop_sim <- intmed_sim/te_sim
+         cde_prop_sim <- cde_sim/te_sim
 
-      pie_prop_sim <- pnie_sim/te_sim
+         intref_prop_sim <- intref_sim/te_sim
 
-      overall_pm_sim <- (pie_sim + intmed_sim)/te_sim
+         intmed_prop_sim <- intmed_sim/te_sim
 
-      overall_int_sim <- (intref_sim + intmed_sim)/te_sim
+         pie_prop_sim <- pnie_sim/te_sim
 
-      overall_pe_sim <- (intref_sim + intmed_sim + pie_sim)/te_sim
+         overall_pm_sim <- (pie_sim + intmed_sim)/te_sim
 
-      for (effect in c("cde", "pnde", "tnde", "pnie", "tnie", "te", "pm", "intref", "intmed",
-                       "cde_prop", "intref_prop", "intmed_prop", "pie_prop",
-                       "overall_pm", "overall_int", "overall_pe")) {
+         overall_int_sim <- (intref_sim + intmed_sim)/te_sim
 
-        mid <- mean(get(paste0(effect, "_sim")))
+         overall_pe_sim <- (intref_sim + intmed_sim + pie_sim)/te_sim
 
-        assign(effect, mid)
+         for (effect in c("cde", "pnde", "tnde", "pnie", "tnie", "te", "pm", "intref", "intmed",
+                          "cde_prop", "intref_prop", "intmed_prop", "pie_prop",
+                          "overall_pm", "overall_int", "overall_pe")) {
 
-      }
+           mid <- mean(get(paste0(effect, "_sim")))
 
-      for (effect_se in c("cde_se", "pnde_se", "tnde_se", "pnie_se", "tnie_se", "te_se", "pm_se",
-                          "intref_se", "intmed_se", "cde_prop_se", "intref_prop_se",
-                          "intmed_prop_se", "pie_prop_se", "overall_pm_se",
-                          "overall_int_se", "overall_pe_se")) {
+           assign(effect, mid)
 
-        mid <- sd(get(stringr::str_replace(effect_se, "_se", "_sim")))
+         }
 
-        assign(effect_se, mid)
+         for (effect_se in c("cde_se", "pnde_se", "tnde_se", "pnie_se", "tnie_se", "te_se", "pm_se",
+                             "intref_se", "intmed_se", "cde_prop_se", "intref_prop_se",
+                             "intmed_prop_se", "pie_prop_se", "overall_pm_se",
+                             "overall_int_se", "overall_pe_se")) {
 
-      }
+           mid <- sd(get(stringr::str_replace(effect_se, "_se", "_sim")))
 
-      decomp3way <-  c(cde = cde, cde_se = cde_se,
-                     pnde = pnde, pnde_se = pnde_se,
-                     tnde = tnde, tnde_se = tnde_se,
-                     pnie = pnie, pnie_se = pnie_se,
-                     tnie = tnie, tnie_se = tnie_se,
-                     te = te, te_se = te_se,
-                     pm = pm, pm_se = pm_se)
+           assign(effect_se, mid)
 
-      class(decomp3way) <- c("simulation_out", "data.frame")
+         }
 
-      decomp4way <-  c(cde = cde, cde_se = cde_se, intref = intref, intref_se = intref_se,
-                     intmed = intmed, intmed_se = intmed_se, pie = pnie, pie_se = pnie_se,
-                     te = te, te_se = te_se, cde_prop = cde_prop, cde_prop_se = cde_prop_se,
-                     intref_prop = intref_prop, intref_prop_se = intref_prop_se,
-                     intmed_prop = intmed_prop, intmed_prop_se = intmed_prop_se,
-                     pie_prop = pie_prop, pie_prop_se = pie_prop_se,
-                     overall_pm = overall_pm, overall_pm_se = overall_pm_se,
-                     overall_int = overall_int, overall_int_se = overall_int_se,
-                     overall_pe = overall_pe, overall_pe_se = overall_pe_se)
+         decomp3way <-  c(cde = cde, cde_se = cde_se,
+                          pnde = pnde, pnde_se = pnde_se,
+                          tnde = tnde, tnde_se = tnde_se,
+                          pnie = pnie, pnie_se = pnie_se,
+                          tnie = tnie, tnie_se = tnie_se,
+                          te = te, te_se = te_se,
+                          pm = pm, pm_se = pm_se)
 
-      class(decomp4way) <- c("simulation_out", "data.frame")
+         decomp4way <-  c(cde = cde, cde_se = cde_se, intref = intref, intref_se = intref_se,
+                          intmed = intmed, intmed_se = intmed_se, pie = pnie, pie_se = pnie_se,
+                          te = te, te_se = te_se, cde_prop = cde_prop, cde_prop_se = cde_prop_se,
+                          intref_prop = intref_prop, intref_prop_se = intref_prop_se,
+                          intmed_prop = intmed_prop, intmed_prop_se = intmed_prop_se,
+                          pie_prop = pie_prop, pie_prop_se = pie_prop_se,
+                          overall_pm = overall_pm, overall_pm_se = overall_pm_se,
+                          overall_int = overall_int, overall_int_se = overall_int_se,
+                          overall_pe = overall_pe, overall_pe_se = overall_pe_se)
 
-      out <- list(decomp3way = decomp3way, decomp4way = decomp4way,
-               sims = data.frame(cde = cde_sim, pnde = pnde_sim, tnde = tnde_sim,
-                                 pnie = pnie_sim, tnie = tnie_sim))
+         class(decomp3way) <- c("simulation_out", "data.frame")
+
+         class(decomp4way) <- c("simulation_out", "data.frame")
+
+         out <- list(decomp3way = decomp3way, decomp4way = decomp4way,
+                     sims = data.frame(cde = cde_sim, pnde = pnde_sim, tnde = tnde_sim,
+                                       pnie = pnie_sim, tnie = tnie_sim, intref = intref_sim,
+                                       intmed = intmed_sim, pie_sim = pnie_sim))
+
+       }
+
+       if (yreg != "linear") {
+
+         cde_sim <- EY1m_sim/EY0m_sim
+
+         pnde_sim <- EY10_sim/EY00_sim
+
+         tnie_sim <- EY11_sim/EY10_sim
+
+         tnde_sim <- EY11_sim/EY01_sim
+
+         pnie_sim <- EY01_sim/EY00_sim
+
+         te_sim <- tnie_sim * pnde_sim
+
+         pm_sim <- (pnde_sim * (tnie_sim - 1)) / (pnde_sim * tnie_sim - 1)
+
+         cde_err_sim <- (EY1m_sim-EY0m_sim)/EY00_sim
+
+         intref_err_sim <- pnde_sim - 1 - cde_comp_sim
+
+         intmed_err_sim <- tnie_sim * pnde_sim - pnde_sim - pnie_sim + 1
+
+         pie_err_sim <- pnie_sim - 1
+
+         total_err_sim <- EY11_sim / EY00_sim - 1
+
+         cde_prop_sim <- cde_err_sim/total_err_sim
+
+         intmed_prop_sim <- intmed_err_sim/total_err_sim
+
+         intref_prop_sim <- intref_err_sim/total_err_sim
+
+         pie_prop_sim <- pie_err_sim/total_err_sim
+
+         overall_pm_sim <- (pie_err_sim+intmed_err_sim)/total_err_sim
+
+         overall_int_sim <- (intref_err_sim+intmed_err_sim)/total_err_sim
+
+         overall_pe_sim <- (intref_err_sim+intmed_err_sim+pie_err_sim)/total_err_sim
+
+         for (effect in c("cde", "pnde", "tnde", "pnie", "tnie", "te", "pm", "cde_err",
+                          "intref_err", "intmed_err", "pie_err", "total_err",
+                          "cde_prop", "intref_prop", "intmed_prop", "pie_prop",
+                          "overall_pm", "overall_int", "overall_pe")) {
+
+           mid <- mean(get(paste0(effect, "_sim")))
+
+           assign(effect, mid)
+
+         }
+
+         for (effect_se in c("cde_se", "pnde_se", "tnde_se", "pnie_se", "tnie_se", "te_se",
+                             "pm_se", "cde_err_se", "intref_err_se", "intmed_err_se", "pie_err_se",
+                             "total_err_se", "cde_prop_se", "intref_prop_se", "intmed_prop_se",
+                             "pie_prop_se", "overall_pm_se", "overall_int_se", "overall_pe_se")) {
+
+           mid <- sd(get(stringr::str_replace(effect_se, "_se", "_sim")))
+
+           assign(effect_se, mid)
+
+         }
+
+         decomp3way <-  c(cde = cde, cde_se = cde_se,
+                          pnde = pnde, pnde_se = pnde_se,
+                          tnde = tnde, tnde_se = tnde_se,
+                          pnie = pnie, pnie_se = pnie_se,
+                          tnie = tnie, tnie_se = tnie_se,
+                          te = te, te_se = te_se,
+                          pm = pm, pm_se = pm_se)
+
+         decomp4way <-  c(cde_err = cde_err, cde_err_se = cde_err_se, intref_err = intref_err,
+                          intref_err_se = intref_err_se, intmed_err = intmed_err,
+                          intmed_err_se = intmed_err_se, pie_err = pie_err, pie_err_se = pie_err_se,
+                          total_err = total_err, total_err_se = total_err_se,
+                          cde_prop = cde_prop, cde_prop_se = cde_prop_se,
+                          intref_prop = intref_prop, intref_prop_se = intref_prop_se,
+                          intmed_prop = intmed_prop, intmed_prop_se = intmed_prop_se,
+                          pie_prop = pie_prop, pie_prop_se = pie_prop_se,
+                          overall_pm = overall_pm, overall_pm_se = overall_pm_se,
+                          overall_int = overall_int, overall_int_se = overall_int_se,
+                          overall_pe = overall_pe, overall_pe_se = overall_pe_se)
+
+         class(decomp3way) <- c("simulation_out", "data.frame")
+
+         class(decomp4way) <- c("simulation_out", "data.frame")
+
+         out <- list(decomp3way = decomp3way, decomp4way = decomp4way,
+                     sims = data.frame(cde = cde_sim, pnde = pnde_sim, tnde = tnde_sim,
+                                       pnie = pnie_sim, tnie = tnie_sim,
+                                       cde_err_sim = cde_err_sim, intref_err_sim = intref_err_sim,
+                                       intmed_err_sim = intmed_err_sim, pie_err_sim = pie_err_sim))
+
+         }
+       }
+
+   return(out)
 
   }
 
-  return(out)
 
-}
+
 
 
 
