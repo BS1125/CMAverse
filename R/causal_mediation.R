@@ -1,5 +1,6 @@
-causal_mediation <- function(data, nway = c(3,4), method = c("delta", "bootstrap", "simulation"),
-                             nboot = 100, conf = 0.95, outcome, treatment, mediator, covariates,
+causal_mediation <- function(data, method = c("delta", "bootstrap", "simulation"),
+                             nboot = 100, conf = 0.95, nsims = 1000,
+                             outcome, treatment, mediator, covariates,
                              vecc = NULL, interaction = TRUE, event = NULL,
                              m_star = 0, a_star = 1, a = 0,
                              mreg = c("linear", "logistic"),
@@ -18,7 +19,7 @@ causal_mediation <- function(data, nway = c(3,4), method = c("delta", "bootstrap
 
   regressions <- run_regressions(formulas = formulas, outcome = outcome, treatment = treatment,
                                  mediator = mediator, covariates = covariates, interaction = interaction,
-                                 event = event, mreg = mreg, yreg = yreg, data = data_boot)
+                                 event = event, mreg = mreg, yreg = yreg, data = data)
 
   coef <- get_coef(regressions = regressions, outcome = outcome, treatment = treatment,
                    mediator = mediator, covariates = covariates, interaction = interaction,
@@ -230,27 +231,27 @@ causal_mediation <- function(data, nway = c(3,4), method = c("delta", "bootstrap
                                          Matrix::bdiag(intref_se^2, intmed_se^2, pie_se^2, te_se^2))
 
       # 3 way decomposition effects and se's
-      decomp3way <-  c(cde = effect_estimates["cde"], cde_se = cde_se,
-                       pnde = effect_estimates["pnde"], pnde_se = pnde_se,
-                       tnde = effect_estimates["tnde"], tnde_se = tnde_se,
-                       pnie = effect_estimates["pnie"], pnie_se = pnie_se,
-                       tnie = effect_estimates["tnie"], tnie_se = tnie_se,
-                       te = effect_estimates["te"], te_se = te_se,
-                       pm = effect_estimates["pm"], pm_se = pm_se)
+      decomp3way <-  c(cde = unname(effect_estimates["cde"]), cde_se = cde_se,
+                       pnde = unname(effect_estimates["pnde"]), pnde_se = pnde_se,
+                       tnde = unname(effect_estimates["tnde"]), tnde_se = tnde_se,
+                       pnie = unname(effect_estimates["pnie"]), pnie_se = pnie_se,
+                       tnie = unname(effect_estimates["tnie"]), tnie_se = tnie_se,
+                       te = unname(effect_estimates["te"]), te_se = te_se,
+                       pm = unname(effect_estimates["pm"]), pm_se = pm_se)
 
       # 4 way decomposition effects and se's
-      decomp4way <-  c(cde = effect_estimates["cde"], cde_se = cde_se,
-                       intref = effect_estimates["intref"], intref_se = intref_se,
-                       intmed = effect_estimates["intmed"], intmed_se = intmed_se,
-                       pie = effect_estimates["pie"], pie_se = pie_se,
-                       te = effect_estimates["te"], te_se = te_se,
-                       cde_prop = effect_estimates["cde_prop"], cde_prop_se = cde_prop_se,
-                       intref_prop = effect_estimates["intref_prop"], intref_prop_se = intref_prop_se,
-                       intmed_prop = effect_estimates["intmed_prop"], intmed_prop_se = intmed_prop_se,
-                       pie_prop = effect_estimates["pie_prop"], pie_prop_se = pie_prop_se,
-                       overall_pm = effect_estimates["overall_pm"], overall_pm_se = overall_pm_se,
-                       overall_int = effect_estimates["overall_int"], overall_int_se = overall_int_se,
-                       overall_pe = effect_estimates["overall_pe"], overall_pe_se = overall_pe_se)
+      decomp4way <-  c(cde = unname(effect_estimates["cde"]), cde_se = cde_se,
+                       intref = unname(effect_estimates["intref"]), intref_se = intref_se,
+                       intmed = unname(effect_estimates["intmed"]), intmed_se = intmed_se,
+                       pie = unname(effect_estimates["pie"]), pie_se = pie_se,
+                       te = unname(effect_estimates["te"]), te_se = te_se,
+                       cde_prop = unname(effect_estimates["cde_prop"]), cde_prop_se = cde_prop_se,
+                       intref_prop = unname(effect_estimates["intref_prop"]), intref_prop_se = intref_prop_se,
+                       intmed_prop = unname(effect_estimates["intmed_prop"]), intmed_prop_se = intmed_prop_se,
+                       pie_prop = unname(effect_estimates["pie_prop"]), pie_prop_se = pie_prop_se,
+                       overall_pm = unname(effect_estimates["overall_pm"]), overall_pm_se = overall_pm_se,
+                       overall_int = unname(effect_estimates["overall_int"]), overall_int_se = overall_int_se,
+                       overall_pe = unname(effect_estimates["overall_pe"]), overall_pe_se = overall_pe_se)
 
     } else if  (yreg %in% c("logistic", "loglinear", "poisson", "quasipoisson",
                             "negbin", "coxph", "aft_exp", "aft_weibull")) {
@@ -428,22 +429,22 @@ causal_mediation <- function(data, nway = c(3,4), method = c("delta", "bootstrap
                                                               effect_estimates["pnie_rr"]),
                                     Matrix::bdiag(tnie_rr_se^2, pnde_rr_se^2, pnie_rr_se^2))
 
-      cde_prop_formula <- intmed_prop_formula <- intref_prop_formula <-
-        pie_prop_formula <- as.formula("~x1/x2")
+      cde_err_prop_formula <- intmed_err_prop_formula <- intref_err_prop_formula <-
+        pie_err_prop_formula <- as.formula("~x1/x2")
 
-      cde_prop_se <- msm::deltamethod(cde_prop_formula, c(effect_estimates["cde_err"],
+      cde_err_prop_se <- msm::deltamethod(cde_err_prop_formula, c(effect_estimates["cde_err"],
                                                           effect_estimates["total_err"]),
                                       Matrix::bdiag(cde_err_se^2, total_err_se^2))
 
-      intmed_prop_se <- msm::deltamethod(intmed_prop_formula, c(effect_estimates["intmed_err"],
+      intmed_err_prop_se <- msm::deltamethod(intmed_err_prop_formula, c(effect_estimates["intmed_err"],
                                                           effect_estimates["total_err"]),
                                       Matrix::bdiag(intmed_err_se^2, total_err_se^2))
 
-      intref_prop_se <- msm::deltamethod(intref_prop_formula, c(effect_estimates["intref_err"],
+      intref_err_prop_se <- msm::deltamethod(intref_err_prop_formula, c(effect_estimates["intref_err"],
                                                           effect_estimates["total_err"]),
                                       Matrix::bdiag(intref_err_se^2, total_err_se^2))
 
-      pie_prop_se <- msm::deltamethod(pie_prop_formula, c(effect_estimates["pie_err"],
+      pie_err_prop_se <- msm::deltamethod(pie_err_prop_formula, c(effect_estimates["pie_err"],
                                                           effect_estimates["total_err"]),
                                       Matrix::bdiag(pie_err_se^2, total_err_se^2))
 
@@ -469,33 +470,33 @@ causal_mediation <- function(data, nway = c(3,4), method = c("delta", "bootstrap
                                                        pie_err_se^2, total_err_se^2))
 
       # 3 way decomposition effects and se's
-      decomp3way <-  c(cde_rr = effect_estimates["cde_rr"], cde_rr_se = cde_rr_se,
-                       pnde_rr = effect_estimates["pnde_rr"], pnde_rr_se = pnde_rr_se,
-                       tnde_rr = effect_estimates["tnde_rr"], tnde_rr_se = tnde_rr_se,
-                       pnie_rr = effect_estimates["pnie_rr"], pnie_rr_se = pnie_rr_se,
-                       tnie_rr = effect_estimates["tnie_rr"], tnie_rr_se = tnie_rr_se,
-                       te_rr = effect_estimates["te_rr"], te_rr_se = te_rr_se,
-                       pm = effect_estimates["pm"], pm_se = pm_se)
+      decomp3way <-  c(cde_rr = unname(effect_estimates["cde_rr"]), cde_rr_se = cde_rr_se,
+                       pnde_rr = unname(effect_estimates["pnde_rr"]), pnde_rr_se = pnde_rr_se,
+                       tnde_rr = unname(effect_estimates["tnde_rr"]), tnde_rr_se = tnde_rr_se,
+                       pnie_rr = unname(effect_estimates["pnie_rr"]), pnie_rr_se = pnie_rr_se,
+                       tnie_rr = unname(effect_estimates["tnie_rr"]), tnie_rr_se = tnie_rr_se,
+                       te_rr = unname(effect_estimates["te_rr"]), te_rr_se = te_rr_se,
+                       pm = unname(effect_estimates["pm"]), pm_se = pm_se)
 
       # 4 way decomposition effects and se's
-      decomp4way <-  c(cde_err = effect_estimates["cde_err"], cde_err_se = cde_err_se,
-                       intref_err = effect_estimates["intref_err"], intref_err_se = intref_err_se,
-                       intmed_err = effect_estimates["intmed_err"], intmed_err_se = intmed_err_se,
-                       pie_err = effect_estimates["pie_err"], pie_err_se = pie_err_se,
-                       total_err = effect_estimates["total_err"], total_err_se = total_err_se,
-                       cde_prop = effect_estimates["cde_prop"], cde_prop_se = cde_prop_se,
-                       intref_prop = effect_estimates["intref_prop"], intref_prop_se = intref_prop_se,
-                       intmed_prop = effect_estimates["intmed_prop"], intmed_prop_se = intmed_prop_se,
-                       pie_prop = effect_estimates["pie_prop"], pie_prop_se = pie_prop_se,
-                       overall_pm = effect_estimates["overall_pm"], overall_pm_se = overall_pm_se,
-                       overall_int = effect_estimates["overall_int"], overall_int_se = overall_int_se,
-                       overall_pe = effect_estimates["overall_pe"], overall_pe_se = overall_pe_se)
+      decomp4way <-  c(cde_err = unname(effect_estimates["cde_err"]), cde_err_se = cde_err_se,
+                       intref_err = unname(effect_estimates["intref_err"]), intref_err_se = intref_err_se,
+                       intmed_err = unname(effect_estimates["intmed_err"]), intmed_err_se = intmed_err_se,
+                       pie_err = unname(effect_estimates["pie_err"]), pie_err_se = pie_err_se,
+                       total_err = unname(effect_estimates["total_err"]), total_err_se = total_err_se,
+                       cde_err_prop = unname(effect_estimates["cde_err_prop"]), cde_err_prop_se = cde_err_prop_se,
+                       intref_err_prop = unname(effect_estimates["intref_err_prop"]),
+                       intref_err_prop_se = intref_err_prop_se,
+                       intmed_err_prop = unname(effect_estimates["intmed_err_prop"]),
+                       intmed_err_prop_se = intmed_err_prop_se,
+                       pie_err_prop = unname(effect_estimates["pie_err_prop"]), pie_err_prop_se = pie_err_prop_se,
+                       overall_pm = unname(effect_estimates["overall_pm"]), overall_pm_se = overall_pm_se,
+                       overall_int = unname(effect_estimates["overall_int"]), overall_int_se = overall_int_se,
+                       overall_pe = unname(effect_estimates["overall_pe"]), overall_pe_se = overall_pe_se)
 
     }
 
     out <- list(decomp3way = decomp3way, decomp4way = decomp4way)
-
-    class(out) <- c("delta_out", "data.frame")
 
   }
 
@@ -520,59 +521,59 @@ causal_mediation <- function(data, nway = c(3,4), method = c("delta", "bootstrap
      if (yreg == "linear") {
 
        # 3 way decomposition effects and se's
-       decomp3way <-  c(cde = effect_estimates["cde"], cde_se = cde_se,
-                      pnde = effect_estimates["pnde"], pnde_se = pnde_se,
-                      tnde = effect_estimates["tnde"], tnde_se = tnde_se,
-                      pnie = effect_estimates["pnie"], pnie_se = pnie_se,
-                      tnie = effect_estimates["tnie"], tnie_se = tnie_se,
-                      te = effect_estimates["te"], te_se = te_se,
-                      pm = effect_estimates["pm"], pm_se = pm_se)
+       decomp3way <-  c(cde = unname(out["cde"]), cde_se =  unname(out["cde_se"]),
+                      pnde = unname(out["pnde"]), pnde_se =  unname(out["pnde_se"]),
+                      tnde = unname(out["tnde"]), tnde_se =  unname(out["tnde_se"]),
+                      pnie = unname(out["pnie"]), pnie_se =  unname(out["pnie_se"]),
+                      tnie = unname(out["tnie"]), tnie_se =  unname(out["tnie_se"]),
+                      te = unname(out["te"]), te_se =  unname(out["te_se"]),
+                      pm = unname(out["pm"]), pm_se =  unname(out["pm_se"]))
 
        # 4 way decomposition effects and se's
-       decomp4way <-  c(cde = effect_estimates["cde"], cde_se = cde_se,
-                      intref = effect_estimates["intref"], intref_se = intref_se,
-                      intmed = effect_estimates["intmed"], intmed_se = intmed_se,
-                      pie = effect_estimates["pie"], pie_se = pie_se,
-                      te = effect_estimates["te"], te_se = te_se,
-                      cde_prop = effect_estimates["cde_prop"], cde_prop_se = cde_prop_se,
-                      intref_prop = effect_estimates["intref_prop"], intref_prop_se = intref_prop_se,
-                      intmed_prop = effect_estimates["intmed_prop"], intmed_prop_se = intmed_prop_se,
-                      pie_prop = effect_estimates["pie_prop"], pie_prop_se = pie_prop_se,
-                      overall_pm = effect_estimates["overall_pm"], overall_pm_se = overall_pm_se,
-                      overall_int = effect_estimates["overall_int"], overall_int_se = overall_int_se,
-                      overall_pe = effect_estimates["overall_pe"], overall_pe_se = overall_pe_se)
+       decomp4way <-  c(cde = unname(out["cde"]), cde_se = unname(out["cde_se"]),
+                      intref = unname(out["intref"]), intref_se = unname(out["intref_se"]),
+                      intmed = unname(out["intmed"]), intmed_se = unname(out["intmed_se"]),
+                      pie = unname(out["pie"]), pie_se = unname(out["pie_se"]),
+                      te = unname(out["te"]), te_se = unname(out["te_se"]),
+                      cde_prop = unname(out["cde_prop"]), cde_prop_se = unname(out["cde_prop_se"]),
+                      intref_prop = unname(out["intref_prop"]), intref_prop_se = unname(out["intref_prop_se"]),
+                      intmed_prop = unname(out["intmed_prop"]), intmed_prop_se = unname(out["intmed_prop_se"]),
+                      pie_prop = unname(out["pie_prop"]), pie_prop_se = unname(out["pie_prop_se"]),
+                      overall_pm = unname(out["overall_pm"]), overall_pm_se = unname(out["overall_pm_se"]),
+                      overall_int = unname(out["overall_int"]), overall_int_se = unname(out["overall_int_se"]),
+                      overall_pe = unname(out["overall_pe"]), overall_pe_se = unname(out["overall_pe_se"]))
 
      } else if (yreg %in% c("logistic", "loglinear", "poisson", "quasipoisson",
                      "negbin", "coxph", "aft_exp", "aft_weibull")) {
 
        # 3 way decomposition effects and se's
-       decomp3way <-  c(cde_rr = effect_estimates["cde_rr"], cde_rr_se = cde_rr_se,
-                        pnde_rr = effect_estimates["pnde_rr"], pnde_rr_se = pnde_rr_se,
-                        tnde_rr = effect_estimates["tnde_rr"], tnde_rr_se = tnde_rr_se,
-                        pnie_rr = effect_estimates["pnie_rr"], pnie_rr_se = pnie_rr_se,
-                        tnie_rr = effect_estimates["tnie_rr"], tnie_rr_se = tnie_rr_se,
-                        te_rr = effect_estimates["te_rr"], te_rr_se = te_rr_se,
-                        pm = effect_estimates["pm"], pm_se = pm_se)
+       decomp3way <-  c(cde_rr = unname(out["cde_rr"]), cde_rr_se = unname(out["cde_rr_se"]),
+                        pnde_rr = unname(out["pnde_rr"]), pnde_rr_se = unname(out["pnde_rr_se"]),
+                        tnde_rr = unname(out["tnde_rr"]), tnde_rr_se = unname(out["tnde_rr_se"]),
+                        pnie_rr = unname(out["pnie_rr"]), pnie_rr_se = unname(out["pnie_rr_se"]),
+                        tnie_rr = unname(out["tnie_rr"]), tnie_rr_se = unname(out["tnie_rr_se"]),
+                        te_rr = unname(out["te_rr"]), te_rr_se = unname(out["te_rr_se"]),
+                        pm = unname(out["pm"]), pm_se = unname(out["pm_se"]))
 
        # 4 way decomposition effects and se's
-       decomp4way <-  c(cde_err = effect_estimates["cde_err"], cde_err_se = cde_err_se,
-                        intref_err = effect_estimates["intref_err"], intref_err_se = intref_err_se,
-                        intmed_err = effect_estimates["intmed_err"], intmed_err_se = intmed_err_se,
-                        pie_err = effect_estimates["pie_err"], pie_err_se = pie_err_se,
-                        total_err = effect_estimates["total_err"], total_err_se = total_err_se,
-                        cde_prop = effect_estimates["cde_prop"], cde_prop_se = cde_prop_se,
-                        intref_prop = effect_estimates["intref_prop"], intref_prop_se = intref_prop_se,
-                        intmed_prop = effect_estimates["intmed_prop"], intmed_prop_se = intmed_prop_se,
-                        pie_prop = effect_estimates["pie_prop"], pie_prop_se = pie_prop_se,
-                        overall_pm = effect_estimates["overall_pm"], overall_pm_se = overall_pm_se,
-                        overall_int = effect_estimates["overall_int"], overall_int_se = overall_int_se,
-                        overall_pe = effect_estimates["overall_pe"], overall_pe_se = overall_pe_se)
+       decomp4way <-  c(cde_err = unname(out["cde_err"]), cde_err_se = unname(out["cde_err_se"]),
+                        intref_err = unname(out["intref_err"]), intref_err_se = unname(out["intref_err_se"]),
+                        intmed_err = unname(out["intmed_err"]), intmed_err_se = unname(out["intmed_err_se"]),
+                        pie_err = unname(out["pie_err"]), pie_err_se = unname(out["pie_err_se"]),
+                        total_err = unname(out["total_err"]), total_err_se = unname(out["total_err_se"]),
+                        cde_err_prop = unname(out["cde_err_prop"]), cde_err_prop_se = unname(out["cde_err_prop_se"]),
+                        intref_err_prop = unname(out["intref_err_prop"]),
+                        intref_err_prop_se = unname(out["intref_err_prop_se"]),
+                        intmed_err_prop = unname(out["intmed_err_prop"]),
+                        intmed_err_prop_se = unname(out["intmed_err_prop_se"]),
+                        pie_err_prop = unname(out["pie_err_prop"]), pie_err_prop_se = unname(out["pie_err_prop_se"]),
+                        overall_pm = unname(out["overall_pm"]), overall_pm_se = unname(out["overall_pm_se"]),
+                        overall_int = unname(out["overall_int"]), overall_int_se = unname(out["overall_int_se"]),
+                        overall_pe = unname(out["overall_pe"]), overall_pe_se = unname(out["overall_pe_se"]))
 
      }
 
      out <- list(decomp3way = decomp3way, decomp4way = decomp4way)
-
-     class(out) <- c("boot_out", "data.frame")
 
   }
 
@@ -593,7 +594,7 @@ causal_mediation <- function(data, nway = c(3,4), method = c("delta", "bootstrap
 
      betas_sim <- as.matrix(mvtnorm::rmvnorm(nsims, mean = betas, sigma = vcov_betas))
 
-     cde_sim <- pnde_sim <- tnie_sim <- tnde_sim <- pnie_sim <- intref_sim <- intmed_sim <- c()
+     EY0m_sim <- EY1m_sim <- EY00_sim <- EY01_sim <- EY10_sim <- EY11_sim <-c()
 
      for (j in 1:nsims) {
 
@@ -780,10 +781,6 @@ causal_mediation <- function(data, nway = c(3,4), method = c("delta", "bootstrap
                           overall_int = overall_int, overall_int_se = overall_int_se,
                           overall_pe = overall_pe, overall_pe_se = overall_pe_se)
 
-         class(decomp3way) <- c("simulation_out", "data.frame")
-
-         class(decomp4way) <- c("simulation_out", "data.frame")
-
          out <- list(decomp3way = decomp3way, decomp4way = decomp4way,
                      sims = data.frame(cde = cde_sim, pnde = pnde_sim, tnde = tnde_sim,
                                        pnie = pnie_sim, tnie = tnie_sim, intref = intref_sim,
@@ -810,7 +807,7 @@ causal_mediation <- function(data, nway = c(3,4), method = c("delta", "bootstrap
 
          cde_err_sim <- (EY1m_sim-EY0m_sim)/EY00_sim # excess RR due to cde in the 4 way decomposition
 
-         intref_err_sim <- pnde_rr_sim - 1 - cde_comp_sim # excess RR due to intref in the 4 way decomposition
+         intref_err_sim <- pnde_rr_sim - 1 - cde_err_sim # excess RR due to intref in the 4 way decomposition
 
          intmed_err_sim <- tnie_rr_sim * pnde_rr_sim - pnde_rr_sim - pnie_rr_sim + 1 # excess RR due to intmed in the 4 way decomposition
 
@@ -879,13 +876,9 @@ causal_mediation <- function(data, nway = c(3,4), method = c("delta", "bootstrap
                           overall_int = overall_int, overall_int_se = overall_int_se,
                           overall_pe = overall_pe, overall_pe_se = overall_pe_se)
 
-         class(decomp3way) <- c("simulation_out", "data.frame")
-
-         class(decomp4way) <- c("simulation_out", "data.frame")
-
          out <- list(decomp3way = decomp3way, decomp4way = decomp4way,
-                     sims = data.frame(cde = cde_sim, pnde = pnde_sim, tnde = tnde_sim,
-                                       pnie = pnie_sim, tnie = tnie_sim,
+                     sims = data.frame(cde_rr = cde_rr_sim, pnde_rr = pnde_rr_sim, tnde_rr = tnde_rr_sim,
+                                       pnie_rr = pnie_rr_sim, tnie_rr = tnie_rr_sim,
                                        cde_err_sim = cde_err_sim, intref_err_sim = intref_err_sim,
                                        intmed_err_sim = intmed_err_sim, pie_err_sim = pie_err_sim))
 
@@ -895,9 +888,3 @@ causal_mediation <- function(data, nway = c(3,4), method = c("delta", "bootstrap
    return(out)
 
   }
-
-
-
-
-
-
