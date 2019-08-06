@@ -582,127 +582,74 @@ causal_mediation <- function(data, method = c("delta", "bootstrap", "simulation"
 
   if (method == "simulation") {
 
-     # counterfactual design matrices for the mediator model
-     mdesign_a <- as.matrix(cbind(data.frame(intercept = rep(1,n),treatment = c(rep(a,n))),
-                                    data[,covariates]))
+    EY0m_sim <- EY1m_sim <- EY00_sim <- EY01_sim <- EY10_sim <- EY11_sim <-c()
 
-     mdesign_a_star <- as.matrix(cbind(data.frame(intercept = rep(1,n),treatment = c(rep(a_star,n))),
-                                         data[,covariates]))
+    for (j in 1:nsims) {
 
-     # simulate model coefficients
-     thetas_sim <- as.matrix(mvtnorm::rmvnorm(nsims, mean = thetas, sigma = vcov_thetas))
+      data_sim <- data[sample(1:nrow(data), replace = TRUE),]
 
-     betas_sim <- as.matrix(mvtnorm::rmvnorm(nsims, mean = betas, sigma = vcov_betas))
+      regressions_sim <- run_regressions(formulas = formulas, outcome = outcome, treatment = treatment,
+                                         mediator = mediator, covariates = covariates, interaction = interaction,
+                                         event = event, mreg = mreg, yreg = yreg, data = data_sim)
 
-     EY0m_sim <- EY1m_sim <- EY00_sim <- EY01_sim <- EY10_sim <- EY11_sim <-c()
+      # counterfactual design matrices for the mediator model
+      mdesign_a <- cbind(data.frame(treatment = c(rep(a,n))),data[,covariates])
 
-     for (j in 1:nsims) {
+      mdesign_a_star <- cbind(data.frame(treatment = c(rep(a_star,n))),data[,covariates])
 
-       m_mean_a <- mdesign_a%*%betas_sim[j,]
+      colnames(mdesign_a) <- colnames(mdesign_a_star) <- c(treatment, covariates)
 
-       m_mean_a_star <- mdesign_a_star%*%betas_sim[j,]
+      # simulate counterfactual mediators
+      m_a <- predict(regressions_sim$mediator_regression, newdata = mdesign_a, type = "response")
 
-       covariatesTerm_sim <- rowSums(data[,covariates]*thetas_sim[j,covariates])
+      m_a_star <- predict(regressions_sim$mediator_regression, newdata = mdesign_a_star, type = "response")
 
-       theta_interaction <- ifelse(interaction, thetas_sim[j, paste(treatment, mediator, sep = ":")], 0)
+      # counterfactual design matrices for the outcome model
+      ydesign0m <- cbind(data.frame(treatment = c(rep(a_star,n)), mediator = rep(m, n)), data[,covariates])
 
-       #simulate potential values of the mediator
-       if (mreg == "linear") {
+      ydesign1m <- cbind(data.frame(treatment = c(rep(a,n)), mediator = rep(m, n)), data[,covariates])
 
-         m_sims_a <- matrix(rnorm(n*nsims, mean = m_mean_a, sd = sqrt(variance)),
-                              ncol = nsims) #n by nsims
+      ydesign00 <- cbind(data.frame(treatment = c(rep(a_star,n)), mediator = m_a_star), data[,covariates])
 
-         m_sims_a_star <- matrix(rnorm(n*nsims, mean = m_mean_a_star, sd = sqrt(variance)),
-                                   ncol = nsims) #n by nsims
+      ydesign01 <- cbind(data.frame(treatment = c(rep(a_star,n)), mediator = m_a), data[,covariates])
 
-         } else if (mreg == "logistic")  {
+      ydesign10 <- cbind(data.frame(treatment = c(rep(a,n)), mediator = m_a_star), data[,covariates])
 
-           m_sims_a <- matrix(rbinom(n*nsims, size = 1,
-                                     prob = boot::inv.logit(m_mean_a)), ncol = nsims) #n by nsims
+      ydesign11 <- cbind(data.frame(treatment = c(rep(a,n)), mediator = m_a), data[,covariates])
 
-           m_sims_a_star <- matrix(rbinom(n*nsims, size = 1,
-                                          prob = boot::inv.logit(m_mean_a_star)), ncol = nsims) #n by nsims
+      colnames(ydesign0m) <- colnames(ydesign1m) <- colnames(ydesign00) <- colnames(ydesign01) <-
+        colnames(ydesign10) <- colnames(ydesign11) <- c(treatment, mediator, covariates)
 
-         }
+      # simulate counterfactual mediators
+      y0m <- predict(regressions_sim$outcome_regression, newdata =  ydesign0m, type = "response")
 
-       #calculate expected values of the conterfactual outcomes
-       y0m <- thetas_sim[j,"(Intercept)"]+a_star*thetas_sim[j,treatment]+
-           m_star*thetas_sim[j,mediator]+covariatesTerm_sim+
-           a_star*m_star*theta_interaction
+      y1m <- predict(regressions_sim$outcome_regression, newdata =  ydesign1m, type = "response")
 
-       y1m <- thetas_sim[j,"(Intercept)"]+a*thetas_sim[j,treatment]+
-           m_star*thetas_sim[j,mediator]+covariatesTerm_sim+
-           a*m_star*theta_interaction
+      y00 <- predict(regressions_sim$outcome_regression, newdata =  ydesign00, type = "response")
 
-       y00 <- sapply(1:nsims,FUN=function(k)
-           thetas_sim[j,"(Intercept)"]+a_star*thetas_sim[j,treatment]+
-             m_sims_a_star[,k]*thetas_sim[j,mediator]+covariatesTerm_sim+
-             a_star*m_sims_a_star[,k]*theta_interaction)
+      y01 <- predict(regressions_sim$outcome_regression, newdata =  ydesign01, type = "response")
 
-       y01 <- sapply(1:nsims,FUN =function(k)
-           thetas_sim[j,"(Intercept)"]+a_star*thetas_sim[j,treatment]+
-             m_sims_a[,k]*thetas_sim[j,mediator]+covariatesTerm_sim+
-             a_star*m_sims_a[,k]*theta_interaction)
+      y10 <- predict(regressions_sim$outcome_regression, newdata =  ydesign10, type = "response")
 
-       y10 <- sapply(1:nsims,FUN =function(k)
-           thetas_sim[j,"(Intercept)"]+a*thetas_sim[j,treatment]+
-             m_sims_a_star[,k]*thetas_sim[j,mediator]+covariatesTerm_sim+
-             a*m_sims_a_star[,k]*theta_interaction)
+      y11 <- predict(regressions_sim$outcome_regression, newdata =  ydesign11, type = "response")
 
-       y11 <- sapply(1:nsims,FUN =function(k)
-           thetas_sim[j,"(Intercept)"]+a*thetas_sim[j,treatment]+
-             m_sims_a[,k]*thetas_sim[j,mediator]+covariatesTerm_sim+
-             a*m_sims_a[,k]*theta_interaction)
+      # calculate causal effect components
+      EY0m_sim <- c(EY0m_sim, sum(y0m)/n) #E(Ya0m*)
 
-       if (yreg == "logistic") {
+      EY1m_sim <- c(EY1m_sim, sum(y1m)/n) #E(Ya1m*)
 
-           y0m <- boot::inv.logit(y0m)
+      EY00_sim <- c(EY00_sim, sum(y00)/(n*nsims)) #E(Ya0Ma0)
 
-           y1m <- boot::inv.logit(y1m)
+      EY10_sim <- c(EY10_sim, sum(y10)/(n*nsims)) #E(Ya1Ma0)
 
-           y00 <- boot::inv.logit(y00)
+      EY01_sim <- c(EY01_sim, sum(y01)/(n*nsims)) #E(Ya0Ma1)
 
-           y01 <- boot::inv.logit(y01)
+      EY11_sim <- c(EY11_sim, sum(y11)/(n*nsims)) #E(Ya1Ma1)
 
-           y10 <- boot::inv.logit(y10)
+      }
 
-           y11 <- boot::inv.logit(y11)
-
-         }
-
-       if (yreg %in% c("loglinear", "poisson", "quasipoisson", "negbin",
-                         "coxph", "aft_exp", "aft_weibull")) {
-
-           y0m <- exp(y0m)
-
-           y1m <- exp(y1m)
-
-           y00 <- exp(y00)
-
-           y01 <- exp(y00)
-
-           y10 <- exp(y10)
-
-           y11 <- exp(y11)
-
-         }
-
-       EY0m_sim <- c(EY0m_sim, sum(y0m)/n) #E(Ya0m*)
-
-       EY1m_sim <- c(EY1m_sim, sum(y1m)/n) #E(Ya1m*)
-
-       EY00_sim <- c(EY00_sim, sum(y00)/(n*nsims)) #E(Ya0Ma0)
-
-       EY10_sim <- c(EY10_sim, sum(y10)/(n*nsims)) #E(Ya1Ma0)
-
-       EY01_sim <- c(EY01_sim, sum(y01)/(n*nsims)) #E(Ya0Ma1)
-
-       EY11_sim <- c(EY11_sim, sum(y11)/(n*nsims)) #E(Ya1Ma1)
-
-       }
-
-     # linear outcome
-     if (yreg == "linear") {
+    # linear outcome
+    if (yreg == "linear") {
 
          cde_sim <- EY1m_sim - EY0m_sim # cde in the 3 way or 4 way decomposition
 
