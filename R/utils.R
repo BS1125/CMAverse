@@ -254,7 +254,7 @@ bootstrap_step <- function(data, indices, outcome, treatment, mediator, covariat
 
     if (mreg == "linear") {
 
-      cde_rr <- unname(exp(thetas[treatment] + interactionTerm * m_star * (a - a_star)))
+      cde_rr <- unname(exp((thetas[treatment] + interactionTerm * m_star) * (a - a_star)))
 
       pnde_rr <- unname(exp((thetas[treatment] + interactionTerm * (betas[1] + betas[treatment] * a_star +
                                                                    covariatesTerm + thetas[mediator]  * variance)) * (a - a_star) +
@@ -283,7 +283,7 @@ bootstrap_step <- function(data, indices, outcome, treatment, mediator, covariat
 
     if (mreg == "logistic") {
 
-      cde_rr <- unname(exp(thetas[treatment] + interactionTerm*m_star * (a - a_star)))
+      cde_rr <- unname(exp((thetas[treatment] + interactionTerm*m_star) * (a - a_star)))
 
       pnde_rr <- unname((exp(thetas[treatment] * (a - a_star)) * (1 + exp(thetas[mediator] +
                                                                          interactionTerm * a + betas[1] + betas[treatment] * a_star +
@@ -328,7 +328,7 @@ bootstrap_step <- function(data, indices, outcome, treatment, mediator, covariat
 
     te_rr <- tnie_rr * pnde_rr
 
-    pm <-  (pnde_rr * (tnie_rr - 1)) / (pnde_rr * tnie_rr - 1)
+    pm <- (pnde_rr * (tnie_rr - 1)) / (pnde_rr * tnie_rr - 1)
 
     total_err <- te_rr - 1
 

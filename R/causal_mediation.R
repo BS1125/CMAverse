@@ -2,7 +2,7 @@ causal_mediation <- function(data, method = c("delta", "bootstrap", "simulation"
                              nboot = 100, conf = 0.95, nsims = 1000,
                              outcome, treatment, mediator, covariates,
                              vecc = NULL, interaction = TRUE, event = NULL,
-                             m_star = 0, a_star = 1, a = 0,
+                             m_star = 0, a_star = 0, a = 1,
                              mreg = c("linear", "logistic"),
                              yreg = c("linear", "logistic", "loglinear", "poisson",
                                       "quasipoisson", "negbin", "coxph", "aft_exp", "aft_weibull")) {
@@ -71,35 +71,49 @@ causal_mediation <- function(data, method = c("delta", "bootstrap", "simulation"
       if (mreg == "linear") {
 
         cde_formula <- stringr::str_replace_all(
-          paste0("~(", theta1, "+", theta3, "*m_star)*(a-a_star)"),
+          paste0("(", theta1, "+", theta3, "*m_star)*(a-a_star)"),
           pattern = c("\\ba_star\\b" = as.character(a_star),
                       "\\ba\\b" = as.character(a),
                       "\\bm_star\\b" = as.character(m_star)))
 
         pnde_formula <- stringr::str_replace_all(
-          paste0("~(", theta1, "+", theta3, "*(", beta0, "+", beta1,
+          paste0("(", theta1, "+", theta3, "*(", beta0, "+", beta1,
                  "*a_star+", XC, "))*(a-a_star)"),
           pattern = c("\\ba_star\\b" = as.character(a_star),
                       "\\ba\\b" = as.character(a),
                       "\\bm_star\\b" = as.character(m_star)))
 
         tnde_formula <- stringr::str_replace_all(
-          paste0("~(", theta1, "+", theta3, "*(", beta0, "+", beta1,
+          paste0("(", theta1, "+", theta3, "*(", beta0, "+", beta1,
                  "*a+", XC, "))*(a-a_star)"),
           pattern = c("\\ba_star\\b" = as.character(a_star),
                       "\\ba\\b" = as.character(a),
                       "\\bm_star\\b" = as.character(m_star)))
 
         pnie_formula <- stringr::str_replace_all(
-          paste0("~(", theta2, "*", beta1, "+", theta3, "*", beta1,
+          paste0("(", theta2, "*", beta1, "+", theta3, "*", beta1,
                  "*a_star)*(a-a_star)"),
           pattern = c("\\ba_star\\b" = as.character(a_star),
                       "\\ba\\b" = as.character(a),
                       "\\bm_star\\b" = as.character(m_star)))
 
         tnie_formula <- stringr::str_replace_all(
-          paste0("~(", theta2, "*", beta1, "+", theta3, "*", beta1,
+          paste0("(", theta2, "*", beta1, "+", theta3, "*", beta1,
                  "*a)*(a-a_star)"),
+          pattern = c("\\ba_star\\b" = as.character(a_star),
+                      "\\ba\\b" = as.character(a),
+                      "\\bm_star\\b" = as.character(m_star)))
+
+
+        intref_formula <- stringr::str_replace_all(
+          paste0(theta3, "*(", beta0, "+", beta1, "*a_star", "+", XC,
+                 "-m_star)*(a-a_star)"),
+          pattern = c("\\ba_star\\b" = as.character(a_star),
+                      "\\ba\\b" = as.character(a),
+                      "\\bm_star\\b" = as.character(m_star)))
+
+        intmed_formula <- stringr::str_replace_all(
+          paste0(theta3, "*", beta1, "*(a-a_star)^2"),
           pattern = c("\\ba_star\\b" = as.character(a_star),
                       "\\ba\\b" = as.character(a),
                       "\\bm_star\\b" = as.character(m_star)))
@@ -107,13 +121,13 @@ causal_mediation <- function(data, method = c("delta", "bootstrap", "simulation"
       } else if (mreg=="logistic") {
 
         cde_formula <- stringr::str_replace_all(
-          paste0("~(", theta1, "+", theta3, "*m_star)*(a-a_star)"),
+          paste0("(", theta1, "+", theta3, "*m_star)*(a-a_star)"),
           pattern = c("\\ba_star\\b" = as.character(a_star),
                       "\\ba\\b" = as.character(a),
                       "\\bm_star\\b" = as.character(m_star)))
 
         pnde_formula <- stringr::str_replace_all(
-          paste0("~", theta1, "*(a-a_star)+(", theta3, "*(a-a_star))*exp(",
+          paste0(theta1, "*(a-a_star)+(", theta3, "*(a-a_star))*exp(",
                  beta0, "+", beta1, "*a_star+", XC, ")/(1+exp(",
                  beta0, "+", beta1, "*a_star+", XC, "))"),
           pattern = c("\\ba_star\\b" = as.character(a_star),
@@ -121,7 +135,7 @@ causal_mediation <- function(data, method = c("delta", "bootstrap", "simulation"
                       "\\bm_star\\b" = as.character(m_star)))
 
         tnde_formula <- stringr::str_replace_all(
-          paste0("~", theta1, "*(a-a_star)+(", theta3, "*(a-a_star))*exp(",
+          paste0(theta1, "*(a-a_star)+(", theta3, "*(a-a_star))*exp(",
                  beta0, "+", beta1, "*a+", XC, ")/(1+exp(",
                  beta0, "+", beta1, "*a+", XC, "))"),
           pattern = c("\\ba_star\\b" = as.character(a_star),
@@ -129,7 +143,7 @@ causal_mediation <- function(data, method = c("delta", "bootstrap", "simulation"
                       "\\bm_star\\b" = as.character(m_star)))
 
         pnie_formula <- stringr::str_replace_all(
-          paste0("~(", theta2, "+", theta3, "*a_star)*(exp(", beta0,
+          paste0("(", theta2, "+", theta3, "*a_star)*(exp(", beta0,
                  "+", beta1, "*a+", XC, ")/(1+exp(", beta0, "+",
                  beta1, "*a+", XC, "))-exp(", beta0, "+", beta1,
                  "*a_star+", XC, ")/(1+exp(", beta0, "+", beta1,
@@ -139,7 +153,7 @@ causal_mediation <- function(data, method = c("delta", "bootstrap", "simulation"
                       "\\bm_star\\b" = as.character(m_star)))
 
         tnie_formula <- stringr::str_replace_all(
-          paste0("~(", theta2, "+", theta3, "*a)*(exp(", beta0,
+          paste0("(", theta2, "+", theta3, "*a)*(exp(", beta0,
                  "+", beta1, "*a+", XC, ")/(1+exp(", beta0, "+",
                  beta1, "*a+", XC, "))-exp(", beta0, "+", beta1,
                  "*a_star+", XC, ")/(1+exp(", beta0, "+", beta1,
@@ -148,16 +162,55 @@ causal_mediation <- function(data, method = c("delta", "bootstrap", "simulation"
                       "\\ba\\b" = as.character(a),
                       "\\bm_star\\b" = as.character(m_star)))
 
+        intref_formula <- stringr::str_replace_all(
+          paste0(theta3, "*(a-a_star)*(exp(", beta0, "+", beta1, "*a_star",
+                 "+", XC, ")/(1+exp(", beta0, "+", beta1, "*a_star", "+", XC, "))-m_star)"),
+          pattern = c("\\ba_star\\b" = as.character(a_star),
+                      "\\ba\\b" = as.character(a),
+                      "\\bm_star\\b" = as.character(m_star)))
+
+
+        intmed_formula <- stringr::str_replace_all(
+          paste0(theta3, "*(a-a_star)*(exp(", beta0, "+", beta1, "*a",
+                 "+", XC, ")/(1+exp(", beta0, "+", beta1, "*a", "+", XC, "))-exp(",
+                 beta0, "+", beta1, "*a_star",
+                 "+", XC, ")/(1+exp(", beta0, "+", beta1, "*a_star", "+", XC, ")))"),
+          pattern = c("\\ba_star\\b" = as.character(a_star),
+                      "\\ba\\b" = as.character(a),
+                      "\\bm_star\\b" = as.character(m_star)))
+
       }
+
+      te_formula <- paste0("(", tnie_formula, ")+(", pnde_formula, ")")
+
+      pm_formula <- paste0("(", tnie_formula, ")/((", pnde_formula, ")+(", te_formula, "))")
+
+      cde_prop_formula <- paste0("(", cde_formula, ")/(", te_formula, ")")
+
+      intref_prop_formula <- paste0("(", intref_formula, ")/(", te_formula, ")")
+
+      intmed_prop_formula <- paste0("(", intmed_formula, ")/(", te_formula, ")")
+
+      pie_prop_formula <- paste0("(", pnie_formula, ")/(", te_formula, ")")
+
+      overall_pm_formula <- paste0("((", pnie_formula, ")+(", intmed_formula, "))/(", te_formula, ")")
+
+      overall_int_formula <- paste0("((", intref_formula, ")+(", intmed_formula, "))/(", te_formula, ")")
+
+      overall_pe_formula <- paste0("((", intref_formula, ")+(", intmed_formula, ")+(", pnie_formula,
+                                    "))/(", te_formula, ")")
 
       j <- length(vecc)
 
       if (j > 0) {
 
-        for (formula in c("cde_formula", "pnde_formula", "tnde_formula",
-                          "pnie_formula", "tnie_formula")) {
+        for (formula in c("cde_formula", "pnde_formula", "tnde_formula", "pnie_formula", "tnie_formula",
+                          "intref_formula", "intmed_formula", "te_formula", "pm_formula",
+                          "cde_prop_formula", "intref_prop_formula", "intmed_prop_formula",
+                          "pie_prop_formula", "overall_pm_formula", "overall_int_formula",
+                          "overall_pe_formula")) {
 
-          mid <- get(formula)
+          mid <- paste0("~", get(formula))
 
           for (i in 1:j) {
 
@@ -181,54 +234,29 @@ causal_mediation <- function(data, method = c("delta", "bootstrap", "simulation"
 
       tnie_se <- msm::deltamethod(tnie_formula, c(thetas, betas), vcov_block)
 
-      te_formula <- as.formula("~x1+x2")
+      intref_se <- msm::deltamethod(intref_formula, c(thetas, betas), vcov_block)
 
-      te_se <- msm::deltamethod(te_formula, c(effect_estimates["pnde"], effect_estimates["tnie"]),
-                                Matrix::bdiag(pnde_se^2, tnie_se^2))
+      intmed_se <- msm::deltamethod(intmed_formula, c(thetas, betas), vcov_block)
 
-      pm_formula <- as.formula("~x2/(x1+x3)")
+      te_se <- msm::deltamethod(te_formula, c(thetas, betas), vcov_block)
 
-      pm_se <- msm::deltamethod(pm_formula, c(effect_estimates["pnde"], effect_estimates["tnie"],
-                                              effect_estimates["te"]),
-                                Matrix::bdiag(pnde_se^2, tnie_se^2, te_se^2))
+      pm_se <- msm::deltamethod(pm_formula, c(thetas, betas), vcov_block)
 
-      intref_formula <- intmed_formula <- as.formula("~x1-x2")
+      pie_se <- pnie_se
 
-      intref_se <- msm::deltamethod(intref_formula, c(effect_estimates["pnde"], effect_estimates["cde"]),
-                                Matrix::bdiag(pnde_se^2, cde_se^2))
+      cde_prop_se <- msm::deltamethod(cde_prop_formula, c(thetas, betas), vcov_block)
 
-      intmed_se <- msm::deltamethod(intmed_formula, c(effect_estimates["tnie"], effect_estimates["pnie"]),
-                                    Matrix::bdiag(tnie_se^2, pnie_se^2))
+      intref_prop_se <- msm::deltamethod(intref_prop_formula, c(thetas, betas), vcov_block)
 
-      cde_prop_formula <- intref_prop_formula <- intmed_prop_formula <- pie_prop_formula <- as.formula("~x1/x2")
+      intmed_prop_se <- msm::deltamethod(intmed_prop_formula, c(thetas, betas), vcov_block)
 
-      cde_prop_se <- msm::deltamethod(cde_prop_formula, c(effect_estimates["cde"], effect_estimates["te"]),
-                                    Matrix::bdiag(cde_se^2, te_se^2))
+      pie_prop_se <- msm::deltamethod(pie_prop_formula, c(thetas, betas), vcov_block)
 
-      intref_prop_se <- msm::deltamethod(intref_prop_formula, c(effect_estimates["intref"], effect_estimates["te"]),
-                                      Matrix::bdiag(intref_se^2, te_se^2))
+      overall_pm_se <- msm::deltamethod(overall_pm_formula, c(thetas, betas), vcov_block)
 
-      intmed_prop_se <- msm::deltamethod(intmed_prop_formula, c(effect_estimates["intmed"], effect_estimates["te"]),
-                                         Matrix::bdiag(intmed_se^2, te_se^2))
+      overall_int_se <- msm::deltamethod(overall_int_formula, c(thetas, betas), vcov_block)
 
-      pie_prop_se <- msm::deltamethod(pie_prop_formula, c(effect_estimates["pie"], effect_estimates["te"]),
-                                         Matrix::bdiag(pie_se^2, te_se^2))
-
-      overall_pm_formula <- overall_int_formula <- as.formula("~(x1+x2)/x3")
-
-      overall_pm_se <- msm::deltamethod(overall_pm_formula, c(effect_estimates["pie"], effect_estimates["intmed"],
-                                          effect_estimates["te"]),
-                                      Matrix::bdiag(pie_se^2, intmed_se^2, te_se^2))
-
-      overall_int_se <- msm::deltamethod(overall_int_formula, c(effect_estimates["intref"], effect_estimates["intmed"],
-                                                              effect_estimates["te"]),
-                                        Matrix::bdiag(intref_se^2, intmed_se^2, te_se^2))
-
-      overall_pe_formula <- as.formula("~(x1+x2+x3)/x4")
-
-      overall_pe_se <- msm::deltamethod(overall_pe_formula, c(effect_estimates["intref"], effect_estimates["intmed"],
-                                                              effect_estimates["pie"], effect_estimates["te"]),
-                                         Matrix::bdiag(intref_se^2, intmed_se^2, pie_se^2, te_se^2))
+      overall_pe_se <- msm::deltamethod(overall_pe_formula, c(thetas, betas), vcov_block)
 
       # 3 way decomposition effects and se's
       decomp3way <-  c(cde = unname(effect_estimates["cde"]), cde_se = cde_se,
@@ -258,14 +286,14 @@ causal_mediation <- function(data, method = c("delta", "bootstrap", "simulation"
 
       if (mreg=="linear") {
 
-        cde_formula <- stringr::str_replace_all(
-          paste0("~exp((", theta1, "+", theta3, "*m_star)*(a-a_star))"),
+        cde_rr_formula <- stringr::str_replace_all(
+          paste0("exp((", theta1, "+", theta3, "*m_star)*(a-a_star))"),
           pattern = c("\\ba_star\\b" = as.character(a_star),
                       "\\ba\\b" = as.character(a),
                       "\\bm_star\\b" = as.character(m_star)))
 
-        pnde_formula <- stringr::str_replace_all(
-          paste0("~exp((", theta1, "+", theta3, "*(", beta0, "+", beta1,
+        pnde_rr_formula <- stringr::str_replace_all(
+          paste0("exp((", theta1, "+", theta3, "*(", beta0, "+", beta1,
                  "*a_star+", XC, "+", theta2, "*variance))*(a-a_star)+0.5*",
                  theta3, "^2*variance*(a^2-a_star^2))"),
           pattern = c("\\ba_star\\b" = as.character(a_star),
@@ -273,8 +301,8 @@ causal_mediation <- function(data, method = c("delta", "bootstrap", "simulation"
                       "\\bm_star\\b" = as.character(m_star),
                       "\\bvariance\\b" = as.character(variance)))
 
-        tnde_formula <- stringr::str_replace_all(
-          paste0("~exp((", theta1, "+", theta3, "*(", beta0, "+", beta1,
+        tnde_rr_formula <- stringr::str_replace_all(
+          paste0("exp((", theta1, "+", theta3, "*(", beta0, "+", beta1,
                  "*a+", XC, "+", theta2, "*variance))*(a-a_star)+0.5*",
                  theta3, "^2*variance*(a^2-a_star^2))"),
           pattern = c("\\ba_star\\b" = as.character(a_star),
@@ -282,26 +310,26 @@ causal_mediation <- function(data, method = c("delta", "bootstrap", "simulation"
                       "\\bm_star\\b" = as.character(m_star),
                       "\\bvariance\\b" = as.character(variance)))
 
-        pnie_formula <- stringr::str_replace_all(
-          paste0("~exp((", theta2, "*", beta1, "+", theta2, "*",
+        pnie_rr_formula <- stringr::str_replace_all(
+          paste0("exp((", theta2, "*", beta1, "+", theta2, "*",
                  beta1, "*a_star)*(a-a_star))"),
           pattern = c("\\ba_star\\b" = as.character(a_star),
                       "\\ba\\b" = as.character(a),
                       "\\bm_star\\b" = as.character(m_star)))
 
-        tnie_formula <- stringr::str_replace_all(
-          paste0("~exp((", theta2, "*", beta1, "+", theta2, "*",
+        tnie_rr_formula <- stringr::str_replace_all(
+          paste0("exp((", theta2, "*", beta1, "+", theta3, "*",
                  beta1, "*a)*(a-a_star))"),
           pattern = c("\\ba_star\\b" = as.character(a_star),
                       "\\ba\\b" = as.character(a),
                       "\\bm_star\\b" = as.character(m_star)))
 
         cde_err_formula <- stringr::str_replace_all(
-          paste0("~exp(", theta1, "*(a-a_star)+", theta2, "*m_star+", theta3,
-                 "*a*m_star-(", theta2, "+", theta3, "*a_star)(", beta0, "+",
+          paste0("exp(", theta1, "*(a-a_star)+", theta2, "*m_star+", theta3,
+                 "*a*m_star-(", theta2, "+", theta3, "*a_star)*(", beta0, "+",
                  beta1,"*a_star+", XC, ")-0.5*(", theta2, "+", theta3,
                  "*a_star)^2*variance)-exp(", theta2, "*m_star+", theta3,
-                 "*a_star*m_star-(", theta2, "+", theta3, "*a_star)(", beta0,
+                 "*a_star*m_star-(", theta2, "+", theta3, "*a_star)*(", beta0,
                  "+", beta1, "*a_star", "+", XC, ")-0.5*(",theta2, "+", theta3,
                  "*a_star)^2*variance)"),
           pattern = c("\\ba_star\\b" = as.character(a_star),
@@ -309,16 +337,45 @@ causal_mediation <- function(data, method = c("delta", "bootstrap", "simulation"
                       "\\bm_star\\b" = as.character(m_star),
                       "\\bvariance\\b" = as.character(variance)))
 
+        intref_err_formula <- stringr::str_replace_all(
+          paste0("exp((", theta1, "+", theta3, "*(", beta0, "+",
+                 beta1,"*a_star+", XC, "+", theta2, "*variance))*(a-a_star)+0.5*",
+                 theta3, "^2*variance*(a^2-a_star^2))-1-exp(", theta1, "*(a-a_star)+",
+                 theta2, "*m_star+", theta3, "*a*m_star-(", theta2, "+", theta3,
+                 "*a_star)*(", beta0, "+", beta1, "*a_star+", XC, ")-0.5*(", theta2,
+                 "+", theta3, "*a_star)^2*variance)+exp(", theta2, "*m_star+",
+                 theta3, "*a_star*m_star-(", theta2, "+", theta3, "*a_star)*(", beta0,
+                 "+", beta1,"*a_star+", XC, ")-0.5*(", theta2, "+", theta3,
+                 "*a_star)^2*variance)"),
+          pattern = c("\\ba_star\\b" = as.character(a_star),
+                      "\\ba\\b" = as.character(a),
+                      "\\bm_star\\b" = as.character(m_star),
+                      "\\bvariance\\b" = as.character(variance)))
+
+        intmed_err_formula <- stringr::str_replace_all(
+          paste0("exp((", theta1, "+", theta2, "*", beta1, "+", theta3,
+                 "*(", beta0, "+", beta1,"*a_star+", "+", beta1,"*a+", XC,
+                 "+", theta2, "*variance))*(a-a_star)+0.5*", theta3,
+                 "^2*variance*(a^2-a_star^2))-exp((", theta2, "*", beta1,
+                 "+", theta3, "*", beta1, "*a_star)*(a-a_star))-exp((",
+                 theta1, "+", theta3, "*(", beta0, "+", beta1, "*a_star+", XC,
+                 "+", theta2, "*variance))*(a-a_star)+0.5*", theta3,
+                 "^2*variance*(a^2-a_star^2))+1"),
+          pattern = c("\\ba_star\\b" = as.character(a_star),
+                      "\\ba\\b" = as.character(a),
+                      "\\bm_star\\b" = as.character(m_star),
+                      "\\bvariance\\b" = as.character(variance)))
+
       } else if (mreg=="logistic") {
 
-        cde_formula <- stringr::str_replace_all(
-          paste0("~exp((", theta1, "+", theta3, "*m_star)*(a-a_star))"),
+        cde_rr_formula <- stringr::str_replace_all(
+          paste0("exp((", theta1, "+", theta3, "*m_star)*(a-a_star))"),
           pattern = c("\\ba_star\\b" = as.character(a_star),
                       "\\ba\\b" = as.character(a),
                       "\\bm_star\\b" = as.character(m_star)))
 
-        pnde_formula <- stringr::str_replace_all(
-          paste0("~exp(", theta1, "*(a-a_star))*(1+exp(", theta2, "+",
+        pnde_rr_formula <- stringr::str_replace_all(
+          paste0("exp(", theta1, "*(a-a_star))*(1+exp(", theta2, "+",
                  theta3, "*a+", beta0, "+", beta1, "*a_star+", XC,
                  "))/(1+exp(", theta2, "+", theta3, "*a_star+", beta0,
                  "+", beta1, "*a_star+", XC, "))"),
@@ -326,8 +383,8 @@ causal_mediation <- function(data, method = c("delta", "bootstrap", "simulation"
                       "\\ba\\b" = as.character(a),
                       "\\bm_star\\b" = as.character(m_star)))
 
-        tnde_formula <- stringr::str_replace_all(
-          paste0("~exp(", theta1, "*(a-a_star))*(1+exp(", theta2, "+",
+        tnde_rr_formula <- stringr::str_replace_all(
+          paste0("exp(", theta1, "*(a-a_star))*(1+exp(", theta2, "+",
                  theta3, "*a+", beta0, "+", beta1, "*a+", XC,
                  "))/(1+exp(", theta2, "+", theta3, "*a_star+", beta0,
                  "+", beta1, "*a+", XC, "))"),
@@ -335,8 +392,8 @@ causal_mediation <- function(data, method = c("delta", "bootstrap", "simulation"
                       "\\ba\\b" = as.character(a),
                       "\\bm_star\\b" = as.character(m_star)))
 
-        pnie_formula <- stringr::str_replace_all(
-          paste0("~(1+exp(", beta0, "+", beta1, "*a_star+", XC,
+        pnie_rr_formula <- stringr::str_replace_all(
+          paste0("(1+exp(", beta0, "+", beta1, "*a_star+", XC,
                  "))*(1+exp(", theta2, "+", theta3, "*a_star+",
                  beta0, "+", beta1, "*a+", XC, "))/((1+exp(",
                  beta0, "+", beta1, "*a+", XC, "))*(1+exp(",
@@ -346,8 +403,8 @@ causal_mediation <- function(data, method = c("delta", "bootstrap", "simulation"
                       "\\ba\\b" = as.character(a),
                       "\\bm_star\\b" = as.character(m_star)))
 
-        tnie_formula <- stringr::str_replace_all(
-          paste0("~(1+exp(", beta0, "+", beta1, "*a_star+", XC,
+        tnie_rr_formula <- stringr::str_replace_all(
+          paste0("(1+exp(", beta0, "+", beta1, "*a_star+", XC,
                  "))*(1+exp(", theta2, "+", theta3, "*a+",
                  beta0, "+", beta1, "*a+", XC, "))/((1+exp(",
                  beta0, "+", beta1, "*a+", XC, "))*(1+exp(",
@@ -358,7 +415,7 @@ causal_mediation <- function(data, method = c("delta", "bootstrap", "simulation"
                       "\\bm_star\\b" = as.character(m_star)))
 
         cde_err_formula <- stringr::str_replace_all(
-          paste0("~exp(", theta1, "*(a-a_star)+", theta2, "*m_star+", theta3,
+          paste0("exp(", theta1, "*(a-a_star)+", theta2, "*m_star+", theta3,
                  "*a*m_star)*(1+exp(", beta0, "+", beta1, "*a_star+", XC,
                  "))/(1+exp(",  beta0, "+", beta1,  "*a_star+", XC, "+",
                  theta2, "+", theta3, "*a_star))-exp(", theta2, "*m_star+",
@@ -369,16 +426,76 @@ causal_mediation <- function(data, method = c("delta", "bootstrap", "simulation"
                       "\\ba\\b" = as.character(a),
                       "\\bm_star\\b" = as.character(m_star)))
 
+
+        intref_err_formula <- stringr::str_replace_all(
+          paste0("exp(", theta1, "*(a-a_star))*(1+exp(", beta0, "+",
+                 beta1, "*a_star+", XC, "+", theta2, "+", theta3,
+                 "*a))/(1+exp(", beta0, "+", beta1, "*a_star+", XC, "+",
+                 theta2, "+", theta3, "*a_star))-1-exp(", theta1,
+                 "*(a-a_star)+", theta2, "*m_star+", theta3, "*a*m_star)*(1+exp(",
+                 beta0, "+", beta1, "*a_star+", XC, "))*exp((", theta1, "+",
+                 theta3, "*m_star)*(a-a_star))/(1+exp(", beta0, "+", beta1,
+                 "*a_star+", XC, "+", theta2, "+", theta3, "*a_star))+exp(",
+                 theta2, "*m_star+", theta3, "*a_star*m_star)*(1+exp(",
+                 beta0, "+", beta1, "*a_star+", XC, "))/(1+exp(", beta0, "+",
+                 beta1, "*a_star+", XC, "+", theta2, "+", theta3, "*a_star))"),
+          pattern = c("\\ba_star\\b" = as.character(a_star),
+                      "\\ba\\b" = as.character(a),
+                      "\\bm_star\\b" = as.character(m_star)))
+
+        intmed_err_formula <- stringr::str_replace_all(
+          paste0("(exp(", theta1, "*(a-a_star))*(1+exp(", beta0, "+",
+                 beta1, "*a+", XC, "+", theta2, "+", theta3, "*a))*(1+exp(",
+                 beta0, "+", beta1, "*a_star+", XC, ")))/((1+exp(",
+                 beta0, "+", beta1, "*a_star+", XC, "+", theta2, "+", theta3,
+                 "*a_star))*(1+exp(", beta0, "+", beta1, "*a+", XC,
+                 ")))-((1+exp(", beta0, "+", beta1, "*a+", XC, "+", theta2,
+                 "+", theta3, "*a_star))*(1+exp(", beta0, "+", beta1,
+                 "*a_star+", XC, ")))/((1+exp(", beta0, "+", beta1, "*a_star+",
+                 XC, "+", theta2, "+", theta3, "*a_star))*(1+exp(", beta0, "+",
+                 beta1, "*a+", XC, ")))-(exp(", theta1, "*(a-a_star))*(1+exp(",
+                 beta0, "+", beta1, "*a_star+", XC, "+", theta2, "+", theta3,
+                 "*a)))/(1+exp(", beta0, "+", beta1, "*a_star+", XC, "+",
+                 theta2, "+", theta3, "*a_star))+1"),
+          pattern = c("\\ba_star\\b" = as.character(a_star),
+                      "\\ba\\b" = as.character(a),
+                      "\\bm_star\\b" = as.character(m_star)))
       }
+
+      te_rr_formula <- paste0("(", tnie_rr_formula, ")*(", pnde_rr_formula, ")")
+
+      pm_formula <- paste0("((", pnde_rr_formula, ")*(", tnie_rr_formula, "-1))/(", te_rr_formula, "-1)")
+
+      cde_err_prop_formula <- paste0("(", cde_err_formula, ")/(", te_rr_formula, "-1)")
+
+      intmed_err_prop_formula <- paste0("(", intmed_err_formula, ")/(", te_rr_formula, "-1)")
+
+      intref_err_prop_formula <-paste0("(", intref_err_formula, ")/(", te_rr_formula, "-1)")
+
+      pie_err_prop_formula <- paste0("(", pnie_rr_formula, "-1)/(", te_rr_formula, "-1)")
+
+      overall_pm_formula <- paste0("((", pnie_rr_formula, "-1)+(", intmed_err_formula, "))/(",
+                                   te_rr_formula, "-1)")
+
+      overall_int_formula <- paste0("((", intref_err_formula, ")+(", intmed_err_formula, "))/(",
+                                    te_rr_formula, "-1)")
+
+      overall_pe_formula <- paste0("((", intref_err_formula, ")+(", intmed_err_formula, ")+(",
+                                   pnie_rr_formula,
+                                   "-1))/(", te_rr_formula, "-1)")
 
       j <- length(vecc)
 
       if (j > 0) {
 
-        for (formula in c("cde_formula", "pnde_formula", "tnde_formula",
-                          "pnie_formula", "tnie_formula", "cde_err_formula")) {
+        for (formula in c("cde_rr_formula", "pnde_rr_formula", "tnde_rr_formula",
+                          "pnie_rr_formula", "tnie_rr_formula", "cde_err_formula",
+                          "intref_err_formula", "intmed_err_formula","te_rr_formula", "pm_formula",
+                          "cde_err_prop_formula", "intref_err_prop_formula", "intmed_err_prop_formula",
+                          "pie_err_prop_formula", "overall_pm_formula", "overall_int_formula",
+                          "overall_pe_formula")) {
 
-          mid <- get(formula)
+          mid <- paste0("~", get(formula))
 
           for (i in 1:j) {
 
@@ -392,82 +509,39 @@ causal_mediation <- function(data, method = c("delta", "bootstrap", "simulation"
         }
       }
 
-      cde_rr_se <- msm::deltamethod(cde_formula, thetas, vcov_thetas)
+      cde_rr_se <- msm::deltamethod(cde_rr_formula, thetas, vcov_thetas)
 
-      pnde_rr_se <- msm::deltamethod(pnde_formula, c(thetas, betas), vcov_block)
+      pnde_rr_se <- msm::deltamethod(pnde_rr_formula, c(thetas, betas), vcov_block)
 
-      tnde_rr_se <- msm::deltamethod(tnde_formula, c(thetas, betas), vcov_block)
+      tnde_rr_se <- msm::deltamethod(tnde_rr_formula, c(thetas, betas), vcov_block)
 
-      pnie_rr_se <- pie_err_se <- msm::deltamethod(pnie_formula, c(thetas, betas), vcov_block)
+      pnie_rr_se <- pie_err_se <- msm::deltamethod(pnie_rr_formula, c(thetas, betas), vcov_block)
 
-      tnie_rr_se <- msm::deltamethod(tnie_formula, c(thetas, betas), vcov_block)
+      tnie_rr_se <- msm::deltamethod(tnie_rr_formula, c(thetas, betas), vcov_block)
 
-      te_formula <- as.formula("~x1*x2")
+      te_rr_se <- total_err_se <- msm::deltamethod(te_rr_formula, c(thetas, betas), vcov_block)
 
-      te_rr_se <- total_err_se <- msm::deltamethod(te_formula, c(effect_estimates["pnde_rr"],
-                                                              effect_estimates["tnie_rr"]),
-                                Matrix::bdiag(pnde_rr_se^2, tnie_rr_se^2))
-
-      pm_formula <- as.formula("~x1*(x2-1)/(x1*x2-1)")
-
-      pm_se <- msm::deltamethod(pm_formula, c(effect_estimates["pnde_rr"], effect_estimates["tnie_rr"],
-                                              effect_estimates["te_rr"]),
-                                Matrix::bdiag(pnde_rr_se^2, tnie_rr_se^2, te_rr_se^2))
+      pm_se <- msm::deltamethod(pm_formula, c(thetas, betas), vcov_block)
 
       cde_err_se <-  msm::deltamethod(cde_err_formula, c(thetas, betas), vcov_block)
 
-      intref_err_formula <- as.formula("~x1-x2-1")
+      intref_err_se <-  msm::deltamethod(intref_err_formula, c(thetas, betas), vcov_block)
 
-      intref_err_se <- msm::deltamethod(intref_err_formula, c(effect_estimates["pnde_rr"],
-                                                              effect_estimates["cde_rr"]),
-                       Matrix::bdiag(pnde_rr_se^2, cde_rr_se^2))
+      intmed_err_se <-  msm::deltamethod(intmed_err_formula, c(thetas, betas), vcov_block)
 
-      intmed_err_formula <- as.formula("~x1*x2-x2-x3+1")
+      cde_err_prop_se <- msm::deltamethod(cde_err_prop_formula, c(thetas, betas), vcov_block)
 
-      intmed_err_se <- msm::deltamethod(intmed_err_formula, c(effect_estimates["tnie_rr"],
-                                                              effect_estimates["pnde_rr"],
-                                                              effect_estimates["pnie_rr"]),
-                                    Matrix::bdiag(tnie_rr_se^2, pnde_rr_se^2, pnie_rr_se^2))
+      intmed_err_prop_se <- msm::deltamethod(intmed_err_prop_formula, c(thetas, betas), vcov_block)
 
-      cde_err_prop_formula <- intmed_err_prop_formula <- intref_err_prop_formula <-
-        pie_err_prop_formula <- as.formula("~x1/x2")
+      intref_err_prop_se <- msm::deltamethod(intref_err_prop_formula, c(thetas, betas), vcov_block)
 
-      cde_err_prop_se <- msm::deltamethod(cde_err_prop_formula, c(effect_estimates["cde_err"],
-                                                          effect_estimates["total_err"]),
-                                      Matrix::bdiag(cde_err_se^2, total_err_se^2))
+      pie_err_prop_se <- msm::deltamethod(pie_err_prop_formula, c(thetas, betas), vcov_block)
 
-      intmed_err_prop_se <- msm::deltamethod(intmed_err_prop_formula, c(effect_estimates["intmed_err"],
-                                                          effect_estimates["total_err"]),
-                                      Matrix::bdiag(intmed_err_se^2, total_err_se^2))
+      overall_pm_se <- msm::deltamethod(overall_pm_formula, c(thetas, betas), vcov_block)
 
-      intref_err_prop_se <- msm::deltamethod(intref_err_prop_formula, c(effect_estimates["intref_err"],
-                                                          effect_estimates["total_err"]),
-                                      Matrix::bdiag(intref_err_se^2, total_err_se^2))
+      overall_int_se <- msm::deltamethod(overall_int_formula, c(thetas, betas), vcov_block)
 
-      pie_err_prop_se <- msm::deltamethod(pie_err_prop_formula, c(effect_estimates["pie_err"],
-                                                          effect_estimates["total_err"]),
-                                      Matrix::bdiag(pie_err_se^2, total_err_se^2))
-
-      overall_pm_formula <- overall_int_formula <- as.formula("~(x1+x2)/x3")
-
-      overall_pm_se <- msm::deltamethod(overall_pm_formula, c(effect_estimates["pie_err"],
-                                                              effect_estimates["intmed_err"],
-                                                              effect_estimates["total_err"]),
-                                      Matrix::bdiag(pie_err_se^2, intmed_err_se^2, total_err_se^2))
-
-      overall_int_se <- msm::deltamethod(overall_int_formula, c(effect_estimates["intref_err"],
-                                                                effect_estimates["intmed_err"],
-                                                                effect_estimates["total_err"]),
-                                        Matrix::bdiag(intref_err_se^2, intmed_err_se^2, total_err_se^2))
-
-      overall_pe_formula <- as.formula("~(x1+x2+x3)/x4")
-
-      overall_pe_se <- msm::deltamethod(overall_pe_formula, c(effect_estimates["intref_err"],
-                                                              effect_estimates["intmed_err"],
-                                                              effect_estimates["pie_err"],
-                                                              effect_estimates["total_err"]),
-                                         Matrix::bdiag(intref_err_se^2, intmed_err_se^2,
-                                                       pie_err_se^2, total_err_se^2))
+      overall_pe_se <- msm::deltamethod(overall_pe_formula, c(thetas, betas), vcov_block)
 
       # 3 way decomposition effects and se's
       decomp3way <-  c(cde_rr = unname(effect_estimates["cde_rr"]), cde_rr_se = cde_rr_se,
@@ -605,9 +679,9 @@ causal_mediation <- function(data, method = c("delta", "bootstrap", "simulation"
       m_a_star <- predict(regressions_sim$mediator_regression, newdata = mdesign_a_star, type = "response")
 
       # counterfactual design matrices for the outcome model
-      ydesign0m <- cbind(data.frame(treatment = c(rep(a_star,n)), mediator = rep(m, n)), data[,covariates])
+      ydesign0m <- cbind(data.frame(treatment = c(rep(a_star,n)), mediator = rep(m_star, n)), data[,covariates])
 
-      ydesign1m <- cbind(data.frame(treatment = c(rep(a,n)), mediator = rep(m, n)), data[,covariates])
+      ydesign1m <- cbind(data.frame(treatment = c(rep(a,n)), mediator = rep(m_star, n)), data[,covariates])
 
       ydesign00 <- cbind(data.frame(treatment = c(rep(a_star,n)), mediator = m_a_star), data[,covariates])
 
@@ -638,13 +712,13 @@ causal_mediation <- function(data, method = c("delta", "bootstrap", "simulation"
 
       EY1m_sim <- c(EY1m_sim, sum(y1m)/n) #E(Ya1m*)
 
-      EY00_sim <- c(EY00_sim, sum(y00)/(n*nsims)) #E(Ya0Ma0)
+      EY00_sim <- c(EY00_sim, sum(y00)/n) #E(Ya0Ma0)
 
-      EY10_sim <- c(EY10_sim, sum(y10)/(n*nsims)) #E(Ya1Ma0)
+      EY10_sim <- c(EY10_sim, sum(y10)/n) #E(Ya1Ma0)
 
-      EY01_sim <- c(EY01_sim, sum(y01)/(n*nsims)) #E(Ya0Ma1)
+      EY01_sim <- c(EY01_sim, sum(y01)/n) #E(Ya0Ma1)
 
-      EY11_sim <- c(EY11_sim, sum(y11)/(n*nsims)) #E(Ya1Ma1)
+      EY11_sim <- c(EY11_sim, sum(y11)/n) #E(Ya1Ma1)
 
       }
 
@@ -835,3 +909,4 @@ causal_mediation <- function(data, method = c("delta", "bootstrap", "simulation"
    return(out)
 
   }
+
