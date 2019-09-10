@@ -1,18 +1,18 @@
-causal_mediation <- function(data = NULL, outcome = NULL, exposure = NULL,
-                             exposure.type = "continuous", mediator = NULL, covariates = NULL, vecc = NULL,
-                             EMint = TRUE, MMint = TRUE, EMint.terms = NULL, MMint.terms = NULL,
-                             event = NULL,
+causal_mediation <- function(data = NULL, outcome = NULL, exposure = NULL, exposure.type = "binary",
+                             mediator = NULL, Mintertwined = FALSE, Mjoint = TRUE,
+                             covariates = NULL, vecc = NULL,
+                             EMint = FALSE, MMint = FALSE, EMMint = FALSE,
+                             EMint.terms = NULL, MMint.terms = NULL, EMMint.terms = NULL,
+                             event = NULL, mreg = "linear", yreg = "linear",
                              m_star = 0, a_star = 0, a = 1,
-                             mreg = "linear", yreg = "linear",
-                             model = "sem",
-                             sem.method = "delta",
+                             model = "standard", est.method = "delta",
                              nboot = 1000, conf = 0.95, nsims = 1000, nrep = 5) {
 
-  if (!is.null(exposure.type)&&!(exposure.type %in% c("continuous", "binary","categorical"))) {
-    stop("Unsupported exposure type")
+  if (length(mreg) < length(mediator)) {
+    stop("Unspecified mediator model")
   }
 
-  if (!(mreg %in% c("linear", "logistic"))) {
+  if (!all(mreg %in% c("linear", "logistic"))) {
     stop("Unsupported mediator regression model")
   }
 
@@ -21,41 +21,56 @@ causal_mediation <- function(data = NULL, outcome = NULL, exposure = NULL,
     stop("Unsupported outcome regression model")
   }
 
-  if (!(model %in% c("sem", "ne"))) {
+  if (!(model %in% c("standard", "ne", "wb", "rb"))) {
     stop("Unsupported causal mediation model")
   }
 
-  formulas <- create_formulas(outcome = outcome, exposure = exposure,
-                              exposure.type, mediator = mediator, covariates = covariates,
-                              EMint = EMint, MMint = MMint,
+  if (length(mediator) > 4) {
+    stop("The maximum number of mediators supported is 4")
+  }
+
+
+  formulas <- create_formulas(outcome = outcome, exposure = exposure, mediator = mediator,
+                              covariates = covariates, EMint = EMint,
                               EMint.terms = EMint.terms, MMint.terms = MMint.terms,
-                              event = event, mreg = mreg, yreg = yreg)
+                              EMMint.terms = EMMint.terms, event = event, mreg = mreg, yreg = yreg)
 
   regressions <- run_regressions(formulas = formulas, mreg = mreg, yreg = yreg, data = data)
 
 ##########################################################################################################
-#########################################Structural Equation Model#######################################
+################################################Standard Model############################################
 ##########################################################################################################
 
-  if (model == "sem") {
+  if (model == "standard") {
 
     if (length(mediator) > 1) {
       stop("Structural Equation Model is not supported for multiple mediators")
     }
 
-    if (exposure.type == "categorical") {
-      stop("Structural Equation Model is not supported for categorical exposure")
+    if (!(exposure.type %in% c("continuous", "binary"))) {
+      stop("Standard Model only supports binary and continuous exposure")
     }
 
-    if (!(sem.method %in% c("delta", "bootstrap", "simulation"))) {
+    if (!(est.method %in% c("delta", "bootstrap", "simulation"))) {
       stop("Unsupported estimation method for the Structural Equation Model")
     }
 
-    if (is.null(covariates) & !is.null(vecc)) {
+    if ((is.null(covariates) & !is.null(vecc))) {
+
        warning("Incompatible arguments")
-       } else if (!is.null(covariates) & is.null(vecc)) {
+
+       } else if (!is.null(covariates) & is.null(vecc) & is.numeric(data[,covariates])) {
+
        vecc <- colMeans(as.data.frame(data[, covariates]))
-    }
+
+       } else if (!is.null(covariates) & is.null(vecc) & is.numeric(data[,covariates]) == FALSE) {
+
+         vecc <- as.vector(unlist(sapply(covariates, FUN = function(x) {
+           if (is.numeric(data[, x]) == FALSE) {
+             as.vector(colMeans(as.data.frame(model.matrix(formula(paste("~", x)), data = data)[, -1])))
+           } else  as.vector(mean(data[, x]))})))
+
+       }
 
     coef <- get_coef(regressions = regressions, mreg = mreg, yreg = yreg)
 
@@ -82,7 +97,7 @@ causal_mediation <- function(data = NULL, outcome = NULL, exposure = NULL,
 
     ###############################Delta method: 3 way and 4 way decomposition################################
 
-    if (sem.method == "delta") {
+    if (est.method == "delta") {
 
     theta0 <- "x1"
 
@@ -612,9 +627,9 @@ causal_mediation <- function(data = NULL, outcome = NULL, exposure = NULL,
 
     #####################################Bootstrapping: 3 way and 4 way decomposition####################################
 
-    if (sem.method == "bootstrap") {
+    if (est.method == "bootstrap") {
 
-    out <- boot::boot(data = data, statistic = bootstrap_step, R = nboot,
+    out <- boot::boot(data = data, statistic = bootstrap_step_singleM, R = nboot,
                       outcome = outcome, exposure = exposure, exposure.type = exposure.type,
                       mediator = mediator,
                       covariates = covariates, vecc = vecc, EMint = EMint,
@@ -690,7 +705,7 @@ causal_mediation <- function(data = NULL, outcome = NULL, exposure = NULL,
 
     ###############################Simulation-based approach: 3 way and 4 way decomposition##################################
 
-    if (sem.method == "simulation") {
+    if (est.method == "simulation") {
 
     EY0m_sim <- EY1m_sim <- EY00_sim <- EY01_sim <- EY10_sim <- EY11_sim <-c()
 
@@ -729,17 +744,20 @@ causal_mediation <- function(data = NULL, outcome = NULL, exposure = NULL,
         colnames(ydesign10) <- colnames(ydesign11) <- c(exposure, mediator, covariates)
 
       # simulate counterfactual mediators
-      y0m <- predict(regressions_sim$outcome_regression, newdata =  ydesign0m, type = "response")
 
-      y1m <- predict(regressions_sim$outcome_regression, newdata =  ydesign1m, type = "response")
+      type <- ifelse(yreg != "coxph", "response", "risk")
 
-      y00 <- predict(regressions_sim$outcome_regression, newdata =  ydesign00, type = "response")
+      y0m <- predict(regressions_sim$outcome_regression, newdata =  ydesign0m, type = type)
 
-      y01 <- predict(regressions_sim$outcome_regression, newdata =  ydesign01, type = "response")
+      y1m <- predict(regressions_sim$outcome_regression, newdata =  ydesign1m, type = type)
 
-      y10 <- predict(regressions_sim$outcome_regression, newdata =  ydesign10, type = "response")
+      y00 <- predict(regressions_sim$outcome_regression, newdata =  ydesign00, type = type)
 
-      y11 <- predict(regressions_sim$outcome_regression, newdata =  ydesign11, type = "response")
+      y01 <- predict(regressions_sim$outcome_regression, newdata =  ydesign01, type = type)
+
+      y10 <- predict(regressions_sim$outcome_regression, newdata =  ydesign10, type = type)
+
+      y11 <- predict(regressions_sim$outcome_regression, newdata =  ydesign11, type = type)
 
       # calculate causal effect components
       EY0m_sim <- c(EY0m_sim, sum(y0m)/n) #E(Ya0m*)
@@ -947,6 +965,10 @@ causal_mediation <- function(data = NULL, outcome = NULL, exposure = NULL,
 
   if (model == "ne") {
 
+    if (Mintertwined == TRUE) {
+      stop("Natural effect model doesn't support intertwined mediators")
+    }
+
     if (!(yreg %in% c("linear", "logistic", "loglinear", "poisson", "quasipoisson", "negbin"))) {
       stop("Unsupported outcome regression model for the natural effect model")
     }
@@ -971,11 +993,98 @@ causal_mediation <- function(data = NULL, outcome = NULL, exposure = NULL,
     assign("medflex_formula", medflex_formula, envir = globalenv())
 
     out <- summary(medflex::neEffdecomp(medflex::neModel(as.formula(medflex_formula),
-                                                            expData = expData, se = "robust")))
+                          family = regressions$outcome_regression$family,
+                          expData = expData, se = "robust")))$coefficients
 
   }
+
+
+##########################################################################################################
+#############################################Weighting-based Approach#####################################
+##########################################################################################################
+
+  if (model == "wb") {
+
+    if (Mintertwined == TRUE && Mjoint == FALSE && length(M) > 1) {
+      stop("Weighting-based model can't be used to calculate individual mediated effects for intertwined mediators")
+    }
+
+    if (exposure.type != "binary") {
+      stop("The weighting-based approach only supports binary exposure")
+    }
+
+    effect_estimates <- bootstrap_step_multipleM(data = data, indices = 1:nrow(data),
+                                                 outcome = outcome, exposure = exposure,
+                                                 model = "wb",
+                                                 mediator = mediator, covariates = covariates, vecc = vecc,
+                                                 EMint = EMint, EMint.terms = EMint.terms,
+                                                 MMint.terms = MMint.terms, EMMint.terms = EMMint.terms,
+                                                 event = event, mreg = mreg, yreg = yreg,
+                                                 m_star = m_star, a_star = a_star, a = a)
+
+    out <- boot::boot(data = data, statistic = bootstrap_step_multipleM, R = nboot,
+                      outcome = outcome, exposure = exposure,
+                      mediator = mediator, EMint = EMint, EMint.terms = EMint.terms,
+                      MMint.terms = MMint.terms, EMMint.terms = EMMint.terms,
+                      covariates = covariates, vecc = vecc, model = "wb",
+                      event = event, mreg = mreg, yreg = yreg,
+                      m_star = m_star, a_star = a_star, a = a)
+
+    se <- apply(out$t, 2, sd)
+
+    out <- effect_estimates
+
+    for (i in 1:length(effect_estimates))
+      out[paste0(names(effect_estimates)[i], "_se")] <- se[i]
+
+  }
+
+##########################################################################################################
+#############################################Regression-based Approach#####################################
+##########################################################################################################
+
+  if (model == "rb") {
+
+    if (Mintertwined == TRUE && Mjoint == FALSE && length(M) > 1) {
+      stop("Regression-based model can't be used to calculate individual mediated effects for intertwined mediators")
+    }
+
+    if (yreg != "linear"&&all(mreg == "linear") == FALSE) {
+      stop("The regression-based model only supports continuous outcome when there exists at least one nonlinear mediator")
+    }
+
+    if (!is.null(MMint.terms) | !is.null(EMMint.terms)) {
+      stop("The regression-based model doesn't support mediator-mediator interactions")
+    }
+
+    effect_estimates <- bootstrap_step_multipleM(data = data, indices = 1:nrow(data),
+                                                 outcome = outcome, exposure = exposure,
+                                                 model = "rb",
+                                                 mediator = mediator, covariates = covariates, vecc = vecc,
+                                                 EMint = EMint, EMint.terms = EMint.terms,
+                                                 event = event, mreg = mreg, yreg = yreg,
+                                                 m_star = m_star, a_star = a_star, a = a)
+
+    out <- boot::boot(data = data, statistic = bootstrap_step_multipleM, R = nboot,
+                      outcome = outcome, exposure = exposure,
+                      mediator = mediator, EMint = EMint, EMint.terms = EMint.terms,
+                      covariates = covariates, vecc = vecc, model = "rb",
+                      event = event, mreg = mreg, yreg = yreg,
+                      m_star = m_star, a_star = a_star, a = a)
+
+    se <- apply(out$t, 2, sd)
+
+    out <- effect_estimates
+
+    for (i in 1:length(effect_estimates))
+      out[paste0(names(effect_estimates)[i], "_se")] <- se[i]
+
+  }
+
 
   return(out)
 
 }
+
+
 
