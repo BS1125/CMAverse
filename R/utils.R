@@ -1,5 +1,5 @@
 create_formulas <- function(outcome, exposure, mediator, covariates,
-                            EMint, EMint.terms, MMint.terms, EMMint.terms,
+                            EMint, MMint, EMMint, EMint.terms, MMint.terms, EMMint.terms,
                             event, mreg, yreg) {
 
   mediator_formula <- paste(mediator, exposure, sep = " ~ ")
@@ -20,9 +20,19 @@ create_formulas <- function(outcome, exposure, mediator, covariates,
       stop("Exposure-mediator interaction terms need to be specified")
     } else if (EMint == FALSE) EMint.terms <- NULL
 
+    if (MMint == TRUE&&length(MMint.terms) == 0) {
+      stop("Mediator-mediator interaction terms need to be specified")
+    } else if (MMint == FALSE) MMint.terms <- NULL
+
+    if (EMMint == TRUE&&length(EMMint.terms) == 0) {
+      stop("Exposure-mediator-mediator interaction terms need to be specified")
+    } else if (EMMint == FALSE) EMMint.terms <- NULL
+
+    if (!is.null(c(EMint.terms, MMint.terms, EMMint.terms))) {
     if(!all(unlist(strsplit(c(EMint.terms, MMint.terms, EMMint.terms),
                             split = "[*]")) %in% c(exposure, mediator))){
       stop("Variables other than exposure and mediators in interaction terms")
+      }
     }
 
     if (!is.null(EMMint.terms)) {
@@ -38,7 +48,7 @@ create_formulas <- function(outcome, exposure, mediator, covariates,
 
       int.terms <- unique(c(EMint.terms, MMint.terms, EMMint.terms, int.main.effect))
 
-      }
+      } else int.terms <- unique(c(EMint.terms, MMint.terms))
 
      outcome_formula  <- paste(c(paste(outcome, exposure, sep = " ~ "), mediator,
                                   int.terms), collapse = " + ")
@@ -74,7 +84,7 @@ create_formulas <- function(outcome, exposure, mediator, covariates,
 }
 
 
-run_regressions <- function(formulas = NULL, yreg, mreg, data = NULL) {
+run_regressions <- function(formulas = NULL, model, yreg, mreg, data = NULL) {
 
   outcome_formula <- formulas$outcome_formula
 
@@ -116,14 +126,15 @@ run_regressions <- function(formulas = NULL, yreg, mreg, data = NULL) {
     outcome_regression <- survreg(as.formula(outcome_formula), dist = "weibull", data = data)
   }
 
-  mediator_regression <- lapply(1:length(mediator), FUN = function(x) {
+  if (!(model == "ne" | model == "wb")) {
+  mediator_regression <- lapply(1:length(mediator_formula), FUN = function(x) {
     if (mreg[x] == "linear") {
       glm(mediator_formula[x],
           family = gaussian(),data = data)
     } else if (mreg[x] == "logistic") {
       glm(mediator_formula[x],
           family = binomial("logit"), data = data)}})
-
+   } else mediator_regression <- NULL
 
   regressions <- list(mediator_regression = mediator_regression,
                       outcome_regression = outcome_regression)
@@ -140,16 +151,16 @@ get_coef <- function(regressions = NULL, mreg, yreg) {
   outcome_regression <- regressions$outcome_regression
 
   ## Store coefficients from regressions
-  betas  <- lapply(1:length(mediator), FUN = function(x) coefficients(mediator_regression[[x]]))
+  betas  <- lapply(1:length(mediator_regression), FUN = function(x) coefficients(mediator_regression[[x]]))
 
   thetas <- coefficients(outcome_regression)
 
   ## Store covariances from regressions
-  vcov_betas <- lapply(1:length(mediator), FUN = function(x) vcov(mediator_regression[[x]]))
+  vcov_betas <- lapply(1:length(mediator_regression), FUN = function(x) vcov(mediator_regression[[x]]))
 
   vcov_thetas <- vcov(outcome_regression)
 
-  variance <- lapply(1:length(mediator), FUN = function(x) {
+  variance <- lapply(1:length(mediator_regression), FUN = function(x) {
       if (mreg[x] == "linear") { sigma(mediator_regression[[x]])^2
       } else if (mreg[x] == "logistic") NULL })
 
@@ -157,7 +168,7 @@ get_coef <- function(regressions = NULL, mreg, yreg) {
     vcov_thetas <- vcov_thetas[-nrow(vcov_thetas), -ncol(vcov_thetas)]
 
   ## Build block diagonal matrix
-  vcov_block <- lapply(1:length(mediator), FUN = function(x) Matrix::bdiag(vcov_thetas, vcov_betas[[x]]))
+  vcov_block <- lapply(1:length(mediator_regression), FUN = function(x) Matrix::bdiag(vcov_thetas, vcov_betas[[x]]))
 
   coef <- list(betas = betas, thetas = thetas,
                vcov_betas = vcov_betas, vcov_thetas = vcov_thetas, vcov_block = vcov_block,
@@ -168,18 +179,19 @@ get_coef <- function(regressions = NULL, mreg, yreg) {
 
 
 bootstrap_step_singleM <- function(data, indices, outcome, exposure, exposure.type,
-                           mediator, covariates, vecc, EMint,
+                           mediator, covariates, vecc, EMint, model,
                            event, mreg, yreg, m_star, a_star, a) {
 
   data_boot <- data[indices, ]
 
   formulas <- create_formulas(outcome = outcome, exposure = exposure,
                                mediator = mediator, covariates = covariates,
-                               EMint = EMint, EMint.terms = NULL,
-                               MMint = FALSE, MMint.terms = NULL,
+                               EMint = EMint, MMint = F, EMMint = F, EMint.terms = NULL,
+                               MMint.terms = NULL, EMMint.terms = NULL,
                                event = event, mreg = mreg, yreg = yreg)
 
-  regressions <- run_regressions(formulas = formulas, mreg = mreg, yreg = yreg, data = data_boot)
+  regressions <- run_regressions(formulas = formulas, model = model,
+                                 mreg = mreg, yreg = yreg, data = data_boot)
 
   coef <- get_coef(regressions = regressions, mreg = mreg, yreg = yreg)
 
@@ -219,22 +231,22 @@ bootstrap_step_singleM <- function(data, indices, outcome, exposure, exposure.ty
       cde <- unname((thetas[exposure] + EMintTerm * m_star * (a - a_star)))
 
       pnde <- unname(thetas[exposure] * (a - a_star) + EMintTerm*(a - a_star) *
-                       (exp(betas[1] + betas[[1]][exposure] * a_star + covariatesTerm) /
-                          (1 + exp(betas[1] + betas[[1]][exposure] * a_star + covariatesTerm))))
+                       (exp(betas[[1]][1] + betas[[1]][exposure] * a_star + covariatesTerm) /
+                          (1 + exp(betas[[1]][1] + betas[[1]][exposure] * a_star + covariatesTerm))))
 
       tnde <- unname(thetas[exposure] * (a - a_star) + EMintTerm*(a - a_star) *
-                       (exp(betas[1] + betas[[1]][exposure] * a + covariatesTerm) /
-                          (1 + exp(betas[1] + betas[[1]][exposure] * a + covariatesTerm))))
+                       (exp(betas[[1]][1] + betas[[1]][exposure] * a + covariatesTerm) /
+                          (1 + exp(betas[[1]][1] + betas[[1]][exposure] * a + covariatesTerm))))
 
-      pnie <- unname((thetas[mediator]+EMintTerm*a_star) * (exp(betas[1] +
-                                                                        betas[[1]][exposure] * a + covariatesTerm) / (1 + exp(betas[1] +
-                                                                                                                            betas[[1]][exposure] * a + covariatesTerm)) - exp(betas[1] + betas[[1]][exposure] * a_star +
-                                                                                                                                                                            covariatesTerm) / (1 + exp(betas[1] + betas[[1]][exposure] * a_star + covariatesTerm))))
+      pnie <- unname((thetas[mediator]+EMintTerm*a_star) * (exp(betas[[1]][1] +
+                                                                        betas[[1]][exposure] * a + covariatesTerm) / (1 + exp(betas[[1]][1] +
+                                                                                                                            betas[[1]][exposure] * a + covariatesTerm)) - exp(betas[[1]][1] + betas[[1]][exposure] * a_star +
+                                                                                                                                                                            covariatesTerm) / (1 + exp(betas[[1]][1] + betas[[1]][exposure] * a_star + covariatesTerm))))
 
-      tnie <- unname((thetas[mediator]+EMintTerm*a) * (exp(betas[1] +
-                                                                   betas[[1]][exposure] * a + covariatesTerm) / (1 + exp(betas[1] +
-                                                                                                                       betas[[1]][exposure] * a + covariatesTerm)) - exp(betas[1] + betas[[1]][exposure] * a_star +
-                                                                                                                                                                       covariatesTerm) / (1 + exp(betas[1] + betas[[1]][exposure] * a_star + covariatesTerm))))
+      tnie <- unname((thetas[mediator]+EMintTerm*a) * (exp(betas[[1]][1] +
+                                                                   betas[[1]][exposure] * a + covariatesTerm) / (1 + exp(betas[[1]][1] +
+                                                                                                                       betas[[1]][exposure] * a + covariatesTerm)) - exp(betas[[1]][1] + betas[[1]][exposure] * a_star +
+                                                                                                                                                                       covariatesTerm) / (1 + exp(betas[[1]][1] + betas[[1]][exposure] * a_star + covariatesTerm))))
 
       }
 
@@ -277,13 +289,13 @@ bootstrap_step_singleM <- function(data, indices, outcome, exposure, exposure.ty
 
       cde_rr <- unname(exp((thetas[exposure] + EMintTerm * m_star) * (a - a_star)))
 
-      pnde_rr <- unname(exp((thetas[exposure] + EMintTerm * (betas[1] + betas[[1]][exposure] * a_star +
-                                                                   covariatesTerm + thetas[mediator]  * variance)) * (a - a_star) +
-                           0.5 * EMintTerm ^ 2 * variance * (a^2 - a_star ^ 2)))
+      pnde_rr <- unname(exp((thetas[exposure] + EMintTerm * (betas[[1]][1] + betas[[1]][exposure] * a_star +
+                                                                   covariatesTerm + thetas[mediator]  * variance[[1]])) * (a - a_star) +
+                           0.5 * EMintTerm ^ 2 * variance[[1]] * (a^2 - a_star ^ 2)))
 
-      tnde_rr <- unname(exp((thetas[exposure] + EMintTerm * (betas[1] + betas[[1]][exposure] * a +
-                                                                   covariatesTerm + thetas[mediator]  * variance)) * (a - a_star) +
-                           0.5 * EMintTerm ^ 2 * variance * (a^2 - a_star ^ 2)))
+      tnde_rr <- unname(exp((thetas[exposure] + EMintTerm * (betas[[1]][1] + betas[[1]][exposure] * a +
+                                                                   covariatesTerm + thetas[mediator]  * variance[[1]])) * (a - a_star) +
+                           0.5 * EMintTerm ^ 2 * variance[[1]] * (a^2 - a_star ^ 2)))
 
       pnie_rr <- unname(exp((thetas[mediator] * betas[[1]][exposure] +
                             EMintTerm * betas[[1]][exposure] * a_star) * (a - a_star)))
@@ -293,13 +305,13 @@ bootstrap_step_singleM <- function(data, indices, outcome, exposure, exposure.ty
 
       cde_err <- unname(exp(thetas[exposure]*(a-a_star)+thetas[mediator]*m_star+
                               EMintTerm*a*m_star- (thetas[mediator]+EMintTerm*a_star)*
-                               (betas['(Intercept)']+betas[[1]][exposure]*a_star+
-                                  sum(betas[3:(2+length(vecc))]*t(vecc)))-
-                               0.5*(thetas[mediator]+EMintTerm*a_star)^2*coef$variance)-
+                               (betas[[1]][1]+betas[[1]][exposure]*a_star+
+                                  covariatesTerm)-
+                               0.5*(thetas[mediator]+EMintTerm*a_star)^2*variance[[1]])-
                            exp(thetas[mediator]*m_star+EMintTerm*a_star*m_star-
-                                 (thetas[mediator]+EMintTerm*a_star)*(betas['(Intercept)']+
-                                 betas[[1]][exposure]*a_star+sum(betas[3:(2+length(vecc))]*t(vecc)))-
-                                 0.5*(thetas[mediator]+EMintTerm*a_star)^2*coef$variance))
+                                 (thetas[mediator]+EMintTerm*a_star)*(betas[[1]][1]+
+                                 betas[[1]][exposure]*a_star+covariatesTerm)-
+                                 0.5*(thetas[mediator]+EMintTerm*a_star)^2*variance[[1]]))
 
     }
 
@@ -308,36 +320,36 @@ bootstrap_step_singleM <- function(data, indices, outcome, exposure, exposure.ty
       cde_rr <- unname(exp((thetas[exposure] + EMintTerm*m_star) * (a - a_star)))
 
       pnde_rr <- unname((exp(thetas[exposure] * (a - a_star)) * (1 + exp(thetas[mediator] +
-                                                                         EMintTerm * a + betas[1] + betas[[1]][exposure] * a_star +
+                                                                         EMintTerm * a + betas[[1]][1] + betas[[1]][exposure] * a_star +
                                                                          covariatesTerm))) /(1 + exp(thetas[mediator] + EMintTerm * a_star +
-                                                                                                       betas[1] + betas[[1]][exposure] * a_star + covariatesTerm)))
+                                                                                                       betas[[1]][1] + betas[[1]][exposure] * a_star + covariatesTerm)))
 
       tnde_rr <- unname((exp(thetas[exposure] * (a - a_star)) * (1 + exp(thetas[mediator] +
-                                                                         EMintTerm * a + betas[1] + betas[[1]][exposure] * a + covariatesTerm))) /
-                       (1 + exp(thetas[mediator] + EMintTerm * a_star +  betas[1] +
+                                                                         EMintTerm * a + betas[[1]][1] + betas[[1]][exposure] * a + covariatesTerm))) /
+                       (1 + exp(thetas[mediator] + EMintTerm * a_star +  betas[[1]][1] +
                                   betas[[1]][exposure] * a + covariatesTerm)))
 
-      pnie_rr <- unname(((1 + exp(betas[1] + betas[[1]][exposure] * a_star + covariatesTerm)) *
-                        (1 + exp(thetas[mediator] + EMintTerm * a_star + betas[1] +
+      pnie_rr <- unname(((1 + exp(betas[[1]][1] + betas[[1]][exposure] * a_star + covariatesTerm)) *
+                        (1 + exp(thetas[mediator] + EMintTerm * a_star + betas[[1]][1] +
                                    betas[[1]][exposure] * a + covariatesTerm))) /
-                       ((1 + exp(betas[1] + betas[[1]][exposure] * a + covariatesTerm)) *
-                          (1+ exp(thetas[mediator] + EMintTerm * a_star + betas[1] +
+                       ((1 + exp(betas[[1]][1] + betas[[1]][exposure] * a + covariatesTerm)) *
+                          (1+ exp(thetas[mediator] + EMintTerm * a_star + betas[[1]][1] +
                                     betas[[1]][exposure] * a_star + covariatesTerm))))
 
-      tnie_rr <- unname(((1 + exp(betas[1] + betas[[1]][exposure] * a_star + covariatesTerm)) *
-                        (1 + exp(thetas[mediator] + EMintTerm * a + betas[1] + betas[[1]][exposure] * a +
-                                   covariatesTerm))) / ((1 + exp(betas[1] + betas[[1]][exposure] * a + covariatesTerm)) *
-                                                          (1 + exp(thetas[mediator] + EMintTerm * a + betas[1] + betas[[1]][exposure] * a_star +
+      tnie_rr <- unname(((1 + exp(betas[[1]][1] + betas[[1]][exposure] * a_star + covariatesTerm)) *
+                        (1 + exp(thetas[mediator] + EMintTerm * a + betas[[1]][1] + betas[[1]][exposure] * a +
+                                   covariatesTerm))) / ((1 + exp(betas[[1]][1] + betas[[1]][exposure] * a + covariatesTerm)) *
+                                                          (1 + exp(thetas[mediator] + EMintTerm * a + betas[[1]][1] + betas[[1]][exposure] * a_star +
                                                                      covariatesTerm))))
 
       cde_err <- unname((exp(thetas[exposure]*(a-a_star)+thetas[mediator]*m_star+
-                               EMintTerm*a*m_star)*(1+exp(betas['(Intercept)']+
-                  betas[[1]][exposure]*a_star+sum(betas[3:(2+length(vecc))]*t(vecc))))/(1+exp(betas['(Intercept)']+
-                  betas[[1]][exposure]*a_star+sum(betas[3:(2+length(vecc))]*t(vecc))+thetas[mediator]+
+                               EMintTerm*a*m_star)*(1+exp(betas[[1]]["(Intercept)"]+
+                  betas[[1]][exposure]*a_star+covariatesTerm))/(1+exp(betas[[1]]["(Intercept)"]+
+                  betas[[1]][exposure]*a_star+covariatesTerm+thetas[mediator]+
                     EMintTerm*a_star))-exp(thetas[mediator]*m_star+
-                                                   EMintTerm*a_star*m_star)*(1+exp(betas['(Intercept)']+
-                  betas[[1]][exposure]*a_star+sum(betas[3:(2+length(vecc))]*t(vecc))))/(1+exp(betas['(Intercept)']+
-                  betas[[1]][exposure]*a_star+sum(betas[3:(2+length(vecc))]*t(vecc))+thetas[mediator]+
+                                                   EMintTerm*a_star*m_star)*(1+exp(betas[[1]]["(Intercept)"]+
+                  betas[[1]][exposure]*a_star+covariatesTerm))/(1+exp(betas[[1]]["(Intercept)"]+
+                  betas[[1]][exposure]*a_star+covariatesTerm+thetas[mediator]+
                     EMintTerm*a_star))))
 
     }
@@ -386,21 +398,30 @@ bootstrap_step_singleM <- function(data, indices, outcome, exposure, exposure.ty
 
 
 bootstrap_step_multipleM <- function(data, indices, outcome, exposure,
-                                     mediator, covariates, vecc,
-                                     EMint, EMint.terms, MMint.terms, EMMint.terms, model,
+                                     mediator, covariates, vecc, model,
+                                     EMint, MMint, EMMint, EMint.terms, MMint.terms, EMMint.terms,
                                      event, mreg, yreg, m_star, a_star, a) {
 
   data_boot <- data[indices, ]
+
+  if (length(mediator) == 1&&EMint == TRUE) EMint.terms <- c(paste(exposure, mediator, sep = "*"))
 
   if (model == "rb") {
 
   formulas <- create_formulas(outcome = outcome, exposure = exposure,
                               mediator = mediator, covariates = covariates,
-                              EMint = EMint, EMint.terms = EMint.terms,
-                              MMint.terms = NULL, EMMint.terms = NULL,
+                              EMint = EMint, MMint = F, EMMint = F,
+                              EMint.terms = EMint.terms, MMint.terms = NULL, EMMint.terms = NULL,
                               event = event, mreg = mreg, yreg = yreg)
 
-  regressions <- run_regressions(formulas = formulas, mreg = mreg, yreg = yreg, data = data_boot)
+  if (!is.null(EMint.terms)) {
+
+  EMint.index <- sapply(1:length(EMint.terms),
+                        FUN = function(x) which(mediator %in% strsplit(EMint.terms, split = "[*]")[[x]]))
+
+  }
+
+  regressions <- run_regressions(formulas = formulas, model = model, mreg = mreg, yreg = yreg, data = data_boot)
 
   coef <- get_coef(regressions = regressions, mreg = mreg, yreg = yreg)
 
@@ -422,7 +443,7 @@ bootstrap_step_multipleM <- function(data, indices, outcome, exposure,
     cde <- tnde <- pnde <- unname(thetas[exposure] * (a - a_star))
 
     tnie <- pnie <-  unname(sum(sapply(1:length(mediator), FUN = function(x) if (mreg[x] == "linear") {
-      betas[[x]][exposure] * thetas[mediator[x]] *(a - a_star)
+      betas[[x]][exposure] * thetas[mediator[x]] * (a - a_star)
     } else if (mreg[x] == "logistic") {
       (exp(betas[[x]][1] + betas[[x]][exposure] * a + covariatesTerm[[x]]) / (1 + exp(betas[[x]][1] +
                                                                                         betas[[x]][exposure] * a + covariatesTerm[[x]])) -
@@ -502,7 +523,8 @@ bootstrap_step_multipleM <- function(data, indices, outcome, exposure,
 
       RRcde <- RRcde * exp(sum(EMintTerm * m_star[EMint.index] * (a - a_star)))
 
-      Mcovariance <- diag(sqrt(unlist(variance)))%*%cor(data_boot[, mediator])%*%diag(sqrt(unlist(variance)))
+      if (length(mediator)==1) {Mcovariance <- unlist(variance)
+      } else  Mcovariance <- diag(sqrt(unlist(variance)))%*%cor(data_boot[, mediator])%*%diag(sqrt(unlist(variance)))
 
       RRpnde <- RRpnde * unname(exp(sum(sapply(1:length(EMint.terms), FUN = function(x)
         EMintTerm[x] * (betas[[EMint.index[x]]]["(Intercept)"] + betas[[EMint.index[x]]][exposure] * a_star +
@@ -536,30 +558,45 @@ bootstrap_step_multipleM <- function(data, indices, outcome, exposure,
 
       RRpnie <- RRpnie * unname(exp(sum(sapply(1:length(EMint.terms), FUN = function(x)
         EMintTerm[x]*betas[[EMint.index[x]]][exposure] * a_star * (a - a_star)))))
-
-      RRte <- RRpnde * RRtnie
-
-      pm <- (RRpnde * (RRtnie - 1)) / (RRpnde * RRtnie - 1)
-
-      out <- c(RRcde = RRcde, RRpnde = RRpnde, RRtnde = RRtnde, RRpnie = RRpnie, RRtnie = RRtnie,
-               RRte = RRte, pm = pm)
     }
-  }
+
+    RRte <- RRpnde * RRtnie
+
+    pm <- (RRpnde * (RRtnie - 1)) / (RRpnde * RRtnie - 1)
+
+    out <- c(RRcde = RRcde, RRpnde = RRpnde, RRtnde = RRtnde, RRpnie = RRpnie, RRtnie = RRtnie,
+               RRte = RRte, pm = pm)
+
+    }
   } else if (model == "wb") {
 
     exposure_regression <- glm(paste(exposure, paste(covariates, collapse = "+"), sep = "~"),
                                family = binomial("logit"), data = data_boot)
 
-    w <- sapply(1:nrow(data_boot), FUN = function(i) 1/dbinom(x = data_boot[i, exposure], size = 1,
-                                                         prob = predict.glm(exposure_regression, type = "response",
-                                                                            newdata = data_boot[i, covariates])))
+    formulas <- create_formulas(outcome = outcome, exposure = exposure,
+                                mediator = mediator, covariates = covariates,
+                                EMint = EMint, MMint = MMint, EMMint = EMMint,
+                                EMint.terms = EMint.terms,
+                                MMint.terms = MMint.terms, EMMint.terms = EMMint.terms,
+                                event = event, mreg = mreg, yreg = yreg)
+
+    regressions <- run_regressions(formulas = formulas, model = model,
+                                   mreg = mreg, yreg = yreg, data = data_boot)
+
+    prob = predict.glm(exposure_regression, type = "response",
+                       newdata = setNames(as.data.frame(data_boot[, covariates]), nm = covariates))
+
+    w <- 1/dbinom(x = data_boot[, exposure], size = 1, prob = prob)
 
     data_cde <- data_boot[1,]
     data_cde[, exposure] <- a
     data_cde[, mediator] <- m_star
-    EY1m <- as.numeric(predict(regressions$outcome_regression, newdata = data_cde))
+    EY1m <- as.numeric(predict(regressions$outcome_regression, newdata = data_cde,
+                               type = ifelse(yreg != "coxph", "response", "risk")))
+
     data_cde[, exposure] <- a_star
-    EY0m <- as.numeric(predict(regressions$outcome_regression, newdata = data_cde))
+    EY0m <- as.numeric(predict(regressions$outcome_regression, newdata = data_cde,
+                               type = ifelse(yreg != "coxph", "response", "risk")))
 
     Yfitted <- predict(regressions$outcome_regression, newdata = data_boot,
                        type = ifelse(yreg != "coxph", "response", "risk"))
@@ -568,7 +605,6 @@ bootstrap_step_multipleM <- function(data, indices, outcome, exposure,
     data_cf[, exposure] <- 1 - data_boot[, exposure]
     Ycf <- predict(regressions$outcome_regression, newdata = data_cf,
                    type = ifelse(yreg != "coxph", "response", "risk"))
-
 
     EY00 <- weighted.mean(x = Yfitted[which(data_boot[, exposure] == a_star)],
                           w = w[which(data_boot[, exposure] == a_star)])
@@ -580,13 +616,6 @@ bootstrap_step_multipleM <- function(data, indices, outcome, exposure,
                           w = w[which(data_boot[, exposure] == a)])
 
     if (yreg == "linear") {
-
-      df_cde <- setNames(as.data.frame(t(c(a, m_star, rep(0, length(vecc))))),
-                         nm = c(exposure, mediator, covariates))
-
-      cde <- predict(regressions$outcome_regression,
-                     newdata = setNames(c(a, m_star, data_boot[1, covariates]),
-                                        nm = c(exposure, mediator, covariates))) -
 
       cde <- EY1m - EY0m
 
