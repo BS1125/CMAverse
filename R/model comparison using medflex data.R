@@ -7,7 +7,7 @@ library("CMA")
 data("UPBdata")
 
 impData=neImpute(UPB~attbin+negaff+age,family = binomial,nMed=1,data=UPBdata)
-neMod=neModel(UPB~attbin0+attbin1+age,family = binomial(),expData=impData,se="robust")
+neMod1=neModel(UPB~attbin0+attbin1+age,family = binomial(),expData=impData,se="robust")
 
 res1=summary(neEffdecomp(neMod))$coefficients
 
@@ -21,6 +21,23 @@ res1[,c("Estimate","Std. Error")]
 # natural direct effect   1.473154   2.011951
 # natural indirect effect 1.405780   1.155350
 # total effect            2.070930   3.688186
+
+expData=neWeight(UPB~attbin+negaff+age,family = binomial,nMed=1,data=UPBdata)
+neMod2=neModel(UPB~attbin0+attbin1+age,family = binomial(),expData=expData,se="robust")
+
+res2=summary(neEffdecomp(neMod2))$coefficients
+
+res2[, "Estimate"]=exp(summary(neEffdecomp(neMod2))$coefficients[, "Estimate"])
+
+for (i in 1:length(res2[, "Std. Error"]))
+  res2[, "Std. Error"][i] <- msm::deltamethod(as.formula("~exp(x1)"), res2[, "Estimate"][i],
+                                              summary(neEffdecomp(neMod2))$coefficients[, "Std. Error"][i])
+res2[,c("Estimate","Std. Error")]
+# Estimate Std. Error
+# natural direct effect   1.387632   1.107489
+# natural indirect effect 1.910029   3.062107
+# total effect            2.650416   6.652369
+
 
 causal_mediation(data = UPBdata, model = "ne",
                  outcome = "UPB", exposure = 'attbin', exposure.type = "binary",
