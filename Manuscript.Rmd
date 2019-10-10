@@ -1,0 +1,54 @@
+---
+title: 'CMA: A Suite of Functions For Causal Mediation Analysis'
+output: 
+  pdf_document
+---
+
+# Abstract
+
+In many research field including epidemiology, social sciences and pharmaceutical research, mediation analysis is a widely-used statistical analysis approach that can help researchers in identifying the underlying causal mechanism between the exposure of interest and the outcome within a counterfactual framework. Other than a direct causal relationship between the exposure and outcome, mediation models put forward other causal pathways in which the exposure causes the outcome through a mediator and decompose the total causal effect into direct effect and indirect effect. In this paper, we firstly describe the fundamental assumptions and effect decomposition in the counterfactual framework, and then integrates the most commonly accepted mediation including the standard mediation models accomodating single or multiple mediators and interactions, the natural effect model and the weighting-based model. Next, we develops an R package with user-friendly functions, easy-to-read output and visualization to implement these mediation models and effect decomposition. Finally, we showcase our package by a real data application.  
+
+**Keywords:** _Causal Inference; Mediation Analysis; Effect Decomposition; CMA; R_
+
+# Introduction
+
+# Methods
+
+## The Counterfactual Framework
+
+```{r echo=F,warning=F,message=F,fig.width=6,fig.height=3}
+library(dagitty)
+library(ggplot2)
+library(ggdag)
+
+
+g1 <- dagitty( "dag {
+    A -> Y
+    A -> M1 -> Y
+    A -> M2 -> Y
+    C -> A
+    C -> M1
+    C -> M2
+    C -> Y
+}")
+
+coordinates(g1) <- list(x=c(A=0,Y=4,M1=2,M2=2,C=0.5),y=c(A=0,Y=0,M1=-2,M2=-0.5,C=-3))
+plot(g1)
+
+coordinates(g1) <- list(x=c(A=0,Y=4,M1=2,M2=2,C=0.5),y=c(A=0,Y=0,M1=2,M2=0.5,C=3))
+
+ggdag(g1)+
+  theme(axis.title.x=element_blank(),
+        axis.title.y=element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid  = element_blank(),
+        panel.background = element_rect(fill = "white"))
+```
+
+
+# Software Illustration
+
+# Data Analysis
+
+# Discussions and Conclusions 
