@@ -162,7 +162,7 @@ causal_mediation <- function(data = NULL, outcome = NULL, exposure = NULL, expos
 
         out <- simulation_approach(data = data, formulas = formulas, exposure = exposure,
                                    mediator = mediator, outcome = outcome,
-                                   covariates.pre = covariates.pre, covariates.post = covariates.post
+                                   covariates.pre = covariates.pre, covariates.post = covariates.post,
                                    mreg = mreg, yreg = yreg, model = model, nsims = nsims)
 
       }

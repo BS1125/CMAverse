@@ -1,0 +1,306 @@
+---
+title: "Summary"
+author: "Baoyi Shi"
+output: 
+  pdf_document:
+    number_sections: true
+header-includes:
+- \usepackage{caption}
+---
+
+# Supported Data Types and Functionalities
+
+rb: Regression-based Approach
+
+wb: Weighting-based Approach
+
+msm: Marginal Structural Model
+
+iorw: Inverse Odds Ratio Weighting Approach
+
+ne: Natural Effect Model
+
+g-formula: G-formula Approach
+
+\begin{center}
+\captionof{table}{Supported Data Types and Functionalities}
+\begin{tabular}{|l|l|l|l|l|l|l|}
+\hline
+
+&rb & wb & msm & iorw & ne & g-formula \\ \hline
+Linear Y & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
+Logistic Y & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
+Loglinear Y & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
+Poisson Y & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
+Quasipoisson Y & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
+NegBin Y & $\surd$& $\surd$& $\surd$& $\surd$& $\times$& $\surd$ \\ \hline
+Coxph Y & $\surd$& $\surd$& $\surd$& $\surd$& $\times$& $\surd$ \\ \hline
+AFT Exp Y & $\surd$& $\surd$& $\surd$& $\surd$& $\times$& $\surd$ \\ \hline
+AFT Weibull Y & $\surd$& $\surd$& $\surd$& $\surd$& $\times$& $\surd$ \\ \hline
+Linear M & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
+Logistic M & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
+Categorical M & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
+Any type M & $\times$& $\surd$& $\times$ & $\surd$& $\surd$& $\times$ \\ \hline
+User-defined Y/M Models & $\surd$& $\surd$& $\surd$ & $\surd$& $\times$& $\surd$ \\ \hline
+Single M & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
+Multiple M & $\surd$& $\surd$& $\times$& $\surd$& $\surd$& $\surd$ \\ \hline
+Pre-exposure Confounding & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
+Post-exposure Confounding & $\times$ & $\times$& $\surd$& $\times$& $\times$& $\surd$ \\ \hline
+2-way Decomposition & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
+4-way Decomposition & $\surd$& $\surd$& $\surd$& $\times$& $\times$& $\surd$ \\ \hline
+Estimation: Closed-form Parameters Function & $\surd$& $\times$& $\surd$& $\surd$& $\times$& $\times$ \\ \hline
+Estimation: Direct Imputation & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
+Inference: Delta Method & $\surd$& $\times$& $\surd$& $\surd$& $\times$& $\times$ \\ \hline
+Inference: Bootstrapping & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
+\end{tabular}
+\end{center}
+
+# Estimation and Inference
+
+## Estimation Method
+
+**Closed-form Parameters Function**
+
+Effect estimates are calculated using regression parameters. 
+
+**Direct Conterfacturals imputation**
+
+1. For subject i, simulate $M_{a,i}$ by the predicted values of mediator regression models under $A=a,C=C_i$ and simulate $M_{a^*,i}$ by the predicted values of mediator regression models under $A=a^*,C=C_i$.
+
+2. For subject i, simulate $Y_{aMa,i}$ by the predicted value of the outcome regression model under $A=a,M=M_{a,i},C=C_i$, simulate $Y_{aMa^*,i}$ by the predicted value of the outcome regression model under $A=a,M=M_{a^*,i},C=C_i$, simulate $Y_{a^*Ma,i}$ by the predicted value of the outcome regression model under $A=a^*,M=M_{a,i},C=C_i$ and simulate $Y_{a^*Ma^*,i}$ by the predicted value of the outcome regression model under $A=a^*,M=M_{a^*,i},C=C_i$. 
+
+3. Estimate $E[Y_{aMa}]$, $E[Y_{a^*Ma^*}]$, $E[Y_{aMa^*}]$, and $E[Y_{a^*Ma}]$ by $\frac{\sum_{i=1}^NY_{aMa,i}}{n}$, $\frac{\sum_{i=1}^NY_{a^*Ma^*,i}}{n}$, $\frac{\sum_{i=1}^NY_{aMa^*,i}}{n}$ and $\frac{\sum_{i=1}^NY_{a^*Ma,i}}{n}$ respectively.
+
+## Inference Method
+
+**Delta Method**
+
+Standard errors of effects are estimated using the standard errors of regression parameters and delta method based on the closed-form parameters function.
+
+**Bootstrapping**
+
+Bootstrap the data, refit the regression models, and calculate a bootstrap estimate. Repeat the bootstrapping K times and calculate the standard error of these K boostrap estimates for each estimand, which is the estimated standard error of this estimand.
+
+# Pre-treatment Confounding
+
+## DAG
+
+```{r echo=F,fig.width=6,fig.height=3}
+g1 <- dagitty::dagitty( "dag {
+    A -> Y
+    A -> M -> Y
+    C -> A
+    C -> M
+    C -> Y
+}")
+
+dagitty::coordinates(g1) <- list(x=c(A=0,Y=4,M=2,C=0.2),y=c(A=0,Y=0,M=-0.8,C=-1))
+
+plot(g1)
+```
+
+In the DAG, A denotes the treatment, Y denotes the outcome, M denotes a set of mediators, and C denotes a set of pre-treatment covariates.
+
+## Estimand
+
+**2-way decomposition in additive scale**
+
+$CDE=E[Y_{am}-Y_{a^*m}|C]$
+
+$PNDE=E[Y_{aM_a^*}-Y_{a^*M_a^*}|C]$
+
+$TNDE=E[Y_{aM_a}-Y_{a^*M_a}|C]$
+
+$PNIE=E[Y_{a^*M_a}-Y_{a^*M_a^*}|C]$
+
+$TNIE=E[Y_{aM_a}-Y_{aM_a^*}|C]$
+
+$TE=PNDE+TNDE$
+
+
+**2-way decomposition in RR scale**
+
+$rr\_CDE=E[Y_{am}|C]/E[Y_{a^*m}|C]$
+
+$rr\_PNDE=E[Y_{aM_a^*}|C]/E[Y_{a^*M_a^*}|C]$
+
+$rr\_TNDE=E[Y_{aM_a}|C]/E[Y_{a^*M_a}|C]$
+
+$rr\_PNIE=E[Y_{a^*M_a}|C]/E[Y_{a^*M_a^*}|C]$
+
+$rr\_TNIE=E[Y_{aM_a}|C]/E[Y_{aM_a^*}|C]$
+
+$rr\_TE=rr\_PNDE\times rr\_TNDE$
+
+
+**4-way decomposition in additive scale**
+
+$CDE$ is defined above
+
+$INT_{ref}=PNDE-CDE$
+
+$INT_{med}=TNIE-PNIE$
+
+$PIE=PNIE$
+
+
+**4-way decomposition in RR scale**
+
+$err\_CDE=(E[Y_{am}-Y_{a^*m}|C])/E[Y_{a^*M_a^*}|C]$
+
+$err\_INT_{ref}=rr\_PNDE-1-err\_CDE$
+
+$err\_INT_{med}=rr\_TNIE*rr\_PNDE-rr\_PNDE-rr\_PNIE+1$
+
+$err\_PIE=rr\_PNIE-1$
+
+$err\_TE=err\_CDE+err\_INT_{ref}+err\_INT_{med}+err\_PIE$
+
+## Estimation Approaches Can be Used
+
+### Regression-based Approach
+
+Reference:
+
+https://www.ncbi.nlm.nih.gov/pubmed/23379553
+
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/
+
+**Procedures**
+
+1. Fit a regression model for Y on A, M and C.
+
+2. Fit a regression model for each mediator in M on A and C.
+
+3. Estimate the point estimates of causal effects using closed-form parameters functions or direct Conterfacturals imputation.
+
+4. Estimate the standard errors of causal effects using delta method or bootstrapping.
+
+### Weighting-based Approach
+
+Reference:
+
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/
+
+**Procedures**
+
+1. Fit a regression model for Y on A, M, C.
+
+2. For $E[Y_{a^*Ma^*}]$, estimate it by taking a weighted average of the subjects with $A=a^*$ and each subject i is given a weight $\frac{P(A=a^*)}{P(A=a^*|c_i)}$.
+
+3. For $E[Y_{aMa}]$, estimate it by taking a weighted average of the subjects with $A=a$ and each subject i is given a weight $\frac{P(A=a)}{P(A=a|c_i)}$.
+
+4. For $E[Y_{aMa^*}]$, estimate it by taking a weighted average of the predicted Y values for subjects with $A=a^*$ and each subject i is given a weight $\frac{P(A=a^*)}{P(A=a^*|c_i)}$.
+
+5. For $E[Y_{a^*Ma}]$, estimate it by taking a weighted average of the predicted Y values for subjects with $A=a$ and each subject i is given a weight $\frac{P(A=a)}{P(A=a|c_i)}$.
+
+6. Use bootsrapping to estimate the standard error for each estimand.
+
+### Inverse Odds Ratio Weighting Approach
+
+Reference:
+
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3954805/
+
+https://www.ncbi.nlm.nih.gov/pubmed/25693776
+
+**Procedures**
+
+1. Fit a model for A given M and C
+
+2. Calculate the stablized weights for each subject, $w_i=\frac{f_{A|M,C}(A=0|M_i,C_i)}{f_{A|M,C}(A=A_i|M_i,C_i)}$.
+
+3. Estimate the direct effect by a weighted regression model of Y on A and C using the weights calculated in 2. The estimated direct effect is the coefficient of A in this regression model.
+
+4. Estimate the total effect by a regression model of Y on A and C. The estimated total effect is the coefficient of A in this regression model.
+
+5. Calculate the indirect effect by subtracting the direct effect from the total effect.
+
+### Natural Effect Model
+
+Incorporate the Medflex package.
+
+### Other Approaches
+
+Approaches talked about later can also be used.
+
+# Post-treatment Confounding
+
+## DAG
+
+```{r echo=F,fig.width=6,fig.height=4}
+g1 <- dagitty::dagitty( "dag {
+    A -> Y
+    A -> M -> Y
+    C -> A
+    C -> M
+    C -> Y
+    A -> L
+    L -> Y
+    L -> M
+    C -> L
+}")
+
+dagitty::coordinates(g1) <- list(x=c(A=0,Y=4,M=2,C=0.2,L=2),y=c(A=0,Y=0,M=-0.8,C=-1,L=0.5))
+
+plot(g1)
+```
+
+In the DAG, A denotes the treatment, Y denotes the outcome, M denotes a set of mediators, C denotes a set of pre-treatment covariates and L denotes a set of post-treatment covariates.
+
+## Estimand
+
+$rNDE=E(Y_{aGa^*})-E(Y_{a^*Ga^*})=\sum_{l,m,c}\{E[Y|a,l,m,c]P(l|a,c)-E[Y|a^*,l,m,c]P(l|a^*,c)\}P(m|a^*,c)P(c)$
+
+$rNIE=E(Y_{aGa})-E(Y_{aGa^*})=\sum_{l,m,c}\{E[Y|a,l,m,c]P(l|a,c)\{P(m|a,c)-P(m|a^*,c)\}P(c)$
+
+$rTE=rNDE+rNIE$
+
+## Estimation Approaches Can be Used
+
+### G-formula Approach
+
+Reference: 
+
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5285457/
+
+**Estimation Algorithm for $E(Y_{a1Ga2})$**
+
+Let $L=(L_1, L_2,...,L_p)$ and $M=(M_1, M_2,...,M_n)$.
+
+1. Bootstrap the dataset.
+
+2. Fit models for $E(L_1|A,C)$, $E(L_2|L_1,A,C)$,..., $E(L_p|L_1,L_2,...,L_{p-1},A,C)$ using the bootstrapped dataset. Then, for each subject i, simulate the value of $L^*_{1i}$ under A=a1 by the predicted value of $L_{1i}|A=a1,C=C_i$; simulate the value of $L^*_{2i}$ under A=a1 by the predicted value of $L_2|L^*_{1i},A=a1,C=C_i$; ...; simulate the value of $L^*_{pi}$ under A=a1 by the predicted value of $L_p|L^*_{p-1,i},...,L^*_{2i},L^*_{1i},A=a1,C=C_i$.
+
+3. Fit models for $E(M_1|A,C)$, $E(M_2|M_1, A, C)$,...,$E(M_n|M_1,M_2,...,M_{n-1}, A, C)$ using the bootstrapped dataset. Then, for each subject i, simulate the value of $M^*_{1i}$ under A=a2 by the predicted value of $M_{1i}|A=a2,C=C_i$; simulate the value of $M^*_{2i}$ under A=a2 by the predicted value of $M_2|M^*_{1i},A=a2,C=C_i$; ...; simulate the value of $M^*_{ni}$ under A=a2 by the predicted value of $M_n|M^*_{n-1,i},...,M^*_{2i},M^*_{1i},A=a2,C=C_i$.
+
+4. Fit models for E(Y|A,L,M,C) using the bootstrapped dataset. Then, for each subject i, simulate the potential outcome $Y_i^*$ by the predicted value of $Y|A=a1,L_p=L^*_{pi},...,L_2=L^*_{2i},L_1=L^*_{1i},M_n=M^*_{ni},...,M_2=M^*_{2i},M_1=M^*_{1i},C=C_i$.
+
+5. Calculate mean value of $Y^*$, i.e, $\sum_{i=1}^NY_i^*$
+
+6. Repeat 1-5 K times and estimate $E(Y_{a1Ga2})$ as $\sum_{k=1}^K\sum_{i=1}^NY_{ik}^*$.
+
+
+### Marginal Structual Model
+
+Reference:
+
+https://journals.lww.com/epidem/fulltext/2009/01000/marginal_structural_models_for_the_estimation_of.6.aspx
+
+**Procedures**
+
+For rCDE:
+
+1. Fit a weighted regression model for Y on A and M where each subject i is given a weight $\frac{P(A=a_i)}{P(A=a_i|C=c_i)}\frac{P(M=m_i|A=a_i)}{P(M=m_i|A=a_i,C=c_i,L=l_i)}$.
+
+2. Get the point estimate using $CDE=E[Y_{am}-Y_{a^*m}]$ and get the standard error using bootstrapping.
+
+For rNDE and rNIE:
+
+1. Fit a weighted regression model for Y on A, M and C where each subject i is given a weight $\frac{P(A=a_i)}{P(A=a_i|C=c_i)}\frac{P(M=m_i|A=a_i)}{P(M=m_i|A=a_i,C=c_i,L=l_i)}$.
+
+2. Fit a weighted regression model for M on A and C where each subject i is given a weight $\frac{P(A=a_i)}{P(A=a_i|C=c_i)}$.
+
+3. Get the point estimate and standard error using the simulation-based approach.
+
+
