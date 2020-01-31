@@ -41,14 +41,7 @@ run_regressions <- function(model, formulas = NULL, exposure.type, covariates.po
       outcome_regression <- survreg(as.formula(outcome_formula), dist = "weibull", data = data)
     }
 
-  if (!is.null(mreg) && length(mediator_formula) == 1) {
-
-    if (mreg == "linear") {
-      mediator_regression <- lm(mediator_formula[[1]], data = data)
-    } else if (mreg == "binary") {
-      mediator_regression <- glm(mediator_formula[[1]], family = binomial("logit"),data = data)
-    }
-   } else if (!is.null(mreg) && length(mediator_formula) > 1){
+  if (!is.null(mreg)){
     mediator_regression <- lapply(1:length(mediator_formula), FUN = function(x) {
       if (mreg[x] == "linear") {
         lm(mediator_formula[[x]], data = data)
@@ -138,11 +131,9 @@ run_regressions <- function(model, formulas = NULL, exposure.type, covariates.po
                         outcome_regression = outcome_regression,
                         cde_outcome_regression = cde_outcome_regression)
 
-  }
+  } else if (model == "iorw") {
 
 ####################################Inverse Odds Ratio Weighting Approach########################
-
-  if (model == "iorw") {
 
     exposure_formula <- formulas$exposure_formula
 
@@ -175,11 +166,10 @@ run_regressions <- function(model, formulas = NULL, exposure.type, covariates.po
 
     regressions <- list(tot_outcome_regression = tot_outcome_regression,
                         dir_outcome_regression = dir_outcome_regression)
-  }
+
+    } else if (model == "g-formula") {
 
 ########################################G-formula Approach#######################################
-
-  if (model == "g-formula") {
 
     post_covar_formula <- formulas$post_covar_formula
 
@@ -193,6 +183,11 @@ run_regressions <- function(model, formulas = NULL, exposure.type, covariates.po
     regressions <- list(post_covar_regression = post_covar_regression,
                         mediator_regression = mediator_regression,
                         outcome_regression = outcome_regression)
+
+    } else {
+
+      regressions <- list(mediator_regression = mediator_regression,
+                          outcome_regression = outcome_regression)
 
   }
 

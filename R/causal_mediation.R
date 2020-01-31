@@ -5,7 +5,7 @@ causal_mediation <- function(data = NULL, outcome = NULL, exposure = NULL, expos
                              EMint.terms = NULL, MMint.terms = NULL, EMMint.terms = NULL,
                              event = NULL, mreg = "linear", yreg = "linear",
                              m_star = NULL, a_star = 0, a = 1,
-                             model = "standard", est.method = "delta",
+                             model = "rb", est.method = "delta",
                              nboot = 1000, conf = 0.95, nsims = 1000, nrep = 5) {
 
   require(dplyr)
@@ -27,7 +27,7 @@ causal_mediation <- function(data = NULL, outcome = NULL, exposure = NULL, expos
     stop("Unsupported outcome regression model")
   }
 
-  if (!(model %in% c("rb", "ne", "msm"))) {
+  if (!(model %in% c("rb", "wb", "ne", "msm", "iorw", "g-formula"))) {
     stop("Unsupported causal mediation model")
   }
 
@@ -50,6 +50,8 @@ causal_mediation <- function(data = NULL, outcome = NULL, exposure = NULL, expos
     EMint = TRUE
     MMint = TRUE
   }
+
+  if (EMint && length(mediator) == 1) EMint.terms <- paste(exposure, mediator, sep = "*")
 
   if (length(mediator) == 1 && MMint == TRUE) {
     stop("Mediator-mediator interaction doesn't apply for a single mediator")
@@ -85,8 +87,6 @@ causal_mediation <- function(data = NULL, outcome = NULL, exposure = NULL, expos
 
       vecc <- colMeans(as.data.frame(data[, covariates.pre]))
 
-    } else if (is.numeric(data[,covariates.pre]) == FALSE) {
-      stop("The standard model only supports numeric covariates.pre ")
     }
 
     if (est.method %in% c("delta", "bootstrap")) {
@@ -95,24 +95,7 @@ causal_mediation <- function(data = NULL, outcome = NULL, exposure = NULL, expos
         stop("When length(mediator) > 1, the regression-based model only supports simulation-based estimation approach")
       }
 
-
-      coef <- get_coef(regressions = regressions, mreg = mreg, yreg = yreg)
-
-      n <- nrow(data)
-
-      betas <- coef$betas
-
-      thetas <- coef$thetas
-
-      variance <- coef$variance
-
-      vcov_thetas <- coef$vcov_thetas
-
-      vcov_betas <- coef$vcov_betas
-
-      vcov_block <- coef$vcov_block
-
-      effect_estimates <- bootstrap_step(data = data, indices = c(1:nrow(data)), outcome = outcome,
+      effect_estimates <- bootstrap_step(data = data, indices = c(1:n), outcome = outcome,
                                          exposure = exposure, mediator = mediator, covariates.pre = covariates.pre,
                                          event = event, model = model, vecc = vecc,
                                          EMint = EMint, EMint.terms = EMint.terms,
@@ -122,6 +105,22 @@ causal_mediation <- function(data = NULL, outcome = NULL, exposure = NULL, expos
 ####################################################Delta method################################################
 
       if (est.method == "delta") {
+
+        coef <- get_coef(regressions = regressions, mreg = mreg, yreg = yreg)
+
+        n <- nrow(data)
+
+        betas <- coef$betas
+
+        thetas <- coef$thetas
+
+        variance <- coef$variance
+
+        vcov_thetas <- coef$vcov_thetas
+
+        vcov_betas <- coef$vcov_betas
+
+        vcov_block <- coef$vcov_block
 
       effect_se <- delta_method(mediator = mediator, thetas = thetas, betas = betas,
                                 variance = variance, vcov_block = vcov_block, EMint = EMint,

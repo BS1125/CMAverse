@@ -1,5 +1,5 @@
 simulation_approach <- function(data, formulas, exposure, mediator, outcome, covariates.pre,
-                            mreg, yreg, model, nsims) {
+                                covariates.post=NULL, mreg, yreg, model, nsims) {
 
   EY0m_sim <- EY1m_sim <- EY00_sim <- EY01_sim <- EY10_sim <- EY11_sim <-c()
 
