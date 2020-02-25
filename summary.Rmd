@@ -47,8 +47,8 @@ Post-exposure Confounding & $\times$ & $\times$& $\surd$& $\times$& $\times$& $\
 2-way Decomposition & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
 4-way Decomposition & $\surd$& $\surd$& $\surd$& $\times$& $\times$& $\surd$ \\ \hline
 Estimation: Closed-form Parameter Function & $\surd$& $\times$& $\surd$& $\surd$& $\times$& $\times$ \\ \hline
-Estimation: Direct Imputation & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
-Inference: Delta Method & $\surd$& $\times$& $\surd$& $\surd$& $\times$& $\times$ \\ \hline
+Estimation: Direct Imputation & $\surd$& $\surd$& $\surd$& $\times$& $\surd$& $\surd$ \\ \hline
+Inference: Delta Method & $\surd$& $\times$& $\surd$& $\times$& $\times$& $\times$ \\ \hline
 Inference: Bootstrapping & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
 \end{tabular}
 \end{center}
@@ -78,8 +78,8 @@ Post-exposure Confounding & $\times$ & $\times$& $\surd$& $\times$& $\times$& $\
 2-way Decomposition & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
 4-way Decomposition & $\surd$& $\surd$& $\surd$& $\times$& $\times$& $\surd$ \\ \hline
 Estimation: Closed-form Parameter Function & $\times$& $\times$& $\times$& $\surd$& $\times$& $\times$ \\ \hline
-Estimation: Direct Imputation & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
-Inference: Delta Method & $\times$& $\times$& $\times$& $\surd$& $\times$& $\times$ \\ \hline
+Estimation: Direct Imputation & $\surd$& $\surd$& $\surd$& $\times$& $\surd$& $\surd$ \\ \hline
+Inference: Delta Method & $\times$& $\times$& $\times$& $\times$& $\times$& $\times$ \\ \hline
 Inference: Bootstrapping & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
 \end{tabular}
 \end{center}
@@ -146,21 +146,24 @@ $TNIE=E[Y_{aM_a}-Y_{aM_a^*}|C]$
 
 $TE=PNDE+TNIE$
 
+$PM=\frac{TNIE}{PNDE+TE}$
+
 
 **2-way decomposition in RR scale**
 
-$rr\_CDE=E[Y_{am}|C]/E[Y_{a^*m}|C]$
+$rr^{CDE}=E[Y_{am}|C]/E[Y_{a^*m}|C]$
 
-$rr\_PNDE=E[Y_{aM_a^*}|C]/E[Y_{a^*M_a^*}|C]$
+$rr^{PNDE}=E[Y_{aM_a^*}|C]/E[Y_{a^*M_a^*}|C]$
 
-$rr\_TNDE=E[Y_{aM_a}|C]/E[Y_{a^*M_a}|C]$
+$rr^{TNDE}=E[Y_{aM_a}|C]/E[Y_{a^*M_a}|C]$
 
-$rr\_PNIE=E[Y_{a^*M_a}|C]/E[Y_{a^*M_a^*}|C]$
+$rr^{PNIE}=E[Y_{a^*M_a}|C]/E[Y_{a^*M_a^*}|C]$
 
-$rr\_TNIE=E[Y_{aM_a}|C]/E[Y_{aM_a^*}|C]$
+$rr^{TNIE}=E[Y_{aM_a}|C]/E[Y_{aM_a^*}|C]$
 
-$rr\_TE=rr\_PNDE\times rr\_TNIE$
+$rr^{TE}=rr^{PNDE}\times rr^{TNIE}$
 
+$PM=\frac{rr^{PNDE}*(rr^{TNIE}-1)}{rr^{TE}-1}$
 
 **4-way decomposition in additive scale**
 
@@ -172,18 +175,45 @@ $INT_{med}=TNIE-PNIE$
 
 $PIE=PNIE$
 
+$prop^{CDE}=\frac{CDE}{TE}$
+
+$prop^{INT_{ref}}=\frac{INT_{ref}}{TE}$
+
+$prop^{INT_{med}}=\frac{INT_{med}}{TE}$
+
+$prop^{PIE}=\frac{PIE}{TE}$
+
+$overall^{PM}=\frac{PNIE+INT_{med}}{TE}$
+
+$overall^{INT}=\frac{INT_{ref}+INT_{med}}{TE}$
+
+$overall^{PE}=\frac{INT_{ref}+INT_{med}+PIE}{TE}$
 
 **4-way decomposition in RR scale**
 
-$err\_CDE=(E[Y_{am}-Y_{a^*m}|C])/E[Y_{a^*M_a^*}|C]$
+$err^{CDE}=(E[Y_{am}-Y_{a^*m}|C])/E[Y_{a^*M_a^*}|C]$
 
-$err\_INT_{ref}=rr\_PNDE-1-err\_CDE$
+$err^{INT_{ref}}=rr^{PNDE}-1-err^{CDE}$
 
-$err\_INT_{med}=rr\_TNIE*rr\_PNDE-rr\_PNDE-rr\_PNIE+1$
+$err^{INT_{med}}=rr^{TNIE}*rr^{PNDE}-rr^{PNDE}-rr^{PNIE}+1$
 
-$err\_PIE=rr\_PNIE-1$
+$err^{PIE}=rr^{PNIE}-1$
 
-$err\_TE=err\_CDE+err\_INT_{ref}+err\_INT_{med}+err\_PIE=rr\_{TE}-1$
+$err^{TE}=err^{CDE}+err^{INT_{ref}}+err^{INT_{med}}+err^{PIE}=rr^{TE}-1$
+
+$prop^{err^{CDE}}=\frac{err^{CDE}}{err^{TE}}$
+
+$prop^{err^{INT_{ref}}}=\frac{err^{INT_{ref}}}{err^{TE}}$
+
+$prop^{err^{INT_{med}}}=\frac{err^{INT_{med}}}{err^{TE}}$
+
+$prop^{err^{PIE}}=\frac{err^{PIE}}{err^{TE}}$
+
+$overall^{PM}=\frac{err^{PIE}+err^{INT_{med}}}{err^{TE}}$
+
+$overall^{INT}=\frac{err^{INT_{ref}}+err^{INT_{med}}}{err^{TE}}$
+
+$overall^{PE}=\frac{err^{INT_{ref}}+err^{INT_{med}}+err^{PIE}}{err^{TE}}$
 
 ## Estimation Approaches Can be Used
 
@@ -352,13 +382,17 @@ https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/
 
 1. Fit a regression model for Y on A, M, C.
 
-2. For $E[Y_{a^*Ma^*}]$, estimate it by taking a weighted average of the subjects with $A=a^*$ and each subject i is given a weight $\frac{P(A=a^*)}{P(A=a^*|c_i)}$.
+2. For $E[Y_{a^*m}]$, estimate it by taking a weighted average of the predicted Y values for subjects with $A=a^*$ if the subjects had had mediator $M=m$ rather than their own values of mediator and each subject i is given a weight $\frac{P(A=a^*)}{P(A=a^|c_i)}$.
 
-3. For $E[Y_{aMa}]$, estimate it by taking a weighted average of the subjects with $A=a$ and each subject i is given a weight $\frac{P(A=a)}{P(A=a|c_i)}$.
+3. For $E[Y_{am}]$, estimate it by taking a weighted average of the predicted Y values for subjects with $A=a$ if the subjects had had mediator $M=m$ rather than their own values of mediator and each subject i is given a weight $\frac{P(A=a)}{P(A=a|c_i)}$.
 
-4. For $E[Y_{aMa^*}]$, estimate it by taking a weighted average of the predicted Y values for subjects with $A=a^*$ and each subject i is given a weight $\frac{P(A=a^*)}{P(A=a^*|c_i)}$.
+4. For $E[Y_{a^*Ma^*}]$, estimate it by taking a weighted average of the subjects with $A=a^*$ and each subject i is given a weight $\frac{P(A=a^*)}{P(A=a^*|c_i)}$.
 
-5. For $E[Y_{a^*Ma}]$, estimate it by taking a weighted average of the predicted Y values for subjects with $A=a$ and each subject i is given a weight $\frac{P(A=a)}{P(A=a|c_i)}$.
+5. For $E[Y_{aMa}]$, estimate it by taking a weighted average of the subjects with $A=a$ and each subject i is given a weight $\frac{P(A=a)}{P(A=a|c_i)}$.
+
+6. For $E[Y_{aMa^*}]$, estimate it by taking a weighted average of the predicted Y values  for subjects with $A=a^*$ if the subjects had had exposure $A=a$ rather than $A=a^*$ and each subject i is given a weight $\frac{P(A=a^*)}{P(A=a^*|c_i)}$.
+
+7. For $E[Y_{a^*Ma}]$, estimate it by taking a weighted average of the predicted Y values for subjects with $A=a$ if the subjects had had exposure $A=a^*$ rather than $A=a$ and each subject i is given a weight $\frac{P(A=a)}{P(A=a|c_i)}$.
 
 6. Use bootsrapping to estimate the standard error for each estimand.
 
@@ -374,13 +408,15 @@ https://www.ncbi.nlm.nih.gov/pubmed/25693776
 
 1. Fit a model for A given M and C
 
-2. Calculate the stablized weights for each subject, $w_i=\frac{f_{A|M,C}(A=0|M_i,C_i)}{f_{A|M,C}(A=A_i|M_i,C_i)}$.
+2. Calculate weights for each subject, $w_i=\frac{f_{A|M,C}(A=0|M_i,C_i)}{f_{A|M,C}(A=A_i|M_i,C_i)}$.
 
 3. Estimate the direct effect by a weighted regression model of Y on A and C using the weights calculated in 2. The estimated direct effect is the coefficient of A in this regression model.
 
 4. Estimate the total effect by a regression model of Y on A and C. The estimated total effect is the coefficient of A in this regression model.
 
 5. Calculate the indirect effect by subtracting the direct effect from the total effect.
+
+6. Use bootstrapping to get the standard error.
 
 ### Natural Effect Model
 
@@ -448,7 +484,7 @@ For rNDE and rNIE:
 
 3. For single-mediator cases, get the point estimate using the closed-form parameter function or direct imputation; for multiple-mediator cases, get the point estimate using direct imputation.
 
-4. For single-mediator cases, get the point estimate using the delta method or bootstrapping; for multiple-mediator cases, get the point estimate using bootstrapping.
+4. For single-mediator cases, get the standard error using the delta method or bootstrapping; for multiple-mediator cases, get the standard error using bootstrapping.
 
 ### G-formula Approach
 
