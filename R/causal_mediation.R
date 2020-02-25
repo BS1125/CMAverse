@@ -39,6 +39,7 @@ causal_mediation <- function(data = NULL, outcome = NULL, event = NULL,
     a <- which(levels(data[,exposure]) == a) - 1
     a_star <- which(levels(data[,exposure]) == a_star) - 1
     levels(data[,exposure]) <- 0:1
+
   }
 
   if (is.null(mval) == TRUE) {
@@ -95,18 +96,13 @@ if (model != "ne") {
 
         if (is.numeric(data[, covariates.pre[i]])) {
           vecc <- c(vecc, cval[[i]])
-          covariates.pre.new <- c(covariates.pre.new, covariates.pre[i])
         } else if (!is.numeric(data[, covariates.pre[i]])) {
           data[,covariates.pre[i]] <- as.factor(data[,covariates.pre[i]])
           mid <- which(levels(data[,covariates.pre[i]]) == cval[[i]])
           levels(data[,covariates.pre[i]]) <- 0:(length(levels(data[,covariates.pre[i]]))-1)
-          vecc <- c(vecc, as.numeric(levels(data[,covariates.pre]) == mid - 1)[-1])
-          covariates.pre.new <- c(covariates.pre.new, paste0(covariates.pre[i],
-                                                             levels(data[,covariates.pre[i]])[-1]))
+          vecc <- c(vecc, mid - 1)
         }
       }
-
-      covariates.pre <- covariates.pre.new
 
     }
 
