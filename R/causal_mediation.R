@@ -50,7 +50,7 @@ causal_mediation <- function(data = NULL, outcome = NULL, event = NULL,
 
   if (!is.null(mval) && (length(mval) != length(mediator))) {
     stop("length(mval) != length(mediator)")
-  } else if (is.null(mval)) mval <- list(rep(0, length(mediator)))
+  } else if (is.null(mval)) mval <- as.list(rep(0, length(mediator)))
 
   m_star <- c()
 
