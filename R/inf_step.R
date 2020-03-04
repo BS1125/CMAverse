@@ -26,7 +26,7 @@ inf_step <- function(data, nboot, outcome, exposure, exposure.type, mediator,
                                 EMint = EMint, MMint = MMint, EMMint = EMMint,
                                 EMint.terms = EMint.terms, MMint.terms = MMint.terms,
                                 EMMint.terms = EMMint.terms,
-                                event = event, mreg = mreg, yreg = yreg)
+                                event = event, mreg = mreg, yreg = yreg, data = data)
 
     regressions <- run_regressions(model = model, formulas = formulas,
                                    exposure = exposure, exposure.type = exposure.type,

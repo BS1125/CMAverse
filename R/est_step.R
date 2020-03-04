@@ -12,7 +12,7 @@ est_step <- function(data, indices, outcome, exposure, exposure.type, mediator,
                               EMint = EMint, MMint = MMint, EMMint = EMMint,
                               EMint.terms = EMint.terms, MMint.terms = MMint.terms,
                               EMMint.terms = EMMint.terms,
-                              event = event, mreg = mreg, yreg = yreg)
+                              event = event, mreg = mreg, yreg = yreg, data = data_boot)
 
   regressions <- run_regressions(model = model, formulas = formulas,
                                  exposure = exposure,  exposure.type = exposure.type,
@@ -24,8 +24,8 @@ est_step <- function(data, indices, outcome, exposure, exposure.type, mediator,
 
     if (!(model %in% c("rb", "iorw"))) {
       stop("Closed-form parameter function estimation doesn't support the selected model")
-    } else if (length(mediator) > 1) {
-      stop("Closed-form parameter function estimation doesn't support multiple mediator cases")
+    } else if (length(mediator) > 1&&model != "iorw") {
+      stop("For the selected model, closed-form parameter function estimation doesn't support multiple mediator cases")
     }
 
     coef <- get_coef(formulas = formulas, regressions = regressions,
@@ -38,8 +38,6 @@ est_step <- function(data, indices, outcome, exposure, exposure.type, mediator,
       }
 
       mlevel <- ifelse(is.factor(data_boot[, mediator]), length(levels(data_boot[, mediator])), 2)
-
-      ############################################DE and IE#############################################
 
       thetas <- coef$thetas
 
@@ -81,13 +79,14 @@ est_step <- function(data, indices, outcome, exposure, exposure.type, mediator,
 
         } else if (mreg %in% c("logistic", "multinomial")) {
 
-          cde <- unname((theta1 + ifelse(m_star == 0, 0, theta3[m_star])) * (a-a_star))
+          cde <- unname((theta1 + sum(theta3*m_star)) * (a-a_star))
 
           pnde <- unname((theta1 +
                             (sum(theta3 * exp(beta0 + beta1 * a_star +
                                                 covariatesTerm)) /
                                (1 + sum(exp(beta0 + beta1 * a_star +
                                               covariatesTerm))))) * (a - a_star))
+
           tnde <- unname((theta1  +
                             (sum(theta3 * exp(beta0 + beta1 * a +
                                                 covariatesTerm)) /
@@ -163,7 +162,7 @@ est_step <- function(data, indices, outcome, exposure, exposure.type, mediator,
 
         } else if (mreg %in% c("logistic", "multinomial")) {
 
-          cde_rr <- unname(exp((theta1 + ifelse(m_star == 0, 0, theta3[m_star])) * (a-a_star)))
+          cde_rr <- unname(exp((theta1 + sum(theta3*m_star)) * (a-a_star)))
 
           pnde_rr <- unname((exp(theta1 * (a - a_star)) *
                                (1 + sum(exp(theta2 + theta3 * a +
@@ -189,9 +188,9 @@ est_step <- function(data, indices, outcome, exposure, exposure.type, mediator,
                                  (1+ sum(exp(theta2 + theta3 * a + beta0 +
                                                beta1 * a_star + covariatesTerm)))))
 
-          cde_err <- unname(exp(ifelse(m_star == 0, 0, theta2[m_star])) *
-                              (exp(theta1 * (a - a_star) + a * ifelse(m_star == 0, 0, theta3[m_star])) -
-                                 exp(a_star * ifelse(m_star == 0, 0, theta3[m_star]))) *
+          cde_err <- unname(exp(sum(theta2*m_star)) *
+                              (exp(theta1 * (a - a_star) + a * sum(theta3*m_star)) -
+                                 exp(a_star * sum(theta3*m_star))) *
                               (1 + sum(exp(beta0 + beta1 * a_star + covariatesTerm))) /
                               (1+ sum(exp(theta2 + theta3 * a_star + beta0 +
                                             beta1 * a_star + covariatesTerm))))
@@ -264,8 +263,6 @@ est_step <- function(data, indices, outcome, exposure, exposure.type, mediator,
 
   } else if (est.method == "imputation") {
 
-    EY0m_sim <- EY1m_sim <- EY00_sim <- EY01_sim <- EY10_sim <- EY11_sim <-c()
-
     if (model %in% c("rb", "msm")) {
 
       mediator_regression <- regressions$mediator_regression
@@ -280,11 +277,6 @@ est_step <- function(data, indices, outcome, exposure, exposure.type, mediator,
 
       colnames(mdesign_a) <- colnames(mdesign_a_star) <- c(exposure, covariates.pre)
 
-      if (is.factor(data[, exposure])) {
-        mdesign_a_star[,1] <- as.factor(mdesign_a_star[,1])
-        mdesign_a[,1] <- as.factor(mdesign_a[,1])
-      }
-
       m_a <- do.call(data.frame, lapply(1:length(mediator_regression),
                                         FUN = function(x) {
                                           if (inherits(mediator_regression[[x]], "lm")|
@@ -297,7 +289,7 @@ est_step <- function(data, indices, outcome, exposure, exposure.type, mediator,
                                                                            "coxph"), "risk", "response"))
 
                                           } else if (inherits(mediator_regression[[x]], "multinom")) {
-                                            predict(mediator_regression[[x]], newdata = mdesign_a, type = "class")
+                                            predict(mediator_regression[[x]], newdata = mdesign_a, type = "prob")[, -1]
                                           }}))
 
       m_a_star <- do.call(data.frame, lapply(1:length(mediator_regression),
@@ -312,7 +304,7 @@ est_step <- function(data, indices, outcome, exposure, exposure.type, mediator,
                                                                                 "coxph"), "risk", "response"))
 
                                                } else if (inherits(mediator_regression[[x]], "multinom")) {
-                                                 predict(mediator_regression[[x]], newdata = mdesign_a_star, type = "class")
+                                                 predict(mediator_regression[[x]], newdata = mdesign_a_star, type = "prob")[, -1]
                                                }}))
 
       ydesign0m <- data.frame(rep(a_star, nrow(data_boot)), t(m_star)[rep(1,nrow(data_boot)),],
@@ -329,25 +321,19 @@ est_step <- function(data, indices, outcome, exposure, exposure.type, mediator,
 
       ydesign11 <- data.frame(rep(a, nrow(data_boot)), m_a, data_boot[,covariates.pre])
 
-      colnames(ydesign0m) <- colnames(ydesign1m) <- colnames(ydesign00) <- colnames(ydesign01) <-
-        colnames(ydesign10) <- colnames(ydesign11) <- c(exposure, mediator, covariates.pre)
-
-      if (is.factor(data[, exposure])) {
-        ydesign0m[,1] <- as.factor(ydesign0m[,1])
-        ydesign1m[,1] <- as.factor(ydesign1m[,1])
-        ydesign01[,1] <- as.factor(ydesign01[,1])
-        ydesign10[,1] <- as.factor(ydesign10[,1])
-        ydesign00[,1] <- as.factor(ydesign00[,1])
-        ydesign11[,1] <- as.factor(ydesign11[,1])
-      }
+      mname <- c()
 
       for (i in 1:length(mediator)) {
 
-        if (is.factor(data[, mediator[i]])) {
-          ydesign0m[,1+i] <- as.factor(ydesign0m[,1+i])
-          ydesign1m[,1+i] <- as.factor(ydesign1m[,1+i])
-        }
+        if (inherits(mediator_regression[[i]], "multinom")) {
+          mname <- c(mname, paste0(mediator[i], 1:(length(levels(data[, mediator[i]])) - 1)))
+        } else mname <- c(mname, mediator[i])
+
       }
+
+      colnames(ydesign0m) <- colnames(ydesign1m) <- colnames(ydesign00) <-
+        colnames(ydesign01) <- colnames(ydesign10) <- colnames(ydesign11) <-
+        c(exposure, mname, covariates.pre)
 
       if (model == "rb") {
 
@@ -386,66 +372,19 @@ est_step <- function(data, indices, outcome, exposure, exposure.type, mediator,
 
       mediator_regression <- regressions$mediator_regression
 
-      postcovar_regression <- regressions$postcovar_regression
-
-      postcovardesign_a <- data.frame(c(rep(a,nrow(data_boot))),
-                                      data_boot[,covariates.pre])
-
-      postcovardesign_a_star <- data.frame(c(rep(a_star,nrow(data_boot))),
-                                           data_boot[,covariates.pre])
-
-      mdesign_a <- data.frame(c(rep(a,nrow(data_boot))),
-                              data_boot[,covariates.pre],
-                              data_boot[,covariates.post])
-
-      mdesign_a_star <- data.frame(c(rep(a_star,nrow(data_boot))),
-                                   data_boot[,covariates.pre],
-                                   data_boot[,covariates.post])
-
-      colnames(postcovardesign_a) <- colnames(postcovardesign_a_star) <-
-        c(exposure, covariates.pre)
-
-      colnames(mdesign_a) <- colnames(mdesign_a_star) <-
-        c(exposure, covariates.pre, covariates.post)
-
-      if (is.factor(data[, exposure])) {
-        mdesign_a_star[,1] <- as.factor(mdesign_a_star[,1])
-        mdesign_a[,1] <- as.factor(mdesign_a[,1])
-        postcovardesign_a_star[,1] <- as.factor(postcovardesign_a_star[,1])
-        postcovardesign_a[,1] <- as.factor(postcovardesign_a[,1])
-      }
-
-      m_a_star <- do.call(data.frame, lapply(1:length(mediator_regression),
-                                             FUN = function(x) {
-                                               if (inherits(mediator_regression[[x]], "lm")|
-                                                   inherits(mediator_regression[[x]], "glm")|
-                                                   inherits(mediator_regression[[x]], "survreg")|
-                                                   inherits(mediator_regression[[x]], "coxph")) {
-                                                 predict(mediator_regression[[x]],
-                                                         newdata = mdesign_a_star,
-                                                         type = ifelse(inherits(mediator_regression[[x]],
-                                                                                "coxph"), "risk", "response"))
-
-                                               } else if (inherits(mediator_regression[[x]], "multinom")) {
-                                                 predict(mediator_regression[[x]], newdata = mdesign_a_star, type = "class")
-                                               }}))
-
-      m_a <- do.call(data.frame, lapply(1:length(mediator_regression),
-                                        FUN = function(x) {
-                                          if (inherits(mediator_regression[[x]], "lm")|
-                                              inherits(mediator_regression[[x]], "glm")|
-                                              inherits(mediator_regression[[x]], "survreg")|
-                                              inherits(mediator_regression[[x]], "coxph")) {
-                                            predict(mediator_regression[[x]],
-                                                    newdata = mdesign_a,
-                                                    type = ifelse(inherits(mediator_regression[[x]],
-                                                                           "coxph"), "risk", "response"))
-
-                                          } else if (inherits(mediator_regression[[x]], "multinom")) {
-                                            predict(mediator_regression[[x]], newdata = mdesign_a, type = "class")
-                                          }}))
-
       if (!is.null(covariates.post)){
+
+        postcovar_regression <- regressions$postcovar_regression
+
+        postcovardesign_a <- data.frame(c(rep(a,nrow(data_boot))),
+                                        data_boot[,covariates.pre])
+
+        postcovardesign_a_star <- data.frame(c(rep(a_star,nrow(data_boot))),
+                                             data_boot[,covariates.pre])
+
+        colnames(postcovardesign_a) <- colnames(postcovardesign_a_star) <-
+          c(exposure, covariates.pre)
+
         postcovar_a_star <- do.call(data.frame, lapply(1:length(postcovar_regression),
                                                        FUN = function(x) {
                                                          if (inherits(postcovar_regression[[x]], "lm")|
@@ -458,7 +397,7 @@ est_step <- function(data, indices, outcome, exposure, exposure.type, mediator,
                                                                                           "coxph"), "risk", "response"))
 
                                                          } else if (inherits(postcovar_regression[[x]], "multinom")) {
-                                                           predict(postcovar_regression[[x]], newdata = postcovardesign_a_star, type = "class")
+                                                           predict(postcovar_regression[[x]], newdata = postcovardesign_a_star, type = "prob")[, -1]
                                                          }}))
 
         postcovar_a <- do.call(data.frame, lapply(1:length(postcovar_regression),
@@ -473,11 +412,68 @@ est_step <- function(data, indices, outcome, exposure, exposure.type, mediator,
                                                                                      "coxph"), "risk", "response"))
 
                                                     } else if (inherits(postcovar_regression[[x]], "multinom")) {
-                                                      predict(postcovar_regression[[x]], newdata = postcovardesign_a, type = "class")
+                                                      predict(postcovar_regression[[x]], newdata = postcovardesign_a, type = "prob")[ ,-1]
                                                     }}))
       } else {
         postcovar_a_star <- postcovar_a <-data.frame()[1:nrow(data_boot), ]
       }
+
+
+      mdesign_a <- data.frame(c(rep(a,nrow(data_boot))),
+                              data_boot[,covariates.pre],
+                              postcovar_a)
+
+      mdesign_a_star <- data.frame(c(rep(a_star,nrow(data_boot))),
+                                   data_boot[,covariates.pre],
+                                   postcovar_a_star)
+
+      pcname <- c()
+
+      if (!is.null(covariates.post)){
+
+        for (i in 1:length(covariates.post)) {
+
+          if (inherits(postcovar_regression[[i]], "multinom")) {
+            pcname <- c(pcname, paste0(covariates.post[i], 1:(length(levels(data[, covariates.post[i]])) - 1)))
+          } else pcname <- c(pcname, covariates.post[i])
+
+        }
+      }
+
+      colnames(mdesign_a) <- colnames(mdesign_a_star) <-
+        c(exposure, covariates.pre, pcname)
+
+      m_a_star <- do.call(data.frame, lapply(1:length(mediator_regression),
+                                             FUN = function(x) {
+                                               if (inherits(mediator_regression[[x]], "lm")|
+                                                   inherits(mediator_regression[[x]], "glm")|
+                                                   inherits(mediator_regression[[x]], "survreg")|
+                                                   inherits(mediator_regression[[x]], "coxph")) {
+                                                 predict(mediator_regression[[x]],
+                                                         newdata = mdesign_a_star,
+                                                         type = ifelse(inherits(mediator_regression[[x]],
+                                                                                "coxph"), "risk", "response"))
+
+                                               } else if (inherits(mediator_regression[[x]], "multinom")) {
+                                                 predict(mediator_regression[[x]], newdata = mdesign_a_star, type = "prob")[, -1]
+                                               }}))
+
+      m_a <- do.call(data.frame, lapply(1:length(mediator_regression),
+                                        FUN = function(x) {
+                                          if (inherits(mediator_regression[[x]], "lm")|
+                                              inherits(mediator_regression[[x]], "glm")|
+                                              inherits(mediator_regression[[x]], "survreg")|
+                                              inherits(mediator_regression[[x]], "coxph")) {
+                                            predict(mediator_regression[[x]],
+                                                    newdata = mdesign_a,
+                                                    type = ifelse(inherits(mediator_regression[[x]],
+                                                                           "coxph"), "risk", "response"))
+
+                                          } else if (inherits(mediator_regression[[x]], "multinom")) {
+                                            predict(mediator_regression[[x]], newdata = mdesign_a, type = "prob")[, -1]
+                                          }}))
+
+
 
       ydesign0m <- data.frame(rep(a_star, nrow(data_boot)), t(m_star)[rep(1,nrow(data_boot)),],
                               data_boot[,covariates.pre], postcovar_a_star)
@@ -497,26 +493,19 @@ est_step <- function(data, indices, outcome, exposure, exposure.type, mediator,
       ydesign11 <- data.frame(rep(a, nrow(data_boot)), m_a,
                               data_boot[,covariates.pre], postcovar_a)
 
-      colnames(ydesign0m) <- colnames(ydesign1m) <- colnames(ydesign00) <- colnames(ydesign01) <-
-        colnames(ydesign10) <- colnames(ydesign11) <- c(exposure, mediator, covariates.pre,
-                                                        covariates.post)
-
-      if (is.factor(data[, exposure])) {
-        ydesign0m[,1] <- as.factor(ydesign0m[,1])
-        ydesign1m[,1] <- as.factor(ydesign1m[,1])
-        ydesign01[,1] <- as.factor(ydesign01[,1])
-        ydesign10[,1] <- as.factor(ydesign10[,1])
-        ydesign00[,1] <- as.factor(ydesign00[,1])
-        ydesign11[,1] <- as.factor(ydesign11[,1])
-      }
+      mname <- c()
 
       for (i in 1:length(mediator)) {
 
-        if (is.factor(data[, mediator[i]])) {
-          ydesign0m[,1+i] <- as.factor(ydesign0m[,1+i])
-          ydesign1m[,1+i] <- as.factor(ydesign1m[,1+i])
-        }
+        if (inherits(mediator_regression[[i]], "multinom")) {
+          mname <- c(mname, paste0(mediator[i], 1:(length(levels(data[, mediator[i]])) - 1)))
+        } else mname <- c(mname, mediator[i])
+
       }
+
+      colnames(ydesign0m) <- colnames(ydesign1m) <- colnames(ydesign00) <- colnames(ydesign01) <-
+        colnames(ydesign10) <- colnames(ydesign11) <- c(exposure, mname, covariates.pre,
+                                                        pcname)
 
       EY0m <- mean(predict(outcome_regression, newdata =  ydesign0m,
                            type = ifelse(inherits(outcome_regression, "coxph"), "risk", "response")))
@@ -546,7 +535,9 @@ est_step <- function(data, indices, outcome, exposure, exposure.type, mediator,
                          count(data_boot, !!as.name(exposure)),
                          by = exposure)[, "n"]/nrow(data_boot)
 
-      exposure_regression <- regressions$exposure_regression
+      exposure_regression <- update(regressions$exposure_regression,
+                                    formula. = regressions$exposure_regression$formula,
+                                    data = data_boot)
 
       outcome_regression <- regressions$outcome_regression
 
@@ -588,13 +579,6 @@ est_step <- function(data, indices, outcome, exposure, exposure.type, mediator,
           ydesign0m[,1+i] <- as.factor(ydesign0m[,1+i])
           ydesign1m[,1+i] <- as.factor(ydesign1m[,1+i])
         }
-      }
-
-      if (is.factor(data[, exposure])) {
-        ydesign0m[,1] <- as.factor(ydesign0m[,1])
-        ydesign1m[,1] <- as.factor(ydesign1m[,1])
-        ydesign01[,1] <- as.factor(ydesign01[,1])
-        ydesign10[,1] <- as.factor(ydesign10[,1])
       }
 
       EY0m <- weighted.mean(predict(outcome_regression, newdata = ydesign0m,
