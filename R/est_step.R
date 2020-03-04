@@ -338,33 +338,41 @@ est_step <- function(data, indices, outcome, exposure, exposure.type, mediator,
       if (model == "rb") {
 
         EY0m <- mean(predict(outcome_regression, newdata =  ydesign0m,
-                             type = ifelse(inherits(outcome_regression, "coxph"), "risk", "response")))
+                             type = ifelse(inherits(outcome_regression, "coxph"), "risk", "response")),
+                     na.rm = TRUE)
 
         EY1m <- mean(predict(outcome_regression, newdata =  ydesign1m,
-                             type = ifelse(inherits(outcome_regression, "coxph"), "risk", "response")))
+                             type = ifelse(inherits(outcome_regression, "coxph"), "risk", "response")),
+                     na.rm = TRUE)
 
 
       } else if (model == "msm") {
 
         EY0m <- mean(predict(cde_outcome_regression, newdata =  ydesign0m,
-                             type = ifelse(inherits(outcome_regression, "coxph"), "risk", "response")))
+                             type = ifelse(inherits(outcome_regression, "coxph"), "risk", "response")),
+                     na.rm = TRUE)
 
         EY1m <- mean(predict(cde_outcome_regression, newdata =  ydesign1m,
-                             type = ifelse(inherits(outcome_regression, "coxph"), "risk", "response")))
+                             type = ifelse(inherits(outcome_regression, "coxph"), "risk", "response")),
+                     na.rm = TRUE)
 
       }
 
       EY00 <- mean(predict(outcome_regression, newdata =  ydesign00,
-                           type = ifelse(inherits(outcome_regression, "coxph"), "risk", "response")))
+                           type = ifelse(inherits(outcome_regression, "coxph"), "risk", "response")),
+                   na.rm = TRUE)
 
       EY01 <- mean(predict(outcome_regression, newdata =  ydesign01,
-                           type = ifelse(inherits(outcome_regression, "coxph"), "risk", "response")))
+                           type = ifelse(inherits(outcome_regression, "coxph"), "risk", "response")),
+                   na.rm = TRUE)
 
       EY10 <- mean(predict(outcome_regression, newdata =  ydesign10,
-                           type = ifelse(inherits(outcome_regression, "coxph"), "risk", "response")))
+                           type = ifelse(inherits(outcome_regression, "coxph"), "risk", "response")),
+                   na.rm = TRUE)
 
       EY11 <- mean(predict(outcome_regression, newdata =  ydesign11,
-                           type = ifelse(inherits(outcome_regression, "coxph"), "risk", "response")))
+                           type = ifelse(inherits(outcome_regression, "coxph"), "risk", "response")),
+                   na.rm = TRUE)
 
     } else if (model == "g-formula") {
 
@@ -508,22 +516,28 @@ est_step <- function(data, indices, outcome, exposure, exposure.type, mediator,
                                                         pcname)
 
       EY0m <- mean(predict(outcome_regression, newdata =  ydesign0m,
-                           type = ifelse(inherits(outcome_regression, "coxph"), "risk", "response")))
+                           type = ifelse(inherits(outcome_regression, "coxph"), "risk", "response")),
+                   na.rm = TRUE)
 
       EY1m <- mean(predict(outcome_regression, newdata =  ydesign1m,
-                           type = ifelse(inherits(outcome_regression, "coxph"), "risk", "response")))
+                           type = ifelse(inherits(outcome_regression, "coxph"), "risk", "response")),
+                   na.rm = TRUE)
 
       EY00 <- mean(predict(outcome_regression, newdata =  ydesign00,
-                           type = ifelse(inherits(outcome_regression, "coxph"), "risk", "response")))
+                           type = ifelse(inherits(outcome_regression, "coxph"), "risk", "response")),
+                   na.rm = TRUE)
 
       EY01 <- mean(predict(outcome_regression, newdata =  ydesign01,
-                           type = ifelse(inherits(outcome_regression, "coxph"), "risk", "response")))
+                           type = ifelse(inherits(outcome_regression, "coxph"), "risk", "response")),
+                   na.rm = TRUE)
 
       EY10 <- mean(predict(outcome_regression, newdata =  ydesign10,
-                           type = ifelse(inherits(outcome_regression, "coxph"), "risk", "response")))
+                           type = ifelse(inherits(outcome_regression, "coxph"), "risk", "response")),
+                   na.rm = TRUE)
 
       EY11 <- mean(predict(outcome_regression, newdata =  ydesign11,
-                           type = ifelse(inherits(outcome_regression, "coxph"), "risk", "response")))
+                           type = ifelse(inherits(outcome_regression, "coxph"), "risk", "response")),
+                   na.rm = TRUE)
 
     } else if (model == "wb") {
 
@@ -583,23 +597,24 @@ est_step <- function(data, indices, outcome, exposure, exposure.type, mediator,
 
       EY0m <- weighted.mean(predict(outcome_regression, newdata = ydesign0m,
                                     type = ifelse(inherits(outcome_regression, "coxph"), "risk", "response")),
-                            w = w[index_a_star])
+                            w = w[index_a_star],
+                            na.rm = TRUE)
 
       EY1m <- weighted.mean(predict(outcome_regression, newdata = ydesign1m,
                                     type = ifelse(inherits(outcome_regression, "coxph"), "risk", "response")),
-                            w = w[index_a])
+                            w = w[index_a], na.rm = TRUE)
 
-      EY00 <- weighted.mean(data_boot[index_a_star, outcome], w = w[index_a_star])
+      EY00 <- weighted.mean(data_boot[index_a_star, outcome], w = w[index_a_star], na.rm = TRUE)
 
-      EY11 <- weighted.mean(data_boot[index_a, outcome], w = w[index_a])
+      EY11 <- weighted.mean(data_boot[index_a, outcome], w = w[index_a], na.rm = TRUE)
 
       EY01 <- weighted.mean(predict(outcome_regression, newdata = ydesign01,
                                     type = ifelse(inherits(outcome_regression, "coxph"), "risk", "response")),
-                            w = w[index_a])
+                            w = w[index_a], na.rm = TRUE)
 
       EY10 <- weighted.mean(predict(outcome_regression, newdata = ydesign10,
                                     type = ifelse(inherits(outcome_regression, "coxph"), "risk", "response")),
-                            w = w[index_a_star])
+                            w = w[index_a_star], na.rm = TRUE)
 
     }
 
