@@ -5,7 +5,7 @@ causal_mediation <- function(data = NULL, outcome = NULL, event = NULL,
                              EMint = FALSE, MMint = FALSE, EMMint = FALSE,
                              EMint.terms = NULL, MMint.terms = NULL, EMMint.terms = NULL,
                              mreg = "linear", yreg = "linear",
-                             mval = list(), a_star = 0, a = 1,
+                             mval = NULL, a_star = 0, a = 1,
                              model = "rb", est.method = "paramfunc", inf.method = "delta",
                              nboot = 200, nrep = 5) {
 
