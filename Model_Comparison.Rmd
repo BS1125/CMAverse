@@ -61,7 +61,7 @@ $$E[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_2m^*+\theta_4c$$
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_noint,  outcome = "contY_contM_noint", exposure = 'A', 
+cmest(data = df_noint,  outcome = "contY_contM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cont', covariates.pre = "C", 
                  yreg = "linear", mreg = "linear", mval = list(0),
@@ -74,7 +74,7 @@ causal_mediation(data = df_noint,  outcome = "contY_contM_noint", exposure = 'A'
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_noint,  outcome = "contY_contM_noint", exposure = 'A', 
+cmest(data = df_noint,  outcome = "contY_contM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cont', covariates.pre = "C",  
                  yreg = "linear", mreg = "linear", mval = list(0),
@@ -87,7 +87,7 @@ causal_mediation(data = df_noint,  outcome = "contY_contM_noint", exposure = 'A'
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_noint,  outcome = "contY_contM_noint", exposure = 'A', 
+cmest(data = df_noint,  outcome = "contY_contM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cont', covariates.pre = "C",
                  yreg = "linear", mreg = "linear", mval = list(0),
@@ -96,37 +96,11 @@ causal_mediation(data = df_noint,  outcome = "contY_contM_noint", exposure = 'A'
 
 ```
 
-### Causal Effects and Standard Errors Estimated By the Marginal Structural Model 
-
-```{r warning=F,message=F}
-
-causal_mediation(data = df_noint,  outcome = "contY_contM_noint", exposure = "A", 
-                 exposure.type = "binary",
-                 mediator = 'M_cont', covariates.pre = "C",
-                 yreg = "linear", mreg = "linear", mval = list(0),
-                 a_star = 0, a = 1, 
-                 est.method = "imputation", inf.method = "bootstrap", model = "msm")
-
-```
-
-### Causal Effects and Standard Errors Estimated By the Inverse Odds-ratio Weighting Approach 
-
-```{r warning=F,message=F}
-
-causal_mediation(data = df_noint,  outcome = "contY_contM_noint", exposure = 'A', 
-                 exposure.type = "binary",
-                 mediator = 'M_cont', covariates.pre = "C",
-                 yreg = "linear", mreg = "linear", mval = list(0),
-                 a_star = 0, a = 1, 
-                 est.method = "paramfunc", inf.method = "bootstrap", model = "iorw")
-
-```
-
 ### Causal Effects and Standard Errors Estimated By the G-formula Approach 
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_noint,  outcome = "contY_contM_noint", exposure = 'A', 
+cmest(data = df_noint,  outcome = "contY_contM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cont', covariates.pre = "C", 
                  yreg = "linear", mreg = "linear", mval = list(0),
@@ -138,7 +112,7 @@ causal_mediation(data = df_noint,  outcome = "contY_contM_noint", exposure = 'A'
 ### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
 
 ```{r warning=F,message=F}
-causal_mediation(data = df_noint,  outcome = "contY_contM_noint", exposure = 'A', 
+cmest(data = df_noint,  outcome = "contY_contM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cont', covariates.pre = "C", 
                  yreg = "linear", mreg = "linear", mval = list(0),
@@ -185,7 +159,7 @@ $$E[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_2m^*+\theta_3am^*+\theta_4c$$
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_int,  outcome = "contY_contM_int", exposure = 'A', 
+cmest(data = df_int,  outcome = "contY_contM_int", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cont', covariates.pre = "C", EMint = TRUE,
                  yreg = "linear", mreg = "linear", mval = list(0),
@@ -198,7 +172,7 @@ causal_mediation(data = df_int,  outcome = "contY_contM_int", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_int,  outcome = "contY_contM_int", exposure = 'A', 
+cmest(data = df_int,  outcome = "contY_contM_int", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cont', covariates.pre = "C", EMint = TRUE,
                  yreg = "linear", mreg = "linear", mval = list(0),
@@ -211,7 +185,7 @@ causal_mediation(data = df_int,  outcome = "contY_contM_int", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_int,  outcome = "contY_contM_int", exposure = 'A', 
+cmest(data = df_int,  outcome = "contY_contM_int", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cont', covariates.pre = "C", EMint = TRUE, 
                  yreg = "linear", mreg = "linear", mval = list(0),
@@ -220,37 +194,11 @@ causal_mediation(data = df_int,  outcome = "contY_contM_int", exposure = 'A',
 
 ```
 
-### Causal Effects and Standard Errors Estimated By the Marginal Structural Model 
-
-```{r warning=F,message=F}
-
-causal_mediation(data = df_int,  outcome = "contY_contM_int", exposure = "A", 
-                 exposure.type = "binary",
-                 mediator = 'M_cont', covariates.pre = "C", EMint = TRUE,
-                 yreg = "linear", mreg = "linear", mval = list(0),
-                 a_star = 0, a = 1, 
-                 est.method = "imputation", inf.method = "bootstrap", model = "msm")
-
-```
-
-### Causal Effects and Standard Errors Estimated By the Inverse Odds-ratio Weighting Approach 
-
-```{r warning=F,message=F}
-
-causal_mediation(data = df_int,  outcome = "contY_contM_int", exposure = 'A', 
-                 exposure.type = "binary",
-                 mediator = 'M_cont', covariates.pre = "C", EMint = TRUE,
-                 yreg = "linear", mreg = "linear", mval = list(0),
-                 a_star = 0, a = 1, 
-                 est.method = "paramfunc", inf.method = "bootstrap", model = "iorw")
-
-```
-
 ### Causal Effects and Standard Errors Estimated By the G-formula Approach 
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_int,  outcome = "contY_contM_int", exposure = 'A', 
+cmest(data = df_int,  outcome = "contY_contM_int", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cont', covariates.pre = "C", EMint = TRUE,
                  yreg = "linear", mreg = "linear", mval = list(0),
@@ -262,10 +210,10 @@ causal_mediation(data = df_int,  outcome = "contY_contM_int", exposure = 'A',
 ### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
 
 ```{r warning=F,message=F}
-causal_mediation(data = df_int,  outcome = "contY_contM_int", exposure = 'A', 
+cmest(data = df_int,  outcome = "contY_contM_int", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cont', covariates.pre = "C", EMint = TRUE,  
-                 yreg = "linear", mreg = "linear", mval = list(0),
+                 yreg = "linear", mreg = "linear", 
                  a_star = 0, a = 1, model = "ne")
 ```
 
@@ -310,7 +258,7 @@ $$E[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_2m^*+\theta_4c$$
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_noint,  outcome = "contY_binM_noint", exposure = 'A', 
+cmest(data = df_noint,  outcome = "contY_binM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_bin', covariates.pre = "C",
                  yreg = "linear", mreg = "logistic", mval = list(0),
@@ -323,7 +271,7 @@ causal_mediation(data = df_noint,  outcome = "contY_binM_noint", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_noint,  outcome = "contY_binM_noint", exposure = 'A', 
+cmest(data = df_noint,  outcome = "contY_binM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_bin', covariates.pre = "C",  
                  yreg = "linear", mreg = "logistic", mval = list(0),
@@ -336,7 +284,7 @@ causal_mediation(data = df_noint,  outcome = "contY_binM_noint", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_noint,  outcome = "contY_binM_noint", exposure = 'A', 
+cmest(data = df_noint,  outcome = "contY_binM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_bin', covariates.pre = "C", 
                  yreg = "linear", mreg = "logistic", mval = list(0),
@@ -349,7 +297,7 @@ causal_mediation(data = df_noint,  outcome = "contY_binM_noint", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_noint,  outcome = "contY_binM_noint", exposure = "A", 
+cmest(data = df_noint,  outcome = "contY_binM_noint", exposure = "A", 
                  exposure.type = "binary",
                  mediator = 'M_bin', covariates.pre = "C", 
                  yreg = "linear", mreg = "logistic", mval = list(0),
@@ -362,7 +310,7 @@ causal_mediation(data = df_noint,  outcome = "contY_binM_noint", exposure = "A",
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_noint,  outcome = "contY_binM_noint", exposure = 'A', 
+cmest(data = df_noint,  outcome = "contY_binM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_bin', covariates.pre = "C", 
                  yreg = "linear", mreg = "logistic", mval = list(0),
@@ -375,7 +323,7 @@ causal_mediation(data = df_noint,  outcome = "contY_binM_noint", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_noint,  outcome = "contY_binM_noint", exposure = 'A', 
+cmest(data = df_noint,  outcome = "contY_binM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_bin', covariates.pre = "C", 
                  yreg = "linear", mreg = "logistic", mval = list(0),
@@ -387,7 +335,7 @@ causal_mediation(data = df_noint,  outcome = "contY_binM_noint", exposure = 'A',
 ### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
 
 ```{r warning=F,message=F}
-causal_mediation(data = df_noint,  outcome = "contY_binM_noint", exposure = 'A', 
+cmest(data = df_noint,  outcome = "contY_binM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_bin', covariates.pre = "C",  
                  yreg = "linear", mreg = "logistic", mval = list(0),
@@ -433,7 +381,7 @@ $$E[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_2m^*+\theta_3am^*+\theta_4c$$
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_int,  outcome = "contY_binM_int", exposure = 'A', 
+cmest(data = df_int,  outcome = "contY_binM_int", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_bin', covariates.pre = "C", EMint = TRUE, 
                  yreg = "linear", mreg = "logistic", mval = list(0),
@@ -446,7 +394,7 @@ causal_mediation(data = df_int,  outcome = "contY_binM_int", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_int,  outcome = "contY_binM_int", exposure = 'A', 
+cmest(data = df_int,  outcome = "contY_binM_int", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_bin', covariates.pre = "C", EMint = TRUE, 
                  yreg = "linear", mreg = "logistic", mval = list(0),
@@ -459,7 +407,7 @@ causal_mediation(data = df_int,  outcome = "contY_binM_int", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_int,  outcome = "contY_binM_int", exposure = 'A', 
+cmest(data = df_int,  outcome = "contY_binM_int", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_bin', covariates.pre = "C", EMint = TRUE, 
                  yreg = "linear", mreg = "logistic", mval = list(0),
@@ -472,7 +420,7 @@ causal_mediation(data = df_int,  outcome = "contY_binM_int", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_int,  outcome = "contY_binM_int", exposure = "A", 
+cmest(data = df_int,  outcome = "contY_binM_int", exposure = "A", 
                  exposure.type = "binary",
                  mediator = 'M_bin', covariates.pre = "C", EMint = TRUE,
                  yreg = "linear", mreg = "logistic", mval = list(0),
@@ -485,7 +433,7 @@ causal_mediation(data = df_int,  outcome = "contY_binM_int", exposure = "A",
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_int,  outcome = "contY_binM_int", exposure = 'A', 
+cmest(data = df_int,  outcome = "contY_binM_int", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_bin', covariates.pre = "C", EMint = TRUE, 
                  yreg = "linear", mreg = "logistic", mval = list(0),
@@ -498,7 +446,7 @@ causal_mediation(data = df_int,  outcome = "contY_binM_int", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_int,  outcome = "contY_binM_int", exposure = 'A', 
+cmest(data = df_int,  outcome = "contY_binM_int", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_bin', covariates.pre = "C", EMint = TRUE,
                  yreg = "linear", mreg = "logistic", mval = list(0),
@@ -510,7 +458,7 @@ causal_mediation(data = df_int,  outcome = "contY_binM_int", exposure = 'A',
 ### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
 
 ```{r warning=F,message=F}
-causal_mediation(data = df_int,  outcome = "contY_binM_int", exposure = 'A', 
+cmest(data = df_int,  outcome = "contY_binM_int", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_bin', covariates.pre = "C", EMint = TRUE,
                  yreg = "linear", mreg = "logistic", mval = list(0),
@@ -563,7 +511,7 @@ $$E[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_{21}I\{m^*==1\}+\theta_{22}I\{m^*==2\}+
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_noint,  outcome = "contY_catM_noint", exposure = 'A', 
+cmest(data = df_noint,  outcome = "contY_catM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cat', covariates.pre = "C", 
                  yreg = "linear", mreg = "multinomial", mval = list(0),
@@ -576,7 +524,7 @@ causal_mediation(data = df_noint,  outcome = "contY_catM_noint", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_noint,  outcome = "contY_catM_noint", exposure = 'A', 
+cmest(data = df_noint,  outcome = "contY_catM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cat', covariates.pre = "C", 
                  yreg = "linear", mreg = "multinomial", mval = list(0),
@@ -589,7 +537,7 @@ causal_mediation(data = df_noint,  outcome = "contY_catM_noint", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_noint,  outcome = "contY_catM_noint", exposure = 'A', 
+cmest(data = df_noint,  outcome = "contY_catM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cat', covariates.pre = "C", 
                  yreg = "linear", mreg = "multinomial", mval = list(0),
@@ -602,7 +550,7 @@ causal_mediation(data = df_noint,  outcome = "contY_catM_noint", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_noint,  outcome = "contY_catM_noint", exposure = "A", 
+cmest(data = df_noint,  outcome = "contY_catM_noint", exposure = "A", 
                  exposure.type = "binary",
                  mediator = 'M_cat', covariates.pre = "C", 
                  yreg = "linear", mreg = "multinomial", mval = list(0),
@@ -615,7 +563,7 @@ causal_mediation(data = df_noint,  outcome = "contY_catM_noint", exposure = "A",
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_noint,  outcome = "contY_catM_noint", exposure = 'A', 
+cmest(data = df_noint,  outcome = "contY_catM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cat', covariates.pre = "C",  
                  yreg = "linear", mreg = "multinomial", mval = list(0),
@@ -628,7 +576,7 @@ causal_mediation(data = df_noint,  outcome = "contY_catM_noint", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_noint,  outcome = "contY_catM_noint", exposure = 'A', 
+cmest(data = df_noint,  outcome = "contY_catM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cat', covariates.pre = "C",  
                  yreg = "linear", mreg = "multinomial", mval = list(0),
@@ -640,7 +588,7 @@ causal_mediation(data = df_noint,  outcome = "contY_catM_noint", exposure = 'A',
 ### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
 
 ```{r warning=F,message=F}
-causal_mediation(data = df_noint,  outcome = "contY_catM_noint", exposure = 'A', 
+cmest(data = df_noint,  outcome = "contY_catM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cat', covariates.pre = "C", 
                  yreg = "linear", mreg = "multinomial", mval = list(0),
@@ -691,7 +639,7 @@ $$E[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_{21}I\{m^*==1\}+\theta_{22}I\{m^*==2\}+
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_int,  outcome = "contY_catM_int", exposure = 'A', 
+cmest(data = df_int,  outcome = "contY_catM_int", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cat', covariates.pre = "C", EMint = TRUE,
                  yreg = "linear", mreg = "multinomial", mval = list(0),
@@ -704,7 +652,7 @@ causal_mediation(data = df_int,  outcome = "contY_catM_int", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_int,  outcome = "contY_catM_int", exposure = 'A', 
+cmest(data = df_int,  outcome = "contY_catM_int", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cat', covariates.pre = "C", EMint = TRUE,
                  yreg = "linear", mreg = "multinomial", mval = list(0),
@@ -717,7 +665,7 @@ causal_mediation(data = df_int,  outcome = "contY_catM_int", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_int,  outcome = "contY_catM_int", exposure = 'A', 
+cmest(data = df_int,  outcome = "contY_catM_int", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cat', covariates.pre = "C", EMint = TRUE, 
                  yreg = "linear", mreg = "multinomial", mval = list(0),
@@ -730,7 +678,7 @@ causal_mediation(data = df_int,  outcome = "contY_catM_int", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_int,  outcome = "contY_catM_int", exposure = "A", 
+cmest(data = df_int,  outcome = "contY_catM_int", exposure = "A", 
                  exposure.type = "binary",
                  mediator = 'M_cat', covariates.pre = "C", EMint = TRUE,
                  yreg = "linear", mreg = "multinomial", mval = list(0),
@@ -743,7 +691,7 @@ causal_mediation(data = df_int,  outcome = "contY_catM_int", exposure = "A",
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_int,  outcome = "contY_catM_int", exposure = 'A', 
+cmest(data = df_int,  outcome = "contY_catM_int", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cat', covariates.pre = "C", EMint = TRUE, 
                  yreg = "linear", mreg = "multinomial", mval = list(0),
@@ -756,7 +704,7 @@ causal_mediation(data = df_int,  outcome = "contY_catM_int", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_int,  outcome = "contY_catM_int", exposure = 'A', 
+cmest(data = df_int,  outcome = "contY_catM_int", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cat', covariates.pre = "C", EMint = TRUE, 
                  yreg = "linear", mreg = "multinomial", mval = list(0),
@@ -768,7 +716,7 @@ causal_mediation(data = df_int,  outcome = "contY_catM_int", exposure = 'A',
 ### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
 
 ```{r warning=F,message=F}
-causal_mediation(data = df_int,  outcome = "contY_catM_int", exposure = 'A', 
+cmest(data = df_int,  outcome = "contY_catM_int", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cat', covariates.pre = "C", EMint = TRUE,
                  yreg = "linear", mreg = "multinomial", mval = list(0),
@@ -824,7 +772,7 @@ $$E[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_{21}I\{m1^*==1\}+\theta_{22}I\{m1^*==2\
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_multipleM_noint,  outcome = "contY_catMbinM_noint", exposure = 'A', 
+cmest(data = df_multipleM_noint,  outcome = "contY_catMbinM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = c('M_cat',"M_bin"), covariates.pre = "C", 
                  yreg = "linear", mreg = c("multinomial", "logistic"), mval = list(0,0),
@@ -837,7 +785,7 @@ causal_mediation(data = df_multipleM_noint,  outcome = "contY_catMbinM_noint", e
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_multipleM_noint,  outcome = "contY_catMbinM_noint", exposure = 'A', 
+cmest(data = df_multipleM_noint,  outcome = "contY_catMbinM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = c('M_cat',"M_bin"), covariates.pre = "C",  
                  yreg = "linear", mreg = c("multinomial", "logistic"), mval = list(0,0),
@@ -850,7 +798,7 @@ causal_mediation(data = df_multipleM_noint,  outcome = "contY_catMbinM_noint", e
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_multipleM_noint,  outcome = "contY_catMbinM_noint", exposure = "A", 
+cmest(data = df_multipleM_noint,  outcome = "contY_catMbinM_noint", exposure = "A", 
                  exposure.type = "binary",
                  mediator = c('M_cat',"M_bin"), covariates.pre = "C",  
                  yreg = "linear", mreg = c("multinomial", "logistic"), mval = list(0,0),
@@ -863,7 +811,7 @@ causal_mediation(data = df_multipleM_noint,  outcome = "contY_catMbinM_noint", e
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_multipleM_noint,  outcome = "contY_catMbinM_noint", exposure = 'A', 
+cmest(data = df_multipleM_noint,  outcome = "contY_catMbinM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = c('M_cat',"M_bin"), covariates.pre = "C", 
                  yreg = "linear", mreg = c("multinomial", "logistic"), mval = list(0,0),
@@ -876,7 +824,7 @@ causal_mediation(data = df_multipleM_noint,  outcome = "contY_catMbinM_noint", e
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_multipleM_noint,  outcome = "contY_catMbinM_noint", exposure = 'A', 
+cmest(data = df_multipleM_noint,  outcome = "contY_catMbinM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = c('M_cat',"M_bin"), covariates.pre = "C", 
                  yreg = "linear", mreg = c("multinomial", "logistic"), mval = list(0,0),
@@ -888,7 +836,7 @@ causal_mediation(data = df_multipleM_noint,  outcome = "contY_catMbinM_noint", e
 ### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
 
 ```{r warning=F,message=F}
-causal_mediation(data = df_multipleM_noint,  outcome = "contY_catMbinM_noint", exposure = 'A', 
+cmest(data = df_multipleM_noint,  outcome = "contY_catMbinM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = c('M_cat',"M_bin"), covariates.pre = "C",  
                  yreg = "linear", mreg = c("multinomial", "logistic"), mval = list(0,0),
@@ -942,7 +890,7 @@ $$E[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_{21}I\{m1^*==1\}+\theta_{22}I\{m1^*==2\
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_multipleM_EMint, outcome = "contY_catMbinM_EMint", exposure = 'A', 
+cmest(data = df_multipleM_EMint, outcome = "contY_catMbinM_EMint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = c('M_cat',"M_bin"), covariates.pre = "C", 
                  EMint = TRUE, EMint.terms = c("A*M_bin"),
@@ -956,7 +904,7 @@ causal_mediation(data = df_multipleM_EMint, outcome = "contY_catMbinM_EMint", ex
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_multipleM_EMint,  outcome = "contY_catMbinM_EMint", exposure = 'A', 
+cmest(data = df_multipleM_EMint,  outcome = "contY_catMbinM_EMint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = c('M_cat',"M_bin"), covariates.pre = "C", 
                  EMint = TRUE, EMint.terms = c("A*M_bin"),
@@ -970,7 +918,7 @@ causal_mediation(data = df_multipleM_EMint,  outcome = "contY_catMbinM_EMint", e
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_multipleM_EMint,  outcome = "contY_catMbinM_EMint", exposure = "A", 
+cmest(data = df_multipleM_EMint,  outcome = "contY_catMbinM_EMint", exposure = "A", 
                  exposure.type = "binary",
                  mediator = c('M_cat',"M_bin"), covariates.pre = "C",
                  EMint = TRUE, EMint.terms = c("A*M_bin"),
@@ -984,7 +932,7 @@ causal_mediation(data = df_multipleM_EMint,  outcome = "contY_catMbinM_EMint", e
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_multipleM_EMint,  outcome = "contY_catMbinM_EMint", exposure = 'A', 
+cmest(data = df_multipleM_EMint,  outcome = "contY_catMbinM_EMint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = c('M_cat',"M_bin"), covariates.pre = "C", 
                  EMint = TRUE, EMint.terms = c("A*M_bin"),
@@ -998,7 +946,7 @@ causal_mediation(data = df_multipleM_EMint,  outcome = "contY_catMbinM_EMint", e
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_multipleM_EMint,  outcome = "contY_catMbinM_EMint", exposure = 'A', 
+cmest(data = df_multipleM_EMint,  outcome = "contY_catMbinM_EMint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = c('M_cat',"M_bin"), covariates.pre = "C", 
                  EMint = TRUE, EMint.terms = c("A*M_bin"),
@@ -1011,7 +959,7 @@ causal_mediation(data = df_multipleM_EMint,  outcome = "contY_catMbinM_EMint", e
 ### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
 
 ```{r warning=F,message=F}
-causal_mediation(data = df_multipleM_EMint,  outcome = "contY_catMbinM_EMint", exposure = 'A', 
+cmest(data = df_multipleM_EMint,  outcome = "contY_catMbinM_EMint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = c('M_cat',"M_bin"), covariates.pre = "C", 
                  EMint = TRUE, EMint.terms = c("A*M_bin"),
@@ -1067,7 +1015,7 @@ $$\theta_{31}I\{m1^*==1\}m2^*+\theta_{32}I\{m1^*==2\}m2^*+\theta_4c$$
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_multipleM_MMint,  outcome = "contY_catMbinM_MMint", exposure = 'A', 
+cmest(data = df_multipleM_MMint,  outcome = "contY_catMbinM_MMint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = c('M_cat',"M_bin"), covariates.pre = "C", MMint = TRUE, 
                  yreg = "linear", mreg = c("multinomial", "logistic"), mval = list(0,0),
@@ -1080,7 +1028,7 @@ causal_mediation(data = df_multipleM_MMint,  outcome = "contY_catMbinM_MMint", e
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_multipleM_MMint,  outcome = "contY_catMbinM_MMint", exposure = 'A', 
+cmest(data = df_multipleM_MMint,  outcome = "contY_catMbinM_MMint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = c('M_cat',"M_bin"), covariates.pre = "C", MMint = TRUE, 
                  yreg = "linear", mreg = c("multinomial", "logistic"), mval = list(0,0),
@@ -1092,7 +1040,7 @@ causal_mediation(data = df_multipleM_MMint,  outcome = "contY_catMbinM_MMint", e
 ### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
 
 ```{r warning=F,message=F}
-causal_mediation(data = df_multipleM_MMint,  outcome = "contY_catMbinM_MMint", exposure = 'A', 
+cmest(data = df_multipleM_MMint,  outcome = "contY_catMbinM_MMint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = c('M_cat',"M_bin"), covariates.pre = "C", MMint = TRUE, 
                  yreg = "linear", mreg = c("multinomial", "logistic"), mval = list(0,0),
@@ -1147,7 +1095,7 @@ $$\theta_{31}aI\{m1^*==1\}m2^*+\theta_{32}aI\{m1^*==2\}m2^*+\theta_4c$$
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_multipleM_EMMint,  outcome = "contY_catMbinM_EMMint", exposure = 'A',
+cmest(data = df_multipleM_EMMint,  outcome = "contY_catMbinM_EMMint", exposure = 'A',
                  exposure.type = "binary",
                  mediator = c('M_cat',"M_bin"), covariates.pre = "C", EMMint = TRUE, 
                  yreg = "linear", mreg = c("multinomial", "logistic"), mval = list(0,0),
@@ -1160,7 +1108,7 @@ causal_mediation(data = df_multipleM_EMMint,  outcome = "contY_catMbinM_EMMint",
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_multipleM_EMMint,  outcome = "contY_catMbinM_EMMint", exposure = 'A',
+cmest(data = df_multipleM_EMMint,  outcome = "contY_catMbinM_EMMint", exposure = 'A',
                  exposure.type = "binary",
                  mediator = c('M_cat',"M_bin"), covariates.pre = "C", EMMint = TRUE, 
                  yreg = "linear", mreg = c("multinomial", "logistic"), mval = list(0,0),
@@ -1172,7 +1120,7 @@ causal_mediation(data = df_multipleM_EMMint,  outcome = "contY_catMbinM_EMMint",
 ### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
 
 ```{r warning=F,message=F}
-causal_mediation(data = df_multipleM_EMMint,  outcome = "contY_catMbinM_EMMint", exposure = 'A',
+cmest(data = df_multipleM_EMMint,  outcome = "contY_catMbinM_EMMint", exposure = 'A',
                  exposure.type = "binary",
                  mediator = c('M_cat',"M_bin"), covariates.pre = "C", EMMint = TRUE, 
                  yreg = "linear", mreg = c("multinomial", "logistic"), mval = list(0,0),
@@ -1221,7 +1169,7 @@ $$logitE[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_2m^*+\theta_4c$$
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_noint,  outcome = "binY_contM_noint", exposure = 'A', 
+cmest(data = df_noint,  outcome = "binY_contM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cont', covariates.pre = "C", 
                  yreg = "logistic", mreg = "linear", mval = list(0),
@@ -1234,7 +1182,7 @@ causal_mediation(data = df_noint,  outcome = "binY_contM_noint", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_noint,  outcome = "binY_contM_noint", exposure = 'A', 
+cmest(data = df_noint,  outcome = "binY_contM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cont', covariates.pre = "C", 
                  yreg = "logistic", mreg = "linear", mval = list(0),
@@ -1247,7 +1195,7 @@ causal_mediation(data = df_noint,  outcome = "binY_contM_noint", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_noint,  outcome = "binY_contM_noint", exposure = 'A', 
+cmest(data = df_noint,  outcome = "binY_contM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cont', covariates.pre = "C", 
                  yreg = "logistic", mreg = "linear", mval = list(0),
@@ -1256,37 +1204,11 @@ causal_mediation(data = df_noint,  outcome = "binY_contM_noint", exposure = 'A',
 
 ```
 
-### Causal Effects and Standard Errors Estimated By the Marginal Structural Model 
-
-```{r warning=F,message=F}
-
-causal_mediation(data = df_noint,  outcome = "binY_contM_noint", exposure = "A", 
-                 exposure.type = "binary",
-                 mediator = 'M_cont', covariates.pre = "C", 
-                 yreg = "logistic", mreg = "linear", mval = list(0),
-                 a_star = 0, a = 1, 
-                 est.method = "imputation", inf.method = "bootstrap", model = "msm")
-
-```
-
-### Causal Effects and Standard Errors Estimated By the Inverse Odds-ratio Weighting Approach 
-
-```{r warning=F,message=F}
-
-causal_mediation(data = df_noint,  outcome = "binY_contM_noint", exposure = 'A', 
-                 exposure.type = "binary",
-                 mediator = 'M_cont', covariates.pre = "C", 
-                 yreg = "logistic", mreg = "linear", mval = list(0),
-                 a_star = 0, a = 1, 
-                 est.method = "paramfunc", inf.method = "bootstrap", model = "iorw")
-
-```
-
 ### Causal Effects and Standard Errors Estimated By the G-formula Approach 
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_noint,  outcome = "binY_contM_noint", exposure = 'A', 
+cmest(data = df_noint,  outcome = "binY_contM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cont', covariates.pre = "C",  
                  yreg = "logistic", mreg = "linear", mval = list(0),
@@ -1298,7 +1220,7 @@ causal_mediation(data = df_noint,  outcome = "binY_contM_noint", exposure = 'A',
 ### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
 
 ```{r warning=F,message=F}
-causal_mediation(data = df_noint,  outcome = "binY_contM_noint", exposure = 'A', 
+cmest(data = df_noint,  outcome = "binY_contM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cont', covariates.pre = "C",
                  yreg = "logistic", mreg = "linear", mval = list(0),
@@ -1345,7 +1267,7 @@ $$logitE[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_2m^*+\theta_3am^*+\theta_4c$$
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_int,  outcome = "binY_contM_int", exposure = 'A', 
+cmest(data = df_int,  outcome = "binY_contM_int", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cont', covariates.pre = "C", EMint = TRUE, 
                  yreg = "logistic", mreg = "linear", mval = list(0),
@@ -1358,7 +1280,7 @@ causal_mediation(data = df_int,  outcome = "binY_contM_int", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_int,  outcome = "binY_contM_int", exposure = 'A', 
+cmest(data = df_int,  outcome = "binY_contM_int", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cont', covariates.pre = "C", EMint = TRUE,
                  yreg = "logistic", mreg = "linear", mval = list(0),
@@ -1371,7 +1293,7 @@ causal_mediation(data = df_int,  outcome = "binY_contM_int", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_int,  outcome = "binY_contM_int", exposure = 'A', 
+cmest(data = df_int,  outcome = "binY_contM_int", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cont', covariates.pre = "C", EMint = TRUE, 
                  yreg = "logistic", mreg = "linear", mval = list(0),
@@ -1380,37 +1302,11 @@ causal_mediation(data = df_int,  outcome = "binY_contM_int", exposure = 'A',
 
 ```
 
-### Causal Effects and Standard Errors Estimated By the Marginal Structural Model 
-
-```{r warning=F,message=F}
-
-causal_mediation(data = df_int,  outcome = "binY_contM_int", exposure = "A", 
-                 exposure.type = "binary",
-                 mediator = 'M_cont', covariates.pre = "C", EMint = TRUE, 
-                 yreg = "logistic", mreg = "linear", mval = list(0),
-                 a_star = 0, a = 1, 
-                 est.method = "imputation", inf.method = "bootstrap", model = "msm")
-
-```
-
-### Causal Effects and Standard Errors Estimated By the Inverse Odds-ratio Weighting Approach 
-
-```{r warning=F,message=F}
-
-causal_mediation(data = df_int,  outcome = "binY_contM_int", exposure = 'A', 
-                 exposure.type = "binary",
-                 mediator = 'M_cont', covariates.pre = "C", EMint = TRUE, 
-                 yreg = "logistic", mreg = "linear", mval = list(0),
-                 a_star = 0, a = 1, 
-                 est.method = "paramfunc", inf.method = "bootstrap", model = "iorw")
-
-```
-
 ### Causal Effects and Standard Errors Estimated By the G-formula Approach 
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_int,  outcome = "binY_contM_int", exposure = 'A', 
+cmest(data = df_int,  outcome = "binY_contM_int", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cont', covariates.pre = "C", EMint = TRUE,
                  yreg = "logistic", mreg = "linear", mval = list(0),
@@ -1422,7 +1318,7 @@ causal_mediation(data = df_int,  outcome = "binY_contM_int", exposure = 'A',
 ### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
 
 ```{r warning=F,message=F}
-causal_mediation(data = df_int,  outcome = "binY_contM_int", exposure = 'A', 
+cmest(data = df_int,  outcome = "binY_contM_int", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cont', covariates.pre = "C", EMint = TRUE, 
                  yreg = "logistic", mreg = "linear", mval = list(0),
@@ -1470,7 +1366,7 @@ $$logitE[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_2m^*+\theta_4c$$
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_noint,  outcome = "binY_binM_noint", exposure = 'A', 
+cmest(data = df_noint,  outcome = "binY_binM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_bin', covariates.pre = "C",  
                  yreg = "logistic", mreg = "logistic", mval = list(0),
@@ -1483,7 +1379,7 @@ causal_mediation(data = df_noint,  outcome = "binY_binM_noint", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_noint,  outcome = "binY_binM_noint", exposure = 'A', 
+cmest(data = df_noint,  outcome = "binY_binM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_bin', covariates.pre = "C", 
                  yreg = "logistic", mreg = "logistic", mval = list(0),
@@ -1496,7 +1392,7 @@ causal_mediation(data = df_noint,  outcome = "binY_binM_noint", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_noint,  outcome = "binY_binM_noint", exposure = 'A', 
+cmest(data = df_noint,  outcome = "binY_binM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_bin', covariates.pre = "C",  
                  yreg = "logistic", mreg = "logistic", mval = list(0),
@@ -1509,7 +1405,7 @@ causal_mediation(data = df_noint,  outcome = "binY_binM_noint", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_noint,  outcome = "binY_binM_noint", exposure = "A", 
+cmest(data = df_noint,  outcome = "binY_binM_noint", exposure = "A", 
                  exposure.type = "binary",
                  mediator = 'M_bin', covariates.pre = "C",  
                  yreg = "logistic", mreg = "logistic", mval = list(0),
@@ -1522,7 +1418,7 @@ causal_mediation(data = df_noint,  outcome = "binY_binM_noint", exposure = "A",
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_noint,  outcome = "binY_binM_noint", exposure = 'A', 
+cmest(data = df_noint,  outcome = "binY_binM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_bin', covariates.pre = "C",  
                  yreg = "logistic", mreg = "logistic", mval = list(0),
@@ -1535,7 +1431,7 @@ causal_mediation(data = df_noint,  outcome = "binY_binM_noint", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_noint,  outcome = "binY_binM_noint", exposure = 'A', 
+cmest(data = df_noint,  outcome = "binY_binM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_bin', covariates.pre = "C", 
                  yreg = "logistic", mreg = "logistic", mval = list(0),
@@ -1547,7 +1443,7 @@ causal_mediation(data = df_noint,  outcome = "binY_binM_noint", exposure = 'A',
 ### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
 
 ```{r warning=F,message=F}
-causal_mediation(data = df_noint,  outcome = "binY_binM_noint", exposure = 'A', 
+cmest(data = df_noint,  outcome = "binY_binM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_bin', covariates.pre = "C",  
                  yreg = "logistic", mreg = "logistic", mval = list(0),
@@ -1593,7 +1489,7 @@ $$logitE[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_2m^*+\theta_3am^*+\theta_4c$$
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_int,  outcome = "binY_binM_int", exposure = 'A', 
+cmest(data = df_int,  outcome = "binY_binM_int", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_bin', covariates.pre = "C", EMint = TRUE,
                  yreg = "logistic", mreg = "logistic", mval = list(0),
@@ -1606,7 +1502,7 @@ causal_mediation(data = df_int,  outcome = "binY_binM_int", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_int,  outcome = "binY_binM_int", exposure = 'A', 
+cmest(data = df_int,  outcome = "binY_binM_int", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_bin', covariates.pre = "C", EMint = TRUE, 
                  yreg = "logistic", mreg = "logistic", mval = list(0),
@@ -1619,7 +1515,7 @@ causal_mediation(data = df_int,  outcome = "binY_binM_int", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_int,  outcome = "binY_binM_int", exposure = 'A', 
+cmest(data = df_int,  outcome = "binY_binM_int", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_bin', covariates.pre = "C", EMint = TRUE, 
                  yreg = "logistic", mreg = "logistic", mval = list(0),
@@ -1632,7 +1528,7 @@ causal_mediation(data = df_int,  outcome = "binY_binM_int", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_int,  outcome = "binY_binM_int", exposure = "A", 
+cmest(data = df_int,  outcome = "binY_binM_int", exposure = "A", 
                  exposure.type = "binary",
                  mediator = 'M_bin', covariates.pre = "C", EMint = TRUE, 
                  yreg = "logistic", mreg = "logistic", mval = list(0),
@@ -1645,7 +1541,7 @@ causal_mediation(data = df_int,  outcome = "binY_binM_int", exposure = "A",
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_int,  outcome = "binY_binM_int", exposure = 'A', 
+cmest(data = df_int,  outcome = "binY_binM_int", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_bin', covariates.pre = "C", EMint = TRUE, 
                  yreg = "logistic", mreg = "logistic", mval = list(0),
@@ -1658,7 +1554,7 @@ causal_mediation(data = df_int,  outcome = "binY_binM_int", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_int,  outcome = "binY_binM_int", exposure = 'A', 
+cmest(data = df_int,  outcome = "binY_binM_int", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_bin', covariates.pre = "C", EMint = TRUE, 
                  yreg = "logistic", mreg = "logistic", mval = list(0),
@@ -1670,7 +1566,7 @@ causal_mediation(data = df_int,  outcome = "binY_binM_int", exposure = 'A',
 ### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
 
 ```{r warning=F,message=F}
-causal_mediation(data = df_int,  outcome = "binY_binM_int", exposure = 'A', 
+cmest(data = df_int,  outcome = "binY_binM_int", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_bin', covariates.pre = "C", EMint = TRUE, 
                  yreg = "logistic", mreg = "logistic", mval = list(0),
@@ -1723,7 +1619,7 @@ $$logitE[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_{21}I\{m^*==1\}+\theta_{22}I\{m^*=
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_noint,  outcome = "binY_catM_noint", exposure = 'A', 
+cmest(data = df_noint,  outcome = "binY_catM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cat', covariates.pre = "C", 
                  yreg = "logistic", mreg = "multinomial", mval = list(0),
@@ -1736,7 +1632,7 @@ causal_mediation(data = df_noint,  outcome = "binY_catM_noint", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_noint,  outcome = "binY_catM_noint", exposure = 'A', 
+cmest(data = df_noint,  outcome = "binY_catM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cat', covariates.pre = "C", 
                  yreg = "logistic", mreg = "multinomial", mval = list(0),
@@ -1749,7 +1645,7 @@ causal_mediation(data = df_noint,  outcome = "binY_catM_noint", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_noint,  outcome = "binY_catM_noint", exposure = 'A', 
+cmest(data = df_noint,  outcome = "binY_catM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cat', covariates.pre = "C", 
                  yreg = "logistic", mreg = "multinomial", mval = list(0),
@@ -1762,7 +1658,7 @@ causal_mediation(data = df_noint,  outcome = "binY_catM_noint", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_noint,  outcome = "binY_catM_noint", exposure = "A", 
+cmest(data = df_noint,  outcome = "binY_catM_noint", exposure = "A", 
                  exposure.type = "binary",
                  mediator = 'M_cat', covariates.pre = "C", 
                  yreg = "logistic", mreg = "multinomial", mval = list(0),
@@ -1775,7 +1671,7 @@ causal_mediation(data = df_noint,  outcome = "binY_catM_noint", exposure = "A",
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_noint,  outcome = "binY_catM_noint", exposure = 'A', 
+cmest(data = df_noint,  outcome = "binY_catM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cat', covariates.pre = "C",  
                  yreg = "logistic", mreg = "multinomial", mval = list(0),
@@ -1788,7 +1684,7 @@ causal_mediation(data = df_noint,  outcome = "binY_catM_noint", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_noint,  outcome = "binY_catM_noint", exposure = 'A', 
+cmest(data = df_noint,  outcome = "binY_catM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cat', covariates.pre = "C",
                  yreg = "logistic", mreg = "multinomial", mval = list(0),
@@ -1800,7 +1696,7 @@ causal_mediation(data = df_noint,  outcome = "binY_catM_noint", exposure = 'A',
 ### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
 
 ```{r warning=F,message=F}
-causal_mediation(data = df_noint,  outcome = "binY_catM_noint", exposure = 'A', 
+cmest(data = df_noint,  outcome = "binY_catM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cat', covariates.pre = "C",  
                  yreg = "logistic", mreg = "multinomial", mval = list(0),
@@ -1851,7 +1747,7 @@ $$logitE[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_{21}I\{m^*==1\}+\theta_{22}I\{m^*=
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_int,  outcome = "binY_catM_int", exposure = 'A', 
+cmest(data = df_int,  outcome = "binY_catM_int", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cat', covariates.pre = "C", EMint = TRUE, 
                  yreg = "logistic", mreg = "multinomial", mval = list(0),
@@ -1864,7 +1760,7 @@ causal_mediation(data = df_int,  outcome = "binY_catM_int", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_int,  outcome = "binY_catM_int", exposure = 'A', 
+cmest(data = df_int,  outcome = "binY_catM_int", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cat', covariates.pre = "C", EMint = TRUE,
                  yreg = "logistic", mreg = "multinomial", mval = list(0),
@@ -1877,7 +1773,7 @@ causal_mediation(data = df_int,  outcome = "binY_catM_int", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_int,  outcome = "binY_catM_int", exposure = 'A', 
+cmest(data = df_int,  outcome = "binY_catM_int", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cat', covariates.pre = "C", EMint = TRUE, 
                  yreg = "logistic", mreg = "multinomial", mval = list(0),
@@ -1890,7 +1786,7 @@ causal_mediation(data = df_int,  outcome = "binY_catM_int", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_int,  outcome = "binY_catM_int", exposure = "A", 
+cmest(data = df_int,  outcome = "binY_catM_int", exposure = "A", 
                  exposure.type = "binary",
                  mediator = 'M_cat', covariates.pre = "C", EMint = TRUE, 
                  yreg = "logistic", mreg = "multinomial", mval = list(0),
@@ -1903,7 +1799,7 @@ causal_mediation(data = df_int,  outcome = "binY_catM_int", exposure = "A",
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_int,  outcome = "binY_catM_int", exposure = 'A', 
+cmest(data = df_int,  outcome = "binY_catM_int", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cat', covariates.pre = "C", EMint = TRUE, 
                  yreg = "logistic", mreg = "multinomial", mval = list(0),
@@ -1916,7 +1812,7 @@ causal_mediation(data = df_int,  outcome = "binY_catM_int", exposure = 'A',
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_int,  outcome = "binY_catM_int", exposure = 'A', 
+cmest(data = df_int,  outcome = "binY_catM_int", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cat', covariates.pre = "C", EMint = TRUE,
                  yreg = "logistic", mreg = "multinomial", mval = list(0),
@@ -1928,7 +1824,7 @@ causal_mediation(data = df_int,  outcome = "binY_catM_int", exposure = 'A',
 ### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
 
 ```{r warning=F,message=F}
-causal_mediation(data = df_int,  outcome = "binY_catM_int", exposure = 'A', 
+cmest(data = df_int,  outcome = "binY_catM_int", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = 'M_cat', covariates.pre = "C", EMint = TRUE, 
                  yreg = "logistic", mreg = "multinomial", mval = list(0),
@@ -1984,7 +1880,7 @@ $$logitE[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_{21}I\{m1^*==1\}+\theta_{22}I\{m1^
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_multipleM_noint,  outcome = "binY_catMbinM_noint", exposure = 'A', 
+cmest(data = df_multipleM_noint,  outcome = "binY_catMbinM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = c('M_cat',"M_bin"), covariates.pre = "C", 
                  yreg = "logistic", mreg = c("multinomial", "logistic"), mval = list(0,0),
@@ -1997,7 +1893,7 @@ causal_mediation(data = df_multipleM_noint,  outcome = "binY_catMbinM_noint", ex
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_multipleM_noint,  outcome = "binY_catMbinM_noint", exposure = 'A', 
+cmest(data = df_multipleM_noint,  outcome = "binY_catMbinM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = c('M_cat',"M_bin"), covariates.pre = "C", 
                  yreg = "logistic", mreg = c("multinomial", "logistic"), mval = list(0,0),
@@ -2010,7 +1906,7 @@ causal_mediation(data = df_multipleM_noint,  outcome = "binY_catMbinM_noint", ex
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_multipleM_noint,  outcome = "binY_catMbinM_noint", exposure = "A", 
+cmest(data = df_multipleM_noint,  outcome = "binY_catMbinM_noint", exposure = "A", 
                  exposure.type = "binary",
                  mediator = c('M_cat',"M_bin"), covariates.pre = "C",
                  yreg = "logistic", mreg = c("multinomial", "logistic"), mval = list(0,0),
@@ -2023,7 +1919,7 @@ causal_mediation(data = df_multipleM_noint,  outcome = "binY_catMbinM_noint", ex
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_multipleM_noint,  outcome = "binY_catMbinM_noint", exposure = 'A', 
+cmest(data = df_multipleM_noint,  outcome = "binY_catMbinM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = c('M_cat',"M_bin"), covariates.pre = "C", 
                  yreg = "logistic", mreg = c("multinomial", "logistic"), mval = list(0,0),
@@ -2036,7 +1932,7 @@ causal_mediation(data = df_multipleM_noint,  outcome = "binY_catMbinM_noint", ex
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_multipleM_noint,  outcome = "binY_catMbinM_noint", exposure = 'A', 
+cmest(data = df_multipleM_noint,  outcome = "binY_catMbinM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = c('M_cat',"M_bin"), covariates.pre = "C", 
                  yreg = "logistic", mreg = c("multinomial", "logistic"), mval = list(0,0),
@@ -2048,7 +1944,7 @@ causal_mediation(data = df_multipleM_noint,  outcome = "binY_catMbinM_noint", ex
 ### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
 
 ```{r warning=F,message=F}
-causal_mediation(data = df_multipleM_noint,  outcome = "binY_catMbinM_noint", exposure = 'A', 
+cmest(data = df_multipleM_noint,  outcome = "binY_catMbinM_noint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = c('M_cat',"M_bin"), covariates.pre = "C", 
                  yreg = "logistic", mreg = c("multinomial", "logistic"), mval = list(0,0),
@@ -2102,7 +1998,7 @@ $$logitE[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_{21}I\{m1^*==1\}+\theta_{22}I\{m1^
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_multipleM_EMint, outcome = "binY_catMbinM_EMint", exposure = 'A', 
+cmest(data = df_multipleM_EMint, outcome = "binY_catMbinM_EMint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = c('M_cat',"M_bin"), covariates.pre = "C", 
                  EMint = TRUE, EMint.terms = c("A*M_bin"),
@@ -2116,7 +2012,7 @@ causal_mediation(data = df_multipleM_EMint, outcome = "binY_catMbinM_EMint", exp
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_multipleM_EMint,  outcome = "binY_catMbinM_EMint", exposure = 'A', 
+cmest(data = df_multipleM_EMint,  outcome = "binY_catMbinM_EMint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = c('M_cat',"M_bin"), covariates.pre = "C",
                  EMint = TRUE, EMint.terms = c("A*M_bin"),
@@ -2130,7 +2026,7 @@ causal_mediation(data = df_multipleM_EMint,  outcome = "binY_catMbinM_EMint", ex
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_multipleM_EMint,  outcome = "binY_catMbinM_EMint", exposure = "A", 
+cmest(data = df_multipleM_EMint,  outcome = "binY_catMbinM_EMint", exposure = "A", 
                  exposure.type = "binary",
                  mediator = c('M_cat',"M_bin"), covariates.pre = "C", 
                  EMint = TRUE, EMint.terms = c("A*M_bin"),
@@ -2144,7 +2040,7 @@ causal_mediation(data = df_multipleM_EMint,  outcome = "binY_catMbinM_EMint", ex
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_multipleM_EMint,  outcome = "binY_catMbinM_EMint", exposure = 'A', 
+cmest(data = df_multipleM_EMint,  outcome = "binY_catMbinM_EMint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = c('M_cat',"M_bin"), covariates.pre = "C", 
                  EMint = TRUE, EMint.terms = c("A*M_bin"),
@@ -2158,7 +2054,7 @@ causal_mediation(data = df_multipleM_EMint,  outcome = "binY_catMbinM_EMint", ex
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_multipleM_EMint,  outcome = "binY_catMbinM_EMint", exposure = 'A', 
+cmest(data = df_multipleM_EMint,  outcome = "binY_catMbinM_EMint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = c('M_cat',"M_bin"), covariates.pre = "C", 
                  EMint = TRUE, EMint.terms = c("A*M_bin"),
@@ -2171,7 +2067,7 @@ causal_mediation(data = df_multipleM_EMint,  outcome = "binY_catMbinM_EMint", ex
 ### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
 
 ```{r warning=F,message=F}
-causal_mediation(data = df_multipleM_EMint,  outcome = "binY_catMbinM_EMint", exposure = 'A', 
+cmest(data = df_multipleM_EMint,  outcome = "binY_catMbinM_EMint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = c('M_cat',"M_bin"), covariates.pre = "C",  
                  EMint = TRUE, EMint.terms = c("A*M_bin"),
@@ -2228,7 +2124,7 @@ $$\theta_{31}I\{m1^*==1\}m2^*+\theta_{32}I\{m1^*==2\}m2^*+\theta_4c$$
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_multipleM_MMint,  outcome = "binY_catMbinM_MMint", exposure = 'A', 
+cmest(data = df_multipleM_MMint,  outcome = "binY_catMbinM_MMint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = c('M_cat',"M_bin"), covariates.pre = "C", MMint = TRUE, 
                  yreg = "logistic", mreg = c("multinomial", "logistic"), mval = list(0,0),
@@ -2241,7 +2137,7 @@ causal_mediation(data = df_multipleM_MMint,  outcome = "binY_catMbinM_MMint", ex
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_multipleM_MMint,  outcome = "binY_catMbinM_MMint", exposure = 'A', 
+cmest(data = df_multipleM_MMint,  outcome = "binY_catMbinM_MMint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = c('M_cat',"M_bin"), covariates.pre = "C", MMint = TRUE, 
                  yreg = "logistic", mreg = c("multinomial", "logistic"), mval = list(0,0),
@@ -2253,7 +2149,7 @@ causal_mediation(data = df_multipleM_MMint,  outcome = "binY_catMbinM_MMint", ex
 ### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
 
 ```{r warning=F,message=F}
-causal_mediation(data = df_multipleM_MMint,  outcome = "binY_catMbinM_MMint", exposure = 'A', 
+cmest(data = df_multipleM_MMint,  outcome = "binY_catMbinM_MMint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = c('M_cat',"M_bin"), covariates.pre = "C", MMint = TRUE, 
                  yreg = "logistic", mreg = c("multinomial", "logistic"), mval = list(0,0),
@@ -2309,7 +2205,7 @@ $$\theta_{31}aI\{m1^*==1\}m2^*+\theta_{32}aI\{m1^*==2\}m2^*+\theta_4c$$
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_multipleM_EMMint,  outcome = "binY_catMbinM_EMMint", exposure = 'A', 
+cmest(data = df_multipleM_EMMint,  outcome = "binY_catMbinM_EMMint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = c('M_cat',"M_bin"), covariates.pre = "C", EMMint = TRUE, 
                  yreg = "logistic", mreg = c("multinomial", "logistic"), mval = list(0,0),
@@ -2322,7 +2218,7 @@ causal_mediation(data = df_multipleM_EMMint,  outcome = "binY_catMbinM_EMMint", 
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_multipleM_EMMint,  outcome = "binY_catMbinM_EMMint", exposure = 'A', 
+cmest(data = df_multipleM_EMMint,  outcome = "binY_catMbinM_EMMint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = c('M_cat',"M_bin"), covariates.pre = "C", EMMint = TRUE, 
                  yreg = "logistic", mreg = c("multinomial", "logistic"), mval = list(0,0),
@@ -2334,7 +2230,7 @@ causal_mediation(data = df_multipleM_EMMint,  outcome = "binY_catMbinM_EMMint", 
 ### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
 
 ```{r warning=F,message=F}
-causal_mediation(data = df_multipleM_EMMint,  outcome = "binY_catMbinM_EMMint", exposure = 'A', 
+cmest(data = df_multipleM_EMMint,  outcome = "binY_catMbinM_EMMint", exposure = 'A', 
                  exposure.type = "binary",
                  mediator = c('M_cat',"M_bin"), covariates.pre = "C", EMMint = TRUE, 
                  yreg = "logistic", mreg = c("multinomial", "logistic"), mval = list(0,0),
@@ -2414,7 +2310,7 @@ $$\theta_{31}aI\{m1^*==1\}m2^*+\theta_{32}aI\{m1^*==2\}m2^*+\theta_4c+\theta_5l1
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_multipleM_EMint_postcovar,  outcome = "binY_catMbinM_EMint", 
+cmest(data = df_multipleM_EMint_postcovar,  outcome = "binY_catMbinM_EMint", 
                  exposure = "A", exposure.type = "binary",
                  mediator = c('M_bin',"M_cat"), covariates.pre = "C", 
                  covariates.post = c("L_bin", "L_cat"),
@@ -2430,7 +2326,7 @@ causal_mediation(data = df_multipleM_EMint_postcovar,  outcome = "binY_catMbinM_
 
 ```{r warning=F,message=F}
 
-causal_mediation(data = df_multipleM_EMint_postcovar,  outcome = "binY_catMbinM_EMint", 
+cmest(data = df_multipleM_EMint_postcovar,  outcome = "binY_catMbinM_EMint", 
                  exposure = "A", exposure.type = "binary",
                  mediator = c('M_bin',"M_cat"), covariates.pre = "C",  
                  covariates.post = c("L_bin", "L_cat"),

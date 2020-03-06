@@ -28,6 +28,16 @@ est_step <- function(data, indices, outcome, exposure, exposure.type, mediator,
       stop("For the selected model, closed-form parameter function estimation doesn't support multiple mediator cases")
     }
 
+    mediator_regression <- regressions$mediator_regression
+    outcome_regression <- regressions$outcome_regression
+
+    if (model == "rb" && !(((inherits(mediator_regression[[1]], "glm") |
+                             inherits(mediator_regression[[1]], "lm"))&&
+           family(mediator_regression[[1]])$family %in% c("gaussian", "binomial")) |
+        inherits(mediator_regression[[1]], "multinom"))) {
+      stop("Closed-form parameter function estimation doesn't support the selected mediator regression model.")
+    }
+
     coef <- get_coef(formulas = formulas, regressions = regressions,
                      mreg = mreg, yreg = yreg, model = model)
 
@@ -61,9 +71,11 @@ est_step <- function(data, indices, outcome, exposure, exposure.type, mediator,
 
       covariatesTerm <- sapply(0:(mlevel-2), function(x) sum(betas[2 + 1:length(vecc) + x*length(betas)/(mlevel-1)]*vecc))
 
-      if (yreg == "linear") {
+      if ((inherits(outcome_regression, "glm")|inherits(outcome_regression, "lm"))&&
+          family(outcome_regression)$family == "gaussian") {
 
-        if (mreg == "linear") {
+        if ((inherits(mediator_regression[[1]], "glm")|inherits(mediator_regression[[1]], "lm"))&&
+            family(mediator_regression[[1]])$family == "gaussian") {
 
           cde <- unname((theta1 + theta3 * m_star) * (a-a_star))
 
@@ -77,7 +89,9 @@ est_step <- function(data, indices, outcome, exposure, exposure.type, mediator,
 
           tnie <- unname((theta2 + theta3  * a) * beta1 * (a - a_star))
 
-        } else if (mreg %in% c("logistic", "multinomial")) {
+        } else if ((inherits(mediator_regression[[1]], "glm")&&
+                   family(mediator_regression[[1]])$family == "binomial") |
+                   inherits(mediator_regression[[1]], "multinom")) {
 
           cde <- unname((theta1 + sum(theta3*m_star)) * (a-a_star))
 
@@ -135,10 +149,11 @@ est_step <- function(data, indices, outcome, exposure, exposure.type, mediator,
                  intmed_prop = intmed_prop, pie_prop = pie_prop,
                  overall_pm = overall_pm, overall_int = overall_int, overall_pe = overall_pe)
 
-      } else if (yreg %in% c("logistic", "loglinear", "poisson", "quasipoisson",
-                             "negbin", "coxph", "aft_exp", "aft_weibull")) {
+      } else if (!((inherits(outcome_regression, "glm")|inherits(outcome_regression, "lm"))&&
+                 family(outcome_regression)$family == "gaussian")) {
 
-        if (mreg == "linear") {
+        if ((inherits(mediator_regression[[1]], "glm")|inherits(mediator_regression[[1]], "lm"))&&
+              family(mediator_regression[[1]])$family == "gaussian") {
 
           cde_rr <- unname(exp((theta1 + theta3 * m_star) * (a - a_star)))
 
@@ -160,7 +175,9 @@ est_step <- function(data, indices, outcome, exposure, exposure.type, mediator,
                                     (beta0 + beta1 * a_star + covariatesTerm) -
                                     0.5 * (theta2 + theta3 * a_star) ^ 2 * variance))
 
-        } else if (mreg %in% c("logistic", "multinomial")) {
+        } else if ((inherits(mediator_regression[[1]], "glm")&&
+                    family(mediator_regression[[1]])$family == "binomial") |
+                   inherits(mediator_regression[[1]], "multinom")) {
 
           cde_rr <- unname(exp((theta1 + sum(theta3*m_star)) * (a-a_star)))
 
@@ -237,7 +254,8 @@ est_step <- function(data, indices, outcome, exposure, exposure.type, mediator,
 
     } else if (model == "iorw") {
 
-      if (yreg == "linear") {
+      if ((inherits(outcome_regression, "glm")|inherits(outcome_regression, "lm"))&&
+          family(regressions$outcome_regression)$family == "gaussian") {
 
         dir <- unname(coef["dir_coef"])
 
@@ -619,7 +637,7 @@ est_step <- function(data, indices, outcome, exposure, exposure.type, mediator,
     }
 
 
-    if (yreg == "linear"|(!is.character(yreg)&&family(yreg)$Family == "gaussian")) {
+    if (family(regressions$outcome_regression)$family == "gaussian") {
 
       cde <- EY1m - EY0m
 
@@ -662,7 +680,7 @@ est_step <- function(data, indices, outcome, exposure, exposure.type, mediator,
                intmed_prop = intmed_prop, pie_prop = pie_prop,
                overall_pm = overall_pm, overall_int = overall_int, overall_pe = overall_pe)
 
-    } else if (yreg != "linear"|(!is.character(yreg)&&family(yreg)$Family != "gaussian")) {
+    } else if (family(regressions$outcome_regression)$family != "gaussian") {
 
       cde_rr <- EY1m/EY0m
 

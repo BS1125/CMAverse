@@ -1,4 +1,4 @@
-causal_mediation <- function(data = NULL, outcome = NULL, event = NULL,
+cmest <- function(data = NULL, outcome = NULL, event = NULL,
                              exposure = NULL, exposure.type = "binary",
                              mediator = NULL, covariates.pre = NULL, covariates.post = NULL,
                              covariates.post.type = NULL, cval = NULL,
@@ -7,9 +7,9 @@ causal_mediation <- function(data = NULL, outcome = NULL, event = NULL,
                              mreg = "linear", yreg = "linear",
                              mval = NULL, a_star = 0, a = 1,
                              model = "rb", est.method = "paramfunc", inf.method = "delta",
-                             nboot = 200, nrep = 5) {
+                             nboot = 200, nrep = 5, conf = 0.95) {
 
-  require(dplyr)
+   require(dplyr)
 
   if (is.null(exposure) | is.null(outcome) | is.null(mediator)) {
     stop("Unspecified exposure, mediator, or outcome")
@@ -26,10 +26,6 @@ causal_mediation <- function(data = NULL, outcome = NULL, event = NULL,
 
   if (!(model %in% c("rb", "wb", "ne", "msm", "iorw", "g-formula"))) {
     stop("Unsupported causal mediation model")
-  }
-
-  if (is.null(covariates.post) == FALSE && !(model %in% c("msm", "g-formula"))) {
-    stop("Unsupported causal mediation model when post-exposure covariates exist.")
   }
 
   ##########################################reorganize the dataset################################
@@ -135,7 +131,6 @@ causal_mediation <- function(data = NULL, outcome = NULL, event = NULL,
       }
     }
 
-
     n <- nrow(data)
 
     effect_estimate <- est_step(data = data, indices = 1:n,
@@ -159,7 +154,7 @@ causal_mediation <- function(data = NULL, outcome = NULL, event = NULL,
                           a_star = a_star, a = a,
                           est.method = est.method, inf.method = inf.method, model = model)
 
-    out <- list(effect_estimate = effect_estimate, effect_se = effect_se)
+    results <- list(effect_estimate = effect_estimate, effect_se = effect_se)
 
 
   } else if (model == "ne") {
@@ -197,25 +192,37 @@ causal_mediation <- function(data = NULL, outcome = NULL, event = NULL,
 
     family <- regressions$outcome_regression$family
 
-    out <- summary(medflex::neEffdecomp(medflex::neModel(as.formula(medflex_formula),
+    results <- summary(medflex::neEffdecomp(medflex::neModel(as.formula(medflex_formula),
                                                          family = family,
                                                          expData = expData, se = "robust")))$coefficients[, c("Estimate", "Std. Error")]
 
-    if (yreg != "linear") {
+    if (!((inherits(regressions$outcome_regression, "glm")|
+           inherits(regressions$outcome_regression, "lm"))&&
+         family(regressions$outcome_regression)$family == "gaussian")) {
 
-      for (i in 1:length(out[, "Std. Error"]))
-        out[, "Std. Error"][i] <- msm::deltamethod(as.formula("~exp(x1)"), out[, "Estimate"][i],
-                                                   (out[, "Std. Error"][i])^2)
+      for (i in 1:length(results[, "Std. Error"]))
+        results[, "Std. Error"][i] <- msm::deltamethod(as.formula("~exp(x1)"), results[, "Estimate"][i],
+                                                   (results[, "Std. Error"][i])^2)
 
-      out[, "Estimate"] <- exp(out[, "Estimate"])
+      results[, "Estimate"] <- exp(results[, "Estimate"])
 
     }
 
     rm(medflex_formula, pos = ".GlobalEnv")
 
+    effect_estimate <- results[, "Estimate"]
+    effect_se <- results[, "Std. Error"]
+
+    results <- list(effect_estimate = effect_estimate, effect_se = effect_se)
+
   }
+
+  out <- format_df(results = results, conf = conf, n = nrow(data), yreg = yreg, model = model)
+
+  class(out) <- c("cmest", "data.frame")
 
   return(out)
 
 }
+
 
