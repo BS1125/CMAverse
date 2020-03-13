@@ -6,25 +6,16 @@ output:
     number_sections: true
 header-includes:
 - \usepackage{caption}
+- \usepackage{threeparttable}
 ---
 
 # Supported Data Types and Functionalities
 
-rb: Regression-based Approach
-
-wb: Weighting-based Approach
-
-msm: Marginal Structural Model
-
-iorw: Inverse Odds Ratio Weighting Approach
-
-ne: Natural Effect Model
-
-g-formula: G-formula Approach
-
 \begin{center}
-\captionof{table}{Supported Data Types and Functionalities For Single-mediator Cases}
+\begin{threeparttable}
+\captionof{table}{Supported Data Types and Functionalities}
 \begin{tabular}{|l|l|l|l|l|l|l|}
+
 \hline
 
 &rb & wb & msm & iorw & ne & g-formula \\ \hline
@@ -40,75 +31,32 @@ AFT Weibull Y & $\surd$& $\surd$& $\surd$& $\surd$& $\times$& $\surd$ \\ \hline
 Linear M & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
 Logistic M & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
 Categorical M & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
-Any type M & $\times$& $\surd$& $\times$ & $\surd$& $\surd$& $\times$ \\ \hline
+Any type M & $\oslash$& $\surd$& $\oslash$ & $\surd$& $\surd$& $\oslash$ \\ \hline
 User-defined Y/M Models & $\surd$& $\surd$& $\surd$ & $\surd$& $\times$& $\surd$ \\ \hline
+Continuous A & $\surd$& $\oslash$& $\oslash$ & $\oslash$& $\surd$& $\surd$ \\ \hline
+Binary A & $\surd$& $\surd$& $\surd$ & $\surd$& $\surd$& $\surd$ \\ \hline
+Categorical A & $\surd$& $\surd$& $\surd$ & $\surd$& $\surd$& $\surd$ \\ \hline
+Single M& $\surd$& $\surd$& $\surd$ & $\surd$& $\surd$& $\surd$ \\ \hline
+Multiple M& $\surd$& $\surd$& $\surd$ & $\surd$& $\surd$& $\surd$ \\ \hline
 Pre-exposure Confounding & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
-Post-exposure Confounding & $\times$ & $\times$& $\surd$& $\times$& $\times$& $\surd$ \\ \hline
+Post-exposure Confounding & $\oslash$ & $\oslash$& $\surd$& $\oslash$& $\oslash$& $\surd$ \\ \hline
 2-way Decomposition & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
-4-way Decomposition & $\surd$& $\surd$& $\surd$& $\times$& $\times$& $\surd$ \\ \hline
-Estimation: Closed-form Parameter Function & $\surd$& $\times$& $\surd$& $\surd$& $\times$& $\times$ \\ \hline
-Estimation: Direct Imputation & $\surd$& $\surd$& $\surd$& $\times$& $\surd$& $\surd$ \\ \hline
-Inference: Delta Method & $\surd$& $\times$& $\surd$& $\times$& $\times$& $\times$ \\ \hline
+4-way Decomposition & $\surd$& $\surd$& $\surd$& $\oslash$& $\times$& $\surd$ \\ \hline
+Estimation: Closed-form Parameter Function & $\surd$\tnote{*}& $\oslash$& $\oslash$& $\surd$& $\surd$& $\oslash$ \\ \hline
+Estimation: Direct Imputation & $\surd$& $\surd$& $\surd$& $\oslash$& $\times$& $\surd$ \\ \hline
+Inference: Delta Method\tnote{**} & $\surd$& $\oslash$& $\oslash$& $\oslash$& $\surd$& $\oslash$ \\ \hline
 Inference: Bootstrapping & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
 \end{tabular}
+\begin{tablenotes}\footnotesize
+\item[*] Not available for multiple-mediator cases; only outputs conditional causal effects.
+\item[**] Only available for closed-form parameter function estimation.
+\item[$\surd$] Available.
+\item[$\times$] Currently not available but applicable.
+\item[$\oslash$] Neither available nor applicable.
+\item[ ] rb: Regression-based Approach; wb: Weighting-based Approach; msm: Marginal; iorw: Inverse Odds Ratio Weighting Approach; ne: Natural Effect Model; g-formula: G-formula Approach.
+\end{tablenotes}
+\end{threeparttable}
 \end{center}
-
-\begin{center}
-\captionof{table}{Supported Data Types and Functionalities For Multiple-mediator Cases}
-\begin{tabular}{|l|l|l|l|l|l|l|}
-\hline
-
-&rb & wb & msm & iorw & ne & g-formula \\ \hline
-Linear Y & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
-Logistic Y & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
-Loglinear Y & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
-Poisson Y & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
-Quasipoisson Y & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
-NegBin Y & $\surd$& $\surd$& $\surd$& $\surd$& $\times$& $\surd$ \\ \hline
-Coxph Y & $\surd$& $\surd$& $\surd$& $\surd$& $\times$& $\surd$ \\ \hline
-AFT Exp Y & $\surd$& $\surd$& $\surd$& $\surd$& $\times$& $\surd$ \\ \hline
-AFT Weibull Y & $\surd$& $\surd$& $\surd$& $\surd$& $\times$& $\surd$ \\ \hline
-Linear M & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
-Logistic M & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
-Categorical M & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
-Any type M & $\times$& $\surd$& $\times$ & $\surd$& $\surd$& $\times$ \\ \hline
-User-defined Y/M Models & $\surd$& $\surd$& $\surd$ & $\surd$& $\times$& $\surd$ \\ \hline
-Pre-exposure Confounding & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
-Post-exposure Confounding & $\times$ & $\times$& $\surd$& $\times$& $\times$& $\surd$ \\ \hline
-2-way Decomposition & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
-4-way Decomposition & $\surd$& $\surd$& $\surd$& $\times$& $\times$& $\surd$ \\ \hline
-Estimation: Closed-form Parameter Function & $\times$& $\times$& $\times$& $\surd$& $\times$& $\times$ \\ \hline
-Estimation: Direct Imputation & $\surd$& $\surd$& $\surd$& $\times$& $\surd$& $\surd$ \\ \hline
-Inference: Delta Method & $\times$& $\times$& $\times$& $\times$& $\times$& $\times$ \\ \hline
-Inference: Bootstrapping & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
-\end{tabular}
-\end{center}
-
-# Estimation and Inference
-
-## Estimation Method
-
-**Closed-form Parameters Function**
-
-Effect estimates are calculated using regression parameters. 
-
-**Direct Conterfacturals imputation**
-
-1. For subject i, simulate $M_{a,i}$ by the predicted values of mediator regression models under $A=a,C=C_i$ and simulate $M_{a^*,i}$ by the predicted values of mediator regression models under $A=a^*,C=C_i$.
-
-2. For subject i, simulate $Y_{aMa,i}$ by the predicted value of the outcome regression model under $A=a,M=M_{a,i},C=C_i$, simulate $Y_{aMa^*,i}$ by the predicted value of the outcome regression model under $A=a,M=M_{a^*,i},C=C_i$, simulate $Y_{a^*Ma,i}$ by the predicted value of the outcome regression model under $A=a^*,M=M_{a,i},C=C_i$ and simulate $Y_{a^*Ma^*,i}$ by the predicted value of the outcome regression model under $A=a^*,M=M_{a^*,i},C=C_i$. 
-
-3. Estimate $E[Y_{aMa}]$, $E[Y_{a^*Ma^*}]$, $E[Y_{aMa^*}]$, and $E[Y_{a^*Ma}]$ by $\frac{\sum_{i=1}^NY_{aMa,i}}{n}$, $\frac{\sum_{i=1}^NY_{a^*Ma^*,i}}{n}$, $\frac{\sum_{i=1}^NY_{aMa^*,i}}{n}$ and $\frac{\sum_{i=1}^NY_{a^*Ma,i}}{n}$ respectively.
-
-## Inference Method
-
-**Delta Method**
-
-Standard errors of effects are estimated using the standard errors of regression parameters and delta method based on the closed-form parameters function.
-
-**Bootstrapping**
-
-Bootstrap the data, refit the regression models, and calculate a bootstrap estimate. Repeat the bootstrapping K times and calculate the standard error of these K boostrap estimates for each estimand, which is the estimated standard error of this estimand.
 
 # Pre-treatment Confounding
 
@@ -134,15 +82,15 @@ In the DAG, A denotes the treatment, Y denotes the outcome, M denotes a set of m
 
 **2-way decomposition in additive scale**
 
-$CDE=E[Y_{am}-Y_{a^*m}|C]$
+$CDE=E[Y_{am}-Y_{a^*m}]$
 
-$PNDE=E[Y_{aM_a^*}-Y_{a^*M_a^*}|C]$
+$PNDE=E[Y_{aM_a^*}-Y_{a^*M_a^*}]$
 
-$TNDE=E[Y_{aM_a}-Y_{a^*M_a}|C]$
+$TNDE=E[Y_{aM_a}-Y_{a^*M_a}]$
 
-$PNIE=E[Y_{a^*M_a}-Y_{a^*M_a^*}|C]$
+$PNIE=E[Y_{a^*M_a}-Y_{a^*M_a^*}]$
 
-$TNIE=E[Y_{aM_a}-Y_{aM_a^*}|C]$
+$TNIE=E[Y_{aM_a}-Y_{aM_a^*}]$
 
 $TE=PNDE+TNIE$
 
@@ -151,15 +99,15 @@ $PM=\frac{TNIE}{PNDE+TE}$
 
 **2-way decomposition in RR scale**
 
-$rr^{CDE}=E[Y_{am}|C]/E[Y_{a^*m}|C]$
+$rr^{CDE}=E[Y_{am}]/E[Y_{a^*m}]$
 
-$rr^{PNDE}=E[Y_{aM_a^*}|C]/E[Y_{a^*M_a^*}|C]$
+$rr^{PNDE}=E[Y_{aM_a^*}]/E[Y_{a^*M_a^*}]$
 
-$rr^{TNDE}=E[Y_{aM_a}|C]/E[Y_{a^*M_a}|C]$
+$rr^{TNDE}=E[Y_{aM_a}]/E[Y_{a^*M_a}]$
 
-$rr^{PNIE}=E[Y_{a^*M_a}|C]/E[Y_{a^*M_a^*}|C]$
+$rr^{PNIE}=E[Y_{a^*M_a}]/E[Y_{a^*M_a^*}]$
 
-$rr^{TNIE}=E[Y_{aM_a}|C]/E[Y_{aM_a^*}|C]$
+$rr^{TNIE}=E[Y_{aM_a}]/E[Y_{aM_a^*}]$
 
 $rr^{TE}=rr^{PNDE}\times rr^{TNIE}$
 
@@ -167,7 +115,7 @@ $PM=\frac{rr^{PNDE}*(rr^{TNIE}-1)}{rr^{TE}-1}$
 
 **4-way decomposition in additive scale**
 
-$CDE$ is defined above
+$CDE=E[Y_{am}-Y_{a^*m}]$
 
 $INT_{ref}=PNDE-CDE$
 
@@ -191,7 +139,7 @@ $overall^{PE}=\frac{INT_{ref}+INT_{med}+PIE}{TE}$
 
 **4-way decomposition in RR scale**
 
-$err^{CDE}=(E[Y_{am}-Y_{a^*m}|C])/E[Y_{a^*M_a^*}|C]$
+$err^{CDE}=(E[Y_{am}-Y_{a^*m}])/E[Y_{a^*M_a^*}]$
 
 $err^{INT_{ref}}=rr^{PNDE}-1-err^{CDE}$
 
@@ -215,6 +163,30 @@ $overall^{INT}=\frac{err^{INT_{ref}}+err^{INT_{med}}}{err^{TE}}$
 
 $overall^{PE}=\frac{err^{INT_{ref}}+err^{INT_{med}}+err^{PIE}}{err^{TE}}$
 
+## Estimation
+
+**Closed-form Parameter Function Estimation**
+
+Effect estimates are calculated using regression parameters. 
+
+**Direct Conterfacturals imputation Estimation**
+
+1. Impute $Y_{am,i}$, $Y_{a^*m,i}$, $Y_{aMa,i}$, $Y_{a^*Ma^*,i}$, $Y_{aMa^*,i}$, and $Y_{a^*Ma,i}$ for each subject i.
+
+2. Estimate $E[Y_{am}]$, $E[Y_{a^*m}]$, $E[Y_{aMa}]$, $E[Y_{a^*Ma^*}]$, $E[Y_{aMa^*}]$, and $E[Y_{a^*Ma}]$ by $\frac{\sum_{i=1}^NY_{am,i}}{n}$, $\frac{\sum_{i=1}^NY_{a^*m,i}}{n}$, $\frac{\sum_{i=1}^NY_{aMa,i}}{n}$, $\frac{\sum_{i=1}^NY_{a^*Ma^*,i}}{n}$, $\frac{\sum_{i=1}^NY_{aMa^*,i}}{n}$ and $\frac{\sum_{i=1}^NY_{a^*Ma,i}}{n}$ respectively.
+
+3. Calculate causal effects using $E[Y_{am}]$, $E[Y_{a^*m}]$, $E[Y_{aMa}]$, $E[Y_{a^*Ma^*}]$, $E[Y_{aMa^*}]$, and $E[Y_{a^*Ma}]$.
+
+## Inference 
+
+**Delta Method**
+
+Standard errors of effects are estimated using the standard errors of regression parameters and delta method based on the closed-form parameter function.
+
+**Bootstrapping**
+
+Bootstrap the data, refit the regression models, and calculate a bootstrap estimate. Repeat the bootstrapping K times and calculate the standard error of these K boostrap estimates for each estimand, which is the estimated standard error of this estimand.
+
 ## Estimation Approaches Can be Used
 
 ### Regression-based Approach
@@ -225,16 +197,23 @@ https://www.ncbi.nlm.nih.gov/pubmed/23379553
 
 https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/
 
-#### Estimator
+#### Estimation
 
-**1. Continuous Outcome and Continuous Mediator**
+**Closed-form Parameter Function Estimation**
+
+(1) Continuous Outcome and Continuous Mediator
 
 Fit a simple linear regression model for the mediator:
-$$E[M|a,c]=\beta_0+\beta_1a+\beta_2'c$$
-Fit a simple linear regression model for the outcome:
-$$E[Y|a,m,c]=\theta_0+\theta_1a+\theta_2m+\theta_3am+\theta_4'c$$
+$$E[M|a,c]=\beta_0+\beta_1a+\beta_2'c\ (for\ continuous \ exposure)$$
+$$E[M|a,c]=\beta_0+\sum_{k=1}^K\beta_{1k}I\{a=k\}+\beta_2'c\ (for\ binary\ or\ categorical \ exposure)$$
 
-Closed-form parameter function estimators for the causal effects:
+Fit a simple linear regression model for the outcome:
+$$E[Y|a,m,c]=\theta_0+\theta_1a+\theta_2m+\theta_3am+\theta_4'c\ (for\ continuous \ exposure)$$
+$$E[Y|a,m,c]=\theta_0+\sum_{k=1}^K\theta_{1k}I\{a=k\}+\theta_2m+\sum_{k=1}^K\theta_{3k}I\{a=k\}m+\theta_4'c\ (for\ binary\ or\ categorical \ exposure)$$
+
+&nbsp; 
+
+Closed-form parameter function estimators for the causal effects when the exposure is continuous:
 
 $CDE=(\theta_1+\theta_3m)(a-a^*)$
 
@@ -248,14 +227,33 @@ $TNIE=(\theta_2\beta_1+\theta_3\beta_1a)(a-a^*)$
 
 &nbsp; 
 
-**2. Continuous Outcome and Binary Mediator**
+Closed-form parameter function estimators for the causal effects when the exposure is binary or categorical:
+
+$CDE=(\sum_{k=1}^K\theta_{1k}I\{a=k\}-\sum_{k=1}^K\theta_{1k}I\{a^*=k\})+(\sum_{k=1}^K\theta_{3k}I\{a=k\}-\sum_{k=1}^K\theta_{3k}I\{a^*=k\})m$
+
+$PNDE=(\sum_{k=1}^K\theta_{1k}I\{a=k\}-\sum_{k=1}^K\theta_{1k}I\{a^*=k\})+(\sum_{k=1}^K\theta_{3k}I\{a=k\}-\sum_{k=1}^K\theta_{3k}I\{a^*=k\})(\beta_0+\sum_{k=1}^K\beta_{1k}I\{a^*=k\}+\beta_2'c)$
+
+$TNDE=(\sum_{k=1}^K\theta_{1k}I\{a=k\}-\sum_{k=1}^K\theta_{1k}I\{a^*=k\})+(\sum_{k=1}^K\theta_{3k}I\{a=k\}-\sum_{k=1}^K\theta_{3k}I\{a^*=k\})(\beta_0+\sum_{k=1}^K\beta_{1k}I\{a=k\}+\beta_2'c)$
+
+$PNIE=(\theta_2+\sum_{k=1}^K\theta_{3k}I\{a^*=k\})(\sum_{k=1}^K\beta_{1k}I\{a=k\}-\sum_{k=1}^K\beta_{1k}I\{a^*=k\})$
+
+$TNIE=(\theta_2+\sum_{k=1}^K\theta_{3k}I\{a=k\})(\sum_{k=1}^K\beta_{1k}I\{a=k\}-\sum_{k=1}^K\beta_{1k}I\{a^*=k\})$
+
+&nbsp; 
+
+(2)Continuous Outcome and Binary Mediator
 
 Fit a logistic regression model for the mediator:
-$$logitE[M|a,c]=\beta_0+\beta_1a+\beta_2'c$$
-Fit a simple linear regression model for the outcome:
-$$E[Y|a,m,c]=\theta_0+\theta_1a+\theta_2m+\theta_3am+\theta_4'c$$
+$$logitE[M|a,c]=\beta_0+\beta_1a+\beta_2'c\ (for\ continuous \ exposure)$$
+$$logitE[M|a,c]=\beta_0+\sum_{k=1}^K\beta_{1k}I\{a=k\}+\beta_2'c\ (for\ binary\ or\ categorical \ exposure)$$
 
-Closed-form parameter function estimators for the causal effects:
+Fit a simple linear regression model for the outcome:
+$$E[Y|a,m,c]=\theta_0+\theta_1a+\theta_2m+\theta_3am+\theta_4'c\ (for\ continuous \ exposure)$$
+$$E[Y|a,m,c]=\theta_0+\sum_{k=1}^K\theta_{1k}I\{a=k\}+\theta_2m+\sum_{k=1}^K\theta_{3k}I\{a=k\}m+\theta_4'c\ (for\ binary\ or\ categorical \ exposure)$$
+
+&nbsp;
+
+Closed-form parameter function estimators for the causal effects when the exposure is continuous:
 
 $CDE=(\theta_1+\theta_3m)(a-a^*)$
 
@@ -269,16 +267,36 @@ $TNIE=(\theta_2+\theta_3a)(\frac{exp(\beta_0+\beta_1a+\beta_2'c)}{1+exp(\beta_0+
 
 &nbsp; 
 
-**3. Continuous Outcome and Categorical Mediator**
+Closed-form parameter function estimators for the causal effects when the exposure is binary or categorical:
+
+$CDE=(\sum_{k=1}^K\theta_{1k}I\{a=k\}-\sum_{k=1}^K\theta_{1k}I\{a^*=k\})+(\sum_{k=1}^K\theta_{3k}I\{a=k\}-\sum_{k=1}^K\theta_{3k}I\{a^*=k\})m$
+
+$PNDE=(\sum_{k=1}^K\theta_{1k}I\{a=k\}-\sum_{k=1}^K\theta_{1k}I\{a^*=k\})+(\sum_{k=1}^K\theta_{3k}I\{a=k\}-\sum_{k=1}^K\theta_{3k}I\{a^*=k\})\frac{exp(\beta_0+\sum_{k=1}^K\beta_{1k}I\{a^*=k\}+\beta_2'c)}{1+exp(\beta_0+\sum_{k=1}^K\beta_{1k}I\{a^*=k\}+\beta_2'c)}$
+
+$TNDE=(\sum_{k=1}^K\theta_{1k}I\{a=k\}-\sum_{k=1}^K\theta_{1k}I\{a^*=k\})+(\sum_{k=1}^K\theta_{3k}I\{a=k\}-\sum_{k=1}^K\theta_{3k}I\{a^*=k\})\frac{exp(\beta_0+\sum_{k=1}^K\beta_{1k}I\{a=k\}+\beta_2'c)}{1+exp(\beta_0+\sum_{k=1}^K\beta_{1k}I\{a=k\}+\beta_2'c)}$
+
+$PNIE=(\theta_2+\sum_{k=1}^K\theta_{3k}I\{a^*=k\})(\frac{exp(\beta_0+\sum_{k=1}^K\beta_{1k}I\{a=k\}+\beta_2'c)}{1+exp(\beta_0+\sum_{k=1}^K\beta_{1k}I\{a=k\}+\beta_2'c)}-\frac{exp(\beta_0+\sum_{k=1}^K\beta_{1k}I\{a^*=k\}+\beta_2'c)}{1+exp(\beta_0+\sum_{k=1}^K\beta_{1k}I\{a^*=k\}+\beta_2'c)})$
+
+$TNIE=(\theta_2+\sum_{k=1}^K\theta_{3k}I\{a=k\})(\frac{exp(\beta_0+\sum_{k=1}^K\beta_{1k}I\{a=k\}+\beta_2'c)}{1+exp(\beta_0+\sum_{k=1}^K\beta_{1k}I\{a=k\}+\beta_2'c)}-\frac{exp(\beta_0+\sum_{k=1}^K\beta_{1k}I\{a^*=k\}+\beta_2'c)}{1+exp(\beta_0+\sum_{k=1}^K\beta_{1k}I\{a^*=k\}+\beta_2'c)})$
+
+&nbsp; 
+
+(3)Continuous Outcome and Categorical Mediator
 
 Fit a multinomial logistic regression model for the mediator:
 
-$$log\frac{E[M=j|a,c]}{E[M=0|a,c]}=\beta_{0j}+\beta_{1j}a+\beta_{2j}'c, j=1,2,...,l$$, where l is the number of levels of M and $E[M=0|a,c]=\frac{1}{1+\sum_{j=1}^lexp(\beta_{0j}+\beta_{1j}a+\beta_{2j}'c)}$.
+$$log\frac{E[M=j|a,c]}{E[M=0|a,c]}=\beta_{0j}+\beta_{1j}a+\beta_{2j}'c, j=1,2,...,l\ (for\ continuous \ exposure)$$
+
+$$log\frac{E[M=j|a,c]}{E[M=0|a,c]}=\beta_{0j}+\sum_{k=1}^K\beta_{1jk}I\{a=k\}+\beta_{2j}'c, j=1,2,...,l\ (for\ binary\ or\ categorical \ exposure)$$
 
 Fit a simple linear regression model for the outcome:
-$$E[Y|a,m,c]=\theta_0+\theta_1a+\sum_{j=1}^l\theta_{2j}I\{m=j\}+a\sum_{j=1}^l\theta_{3j}I\{m=j\}+\theta_4'c$$
+$$E[Y|a,m,c]=\theta_0+\theta_1a+\sum_{j=1}^l\theta_{2j}I\{m=j\}+a\sum_{j=1}^l\theta_{3j}I\{m=j\}+\theta_4'c\ (for\ continuous \ exposure)$$
+$$E[Y|a,m,c]=\theta_0+\sum_{k=1}^K\theta_{1k}I\{a=k\}+\sum_{j=1}^l\theta_{2j}I\{m=j\}+\sum_{j=1}^l\sum_{k=1}^K\theta_{3jk}I\{m=j\}I\{a=k\}+\theta_4'c$$ 
+$$(for\ binary\ or\ categorical \ exposure)$$
 
-Closed-form parameter function estimators for the causal effects:
+&nbsp;
+
+Closed-form parameter function estimators for the causal effects when the exposure is continuous:
 
 $CDE=(\theta_1+\sum_{j=1}^l\theta_{3j}I\{m=j\})(a-a^*)$
 
@@ -292,15 +310,33 @@ $TNIE=\frac{\sum_{j=1}^l(\theta_{2j}+\theta_{3j}a)exp(\beta_{0j}+\beta_{1j}a+\be
 
 &nbsp; 
 
-**4. Binary Outcome and Continuous Mediator**
+Closed-form parameter function estimators for the causal effects when the exposure is binary or categorical:
+
+$CDE=(\sum_{k=1}^K\theta_{1k}I\{a=k\}-\sum_{k=1}^K\theta_{1k}I\{a^*=k\})+(\sum_{j=1}^l\sum_{k=1}^K\theta_{3jk}I\{m=l\}I\{a=k\}-\sum_{j=1}^l\sum_{k=1}^K\theta_{3jk}I\{m=l\}I\{a^*=k\})$
+
+$PNDE=(\sum_{k=1}^K\theta_{1k}I\{a=k\}-\sum_{k=1}^K\theta_{1k}I\{a^*=k\})+\frac{\sum_{j=1}^l(\sum_{k=1}^K\theta_{3jk}I\{a=k\}-\sum_{k=1}^K\theta_{3jk}I\{a^*=k\})exp(\beta_{0j}+\sum_{k=1}^K\beta_{1jk}I\{a^*=k\}+\beta_{2j}'c)}{1+\sum_{j=1}^lexp(\beta_{0j}+\sum_{k=1}^K\beta_{1jk}I\{a^*=k\}+\beta_{2j}'c)}$
+
+$TNDE=(\sum_{k=1}^K\theta_{1k}I\{a=k\}-\sum_{k=1}^K\theta_{1k}I\{a^*=k\})+\frac{\sum_{j=1}^l(\sum_{k=1}^K\theta_{3jk}I\{a=k\}-\sum_{k=1}^K\theta_{3jk}I\{a^*=k\})exp(\beta_{0j}+\sum_{k=1}^K\beta_{1jk}I\{a=k\}+\beta_{2j}'c)}{1+\sum_{j=1}^lexp(\beta_{0j}+\sum_{k=1}^K\beta_{1jk}I\{a=k\}+\beta_{2j}'c)}$
+
+$PNIE=\frac{\sum_{j=1}^l(\theta_{2j}+\sum_{k=1}^K\theta_{3jk}I\{a^*=k\})exp(\beta_{0j}+\sum_{k=1}^K\beta_{1jk}I\{a=k\}+\beta_{2j}'c)}{1+\sum_{j=1}^lexp(\beta_{0j}+\sum_{k=1}^K\beta_{1jk}I\{a=k\}+\beta_{2j}'c)}-\frac{\sum_{j=1}^l(\theta_{2j}+\sum_{k=1}^K\theta_{3jk}I\{a^*=k\})exp(\beta_{0j}+\sum_{k=1}^K\beta_{1jk}I\{a^*=k\}+\beta_{2j}'c)}{1+\sum_{j=1}^lexp(\beta_{0j}+\sum_{k=1}^K\beta_{1jk}I\{a^*=k\}+\beta_{2j}'c)}$
+
+$TNIE=\frac{\sum_{j=1}^l(\theta_{2j}+\sum_{k=1}^K\theta_{3jk}I\{a=k\})exp(\beta_{0j}+\sum_{k=1}^K\beta_{1jk}I\{a=k\}+\beta_{2j}'c)}{1+\sum_{j=1}^lexp(\beta_{0j}+\sum_{k=1}^K\beta_{1jk}I\{a=k\}+\beta_{2j}'c)}-\frac{\sum_{j=1}^l(\theta_{2j}+\sum_{k=1}^K\theta_{3jk}I\{a=k\})exp(\beta_{0j}+\sum_{k=1}^K\beta_{1jk}I\{a^*=k\}+\beta_{2j}'c)}{1+\sum_{j=1}^lexp(\beta_{0j}+\sum_{k=1}^K\beta_{1jk}I\{a^*=k\}+\beta_{2j}'c)}$
+
+&nbsp; 
+
+(4)Binary Outcome and Continuous Mediator
 
 Fit a simple linear regression model for the mediator:
-$$E[M|a,c]=\beta_0+\beta_1a+\beta_2'c$$
+$$E[M|a,c]=\beta_0+\beta_1a+\beta_2'c\ (for\ continuous \ exposure)$$
+$$E[M|a,c]=\beta_0+\sum_{k=1}^K\beta_{1k}I\{a=k\}+\beta_2'c\ (for\ binary\ or\ categorical \ exposure)$$
 
 Fit a logistic regression model for the outcome:
-$$logitE[Y|a,m,c]=\theta_0+\theta_1a+\theta_2m+\theta_3am+\theta_4'c$$
+$$logitE[Y|a,m,c]=\theta_0+\theta_1a+\theta_2m+\theta_3am+\theta_4'c\ (for\ continuous \ exposure)$$
+$$logitE[Y|a,m,c]=\theta_0+\sum_{k=1}^K\theta_{1k}I\{a=k\}+\theta_2m+\sum_{k=1}^K\theta_{3k}I\{a=k\}m+\theta_4'c\ (for\ binary\ or\ categorical \ exposure)$$
 
-Closed-form parameter function estimators for the causal effects:
+&nbsp; 
+
+Closed-form parameter function estimators for the causal effects when the exposure is continuous:
 
 $OR^{CDE}=exp((\theta_1+\theta_3m)(a-a^*))$
 
@@ -316,15 +352,37 @@ $comp^{CDE}=(exp(\theta_1(a-a^*)+\theta_3am)-exp(\theta_3a^*m))exp(\theta_2m-(\t
 
 &nbsp; 
 
-**5. Binary Outcome and Binary Mediator**
+Closed-form parameter function estimators for the causal effects when the exposure is binary or categorical:
+
+$OR^{CDE}=exp((\sum_{k=1}^K\theta_{1k}I\{a=k\}-\sum_{k=1}^K\theta_{1k}I\{a^*=k\})+(\sum_{k=1}^K\theta_{3k}I\{a=k\}-\sum_{k=1}^K\theta_{3k}I\{a^*=k\})m)$
+
+$OR^{PNDE}=exp((\{\sum_{k=1}^K\theta_{1k}I\{a=k\}-\sum_{k=1}^K\theta_{1k}I\{a^*=k\})+(\{\sum_{k=1}^K\theta_{3k}I\{a=k\}-\sum_{k=1}^K\theta_{3k}I\{a^*=k\})(\beta_0+\sum_{k=1}^K\beta_{1k}I\{a^*=k\}+\beta_2'c+\theta_2\sigma^2)\}+0.5\sigma^2(\sum_{k=1}^K\theta_{3k}^2I\{a=k\}-\sum_{k=1}^K\theta_{3k}^2I\{a^*=k\}))$
+
+$OR^{TNDE}=exp((\sum_{k=1}^K\theta_{1k}I\{a=k\}-\sum_{k=1}^K\theta_{1k}I\{a^*=k\})+(\sum_{k=1}^K\theta_{3k}I\{a=k\}-\sum_{k=1}^K\theta_{3k}I\{a^*=k\})(\beta_0+\sum_{k=1}^K\beta_{1k}I\{a=k\}+\beta_2'c+\theta_2\sigma^2)+0.5\sigma^2(\sum_{k=1}^K\theta_{3k}^2I\{a=k\}-\sum_{k=1}^K\theta_{3k}^2I\{a^*=k\}))$
+
+$OR^{PNIE}=exp(\theta_2(\sum_{k=1}^K\beta_{1k}I\{a=k\}-\sum_{k=1}^K\beta_{1k}I\{a^*=k\})+\sum_{k=1}^K\theta_{3k}I\{a^*=k\}(\sum_{k=1}^K\beta_{1k}I\{a=k\}-\sum_{k=1}^K\beta_{1k}I\{a^*=k\}))$
+
+$OR^{TNIE}=exp(\theta_2(\sum_{k=1}^K\beta_{1k}I\{a=k\}-\sum_{k=1}^K\beta_{1k}I\{a^*=k\})+\sum_{k=1}^K\theta_{3k}I\{a=k\}(\sum_{k=1}^K\beta_{1k}I\{a=k\}-\sum_{k=1}^K\beta_{1k}I\{a^*=k\}))$
+
+$comp^{CDE}=(exp((\sum_{k=1}^K\theta_{1k}I\{a=k\}-\sum_{k=1}^K\theta_{1k}I\{a^*=k\})+\sum_{k=1}^K\theta_{3k}I\{a=k\}m)-exp(\sum_{k=1}^K\theta_{3k}I\{a^*=k\}m))exp(\theta_2m-(\theta_2+\sum_{k=1}^K\theta_{3k}I\{a^*=k\})(\beta_0+\sum_{k=1}^K\beta_{1k}I\{a^*=k\}+\beta_2'c)-0.5(\theta_2+\sum_{k=1}^K\theta_{3k}I\{a^*=k\})^2\sigma^2)$
+
+&nbsp; 
+
+(5)Binary Outcome and Binary Mediator
 
 Fit a logistic regression model for the mediator:
-$$logitE[M|a,c]=\beta_0+\beta_1a+\beta_2'c$$
+$$logitE[M|a,c]=\beta_0+\beta_1a+\beta_2'c\ (for\ continuous \ exposure)$$
 
 Fit a logistic regression model for the outcome:
-$$logitE[Y|a,m,c]=\theta_0+\theta_1a+\theta_2m+\theta_3am+\theta_4'c$$
+$$logitE[M|a,c]=\beta_0+\sum_{k=1}^K\beta_{1k}I\{a=k\}+\beta_2'c\ (for\ binary\ or\ categorical \ exposure)$$
 
-Closed-form parameter function estimators for the causal effects:
+Fit a logistic regression model for the outcome:
+$$logitE[Y|a,m,c]=\theta_0+\theta_1a+\theta_2m+\theta_3am+\theta_4'c\ (for\ continuous \ exposure)$$
+$$logitE[Y|a,m,c]=\theta_0+\sum_{k=1}^K\theta_{1k}I\{a=k\}+\theta_2m+\sum_{k=1}^K\theta_{3k}I\{a=k\}m+\theta_4'c\ (for\ binary\ or\ categorical \ exposure)$$
+
+&nbsp; 
+
+Closed-form parameter function estimators for the causal effects when the exposure is continuous:
 
 $OR^{CDE}=exp((\theta_1+\theta_3m)(a-a^*))$
 
@@ -340,15 +398,40 @@ $comp^{CDE}=\frac{exp(\theta_2m)(exp(\theta_1(a-a^*)+\theta_3am)-exp(\theta_3a^*
 
 &nbsp; 
 
-**6. Binary Outcome and Categorical Mediator**
+Closed-form parameter function estimators for the causal effects when the exposure is binary or categorical:
+
+$OR^{CDE}=exp((\sum_{k=1}^K\theta_{1k}I\{a=k\}-\sum_{k=1}^K\theta_{1k}I\{a^*=k\})+(\sum_{k=1}^K\theta_{3k}I\{a=k\}-\sum_{k=1}^K\theta_{3k}I\{a^*=k\})m)$
+
+$OR^{PNDE}=\frac{exp(\sum_{k=1}^K\theta_{1k}I\{a=k\})\{1+exp(\theta_2+\sum_{k=1}^K\theta_{3k}I\{a=k\}+\beta_0+\sum_{k=1}^K\beta_{1k}I\{a^*=k\}+\beta_2'c)\}}{exp(\sum_{k=1}^K\theta_{1k}I\{a^*=k\})\{1+exp(\theta_2+\sum_{k=1}^K\theta_{3k}I\{a^*=k\}+\beta_0+\sum_{k=1}^K\beta_{1k}I\{a^*=k\}+\beta_2'c)\}}$
+
+$OR^{TNDE}=\frac{exp(\sum_{k=1}^K\theta_{1k}I\{a=k\})\{1+exp(\theta_2+\sum_{k=1}^K\theta_{3k}I\{a=k\}+\beta_0+\sum_{k=1}^K\beta_{1k}I\{a=k\}+\beta_2'c)\}}{exp(\sum_{k=1}^K\theta_{1k}I\{a^*=k\})\{1+exp(\theta_2+\sum_{k=1}^K\theta_{3k}I\{a^*=k\}+\beta_0+\sum_{k=1}^K\beta_{1k}I\{a=k\}+\beta_2'c)\}}$
+
+$OR^{PNIE}=\frac{\{1+exp(\beta_0+\sum_{k=1}^K\beta_{1k}I\{a^*=k\}+\beta_2'c)\}\{1+exp(\theta_2+\sum_{k=1}^K\theta_{3k}I\{a^*=k\}+\beta_0+\sum_{k=1}^K\beta_{1k}I\{a=k\}+\beta_2'c)\}}{\{1+exp(\beta_0+\sum_{k=1}^K\beta_{1k}I\{a=k\}+\beta_2'c)\}\{1+exp(\theta_2+\sum_{k=1}^K\theta_{3k}I\{a^*=k\}+\beta_0+\sum_{k=1}^K\beta_{1k}I\{a^*=k\}+\beta_2'c)\}}$
+
+$OR^{TNIE}=\frac{\{1+exp(\beta_0+\sum_{k=1}^K\beta_{1k}I\{a^*=k\}+\beta_2'c)\}\{1+exp(\theta_2+\sum_{k=1}^K\theta_{3k}I\{a=k\}+\beta_0+\sum_{k=1}^K\beta_{1k}I\{a=k\}+\beta_2'c)\}}{\{1+exp(\beta_0+\sum_{k=1}^K\beta_{1k}I\{a=k\}+\beta_2'c)\}\{1+exp(\theta_2+\sum_{k=1}^K\theta_{3k}I\{a=k\}+\beta_0+\sum_{k=1}^K\beta_{1k}I\{a^*=k\}+\beta_2'c)\}}$
+
+$comp^{CDE}=\frac{exp(\theta_2m)(exp((\sum_{k=1}^K\theta_{1k}I\{a=k\}-\sum_{k=1}^K\theta_{1k}I\{a^*=k\})+\sum_{k=1}^K\theta_{3k}I\{a=k\}m)-exp(\sum_{k=1}^K\theta_{3k}I\{a^*=k\}m))}{1+exp(\beta_0+\sum_{k=1}^K\beta_{1k}I\{a^*=k\}+\beta_2'c+\theta_2+\sum_{k=1}^K\theta_{3k}I\{a^*=k\})}$
+
+$\frac{1+exp(\beta_0+\sum_{k=1}^K\beta_{1k}I\{a^*=k\}+\beta_2'c)}{1+exp(\beta_0+\sum_{k=1}^K\beta_{1k}I\{a^*=k\}+\beta_2'c+\theta_2+\sum_{k=1}^K\theta_{3k}I\{a^*=k\})}$
+
+&nbsp; 
+
+(6)Binary Outcome and Categorical Mediator
 
 Fit a multinomial logistic regression model for the mediator:
-$$log\frac{E[M=j|a,c]}{E[M=0|a,c]}=\beta_{0j}+\beta_{1j}a+\beta_{2j}'c, j=1,2,...,l$$, where l is the number of levels of M and $E[M=0|a,c]=\frac{1}{1+\sum_{j=1}^lexp(\beta_{0j}+\beta_{1j}a+\beta_{2j}'c)}$.
+
+$$log\frac{E[M=j|a,c]}{E[M=0|a,c]}=\beta_{0j}+\beta_{1j}a+\beta_{2j}'c, j=1,2,...,l\ (for\ continuous \ exposure)$$
+
+$$log\frac{E[M=j|a,c]}{E[M=0|a,c]}=\beta_{0j}+\sum_{k=1}^K\beta_{1jk}I\{a=k\}+\beta_{2j}'c, j=1,2,...,l\ (for\ binary\ or\ categorical \ exposure)$$
 
 Fit a logistic regression model for the outcome:
-$$logitE[Y|a,m,c]=\theta_0+\theta_1a+\theta_2m+\theta_3am+\theta_4'c$$
+$$logitE[Y|a,m,c]=\theta_0+\theta_1a+\sum_{j=1}^l\theta_{2j}I\{m=j\}+a\sum_{j=1}^l\theta_{3j}I\{m=j\}+\theta_4'c\ (for\ continuous \ exposure)$$
+$$logitE[Y|a,m,c]=\theta_0+\sum_{k=1}^K\theta_{1k}I\{a=k\}+\sum_{j=1}^l\theta_{2j}I\{m=j\}+\sum_{j=1}^l\sum_{k=1}^K\theta_{3jk}I\{m=j\}I\{a=k\}+\theta_4'c$$ 
+$$(for\ binary\ or\ categorical \ exposure)$$
 
-Closed-form parameter function estimators for the causal effects:
+&nbsp; 
+
+Closed-form parameter function estimators for the causal effects when the exposure is continuous:
 
 $OR^{CDE}=exp((\theta_1+\sum_{j=1}^l\theta_{3j}I\{m=j\})(a-a^*))$
 
@@ -360,17 +443,51 @@ $OR^{PNIE}=\frac{\{1+\sum_{j=1}^lexp(\beta_{0j}+\beta_{1j}a^*+\beta_{2j}'c)\}\{1
 
 $OR^{TNIE}=\frac{\{1+\sum_{j=1}^lexp(\beta_{0j}+\beta_{1j}a^*+\beta_{2j}'c)\}\{1+\sum_{j=1}^lexp(\theta_{2j}+\theta_{3j}a+\beta_{0j}+\beta_{1j}a+\beta_{2j}'c)\}}{\{1+\sum_{j=1}^lexp(\beta_{0j}+\beta_{1j}a+\beta_{2j}'c)\}\{1+\sum_{j=1}^lexp(\theta_{2j}+\theta_{3j}a+\beta_{0j}+\beta_{1j}a^*+\beta_{2j}'c)\}}$
 
-$comp^{CDE}=\frac{exp(\sum_{j=1}^l\theta_{2j}I\{m=j\})(exp(\theta_1(a-a^*)+a\sum_{j=1}^l\theta_{3j}I\{m=j\})-exp(a^*\sum_{j=1}^l\theta_{3j}I\{m=j\}))(1+\sum_{j=1}^lexp(\beta_{0j}+\beta_{1j}a^*+\beta_{2j}'c))}{1+\sum_{j=1}^lexp(\theta_{2j}+\theta_{3j}a^*+\beta_{0j}+\beta_{1j}a^*+\beta_{2j}'c)}$
+$comp^{CDE}=\frac{exp(\sum_{j=1}^l\theta_{2j}I\{m=j\})(1+\sum_{j=1}^lexp(\beta_{0j}+\beta_{1j}a^*+\beta_{2j}'c))(exp(\theta_1(a-a^*)+a\sum_{j=1}^l\theta_{3j}I\{m=j\})-exp(a^*\sum_{j=1}^l\theta_{3j}I\{m=j\}))}{1+\sum_{j=1}^lexp(\theta_{2j}+\theta_{3j}a^*+\beta_{0j}+\beta_{1j}a^*+\beta_{2j}'c)}$
 
-#### Estimation Procedures
+&nbsp; 
+
+Closed-form parameter function estimators for the causal effects when the exposure is binary or categorical:
+
+$OR^{CDE}=exp((\sum_{k=1}^K\theta_{1k}I\{a=k\}-\sum_{k=1}^K\theta_{1k}I\{a^*=k\})+(\sum_{j=1}^l\sum_{k=1}^K\theta_{3jk}I\{m=l\}I\{a=k\}-\sum_{j=1}^l\sum_{k=1}^K\theta_{3jk}I\{m=l\}I\{a^*=k\}))$
+
+$OR^{PNDE}=\frac{exp(\sum_{k=1}^K\theta_{1k}I\{a=k\})\{1+\sum_{j=1}^lexp(\theta_{2j}+\sum_{k=1}^K\theta_{3jk}I\{a=k\}+\beta_{0j}+\sum_{k=1}^K\beta_{1jk}I\{a^*=k\}+\beta_{2j}'c)\}}{exp(\sum_{k=1}^K\theta_{1k}I\{a^*=k\})\{1+\sum_{j=1}^lexp(\theta_{2j}+\sum_{k=1}^K\theta_{3jk}I\{a^*=k\}+\beta_{0j}+\sum_{k=1}^K\beta_{1jk}I\{a^*=k\}+\beta_{2j}'c)\}}$
+
+$OR^{TNDE}=\frac{exp(\sum_{k=1}^K\theta_{1k}I\{a=k\})\{1+\sum_{j=1}^lexp(\theta_{2j}+\sum_{k=1}^K\theta_{3jk}I\{a=k\}+\beta_{0j}+\sum_{k=1}^K\beta_{1jk}I\{a=k\}+\beta_{2j}'c)\}}{exp(\sum_{k=1}^K\theta_{1k}I\{a^*=k\})\{1+\sum_{j=1}^lexp(\theta_{2j}+\sum_{k=1}^K\theta_{3jk}I\{a^*=k\}+\beta_{0j}+\sum_{k=1}^K\beta_{1jk}I\{a=k\}+\beta_{2j}'c)\}}$
+
+$OR^{PNIE}=\frac{\{1+\sum_{j=1}^lexp(\beta_{0j}+\sum_{k=1}^K\beta_{1jk}I\{a^*=k\}+\beta_{2j}'c)\}\{1+\sum_{j=1}^lexp(\theta_{2j}+\sum_{k=1}^K\theta_{3jk}I\{a^*=k\}+\beta_{0j}+\sum_{k=1}^K\beta_{1jk}I\{a=k\}+\beta_{2j}'c)\}}{\{1+\sum_{j=1}^lexp(\beta_{0j}+\sum_{k=1}^K\beta_{1jk}I\{a=k\}+\beta_{2j}'c)\}\{1+\sum_{j=1}^lexp(\theta_{2j}+\sum_{k=1}^K\theta_{3jk}I\{a^*=k\}+\beta_{0j}+\sum_{k=1}^K\beta_{1jk}I\{a^*=k\}+\beta_{2j}'c)\}}$
+
+$OR^{TNIE}=\frac{\{1+\sum_{j=1}^lexp(\beta_{0j}+\sum_{k=1}^K\beta_{1jk}I\{a^*=k\}+\beta_{2j}'c)\}\{1+\sum_{j=1}^lexp(\theta_{2j}+\sum_{k=1}^K\theta_{3jk}I\{a=k\}+\beta_{0j}+\sum_{k=1}^K\beta_{1jk}I\{a=k\}+\beta_{2j}'c)\}}{\{1+\sum_{j=1}^lexp(\beta_{0j}+\sum_{k=1}^K\beta_{1jk}I\{a=k\}+\beta_{2j}'c)\}\{1+\sum_{j=1}^lexp(\theta_{2j}+\sum_{k=1}^K\theta_{3jk}I\{a=k\}+\beta_{0j}+\sum_{k=1}^K\beta_{1jk}I\{a^*=k\}+\beta_{2j}'c)\}}$
+
+$comp^{CDE}=\frac{exp(\sum_{j=1}^l\theta_{2j}I\{m=j\})(1+\sum_{j=1}^lexp(\beta_{0j}+\sum_{k=1}^K\beta_{1jk}I\{a^*=k\}+\beta_{2j}'c))}{1+\sum_{j=1}^lexp(\theta_{2j}+\sum_{k=1}^K\theta_{3jk}I\{a^*=k\}+\beta_{0j}+\sum_{k=1}^K\beta_{1jk}I\{a^*=k\}+\beta_{2j}'c)}$
+
+$\frac{(exp((\sum_{k=1}^K\theta_{1k}I\{a=k\}-\sum_{k=1}^K\theta_{1k}I\{a^*=k\})+\sum_{j=1}^l\sum_{k=1}^K\theta_{3jk}I\{a=k\}I\{m=j\})-exp(\sum_{j=1}^l\sum_{k=1}^K\theta_{3jk}I\{a^*=k\}I\{m=j\}))}{1+\sum_{j=1}^lexp(\theta_{2j}+\sum_{k=1}^K\theta_{3jk}I\{a^*=k\}+\beta_{0j}+\sum_{k=1}^K\beta_{1jk}I\{a^*=k\}+\beta_{2j}'c)}$
+
+&nbsp;
+
+**Direct Conterfacturals imputation Estimation**
 
 1. Fit a regression model for Y on A, M and C.
 
 2. Fit a regression model for each mediator in M on A and C.
 
-3. Estimate the point estimates of causal effects using closed-form parameters functions or direct Conterfacturals imputation.
+Estimation Algorithm for $E(Y_{am})$: 
 
-4. Estimate the standard errors of causal effects using delta method or bootstrapping.
+3. For each subject i, simulate $Y_{am,i}$ by the predicted value of the outcome regression model under $A=a,M=m,C=C_i$. 
+
+4. Estimate $E[Y_{am}]$ by $\frac{\sum_{i=1}^NY_{am,i}}{n}$.
+
+Estimation Algorithm for $E[Y_{a1Ma2}]$:
+
+3. For each subject i, simulate $M_{a2,i}$ by the predicted values of mediator regression models under $A=a2,C=C_i$.
+
+4. For each subject i, simulate $Y_{a1Ma2,i}$ by the predicted value of the outcome regression model under $A=a1,M=M_{a2,i},C=C_i$.
+
+5. Estimate $E[Y_{a1Ma2}]$ by $\frac{\sum_{i=1}^NY_{a1Ma2,i}}{n}$.
+
+#### Inference
+
+When the estimands are estimated through closed-form parameter function estimation, their standard errors can be estimated by the delta method or bootstrapping; when the estimands are estimated through direct counterfactuals imputation estimation, their standard errors can be estimated by bootstrapping.
 
 ### Weighting-based Approach
 
@@ -378,7 +495,9 @@ Reference:
 
 https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/
 
-**Procedures**
+#### Estimation
+
+**Direct Counterfactuals Imputation Estimation**
 
 1. Fit a regression model for Y on A, M, C.
 
@@ -394,7 +513,9 @@ https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/
 
 7. For $E[Y_{a^*Ma}]$, estimate it by taking a weighted average of the predicted Y values for subjects with $A=a$ if the subjects had had exposure $A=a^*$ rather than $A=a$ and each subject i is given a weight $\frac{P(A=a)}{P(A=a|c_i)}$.
 
-6. Use bootsrapping to estimate the standard error for each estimand.
+#### Inference
+
+Estimate standard errors of estimands by bootstrapping.
 
 ### Inverse Odds Ratio Weighting Approach
 
@@ -404,9 +525,11 @@ https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3954805/
 
 https://www.ncbi.nlm.nih.gov/pubmed/25693776
 
-**Procedures**
+#### Estimation
 
-1. Fit a model for A given M and C
+**Closed-form Parameter Function Estimation**
+
+1. Fit a regression model for A given M and C
 
 2. Calculate weights for each subject, $w_i=\frac{f_{A|M,C}(A=0|M_i,C_i)}{f_{A|M,C}(A=A_i|M_i,C_i)}$.
 
@@ -416,11 +539,27 @@ https://www.ncbi.nlm.nih.gov/pubmed/25693776
 
 5. Calculate the indirect effect by subtracting the direct effect from the total effect.
 
-6. Use bootstrapping to get the standard error.
+#### Inference
+
+Estimate standard errors of estimands by bootstrapping.
 
 ### Natural Effect Model
 
-Incorporate the Medflex package.
+Incorporate the Medflex package: https://www.jstatsoft.org/article/view/v076i11
+
+#### Estimation
+
+1. Fit a working model for Y on A, M and C.
+
+2. For each subject i, expand the dataset by setting $x^*$ to be the observed exposure value, setting x to enumerate all potential exposure levels, and then imputing $Y_{x,M_{x^*},i}$ using the predicted value of Y under $A=x,M=M_i,C=C_i$. If the exposure is continuous, expand the dataset by setting x to be a number of draws(defaults to 5) from the conditional distribution of A given $C_i$.
+
+3. Fit a natural effect model for Y on x,$x^*$ and C using the expanded dataset. The natural effect model should at least reflect the structure of the working model.
+
+4. The coefficient of x captures the natural direct effect and the coefficient of $x^*$ captures the natural indirect effect.
+
+#### Inference
+
+The standard errors of estimands can be estimated by the delta method or bootstrapping.
 
 ### Other Approaches
 
@@ -448,15 +587,91 @@ dagitty::coordinates(g1) <- list(x=c(A=0,Y=4,M=2,C=0.2,L=2),y=c(A=0,Y=0,M=-0.8,C
 plot(g1)
 ```
 
-In the DAG, A denotes the treatment, Y denotes the outcome, M denotes a set of mediators and $M=(M_1, M_2,...,M_n)$, C denotes a set of pre-treatment covariates and L denotes a set of post-treatment covariates and $L=(L_1, L_2,...,L_p)$.
+In the DAG, A denotes the treatment, Y denotes the outcome, M denotes a set of mediators and $M=(M_1, M_2,...,M_k)$, C denotes a set of pre-exposure covariates and L denotes a set of post-exposure covariates and $L=(L_1, L_2,...,L_s)$.
 
 ## Estimand
 
-$rNDE=E(Y_{aGa^*})-E(Y_{a^*Ga^*})=\sum_{l,m,c}\{E[Y|a,l,m,c]P(l|a,c)-E[Y|a^*,l,m,c]P(l|a^*,c)\}P(m|a^*,c)P(c)$
+**2-way decomposition in additive scale**
 
-$rNIE=E(Y_{aGa})-E(Y_{aGa^*})=\sum_{l,m,c}\{E[Y|a,l,m,c]P(l|a,c)\{P(m|a,c)-P(m|a^*,c)\}P(c)$
+$CDE=E[Y_{am}-Y_{a^*m}]$
 
-$rTE=rNDE+rNIE$
+$rPNDE=E[Y_{aG_a^*}-Y_{a^*G_a^*}]$
+
+$rTNDE=E[Y_{aG_a}-Y_{a^*G_a}]$
+
+$rPNIE=E[Y_{a^*G_a}-Y_{a^*G_a^*}]$
+
+$rTNIE=E[Y_{aG_a}-Y_{aG_a^*}]$
+
+$rTE=rPNDE+rTNIE$
+
+$PM=\frac{rTNIE}{rPNDE+rTE}$
+
+**2-way decomposition in RR scale**
+
+$rr^{CDE}=E[Y_{am}]/E[Y_{a^*m}]$
+
+$rr^{rPNDE}=E[Y_{aG_a^*}]/E[Y_{a^*G_a^*}]$
+
+$rr^{rTNDE}=E[Y_{aG_a}]/E[Y_{a^*G_a}]$
+
+$rr^{rPNIE}=E[Y_{a^*G_a}]/E[Y_{a^*G_a^*}]$
+
+$rr^{rTNIE}=E[Y_{aG_a}]/E[Y_{aG_a^*}]$
+
+$rr^{rTE}=rr^{rPNDE}\times rr^{rTNIE}$
+
+$PM=\frac{rr^{rPNDE}*(rr^{rTNIE}-1)}{rr^{rTE}-1}$
+
+**4-way decomposition in additive scale**
+
+$CDE=E[Y_{am}-Y_{a^*m}]$
+
+$rINT_{ref}=rPNDE-CDE$
+
+$rINT_{med}=rTNIE-rPNIE$
+
+$rPIE=rPNIE$
+
+$prop^{CDE}=\frac{CDE}{rTE}$
+
+$prop^{rINT_{ref}}=\frac{rINT_{ref}}{rTE}$
+
+$prop^{rINT_{med}}=\frac{rINT_{med}}{rTE}$
+
+$prop^{rPIE}=\frac{rPIE}{rTE}$
+
+$overall^{PM}=\frac{rPNIE+rINT_{med}}{rTE}$
+
+$overall^{INT}=\frac{rINT_{ref}+rINT_{med}}{rTE}$
+
+$overall^{PE}=\frac{rINT_{ref}+rINT_{med}+rPIE}{rTE}$
+
+**4-way decomposition in RR scale**
+
+$err^{CDE}=(E[Y_{am}-Y_{a^*m}])/E[Y_{a^*G_a^*}]$
+
+$err^{rINT_{ref}}=rr^{rPNDE}-1-err^{CDE}$
+
+$err^{rINT_{med}}=rr^{rTNIE}*rr^{rPNDE}-rr^{rPNDE}-rr^{rPNIE}+1$
+
+$err^{rPIE}=rr^{rPNIE}-1$
+
+$err^{rTE}=err^{CDE}+err^{rINT_{ref}}+err^{rINT_{med}}+err^{rPIE}=rr^{rTE}-1$
+
+$prop^{err^{CDE}}=\frac{err^{CDE}}{err^{rTE}}$
+
+$prop^{err^{rINT_{ref}}}=\frac{err^{rINT_{ref}}}{err^{rTE}}$
+
+$prop^{err^{rINT_{med}}}=\frac{err^{rINT_{med}}}{err^{rTE}}$
+
+$prop^{err^{rPIE}}=\frac{err^{rPIE}}{err^{rTE}}$
+
+$overall^{PM}=\frac{err^{rPIE}+err^{rINT_{med}}}{err^{rTE}}$
+
+$overall^{INT}=\frac{err^{rINT_{ref}}+err^{rINT_{med}}}{err^{rTE}}$
+
+$overall^{PE}=\frac{err^{rINT_{ref}}+err^{rINT_{med}}+err^{rPIE}}{err^{rTE}}$
 
 ## Estimation Approaches Can be Used
 
@@ -466,25 +681,27 @@ Reference:
 
 https://journals.lww.com/epidem/fulltext/2009/01000/marginal_structural_models_for_the_estimation_of.6.aspx
 
-**Procedures**
+#### Estimation
 
-For rCDE:
+**Direct Counterfactuals Imputation Estimation**
 
-1. Fit a weighted regression model for Y on A and M where each subject i is given a weight $\frac{P(A=a_i)}{P(A=a_i|C=c_i)}\frac{P(M_1=m_{1i}|A=a_i)}{P(M_1=m_{1i}|A=a_i,C=c_i,L=l_i)}...\frac{P(M_n=m_{ni}|A=a_i)}{P(M_n=m_{ni}|A=a_i,C=c_i,L=l_i)}$.
+Estimation Algorithm for $E(Y_{am})$:
 
-2. Get the point estimate using the closed-form parameter function or direct imputation.
+1. Fit a weighted regression model for Y on A and M where each subject i is given a weight $\frac{P(A=a_i)}{P(A=a_i|C=c_i)}\frac{P(M_1=M_{1,i}|A=a_i)}{P(M_1=M_{1,i}|A=a_i,C=c_i,L=l_i)}...\frac{P(M_k=M_{k,i}|A=a_i)}{P(M_k=M_{k,i}|A=a_i,C=c_i,L=l_i)}$. Then, simulate $Y_{am}$ by the predicted value of the weighted outcome regression model under $A=a,M=m$.
 
-3. Get the standard error using the delta method or bootstrapping.
+2. Estimate $E(Y_{am})$ by $Y_{am}$.
 
-For rNDE and rNIE:
+Estimation Algorithm for $E(Y_{a1Ga2})$:
 
-1. Fit a weighted regression model for Y on A, M and C where each subject i is given a weight $\frac{P(A=a_i)}{P(A=a_i|C=c_i)}\frac{P(M_1=m_{1i}|A=a_i)}{P(M_1=m_{1i}|A=a_i,C=c_i,L=l_i)}...\frac{P(M_n=m_{ni}|A=a_i)}{P(M_n=m_{ni}|A=a_i,C=c_i,L=l_i)}$.
+1. Fit a weighted regression model for each mediator $M_p,p=1,2,...,k,$ on A and C where each subject i is given a weight $\frac{P(A=a_i)}{P(A=a_i|C=c_i)}$. Then, for each subject i, simulate the value of $M_{p,a2,i}$ by the predicted value of $M_{p}|A=a2,C=C_i$.
 
-2. Fit a weighted regression model for each $M_1, M_2,...,M_n$ on A and C where each subject i is given a weight $\frac{P(A=a_i)}{P(A=a_i|C=c_i)}$.
+2. Fit a weighted regression model for Y on A, M and C where each subject i is given a weight $\frac{P(A=a_i)}{P(A=a_i|C=c_i)}\frac{P(M_1=M_{1,i}|A=a_i)}{P(M_1=M_{1,i}|A=a_i,C=c_i,L=l_i)}...\frac{P(M_k=M_{k,i}|A=a_i)}{P(M_k=M_{k,i}|A=a_i,C=c_i,L=l_i)}$. Then, for each subject i, simulate the potential outcome $Y_{a1Ga2,i}$ by the predicted value of $Y|A=a1,M_1=M_{1,a2,i},M_2=M_{2,a2,i},...,M_k=M_{k,a2,i},C=C_i$.
 
-3. For single-mediator cases, get the point estimate using the closed-form parameter function or direct imputation; for multiple-mediator cases, get the point estimate using direct imputation.
+3. Estimate $E(Y_{a1Ga2})$ by $\frac{\sum_{i=1}^NY_{a1Ga2,i}}{n}$.
 
-4. For single-mediator cases, get the standard error using the delta method or bootstrapping; for multiple-mediator cases, get the standard error using bootstrapping.
+#### Inference
+
+Estimate standard errors of estimands by bootstrapping.
 
 ### G-formula Approach
 
@@ -492,16 +709,26 @@ Reference:
 
 https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5285457/
 
-**Estimation Algorithm for $E(Y_{a1Ga2})$**
+#### Estimation
 
-1. Bootstrap the dataset.
+**Direct Counterfactuals Imputation Estimation**
 
-2. Fit models for $E(L_1|A,C)$, $E(L_2|A,C)$,..., $E(L_p|A,C)$ using the bootstrapped dataset. Then, for each subject i, simulate the value of $L^*_{pi}$ under A=a1 by the predicted value of $L_{pi}|A=a_1,C=C_i$.
+Estimation Algorithm for $E(Y_{am})$: 
 
-3. Fit models for $E(M_1|A,C,L)$, $E(M_2|A,C,L)$,...,$E(M_n|A,C,L)$ using the bootstrapped dataset. Then, for each subject i, simulate the value of $M^*_{ni}$ under A=a2 by the predicted value of $M_{ni}|A=a2,C=C_i,L=L_i$.
+1. Fit a model for E(Y|A,L,M,C). For subject i, simulate $Y_{am,i}$ by the predicted value of the outcome regression model under $A=a,L=L_i,M=m,C=C_i$.
 
-4. Fit models for E(Y|A,L,M,C) using the bootstrapped dataset. Then, for each subject i, simulate the potential outcome $Y_i^*$ by the predicted value of $Y|A=a1,L_p=L^*_{pi},...,L_2=L^*_{2i},L_1=L^*_{1i},M_n=M^*_{ni},...,M_2=M^*_{2i},M_1=M^*_{1i},C=C_i,$.
+2. Estimate $E(Y_{am})$ by $\frac{\sum_{i=1}^NY_{am,i}}{n}$
 
-5. Calculate mean value of $Y^*$, i.e, $\sum_{i=1}^NY_i^*$
+Estimation Algorithm for $E(Y_{a1Ga2})$:
 
-6. Repeat 1-5 K times and estimate $E(Y_{a1Ga2})$ as $\sum_{k=1}^K\sum_{i=1}^NY_{ik}^*$.
+1. Fit a regression model for each post-exposure covariate $L_q|A,C),q=1,2,...,s,$ on A and C. Then, for each subject i, simulate the value of $L_{q,a1,i}$ by the predicted value of $L_{q}|A=a1,C=C_i$.
+
+2. Fit a regression model for each mediator $M_p,p=1,2,...,k,$ on A, C and L. Then, for each subject i, simulate the value of $M_{p,a2,i}$ by the predicted value of $M_p|A=a2,C=C_i,L=L_i$.
+
+3. Fit a regression model for Y on A, L, M, and C. Then, for each subject i, simulate the potential outcome $Y_{a1Ga2,i}$ by the predicted value of $Y|A=a1,L_1=L_{1,a1,i},L_2=L_{2,a1,i},...,L_s=L_{s,a1,i},M_1=M_{1,a2,i},M_2=M_{2,a2,i},...,M_n=M_{k,a2,i},C=C_i$.
+
+4. Estimate $E(Y_{a1Ga2})$ by $\frac{\sum_{i=1}^NY_{a1Ga2,i}}{n}$.
+
+#### Inference
+
+Estimate standard errors of estimands by bootstrapping.
