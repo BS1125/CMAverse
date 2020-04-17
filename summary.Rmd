@@ -4,12 +4,16 @@ author: "Baoyi Shi"
 output: 
   pdf_document:
     number_sections: true
+    toc: true
+    toc_depth: 3
 header-includes:
 - \usepackage{caption}
 - \usepackage{threeparttable}
 ---
 
 # Supported Data Types and Functionalities
+
+## Summary Table
 
 \begin{center}
 \begin{threeparttable}
@@ -19,37 +23,43 @@ header-includes:
 \hline
 
 &rb & wb & msm & iorw & ne & g-formula \\ \hline
-Linear Y & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
-Logistic Y & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
-Loglinear Y & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
-Poisson Y & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
-Quasipoisson Y & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
-NegBin Y & $\surd$& $\surd$& $\surd$& $\surd$& $\times$& $\surd$ \\ \hline
-Coxph Y & $\surd$& $\surd$& $\surd$& $\surd$& $\times$& $\surd$ \\ \hline
-AFT Exp Y & $\surd$& $\surd$& $\surd$& $\surd$& $\times$& $\surd$ \\ \hline
-AFT Weibull Y & $\surd$& $\surd$& $\surd$& $\surd$& $\times$& $\surd$ \\ \hline
-Linear M & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
-Logistic M & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
-Categorical M & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
+Continuous Y & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ 
+Binary Y & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ 
+Count Y & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ 
+Nominal Y & $\surd$& $\surd$& $\surd$& $\surd$& $\times$& $\surd$ \\
+Ordinal Y & $\surd$& $\surd$& $\surd$& $\surd$& $\times$& $\surd$ \\ 
+Survival Y & $\surd$& $\surd$& $\surd$& $\surd$& $\times$& $\surd$ \\ \hline
+Continuous M & $\surd$& $\surd$& $\oslash$& $\surd$& $\surd$& $\surd$ \\ 
+Binary M & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ 
+Nominal M & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ 
+Ordinal M & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ 
+Count M & $\surd$& $\surd$& $\oslash$& $\surd$& $\surd$& $\surd$ \\ 
 Any type M & $\oslash$& $\surd$& $\oslash$ & $\surd$& $\surd$& $\oslash$ \\ \hline
-User-defined Y/M Models & $\surd$& $\surd$& $\surd$ & $\surd$& $\times$& $\surd$ \\ \hline
-Continuous A & $\surd$& $\oslash$& $\oslash$ & $\oslash$& $\surd$& $\surd$ \\ \hline
-Binary A & $\surd$& $\surd$& $\surd$ & $\surd$& $\surd$& $\surd$ \\ \hline
-Categorical A & $\surd$& $\surd$& $\surd$ & $\surd$& $\surd$& $\surd$ \\ \hline
-Single M& $\surd$& $\surd$& $\surd$ & $\surd$& $\surd$& $\surd$ \\ \hline
-Multiple M& $\surd$& $\surd$& $\surd$ & $\surd$& $\surd$& $\surd$ \\ \hline
-Pre-exposure Confounding & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
+Continuous A & $\surd$& $\oslash$& $\oslash$ & $\oslash$& $\surd$& $\surd$ \\ 
+Binary A & $\surd$& $\surd$& $\surd$ & $\surd$& $\surd$& $\surd$ \\ 
+Nominal A & $\surd$& $\surd$& $\surd$ & $\surd$& $\surd$& $\surd$ \\ 
+Ordinal A & $\surd$& $\surd$& $\surd$ & $\surd$& $\surd$& $\surd$ \\ 
+Count A & $\surd$& $\oslash$& $\oslash$ & $\oslash$& $\surd$& $\surd$ \\ \hline
+User-defined Models\tnote{*} & $\surd$& $\surd$& $\surd$ & $\surd$& $\surd$& $\surd$ \\ 
+Non-user-defined Models\tnote{**} & $\surd$& $\surd$& $\surd$ & $\surd$& $\surd$& $\surd$ \\ \hline
+Single Mediator& $\surd$& $\surd$& $\surd$ & $\surd$& $\surd$& $\surd$ \\ 
+Multiple Mediators& $\surd$& $\surd$& $\surd$ & $\surd$& $\surd$& $\surd$ \\ \hline
+Pre-exposure Confounding & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ 
 Post-exposure Confounding & $\oslash$ & $\oslash$& $\surd$& $\oslash$& $\oslash$& $\surd$ \\ \hline
-2-way Decomposition & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
+2-way Decomposition & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ 
 4-way Decomposition & $\surd$& $\surd$& $\surd$& $\oslash$& $\times$& $\surd$ \\ \hline
-Estimation: Closed-form Parameter Function & $\surd$\tnote{*}& $\oslash$& $\oslash$& $\surd$& $\surd$& $\oslash$ \\ \hline
+Estimation: Closed-form Parameter Function & $\surd^{***}$& $\oslash$& $\oslash$& $\surd$& $\surd$& $\oslash$ \\ 
 Estimation: Direct Imputation & $\surd$& $\surd$& $\surd$& $\oslash$& $\times$& $\surd$ \\ \hline
-Inference: Delta Method\tnote{**} & $\surd$& $\oslash$& $\oslash$& $\oslash$& $\surd$& $\oslash$ \\ \hline
+Inference: Delta Method & $\surd^{****}$& $\oslash$& $\times$& $\oslash$& $\surd$& $\oslash$ \\
 Inference: Bootstrapping & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ \\ \hline
 \end{tabular}
 \begin{tablenotes}\footnotesize
-\item[*] Not available for multiple-mediator cases; only outputs conditional causal effects.
-\item[**] Only available for closed-form parameter function estimation.
+\item[*] Supports lm/glm/multinom/polr/nls/gam/survreg/coxph regression objects.
+\item[**] Supports lm/glm(family=binomial(link="logit"))/glm(family=binomial(link="log"))/glm(family=poisson)/
+
+glm(family=quasipoisson)/glm.nb/multinom/polr/coxph/survreg(dist="exponential")/survreg(dist="weibull") outcome regressions, lm/glm(family=binomial(link="logit"))/multinom/polr/glm(family=poisson) for other variables.
+\item[***] Only supports single-mediator cases; only supports non-user-defined outcome regressions except multinom and polr, lm/glm(family=binomial(link="logit"))/multinom mediator regressions and continuous/binary/nominal exposure; when the outcome isn't continuous, only outputs conditional effects.
+\item[****] Only available for closed-form parameter function estimation.
 \item[$\surd$] Available.
 \item[$\times$] Currently not available but applicable.
 \item[$\oslash$] Neither available nor applicable.
@@ -57,6 +67,46 @@ Inference: Bootstrapping & $\surd$& $\surd$& $\surd$& $\surd$& $\surd$& $\surd$ 
 \end{tablenotes}
 \end{threeparttable}
 \end{center}
+
+## Supported User-defined Regression Models
+
+1. For continuous variables: lm(), glm(family = gaussian()), glm(family = Gamma()), glm(family = inverse.gaussian()), glm(family = quasi()), gam(family = gaussian()), gam(family = Gamma()), gam(family = inverse.gaussian()), gam(family = quasi()), nls().
+
+2. For binary variables: glm(family = binomial()), glm(family = quasibinomial()), gam(family = binomial()), gam(family = quasibinomial()). 
+
+3. For count variables: glm(family = poisson()), glm(family = quasipoisson()), glm.nb(), gam(family = poisson()), gam(family = quasipoisson()), gam(family = negbin()), gam(family = nb()).
+
+4. For nominal variables: multinom(), gam(family = multinom()).
+
+5. For ordinal variables: gam(family = ocat()), polr().
+
+6. For survival variables: survreg(), coxph().
+
+## Estimation and Inference Algorithms
+
+### Estimation
+
+**Closed-form Parameter Function Estimation**
+
+Effect estimates are calculated using regression parameters. 
+
+**Direct Conterfacturals imputation Estimation**
+
+1. Impute $Y_{am,i}$, $Y_{a^*m,i}$, $Y_{aMa,i}$, $Y_{a^*Ma^*,i}$, $Y_{aMa^*,i}$, and $Y_{a^*Ma,i}$ for each subject i.
+
+2. Estimate $E[Y_{am}]$, $E[Y_{a^*m}]$, $E[Y_{aMa}]$, $E[Y_{a^*Ma^*}]$, $E[Y_{aMa^*}]$, and $E[Y_{a^*Ma}]$ by $\frac{\sum_{i=1}^NY_{am,i}}{n}$, $\frac{\sum_{i=1}^NY_{a^*m,i}}{n}$, $\frac{\sum_{i=1}^NY_{aMa,i}}{n}$, $\frac{\sum_{i=1}^NY_{a^*Ma^*,i}}{n}$, $\frac{\sum_{i=1}^NY_{aMa^*,i}}{n}$ and $\frac{\sum_{i=1}^NY_{a^*Ma,i}}{n}$ respectively.
+
+3. Calculate causal effects using $E[Y_{am}]$, $E[Y_{a^*m}]$, $E[Y_{aMa}]$, $E[Y_{a^*Ma^*}]$, $E[Y_{aMa^*}]$, and $E[Y_{a^*Ma}]$.
+
+### Inference 
+
+**Delta Method**
+
+Standard errors of effects are estimated using the standard errors of regression parameters and delta method based on the closed-form parameter function.
+
+**Bootstrapping**
+
+Bootstrap the data, refit the regression models, and calculate a bootstrap estimate. Repeat the bootstrapping K times and calculate the standard error of these K boostrap estimates for each estimand, which is the estimated standard error of this estimand.
 
 # Pre-treatment Confounding
 
@@ -97,7 +147,7 @@ $TE=PNDE+TNIE$
 $PM=\frac{TNIE}{PNDE+TE}$
 
 
-**2-way decomposition in RR scale**
+**2-way decomposition in ratio scale**
 
 $rr^{CDE}=E[Y_{am}]/E[Y_{a^*m}]$
 
@@ -137,7 +187,7 @@ $overall^{INT}=\frac{INT_{ref}+INT_{med}}{TE}$
 
 $overall^{PE}=\frac{INT_{ref}+INT_{med}+PIE}{TE}$
 
-**4-way decomposition in RR scale**
+**4-way decomposition in ratio scale**
 
 $err^{CDE}=(E[Y_{am}-Y_{a^*m}])/E[Y_{a^*M_a^*}]$
 
@@ -163,31 +213,8 @@ $overall^{INT}=\frac{err^{INT_{ref}}+err^{INT_{med}}}{err^{TE}}$
 
 $overall^{PE}=\frac{err^{INT_{ref}}+err^{INT_{med}}+err^{PIE}}{err^{TE}}$
 
-## Estimation
 
-**Closed-form Parameter Function Estimation**
-
-Effect estimates are calculated using regression parameters. 
-
-**Direct Conterfacturals imputation Estimation**
-
-1. Impute $Y_{am,i}$, $Y_{a^*m,i}$, $Y_{aMa,i}$, $Y_{a^*Ma^*,i}$, $Y_{aMa^*,i}$, and $Y_{a^*Ma,i}$ for each subject i.
-
-2. Estimate $E[Y_{am}]$, $E[Y_{a^*m}]$, $E[Y_{aMa}]$, $E[Y_{a^*Ma^*}]$, $E[Y_{aMa^*}]$, and $E[Y_{a^*Ma}]$ by $\frac{\sum_{i=1}^NY_{am,i}}{n}$, $\frac{\sum_{i=1}^NY_{a^*m,i}}{n}$, $\frac{\sum_{i=1}^NY_{aMa,i}}{n}$, $\frac{\sum_{i=1}^NY_{a^*Ma^*,i}}{n}$, $\frac{\sum_{i=1}^NY_{aMa^*,i}}{n}$ and $\frac{\sum_{i=1}^NY_{a^*Ma,i}}{n}$ respectively.
-
-3. Calculate causal effects using $E[Y_{am}]$, $E[Y_{a^*m}]$, $E[Y_{aMa}]$, $E[Y_{a^*Ma^*}]$, $E[Y_{aMa^*}]$, and $E[Y_{a^*Ma}]$.
-
-## Inference 
-
-**Delta Method**
-
-Standard errors of effects are estimated using the standard errors of regression parameters and delta method based on the closed-form parameter function.
-
-**Bootstrapping**
-
-Bootstrap the data, refit the regression models, and calculate a bootstrap estimate. Repeat the bootstrapping K times and calculate the standard error of these K boostrap estimates for each estimand, which is the estimated standard error of this estimand.
-
-## Estimation Approaches Can be Used
+## Statistical Approaches Can be Used
 
 ### Regression-based Approach
 
@@ -312,7 +339,7 @@ $TNIE=\frac{\sum_{j=1}^l(\theta_{2j}+\theta_{3j}a)exp(\beta_{0j}+\beta_{1j}a+\be
 
 Closed-form parameter function estimators for the causal effects when the exposure is binary or categorical:
 
-$CDE=(\sum_{k=1}^K\theta_{1k}I\{a=k\}-\sum_{k=1}^K\theta_{1k}I\{a^*=k\})+(\sum_{j=1}^l\sum_{k=1}^K\theta_{3jk}I\{m=l\}I\{a=k\}-\sum_{j=1}^l\sum_{k=1}^K\theta_{3jk}I\{m=l\}I\{a^*=k\})$
+$CDE=(\sum_{k=1}^K\theta_{1k}I\{a=k\}-\sum_{k=1}^K\theta_{1k}I\{a^*=k\})+(\sum_{j=1}^l\sum_{k=1}^K\theta_{3jk}I\{m=j\}I\{a=k\}-\sum_{j=1}^l\sum_{k=1}^K\theta_{3jk}I\{m=j\}I\{a^*=k\})$
 
 $PNDE=(\sum_{k=1}^K\theta_{1k}I\{a=k\}-\sum_{k=1}^K\theta_{1k}I\{a^*=k\})+\frac{\sum_{j=1}^l(\sum_{k=1}^K\theta_{3jk}I\{a=k\}-\sum_{k=1}^K\theta_{3jk}I\{a^*=k\})exp(\beta_{0j}+\sum_{k=1}^K\beta_{1jk}I\{a^*=k\}+\beta_{2j}'c)}{1+\sum_{j=1}^lexp(\beta_{0j}+\sum_{k=1}^K\beta_{1jk}I\{a^*=k\}+\beta_{2j}'c)}$
 
@@ -356,7 +383,7 @@ Closed-form parameter function estimators for the causal effects when the exposu
 
 $OR^{CDE}=exp((\sum_{k=1}^K\theta_{1k}I\{a=k\}-\sum_{k=1}^K\theta_{1k}I\{a^*=k\})+(\sum_{k=1}^K\theta_{3k}I\{a=k\}-\sum_{k=1}^K\theta_{3k}I\{a^*=k\})m)$
 
-$OR^{PNDE}=exp((\{\sum_{k=1}^K\theta_{1k}I\{a=k\}-\sum_{k=1}^K\theta_{1k}I\{a^*=k\})+(\{\sum_{k=1}^K\theta_{3k}I\{a=k\}-\sum_{k=1}^K\theta_{3k}I\{a^*=k\})(\beta_0+\sum_{k=1}^K\beta_{1k}I\{a^*=k\}+\beta_2'c+\theta_2\sigma^2)\}+0.5\sigma^2(\sum_{k=1}^K\theta_{3k}^2I\{a=k\}-\sum_{k=1}^K\theta_{3k}^2I\{a^*=k\}))$
+$OR^{PNDE}=exp((\{\sum_{k=1}^K\theta_{1k}I\{a=k\}-\sum_{k=1}^K\theta_{1k}I\{a^*=k\})+(\sum_{k=1}^K\theta_{3k}I\{a=k\}-\sum_{k=1}^K\theta_{3k}I\{a^*=k\})(\beta_0+\sum_{k=1}^K\beta_{1k}I\{a^*=k\}+\beta_2'c+\theta_2\sigma^2)+0.5\sigma^2(\sum_{k=1}^K\theta_{3k}^2I\{a=k\}-\sum_{k=1}^K\theta_{3k}^2I\{a^*=k\}))$
 
 $OR^{TNDE}=exp((\sum_{k=1}^K\theta_{1k}I\{a=k\}-\sum_{k=1}^K\theta_{1k}I\{a^*=k\})+(\sum_{k=1}^K\theta_{3k}I\{a=k\}-\sum_{k=1}^K\theta_{3k}I\{a^*=k\})(\beta_0+\sum_{k=1}^K\beta_{1k}I\{a=k\}+\beta_2'c+\theta_2\sigma^2)+0.5\sigma^2(\sum_{k=1}^K\theta_{3k}^2I\{a=k\}-\sum_{k=1}^K\theta_{3k}^2I\{a^*=k\}))$
 
@@ -673,7 +700,7 @@ $overall^{INT}=\frac{err^{rINT_{ref}}+err^{rINT_{med}}}{err^{rTE}}$
 
 $overall^{PE}=\frac{err^{rINT_{ref}}+err^{rINT_{med}}+err^{rPIE}}{err^{rTE}}$
 
-## Estimation Approaches Can be Used
+## Statistical Approaches Can be Used
 
 ### Marginal Structual Model
 
@@ -681,23 +708,29 @@ Reference:
 
 https://journals.lww.com/epidem/fulltext/2009/01000/marginal_structural_models_for_the_estimation_of.6.aspx
 
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5560424/pdf/nihms788840.pdf
+
 #### Estimation
 
 **Direct Counterfactuals Imputation Estimation**
 
 Estimation Algorithm for $E(Y_{am})$:
 
-1. Fit a weighted regression model for Y on A and M where each subject i is given a weight $\frac{P(A=a_i)}{P(A=a_i|C=c_i)}\frac{P(M_1=M_{1,i}|A=a_i)}{P(M_1=M_{1,i}|A=a_i,C=c_i,L=l_i)}...\frac{P(M_k=M_{k,i}|A=a_i)}{P(M_k=M_{k,i}|A=a_i,C=c_i,L=l_i)}$. Then, simulate $Y_{am}$ by the predicted value of the weighted outcome regression model under $A=a,M=m$.
+1. Fit a weighted regression model for Y on A, M and C where each subject i is given a weight $\frac{P(A=a_i)}{P(A=a_i|C=c_i)}\frac{P(M_1=M_{1,i}|A=a_i)}{P(M_1=M_{1,i}|A=a_i,C=c_i,L=l_i)}\frac{P(M_2=M_{2,i}|A=a_i)}{P(M_2=M_{2,i}|A=a_i,M_1=M_{1,i},C=c_i,L=l_i)}...$
 
-2. Estimate $E(Y_{am})$ by $Y_{am}$.
+$\frac{P(M_k=M_{k,i}|A=a_i)}{P(M_k=M_{k,i}|A=a_i,M_1=M_{1,i},...,M_{k-1}=M_{k-1,i},C=c_i,L=l_i)}$. Then, for each subject i, simulate the potential outcome $Y^*_{am,i}$ by the predicted value of $Y|A=a,M=m,C=C_i$.
+
+2. Estimate $E(Y_{am})$ by $\frac{\sum_{i=1}^nY^*_{am,i}}{n}$.
 
 Estimation Algorithm for $E(Y_{a1Ga2})$:
 
-1. Fit a weighted regression model for each mediator $M_p,p=1,2,...,k,$ on A and C where each subject i is given a weight $\frac{P(A=a_i)}{P(A=a_i|C=c_i)}$. Then, for each subject i, simulate the value of $M_{p,a2,i}$ by the predicted value of $M_{p}|A=a2,C=C_i$.
+1. Fit a weighted regression model for each mediator $M_p,p=1,2,...,k,$ on A and C where each subject i is given a weight $\frac{P(A=a_i)}{P(A=a_i|C=c_i)}$. Then, for each subject i, simulate the value of $M^*_{p,a2,i}$ by the predicted value of $M_{p}|A=a2,C=C_i$.
 
-2. Fit a weighted regression model for Y on A, M and C where each subject i is given a weight $\frac{P(A=a_i)}{P(A=a_i|C=c_i)}\frac{P(M_1=M_{1,i}|A=a_i)}{P(M_1=M_{1,i}|A=a_i,C=c_i,L=l_i)}...\frac{P(M_k=M_{k,i}|A=a_i)}{P(M_k=M_{k,i}|A=a_i,C=c_i,L=l_i)}$. Then, for each subject i, simulate the potential outcome $Y_{a1Ga2,i}$ by the predicted value of $Y|A=a1,M_1=M_{1,a2,i},M_2=M_{2,a2,i},...,M_k=M_{k,a2,i},C=C_i$.
+2. Fit a weighted regression model for Y on A, M and C where each subject i is given a weight $\frac{P(A=a_i)}{P(A=a_i|C=c_i)}\frac{P(M_1=M_{1,i}|A=a_i)}{P(M_1=M_{1,i}|A=a_i,C=c_i,L=l_i)}\frac{P(M_2=M_{2,i}|A=a_i)}{P(M_2=M_{2,i}|A=a_i,M_1=M_{1,i},C=c_i,L=l_i)}...$
 
-3. Estimate $E(Y_{a1Ga2})$ by $\frac{\sum_{i=1}^NY_{a1Ga2,i}}{n}$.
+$\frac{P(M_k=M_{k,i}|A=a_i)}{P(M_k=M_{k,i}|A=a_i,M_1=M_{1,i},...,M_{k-1}=M_{k-1,i},C=c_i,L=l_i)}$. Then, for each subject i, simulate the potential outcome $Y^*_{a1Ga2,i}$ by the predicted value of $Y|A=a1,M_1=M^*_{1,a2,i},M_2=M^*_{2,a2,i},...,M_k=M^*_{k,a2,i},C=C_i$.
+
+3. Estimate $E(Y_{a1Ga2})$ by $\frac{\sum_{i=1}^NY^*_{a1Ga2,i}}{n}$.
 
 #### Inference
 
@@ -715,20 +748,104 @@ https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5285457/
 
 Estimation Algorithm for $E(Y_{am})$: 
 
-1. Fit a model for E(Y|A,L,M,C). For subject i, simulate $Y_{am,i}$ by the predicted value of the outcome regression model under $A=a,L=L_i,M=m,C=C_i$.
+1. Fit a model for E(Y|A,L,M,C). For subject i, simulate $Y^*_{am,i}$ by the predicted value of the outcome regression model under $A=a,L=L_i,M=m,C=C_i$.
 
-2. Estimate $E(Y_{am})$ by $\frac{\sum_{i=1}^NY_{am,i}}{n}$
+2. Estimate $E(Y_{am})$ by $\frac{\sum_{i=1}^NY^*_{am,i}}{n}$
 
 Estimation Algorithm for $E(Y_{a1Ga2})$:
 
-1. Fit a regression model for each post-exposure covariate $L_q|A,C),q=1,2,...,s,$ on A and C. Then, for each subject i, simulate the value of $L_{q,a1,i}$ by the predicted value of $L_{q}|A=a1,C=C_i$.
+1. Fit a regression model for each post-exposure covariate $L_q|A,L_1,...,L_{q-1},C,q=1,2,...,s,$ on A, preceding post-exposure covariates $L_1,...L_{q-1}$, and C. Then, for each subject i, simulate the value of $L^*_{q,a1,i}$ by the predicted value of $L_{q}|A=a1,L_1=L^*_{1,i},...,L_{q-1}=L^*_{q-1,i},C=C_i$.
 
-2. Fit a regression model for each mediator $M_p,p=1,2,...,k,$ on A, C and L. Then, for each subject i, simulate the value of $M_{p,a2,i}$ by the predicted value of $M_p|A=a2,C=C_i,L=L_i$.
+2. Fit a regression model for each mediator $M_p|A,M_1,...,M_{p-1},C,L,p=1,2,...,k,$ on A, preceding mediators, C and L. Then, for each subject i, simulate the value of $M^*_{p,a2,i}$ by the predicted value of $M_p|A=a2,M_1=M^*_{1,i},...,M_{p-1}=M^*_{p-1,i},C=C_i,L=L_i$.
 
-3. Fit a regression model for Y on A, L, M, and C. Then, for each subject i, simulate the potential outcome $Y_{a1Ga2,i}$ by the predicted value of $Y|A=a1,L_1=L_{1,a1,i},L_2=L_{2,a1,i},...,L_s=L_{s,a1,i},M_1=M_{1,a2,i},M_2=M_{2,a2,i},...,M_n=M_{k,a2,i},C=C_i$.
+3. Randomly permute the simulated values of $M^*_{p,a2,i},i=1,...,n$, denoted as $M^{**}_{p,a2,i},i=1,...,n$.
 
-4. Estimate $E(Y_{a1Ga2})$ by $\frac{\sum_{i=1}^NY_{a1Ga2,i}}{n}$.
+3. Fit a regression model for Y on A, L, M, and C. Then, for each subject i, simulate the potential outcome $Y^*_{a1Ga2,i}$ by the predicted value of $Y|A=a1,L_1=L^*_{1,a1,i},L_2=L^*_{2,a1,i},...,L_s=L^*_{s,a1,i},M_1=M^{**}_{1,a2,i},M_2=M^{**}_{2,a2,i},...,M_k=M^{**}_{k,a2,i},C=C_i$.
+
+4. Estimate $E(Y_{a1Ga2})$ by $\frac{\sum_{i=1}^NY^*_{a1Ga2,i}}{n}$.
 
 #### Inference
 
 Estimate standard errors of estimands by bootstrapping.
+
+# Sensitivity Analysis
+
+## Unmeasured Confounding
+
+We use the E-value approach for sensitivity analysis of unmeasured confounding.
+
+Reference:
+
+https://annals.org/aim/fullarticle/2643434/sensitivity-analysis-observational-research-introducing-e-value
+
+https://journals.lww.com/epidem/Fulltext/2019/11000/Mediational_E_values__Approximate_Sensitivity.9.aspx
+
+### Unmeasured Exposure-outcome Confounding
+
+When there exsists unmeasured exposure-outcome confounding, we conduct sensitivity analysis for the total effect and the controlled direct effect. We incorporate the EValue package to calculate the E-value which is interpreted as the minimum strength of association on the risk ratio scale that an unmeasured confounder would need to have with both the exposure and the outcome, conditional on the measured confounders, to explain away an observed total effect or controlled direct effect.
+
+We also plot a curve showing combination of values of the minimum strength of association on the risk ratio scale that an unmeasured confounder must have with the exposure and the outcome to fully explain away an observed treatment–outcome risk ratio. The formula for this curve is:
+
+$$RR_{obs}=RR_{UY}RR_{AU}/(RR_{UY}+RR_{AU}-1)$$
+, where $RR_{obs}$ is the observed effect on the risk ratio scale, $RR_{UY}$ is the maximum risk ratio for the outcome comparing any 2 categories of the unmeasured confounders, with the measured covariates adjusted and $RR_{AU}$ is the maximum risk ratio for any specific level of the unmeasured confounders comparing those with 2 levels of exposure, with the measured covariates adjusted.
+
+**The approach of calculating E-values:**
+
+**Continuous Outcome**
+
+When the outcome is continuous, we estimate the effects on the additive scale. Let $SD_Y$ denote the standard deviation of the outcome and $SE$ denote the standard error of the observed effect, $d=Effect_{obs}/SD_Y$, and $s_d=SE/SD_Y$, then the observed effect and its confidence interval on the risk ratio scale can be approximated by $RR_{approx}=exp(0.91\times d)$ and $CI_{approx}=(exp(0.91\times d-1.78\times s_d),exp(0.91\times d+1.78\times s_d))$.
+
+If $RR_{approx}>1$,
+
+$$E-value=RR_{approx}+\sqrt{RR_{approx}\times (RR_{approx}-1)}$$
+
+If $RR_{approx}<1$,
+
+$$E-value=\frac{1}{RR_{approx}}+\sqrt{\frac{1}{RR_{approx}}\times (\frac{1}{RR_{approx}}-1)}$$
+
+We also calculate the E-value for the limit of the $CI_{approx}$ closest to the null.
+
+**Non-continuous Outcome**
+
+When the outcome is not continuous, we estimate the effects on the risk ratio scale. 
+
+If $RR_{obs}>1$,
+
+$$E-value=RR_{obs}+\sqrt{RR_{obs}\times (RR_{obs}-1)}$$
+
+If $RR_{obs}<1$,
+
+$$E-value=\frac{1}{RR_{obs}}+\sqrt{\frac{1}{RR_{obs}}\times (\frac{1}{RR_{obs}}-1)}$$
+
+We also calculate the E-value for the limit of the CI of the total effect closest to the null.
+
+### Unmeasured Mediator-outcome Confounding
+
+When there exsists unmeasured mediator-outcome confounding, we conduct sensitivity analysis for the natural direct effect and natural indirect effect. We again incorporate the EValue package to calculate the mediational E-value which is interpreted as the minimum strength of association on the risk ratio scale that an unmeasured confounder would need to have with both the mediator and the outcome, conditional on the measured confounders, to explain away an observed natural direct effect or natural indirect effect.
+
+We also plot a curve showing combination of values of the minimum strength of association on the risk ratio scale that an unmeasured confounder must have with the mediator and the outcome to fully explain away an observed natural direct effect or natural indirect effect on the risk ratio scale. The formula for this curve is:
+
+$$RR_{obs}=RR_{UY}RR_{MU}/(RR_{UY}+RR_{MU}-1)$$
+, where $RR_{obs}$ is the observed effect on the risk ratio scale, $RR_{UY}$ is the maximum risk ratio for the outcome comparing any 2 categories of the unmeasured confounders, with the measured covariates adjusted and $RR_{MU}$ is the maximum risk ratio for any specific level of the unmeasured confounders comparing those with 2 levels of the mediator, with the measured covariates adjusted.
+
+The approach of calculating E-values is the same as before.
+
+## Measurement Error
+
+We use the SIMEX approach for sensitivity analysis of the measurement error. We only allow for one independent variable measured with error.
+
+Reference:
+
+https://annals.org/aim/fullarticle/2643434/sensitivity-analysis-observational-research-introducing-e-value
+
+https://academic.oup.com/biostatistics/article/15/3/498/224455
+
+https://www.futuremedicine.com/doi/full/10.2217/epi-2016-0145
+
+### A Single Continuous Independent Variable Measured With Error
+
+Let $\sigma_u^2$ denote the measurement error variance of the variable measure with error. With a grid of pre-specified $\sigma_u$ values, for each $\sigma_u$ value, we incorporate the SIMEX package to estimate the SIMEX estimators of regression coefficients and estimate the causal effects and their standard errors. We also plot the estimated effects against the pre-specified measurement error parameter $\sigma_u$ values. We output all the results in a table and also plot the estimated effects against the pre-specified $\sigma_u$ values.
+
+### A Single Binary Independent Variable Measured With Error
+
+Let SN denote sensitivity and SP denote specificity in the misclassification probabilities. With a grid of combinations of pre-specified SN and SP values, for each combination, we incorporate the SIMEX package to estimate the SIMEX estimators of regression coefficients and estimate the causal effects and their standard errors. We output all the results in a table and also plot the estimated effects against the pre-specified SN and SP values.
