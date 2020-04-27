@@ -9,32 +9,6 @@ z_p <- function(s, n, yreg, model) {
 
   pval <- 2 * pt(-abs(z), n - 1)
 
- # if ((is.character(yreg)&&yreg == "linear")|
- #     (!is.character(yreg)&&((inherits(yreg, "glm")|inherits(yreg, "lm"))&&
- #      family(yreg)$family == "gaussian"))) {
- #
- #      z <- s$Estimate / s$Std.error
- #
- #      pval <- 2 * pt(-abs(z), n - 1)
- #
- #      } else {
- #
- #        if (model %in% c("ne", "iorw")) {
- #
- #          z <- (s$Estimate-1) / s$Std.error
- #
- #        } else {
- #
- #          z[1:7] <- (s$Estimate[1:7]-1) / s$Std.error[1:7]
- #
- #          z[8:19] <- s$Estimate[8:19] / s$Std.error[8:19]
- #
- #        }
- #
- #      pval <- 2 * pt(-abs(z), n - 1)
- #
- #      }
-
   return(data.frame(z = z, pval = pval))
 
 }

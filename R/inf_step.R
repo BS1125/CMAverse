@@ -1,43 +1,44 @@
-inf_step <- function(data, nboot, outcome, exposure, exposure.type, mediator,
-                     covariates.pre, covariates.post, covariates.post.type, vecc,
-                     EMint, MMint, EMMint, EMint.terms, MMint.terms, EMMint.terms,
-                     event, mreg, yreg, m_star, a_star, a, est.method, inf.method, model) {
+inf_step <- function(nboot, data, model,
+                     outcome, event, exposure, mediator, EMint, prec, postc,
+                     yreg, mreg, ereg, postcreg, wmreg,
+                     astar, a, mval, yref, vecc,
+                     estimation, inference) {
 
-  if (inf.method == "delta") {
-
-    if (length(mediator) > 1) {
-      stop("Delta method inference doesn't support multiple mediator cases")
-    }
+  if (inference == "delta") {
 
     if (model != "rb") {
       stop("Delta method inference doesn't support selected model")
-    } else if (length(mediator) > 1) {
-      stop("Delta method inference doesn't support multiple mediator cases")
+    } else if (model == "rb" && length(mediator) > 1) {
+      stop("For the selected model, delta method inference only supports a single mediator")
     }
 
-    if (!(exposure.type %in% c("continuous", "binary"))) {
-      stop("For the selected model, Delta method inference only supports continuous or binary exposure")
+    formulas <- create_formulas(data = data, model = model,
+                                outcome = outcome, event = event,
+                                exposure = exposure, mediator = mediator, EMint = EMint,
+                                prec = prec, postc = postc,
+                                yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg, wmreg = wmreg)
+
+    regressions <- run_regressions(formulas = formulas, data = data, model = model,
+                                   exposure = exposure, mediator = mediator, postc = postc,
+                                   yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg, wmreg = wmreg)
+
+    if (is.character(data[, exposure])|is.factor(data[, exposure])) {
+      a <- as.numeric(levels(as.factor(data[, exposure])) == a)[-1]
+      astar <- as.numeric(levels(as.factor(data[, exposure])) == astar)[-1]
     }
 
+    if (is.character(data[, mediator])|is.factor(data[, mediator])) {
+      mstar <- as.numeric(levels(as.factor(data[, mediator])) == mval[[1]])[-1]
+    }
 
-    formulas <- create_formulas(model = model, outcome = outcome, exposure = exposure,
-                                mediator = mediator, covariates.pre = covariates.pre,
-                                covariates.post = covariates.post,
-                                EMint = EMint, MMint = MMint, EMMint = EMMint,
-                                EMint.terms = EMint.terms, MMint.terms = MMint.terms,
-                                EMMint.terms = EMMint.terms,
-                                event = event, mreg = mreg, yreg = yreg, data = data)
+    coef <- get_coef(formulas = formulas, regressions = regressions, model = model,
+                    yreg = yreg, mreg = mreg)
 
-    regressions <- run_regressions(model = model, formulas = formulas,
-                                   exposure = exposure, exposure.type = exposure.type,
-                                   mediator = mediator, covariates.post = covariates.post,
-                                   covariates.post.type = covariates.post.type,
-                                   mreg = mreg, yreg = yreg, data = data)
+    elevel <- ifelse(is.character(data[, exposure])|is.factor(data[, exposure]),
+                     length(levels(data[, exposure])), 2)
 
-    coef <- get_coef(formulas = formulas, regressions = regressions,
-                     mreg = mreg, yreg = yreg, model = model)
-
-    mlevel <- ifelse(is.factor(data[, mediator]), length(levels(data[, mediator])), 2)
+    mlevel <- ifelse(is.character(data[, mediator])|is.factor(data[, mediator]),
+                     length(levels(data[, mediator])), 2)
 
     thetas <- coef$thetas
 
@@ -49,71 +50,145 @@ inf_step <- function(data, nboot, outcome, exposure, exposure.type, mediator,
 
     theta0 <- "x1"
 
-    theta1 <- "x2"
+    theta1 <- paste0("x", 2:elevel)
 
-    theta2 <- paste0("x", 3:(mlevel + 1))
+    theta2 <- paste0("x", (elevel + 1):(elevel + mlevel - 1))
 
     if (EMint == TRUE) {
-      theta3 <- paste0("x", length(thetas) - ((mlevel - 2):0))
-    } else {theta3 <- rep(0, mlevel - 1)}
+      theta3 <- t(matrix(paste0("x", length(thetas)-(((elevel-1)*(mlevel-1)-1):0)),
+                         ncol = mlevel - 1))
+
+    } else {theta3 <- t(matrix(rep(0, (elevel-1)*(mlevel-1)),
+                               ncol = mlevel - 1))}
 
     beta0 <- paste0("x", length(thetas) + 1 + (0:(mlevel - 2))*length(betas)/(mlevel - 1))
 
-    beta1 <- paste0("x", length(thetas) + 2 + (0:(mlevel - 2))*length(betas)/(mlevel - 1))
+    beta1 <- t(matrix(paste0("x", length(thetas) + rowSums(expand.grid(2:elevel,(0:(mlevel-2))*
+                                                                         length(betas)/(mlevel-1)))),
+                      ncol = mlevel - 1))
 
-    XC <- sapply(0:(mlevel-2), function(x) paste0("x", length(thetas) + 2 +
+    XC <- sapply(0:(mlevel-2), function(x) paste0("x", length(thetas) + elevel +
                                                     x*length(betas)/(mlevel-1) +
                                                     1:length(vecc),
-                                                  "*", as.character(vecc),
+                                                  "*", paste0("(", vecc, ")"),
                                                   collapse = "+"))
-
 
     if (yreg == "linear") {
 
       if (mreg == "linear") {
 
-        cde_formula <- paste0("(", theta1, "+", theta3, "*", "m_star)*(a-a_star)")
+        cde_formula <- paste0("(", paste(theta1, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
+                              paste(theta1, paste0("(", astar, ")"), sep = "*", collapse = "+"), ")+((",
+                              paste(theta3, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
+                              paste(theta3, paste0("(", astar, ")"), sep = "*", collapse = "+"), "))*mstar")
 
-        pnde_formula <- paste0("(", theta1, "+", theta3, "*(", beta0, "+", beta1,
-                               "*a_star+", XC, "))*(a-a_star)")
+        pnde_formula <- paste0("(", paste(theta1, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
+                               paste(theta1, paste0("(", astar, ")"), sep = "*", collapse = "+"), ")+((",
+                               paste(theta3, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
+                               paste(theta3, paste0("(", astar, ")"), sep = "*", collapse = "+"), "))*(",
+                               beta0, "+(", paste(beta1, paste0("(", astar, ")"), sep = "*", collapse = "+"),
+                               ")+", XC, ")")
 
-        tnde_formula <- paste0("(", theta1, "+", theta3, "*(", beta0, "+", beta1,
-                               "*a+", XC, "))*(a-a_star)")
+        tnde_formula <- paste0("(", paste(theta1, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
+                               paste(theta1, paste0("(", astar, ")"), sep = "*", collapse = "+"), ")+((",
+                               paste(theta3, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
+                               paste(theta3, paste0("(", astar, ")"), sep = "*", collapse = "+"), "))*(",
+                               beta0, "+(", paste(beta1, paste0("(", a, ")"), sep = "*", collapse = "+"),
+                               ")+", XC, ")")
 
-        pnie_formula <- paste0(beta1, "*(", theta2, "+", theta3, "*a_star)*(a-a_star)")
+        pnie_formula <- paste0("(", theta2, "+(", paste(theta3, paste0("(", astar, ")"), sep = "*", collapse = "+"),
+                               "))*((", paste(beta1, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
+                               paste(beta1, paste0("(", astar, ")"), sep = "*", collapse = "+"), "))")
 
-        tnie_formula <- paste0(beta1, "*(", theta2, "+", theta3, "*a)*(a-a_star)")
+        tnie_formula <- paste0("(", theta2, "+(", paste(theta3, paste0("(", a, ")"), sep = "*", collapse = "+"),
+                               "))*((", paste(beta1, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
+                               paste(beta1, paste0("(", astar, ")"), sep = "*", collapse = "+"), "))")
 
       } else if (mreg %in% c("logistic", "multinomial")) {
 
-        cde_formula <- paste0("(", theta1, "+", ifelse(m_star == 0, 0, theta3[m_star]), ")*(a-a_star)")
+        cde_formula <- paste0("(", paste(theta1, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
+                              paste(theta1, paste0("(", astar, ")"), sep = "*", collapse = "+"), ")+(",
+                              ifelse(sum(mstar) == 0, 0, paste(theta3[which(mstar == 1),], paste0("(", a, ")"),
+                                                                sep = "*", collapse = "+")), ")-(",
+                              ifelse(sum(mstar) == 0, 0, paste(theta3[which(mstar == 1),], paste0("(", astar, ")"),
+                                                                         sep = "*", collapse = "+")),
+                              ")")
 
-        pnde_formula <- paste0("(", theta1, "+(",
-                               paste0("exp(", beta0, "+", beta1, "*a_star+", XC, ")*",
-                                      theta3, collapse = "+"), ")/(1+",
-                               paste0("exp(", beta0, "+", beta1, "*a_star+", XC, ")",
-                                      collapse = "+"), "))*(a-a_star)")
+        pnde_formula <- paste0("(", paste(theta1, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
+                               paste(theta1, paste0("(", astar, ")"), sep = "*", collapse = "+"), ")+((",
+                               paste0("((",sapply(1:(mlevel - 1), FUN = function(x) paste(theta3[x, ], paste0("(", a, ")"),
+                                                                                          sep = "*", collapse = "+")),
+                                      ")-(", sapply(1:(mlevel - 1), FUN = function(x) paste(theta3[x, ], paste0("(", astar, ")"),
+                                                                                              sep = "*", collapse = "+")),
+                                      "))*exp(", beta0, "+(", sapply(1:(mlevel - 1),
+                                                                     FUN = function(x) paste(beta1[x, ], paste0("(", astar, ")"),
+                                                                                             sep = "*", collapse = "+")),
+                                      ")", "+", XC, ")", collapse = "+"), "))/(1+",
+                               paste0("exp(", beta0, "+(",
+                                      sapply(1:(mlevel - 1), FUN = function(x) paste(beta1[x, ], paste0("(", astar, ")"),
+                                                                                     sep = "*", collapse = "+")),
+                                      ")+", XC, ")", collapse = "+"), ")")
 
-        tnde_formula <- paste0("(", theta1, "+(",
-                               paste0("exp(", beta0, "+", beta1, "*a+", XC, ")*",
-                                      theta3, collapse = "+"), ")/(1+",
-                               paste0("exp(", beta0, "+", beta1, "*a+", XC, ")",
-                                      collapse = "+"), "))*(a-a_star)")
+        tnde_formula <- paste0("(", paste(theta1, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
+                               paste(theta1, paste0("(", astar, ")"), sep = "*", collapse = "+"), ")+((",
+                               paste0("((",sapply(1:(mlevel - 1), FUN = function(x) paste(theta3[x, ], paste0("(", a, ")"),
+                                                                                          sep = "*", collapse = "+")),
+                                      ")-(", sapply(1:(mlevel - 1), FUN = function(x) paste(theta3[x, ], paste0("(", astar, ")"),
+                                                                                              sep = "*", collapse = "+")),
+                                      "))*exp(", beta0, "+(", sapply(1:(mlevel - 1),
+                                                                     FUN = function(x) paste(beta1[x, ], paste0("(", a, ")"),
+                                                                                             sep = "*", collapse = "+")),
+                                      ")", "+", XC, ")", collapse = "+"), "))/(1+",
+                               paste0("exp(", beta0, "+(",
+                                      sapply(1:(mlevel - 1), FUN = function(x) paste(beta1[x, ], paste0("(", a, ")"),
+                                                                                     sep = "*", collapse = "+")),
+                                      ")+", XC, ")", collapse = "+"), ")")
 
-        pnie_formula <- paste0("(", paste0("exp(", beta0, "+", beta1, "*a+", XC, ")*(", theta2, "+",
-                                           theta3, "*a_star)", collapse = "+"), ")/(1+",
-                               paste0("exp(", beta0, "+", beta1, "*a+", XC, ")", collapse = "+"), ")-(",
-                               paste0("exp(", beta0, "+", beta1, "*a_star+", XC, ")*(", theta2, "+",
-                                      theta3, "*a_star)", collapse = "+"), ")/(1+",
-                               paste0("exp(", beta0, "+", beta1, "*a_star+", XC, ")", collapse = "+"), ")")
+        pnie_formula <- paste0("(", paste0("(", theta2, "+(",
+                                           sapply(1:(mlevel - 1), FUN = function(x) paste(theta3[x, ], paste0("(", astar, ")"),
+                                                                                          sep = "*", collapse = "+")),
+                                           "))*exp(", beta0, "+(",
+                                           sapply(1:(mlevel - 1),
+                                                  FUN = function(x) paste(beta1[x, ], paste0("(", a, ")"),
+                                                                          sep = "*", collapse = "+")),
+                                           ")", "+", XC, ")", collapse = "+"), ")/(1+",
+                               paste0("exp(", beta0, "+(",
+                                      sapply(1:(mlevel - 1), FUN = function(x) paste(beta1[x, ], paste0("(", a, ")"),
+                                                                                     sep = "*", collapse = "+")),
+                                      ")+", XC, ")", collapse = "+"), ")-(",
+                               paste0("(", theta2, "+(",
+                                      sapply(1:(mlevel - 1), FUN = function(x) paste(theta3[x, ],
+                                                                                     paste0("(", astar, ")"),
+                                                                                     sep = "*", collapse = "+")),
+                                      "))*exp(", beta0, "+(",
+                                      sapply(1:(mlevel - 1), FUN = function(x) paste(beta1[x, ], paste0("(", astar, ")"), sep = "*", collapse = "+")),
+                                      ")", "+", XC, ")", collapse = "+"), ")/(1+",
+                               paste0("exp(", beta0, "+(",
+                                      sapply(1:(mlevel - 1), FUN = function(x) paste(beta1[x, ], paste0("(", astar, ")"),
+                                                                                     sep = "*", collapse = "+")),
+                                      ")+", XC, ")", collapse = "+"), ")")
 
-        tnie_formula <-  paste0("(", paste0("exp(", beta0, "+", beta1, "*a+", XC, ")*(", theta2, "+",
-                                            theta3, "*a)", collapse = "+"), ")/(1+",
-                                paste0("exp(", beta0, "+", beta1, "*a+", XC, ")", collapse = "+"), ")-(",
-                                paste0("exp(", beta0, "+", beta1, "*a_star+", XC, ")*(", theta2, "+",
-                                       theta3, "*a)", collapse = "+"), ")/(1+",
-                                paste0("exp(", beta0, "+", beta1, "*a_star+", XC, ")", collapse = "+"), ")")
-
+        tnie_formula <- paste0("(", paste0("(", theta2, "+(",
+                                           sapply(1:(mlevel - 1), FUN = function(x) paste(theta3[x, ], paste0("(", a, ")"),
+                                                                                          sep = "*", collapse = "+")),
+                                           "))*exp(", beta0, "+(",
+                                           sapply(1:(mlevel - 1),
+                                                  FUN = function(x) paste(beta1[x, ], paste0("(", a, ")"),
+                                                                          sep = "*", collapse = "+")),
+                                           ")", "+", XC, ")", collapse = "+"), ")/(1+",
+                               paste0("exp(", beta0, "+(",
+                                      sapply(1:(mlevel - 1), FUN = function(x) paste(beta1[x, ], paste0("(", a, ")"),
+                                                                                     sep = "*", collapse = "+")),
+                                      ")+", XC, ")", collapse = "+"), ")-(",
+                               paste0("(", theta2, "+(",
+                                      sapply(1:(mlevel - 1), FUN = function(x) paste(theta3[x, ], paste0("(", a, ")"), sep = "*", collapse = "+")),
+                                      "))*exp(", beta0, "+(",
+                                      sapply(1:(mlevel - 1), FUN = function(x) paste(beta1[x, ], paste0("(", astar, ")"), sep = "*", collapse = "+")),
+                                      ")", "+", XC, ")", collapse = "+"), ")/(1+",
+                               paste0("exp(", beta0, "+(",
+                                      sapply(1:(mlevel - 1), FUN = function(x) paste(beta1[x, ], paste0("(", astar, ")"),
+                                                                                     sep = "*", collapse = "+")),
+                                      ")+", XC, ")", collapse = "+"), ")")
       }
 
       te_formula <- paste0("(", tnie_formula, ")+(", pnde_formula, ")")
@@ -155,73 +230,143 @@ inf_step <- function(data, nboot, outcome, exposure, exposure.type, mediator,
 
       if (mreg == "linear") {
 
-        cde_rr_formula <- paste0("exp((", theta1, "+", theta3, "*m_star)*(a-a_star))")
+        cde_rr_formula <- paste0("exp((", paste(theta1, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
+                                 paste(theta1, paste0("(", astar, ")"), sep = "*", collapse = "+"), ")+((",
+                                 paste(theta3, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
+                                 paste(theta3, paste0("(", astar, ")"), sep = "*", collapse = "+"), "))*mstar)")
 
-        pnde_rr_formula <- paste0("exp((", theta1, "+", theta3, "*(", beta0, "+", beta1,
-                                  "*a_star+", XC, "+", theta2, "*variance))*(a-a_star)+0.5*",
-                                  theta3, "^2*variance*(a^2-a_star^2))")
 
-        tnde_rr_formula <- paste0("exp((", theta1, "+", theta3, "*(", beta0, "+", beta1,
-                                  "*a+", XC, "+", theta2, "*variance))*(a-a_star)+0.5*",
-                                  theta3, "^2*variance*(a^2-a_star^2))")
+        pnde_rr_formula <- paste0("exp((", paste(theta1, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
+                                  paste(theta1, paste0("(", astar, ")"), sep = "*", collapse = "+"), ")+((",
+                                  paste(theta3, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
+                                  paste(theta3, paste0("(", astar, ")"), sep = "*", collapse = "+"), "))*(",
+                                  beta0, "+", paste(beta1, paste0("(", astar, ")"), sep = "*", collapse = "+"),
+                                  "+", XC, "+", theta2, "*variance)+0.5*variance*((",
+                                  paste(paste0(theta3, "^2"), paste0("(", a, ")"), sep = "*", collapse = "+"),
+                                  ")-(", paste(paste0(theta3, "^2"), paste0("(", astar, ")"), sep = "*", collapse = "+"),
+                                  ")))")
 
-        pnie_rr_formula <- paste0("exp((", theta2, "*", beta1, "+", theta3, "*",
-                                  beta1, "*a_star)*(a-a_star))")
+        tnde_rr_formula <- paste0("exp((", paste(theta1, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
+                                  paste(theta1, paste0("(", astar, ")"), sep = "*", collapse = "+"), ")+((",
+                                  paste(theta3, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
+                                  paste(theta3, paste0("(", astar, ")"), sep = "*", collapse = "+"), "))*(",
+                                  beta0, "+", paste(beta1, paste0("(", a, ")"), sep = "*", collapse = "+"),
+                                  "+", XC, "+", theta2, "*variance)+0.5*variance*((",
+                                  paste(paste0(theta3, "^2"), paste0("(", a, ")"), sep = "*", collapse = "+"),
+                                  ")-(", paste(paste0(theta3, "^2"), paste0("(", astar, ")"), sep = "*", collapse = "+"),
+                                  ")))")
 
-        tnie_rr_formula <- paste0("exp((", theta2, "*", beta1, "+", theta3, "*",
-                                  beta1, "*a)*(a-a_star))")
+        pnie_rr_formula <- paste0("exp(", theta2, "*((", paste(beta1, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
+                                  paste(beta1, paste0("(", astar, ")"), sep = "*", collapse = "+"), "))+(",
+                                  paste(theta3, paste0("(", astar, ")"), sep = "*", collapse = "+"), ")*((",
+                                  paste(beta1, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
+                                  paste(beta1, paste0("(", astar, ")"), sep = "*", collapse = "+"), ")))")
 
-        cde_err_formula <- paste0("exp(", theta1, "*(a-a_star)+", theta2, "*m_star+", theta3,
-                                  "*a*m_star-(", theta2, "+", theta3, "*a_star)*(", beta0, "+",
-                                  beta1,"*a_star+", XC, ")-0.5*(", theta2, "+", theta3,
-                                  "*a_star)^2*variance)-exp(", theta2, "*m_star+", theta3,
-                                  "*a_star*m_star-(", theta2, "+", theta3, "*a_star)*(", beta0,
-                                  "+", beta1, "*a_star", "+", XC, ")-0.5*(",theta2, "+", theta3,
-                                  "*a_star)^2*variance)")
+        tnie_rr_formula <- paste0("exp(", theta2, "*((", paste(beta1, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
+                                  paste(beta1, paste0("(", astar, ")"), sep = "*", collapse = "+"), "))+(",
+                                  paste(theta3, paste0("(", a, ")"), sep = "*", collapse = "+"), ")*((",
+                                  paste(beta1, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
+                                  paste(beta1, paste0("(", astar, ")"), sep = "*", collapse = "+"), ")))")
+
+        cde_err_formula <- paste0("(exp(((", paste(theta1, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
+                                  paste(theta1, paste0("(", astar, ")"), sep = "*", collapse = "+"), "))+(",
+                                  paste(theta3, paste0("(", a, ")"), sep = "*", collapse = "+"), ")*mstar)-exp((",
+                                  paste(theta3, paste0("(", astar, ")"), sep = "*", collapse = "+"),
+                                  ")*mstar))*exp(", theta2, "*mstar-(", theta2, "+(",
+                                  paste(theta3, paste0("(", astar, ")"), sep = "*", collapse = "+"), "))*(",
+                                  beta0, "+(", paste(beta1, paste0("(", astar, ")"), sep = "*", collapse = "+"),
+                                  ")+", XC, ")-0.5*(", theta2, "+(",
+                                  paste(theta3, paste0("(", astar, ")"), sep = "*", collapse = "+"), "))^2*variance)")
 
       } else if (mreg %in% c("logistic", "multinomial")) {
 
-        cde_rr_formula <- paste0("exp((", theta1, "+", ifelse(m_star == 0, 0, theta3[m_star]), ")*(a-a_star))")
+        cde_rr_formula <- paste0("exp((", paste(theta1, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
+                                 paste(theta1, paste0("(", astar, ")"), sep = "*", collapse = "+"), ")+(",
+                                 ifelse(sum(mstar) == 0, 0, paste(theta3[which(mstar == 1),], paste0("(", a, ")"),
+                                                                   sep = "*", collapse = "+"))
+                                 , ")-(", ifelse(sum(mstar) == 0, 0, paste(theta3[which(mstar == 1),], paste0("(", astar, ")"),
+                                                                            sep = "*", collapse = "+")),
+                                 "))")
 
-        paste0("exp(", beta0, "+", beta1, "*a+", XC, ")", collapse = "+")
+        pnde_rr_formula <- paste0("(exp((", paste(theta1, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
+                                  paste(theta1, paste0("(", astar, ")"), sep = "*", collapse = "+"), "))*(1+",
+                                  paste0("exp(", theta2, "+(", sapply(1:(mlevel - 1), FUN = function(x) paste(theta3[x, ], paste0("(", a, ")"),
+                                                                                                              sep = "*", collapse = "+")),
+                                         ")+", beta0, "+(" , sapply(1:(mlevel - 1), FUN = function(x) paste(beta1[x, ], paste0("(", astar, ")"),
+                                                                                                            sep = "*", collapse = "+")),
 
-        pnde_rr_formula <- paste0("exp(", theta1, "*(a-a_star))*(1+",
-                                  paste0("exp(", theta2, "+", theta3, "*a+",beta0,
-                                         "+", beta1, "*a_star+", XC, ")", collapse = "+"), ")/(1+",
-                                  paste0("exp(", theta2, "+", theta3, "*a_star+",beta0,
-                                         "+", beta1, "*a_star+", XC, ")", collapse = "+"), ")")
+                                         ")+", XC, ")", collapse = "+"), "))/(1+",
+                                  paste0("exp(", theta2, "+(", sapply(1:(mlevel - 1), FUN = function(x) paste(theta3[x, ], paste0("(", astar, ")"),
+                                                                                                              sep = "*", collapse = "+")),
+                                         ")+", beta0, "+(" , sapply(1:(mlevel - 1), FUN = function(x) paste(beta1[x, ], paste0("(", astar, ")"),
+                                                                                                            sep = "*", collapse = "+")),
 
-        tnde_rr_formula <- paste0("exp(", theta1, "*(a-a_star))*(1+",
-                                  paste0("exp(", theta2, "+", theta3, "*a+",beta0,
-                                         "+", beta1, "*a+", XC, ")", collapse = "+"), ")/(1+",
-                                  paste0("exp(", theta2, "+", theta3, "*a_star+",beta0,
-                                         "+", beta1, "*a+", XC, ")", collapse = "+"), ")")
+                                         ")+", XC, ")", collapse = "+"), ")")
 
-        pnie_rr_formula <- paste0("(1+", paste0("exp(", beta0, "+", beta1, "*a_star+", XC, ")",
-                                                collapse = "+"),
-                                  ")*(1+", paste0("exp(", theta2, "+", theta3, "*a_star+",beta0,
-                                                  "+", beta1, "*a+", XC, ")", collapse = "+"), ")/((1+",
-                                  paste0("exp(", beta0, "+", beta1, "*a+", XC, ")",
-                                         collapse = "+"), ")*(1+",
-                                  paste0("exp(", theta2, "+", theta3, "*a_star+",beta0,
-                                         "+", beta1, "*a_star+", XC, ")", collapse = "+"), "))")
+        tnde_rr_formula <- paste0("(exp((", paste(theta1, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
+                                  paste(theta1, paste0("(", astar, ")"), sep = "*", collapse = "+"), "))*(1+",
+                                  paste0("exp(", theta2, "+(", sapply(1:(mlevel - 1), FUN = function(x) paste(theta3[x, ], paste0("(", a, ")"),
+                                                                                                              sep = "*", collapse = "+")),
+                                         ")+", beta0, "+(" , sapply(1:(mlevel - 1), FUN = function(x) paste(beta1[x, ], paste0("(", a, ")"),
+                                                                                                            sep = "*", collapse = "+")),
 
-        tnie_rr_formula <- paste0("(1+", paste0("exp(", beta0, "+", beta1, "*a_star+", XC, ")",
-                                                collapse = "+"),
-                                  ")*(1+", paste0("exp(", theta2, "+", theta3, "*a+",beta0,
-                                                  "+", beta1, "*a+", XC, ")", collapse = "+"), ")/((1+",
-                                  paste0("exp(", beta0, "+", beta1, "*a+", XC, ")",
-                                         collapse = "+"), ")*(1+",
-                                  paste0("exp(", theta2, "+", theta3, "*a+",beta0,
-                                         "+", beta1, "*a_star+", XC, ")", collapse = "+"), "))")
+                                         ")+", XC, ")", collapse = "+"), "))/(1+",
+                                  paste0("exp(", theta2, "+(", sapply(1:(mlevel - 1), FUN = function(x) paste(theta3[x, ], paste0("(", astar, ")"),
+                                                                                                              sep = "*", collapse = "+")),
+                                         ")+", beta0, "+(" , sapply(1:(mlevel - 1), FUN = function(x) paste(beta1[x, ], paste0("(", a, ")"),
+                                                                                                            sep = "*", collapse = "+")),
 
-        cde_err_formula <- paste0("(exp(", ifelse(m_star == 0, 0, theta2[m_star]), ")*(exp(", theta1,
-                                  "*(a-a_star)+a*", ifelse(m_star == 0, 0, theta3[m_star]),
-                                  ")-exp(a_star*", ifelse(m_star == 0, 0, theta3[m_star]), "))*(1+",
-                                  paste0("exp(", beta0, "+", beta1, "*a_star+", XC, ")",
-                                         collapse = "+"), "))/(1+",
-                                  paste0("exp(", theta2, "+", theta3, "*a_star+",beta0,
-                                         "+", beta1, "*a_star+", XC, ")", collapse = "+"), ")")
+                                         ")+", XC, ")", collapse = "+"), ")")
+
+        pnie_rr_formula <- paste0("((1+", paste0("exp(", beta0, "+(", sapply(1:(mlevel - 1), FUN = function(x) paste(beta1[x, ], paste0("(", astar, ")"),
+                                                                                                                     sep = "*", collapse = "+")),
+                                                 ")+", XC, ")", collapse = "+"), ")*(1+",
+                                  paste0("exp(", theta2, "+(", sapply(1:(mlevel - 1), FUN = function(x) paste(theta3[x, ], paste0("(", astar, ")"),
+                                                                                                              sep = "*", collapse = "+")),
+                                         ")+", beta0, "+(" , sapply(1:(mlevel - 1), FUN = function(x) paste(beta1[x, ], paste0("(", a, ")"),
+                                                                                                            sep = "*", collapse = "+")),
+                                         ")+", XC, ")", collapse = "+"), "))/((1+",
+                                  paste0("exp(", beta0, "+(" , sapply(1:(mlevel - 1), FUN = function(x) paste(beta1[x, ], paste0("(", a, ")"),
+                                                                                                              sep = "*", collapse = "+")),
+                                         ")+", XC, ")", collapse = "+"), ")*(1+",
+                                  paste0("exp(", theta2, "+(", sapply(1:(mlevel - 1), FUN = function(x) paste(theta3[x, ], paste0("(", astar, ")"),
+                                                                                                              sep = "*", collapse = "+")),
+                                         ")+", beta0, "+(" , sapply(1:(mlevel - 1), FUN = function(x) paste(beta1[x, ], paste0("(", astar, ")"),
+                                                                                                            sep = "*", collapse = "+")),
+                                         ")+", XC, ")", collapse = "+"), "))")
+
+        tnie_rr_formula <- paste0("((1+", paste0("exp(", beta0, "+(", sapply(1:(mlevel - 1), FUN = function(x) paste(beta1[x, ], paste0("(", astar, ")"),
+                                                                                                                     sep = "*", collapse = "+")),
+                                                 ")+", XC, ")", collapse = "+"), ")*(1+",
+                                  paste0("exp(", theta2, "+(", sapply(1:(mlevel - 1), FUN = function(x) paste(theta3[x, ], paste0("(", a, ")"),
+                                                                                                              sep = "*", collapse = "+")),
+                                         ")+", beta0, "+(" , sapply(1:(mlevel - 1), FUN = function(x) paste(beta1[x, ], paste0("(", a, ")"),
+                                                                                                            sep = "*", collapse = "+")),
+                                         ")+", XC, ")", collapse = "+"), "))/((1+",
+                                  paste0("exp(", beta0, "+(" , sapply(1:(mlevel - 1), FUN = function(x) paste(beta1[x, ], paste0("(", a, ")"),
+                                                                                                              sep = "*", collapse = "+")),
+                                         ")+", XC, ")", collapse = "+"), ")*(1+",
+                                  paste0("exp(", theta2, "+(", sapply(1:(mlevel - 1), FUN = function(x) paste(theta3[x, ], paste0("(", a, ")"),
+                                                                                                              sep = "*", collapse = "+")),
+                                         ")+", beta0, "+(" , sapply(1:(mlevel - 1), FUN = function(x) paste(beta1[x, ], paste0("(", astar, ")"),
+                                                                                                            sep = "*", collapse = "+")),
+                                         ")+", XC, ")", collapse = "+"), "))")
+
+        cde_err_formula <- paste0("(exp((", ifelse(sum(mstar) == 0, 0, theta2[which(mstar == 1)]), "))*(1+",
+                                  paste0("exp(", beta0, "+(" , sapply(1:(mlevel - 1), FUN = function(x) paste(beta1[x, ], paste0("(", astar, ")"),
+                                                                                                              sep = "*", collapse = "+")),
+                                         ")+", XC, ")", collapse = "+"), ")*(exp((",
+                                  paste(theta1, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
+                                  paste(theta1, paste0("(", astar, ")"), sep = "*", collapse = "+"), ")+(",
+                                  ifelse(sum(mstar) == 0, 0, paste(theta3[which(mstar == 1),], paste0("(", a, ")"),
+                                                                    sep = "*", collapse = "+")), "))-exp((",
+                                  ifelse(sum(mstar) == 0, 0, paste(theta3[which(mstar == 1),], paste0("(", astar, ")"),
+                                                                    sep = "*", collapse = "+")), "))))/(1+",
+                                  paste0("exp(", theta2, "+(", sapply(1:(mlevel - 1), FUN = function(x) paste(theta3[x, ], paste0("(", astar, ")"),
+                                                                                                              sep = "*", collapse = "+")),
+                                         ")+", beta0, "+(" , sapply(1:(mlevel - 1), FUN = function(x) paste(beta1[x, ], paste0("(", astar, ")"),
+                                                                                                            sep = "*", collapse = "+")),
+                                         ")+", XC, ")", collapse = "+"), ")")
 
       }
 
@@ -261,7 +406,7 @@ inf_step <- function(data, nboot, outcome, exposure, exposure.type, mediator,
                             tnie_rr_formula = tnie_rr_formula, te_rr_formula = te_rr_formula,
                             pm_formula = pm_formula, cde_err_formula = cde_err_formula,
                             intref_err_formula = intref_err_formula, intmed_err_formula = intmed_err_formula,
-                            pie_err_formula = pie_err_formula, te_err_formula = te_err_formula,
+                            pie_err_formula = pie_err_formula,
                             cde_err_prop_formula = cde_err_prop_formula,
                             intref_err_prop_formula = intref_err_prop_formula,
                             intmed_err_prop_formula = intmed_err_prop_formula, pie_err_prop_formula = pie_err_prop_formula,
@@ -276,26 +421,23 @@ inf_step <- function(data, nboot, outcome, exposure, exposure.type, mediator,
 
       delta_formula[[formula]] <- as.formula(paste0("~", stringr::str_replace_all(
         delta_formula[[formula]],
-        pattern = c("\\ba_star\\b" = as.character(a_star),
-                    "\\ba\\b" = as.character(a),
-                    "\\bm_star\\b" = as.character(m_star),
+        pattern = c("\\bmstar\\b" = paste0("(", mstar, ")"),
                     "\\bvariance\\b" = as.character(variance)))))
 
       effect_se <- c(effect_se, msm::deltamethod(delta_formula[[formula]], c(thetas, betas), vcov_block))
 
     }
 
-  } else if (inf.method == "bootstrap") {
+  } else if (inference == "bootstrap") {
 
     boots <- boot::boot(data = data, statistic = est_step, R = nboot,
-                        outcome = outcome, exposure = exposure, exposure.type = exposure.type,
-                        mediator = mediator, model = model,
-                        covariates.pre = covariates.pre, covariates.post = covariates.post,
-                        covariates.post.type = covariates.post.type, vecc = vecc,
-                        EMint = EMint, MMint = MMint, EMMint = EMMint, EMint.terms = EMint.terms,
-                        MMint.terms = MMint.terms, EMMint.terms = EMMint.terms,
-                        event = event, mreg = mreg, yreg = yreg,
-                        m_star = m_star, a_star = a_star, a = a, est.method = est.method)
+                        model = model,
+                        outcome = outcome, event = event, exposure = exposure,
+                        mediator = mediator, EMint = EMint,
+                        prec = prec, postc = postc,
+                        yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg, wmreg = wmreg,
+                        astar = astar, a = a, mval = mval, yref = yref, vecc = vecc,
+                        estimation = estimation)
 
     effect_se <- apply(boots$t, 2, sd)
 

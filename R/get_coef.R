@@ -1,25 +1,24 @@
-get_coef <- function(formulas = NULL, regressions = NULL, mreg, yreg, model) {
+get_coef <- function(formulas, regressions, model, yreg, mreg) {
 
   if (model == "rb") {
 
-    assign("mediator_formula", formulas$mediator_formula[[1]], envir = globalenv())
-
-    mediator_regression <- regressions$mediator_regression
+    mediator_regression <- update(regressions$mediator_regression[[1]],
+                                  formula. = formula(regressions$mediator_regression[[1]]))
 
     outcome_regression <- regressions$outcome_regression
 
     ## Store coefficients from regressions
-    betas  <- as.vector(t(coefficients(mediator_regression[[1]])))
+    betas  <- as.vector(t(coefficients(mediator_regression)))
 
     thetas <- coefficients(outcome_regression)
 
     ## Store covariances from regressions
 
-    vcov_betas <- vcov(mediator_regression[[1]])
+    vcov_betas <- vcov(mediator_regression)
 
     vcov_thetas <- vcov(outcome_regression)
 
-    if (mreg == "linear") { variance <- sigma(mediator_regression[[1]])^2
+    if (mreg == "linear") { variance <- sigma(mediator_regression)^2
     } else variance <- NULL
 
     if (yreg == "aft_weibull")
@@ -32,16 +31,24 @@ get_coef <- function(formulas = NULL, regressions = NULL, mreg, yreg, model) {
                  vcov_betas = vcov_betas, vcov_thetas = vcov_thetas, vcov_block = vcov_block,
                  variance = variance)
 
-    rm(mediator_formula, pos = ".GlobalEnv")
-
   } else if (model == "iorw") {
 
-    tot_outcome_regression = regressions$tot_outcome_regression
-    dir_outcome_regression = regressions$dir_outcome_regression
+    tot_regression = regressions$tot_regression
+    dir_regression = regressions$dir_regression
 
-    dir_coef <- unname(coef(dir_outcome_regression)[2])
+    if (is.factor(tot_regression$data[, exposure])) {
 
-    tot_coef <- unname(coef(tot_outcome_regression)[2])
+      dir_coef <- unname(coef(dir_regression)[2+(0:(length(levels(dir_regression$data[, exposure]))-2))])
+
+      tot_coef <- unname(coef(tot_regression)[2+(0:(length(levels(tot_regression$data[, exposure]))-2))])
+
+    } else {
+
+      dir_coef <- unname(coef(dir_regression)[2])
+
+      tot_coef <- unname(coef(tot_regression)[2])
+
+    }
 
     coef <- c(tot_coef = tot_coef, dir_coef = dir_coef)
 
