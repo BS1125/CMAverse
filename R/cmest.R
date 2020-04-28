@@ -59,7 +59,7 @@ cmest <- function(data = NULL, model = "rb",
   }
 
   if (is.null(ereg)) {
-    if (model %in% c("wb", "iorw", "msm", "g-formula")) {
+    if (model %in% c("wb", "iorw", "msm")) {
       stop("Unspecified ereg")
     }
   }

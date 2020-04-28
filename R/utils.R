@@ -40,15 +40,17 @@ format_df <- function(cmest_out, conf = 0.95) {
 
 summary.cmest <- function(cmest_out, digits = 4) {
 
-  format_df(cmest_out = cmest_out)
-
-}
-
-print.summary.cmest <- function(cmest_out, digits = 4) {
-
   out <- format_df(cmest_out = cmest_out)
 
-  printCoefmat(out, digits = digits, has.Pvalue = TRUE)
+  class(out) <- c("summary.cmest", "data.frame")
+
+  out
+
+  }
+
+print.summary.cmest <- function(summary.cmest, digits = 4) {
+
+  printCoefmat(summary.cmest, digits = digits, has.Pvalue = TRUE)
 
 }
 

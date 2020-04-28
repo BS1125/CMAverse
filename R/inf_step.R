@@ -12,6 +12,10 @@ inf_step <- function(nboot, data, model,
       stop("For the selected model, delta method inference only supports a single mediator")
     }
 
+    if (estimation == "imputation") {
+      stop("Delta method inference doesn't support direct imputation estimation")
+    }
+
     formulas <- create_formulas(data = data, model = model,
                                 outcome = outcome, event = event,
                                 exposure = exposure, mediator = mediator, EMint = EMint,
@@ -29,7 +33,7 @@ inf_step <- function(nboot, data, model,
 
     if (is.character(data[, mediator])|is.factor(data[, mediator])) {
       mstar <- as.numeric(levels(as.factor(data[, mediator])) == mval[[1]])[-1]
-    }
+    } else {mstar <- mval[[1]]}
 
     coef <- get_coef(formulas = formulas, regressions = regressions, model = model,
                     yreg = yreg, mreg = mreg)

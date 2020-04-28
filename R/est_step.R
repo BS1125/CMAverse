@@ -63,7 +63,7 @@ est_step <- function(data, indices, model,
 
       if (is.character(data_boot[, mediator])|is.factor(data_boot[, mediator])) {
         mstar <- as.numeric(levels(as.factor(data_boot[, mediator])) == mval[[1]])[-1]
-      }
+      } else {mstar <- mval[[1]]}
 
       coef <- get_coef(formulas = formulas, regressions = regressions, model = model,
                      yreg = yreg, mreg = mreg, data = data)
