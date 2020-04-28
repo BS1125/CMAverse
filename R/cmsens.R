@@ -104,7 +104,7 @@ cmsens <- function(cmest_out = NULL, sens = "uc",
 
        if (model == "rb") {
 
-         if (MEvariable %in% c(exposure, mediator, prec)) {
+         if (MEvariable %in% c(exposure, prec)) {
 
           sens_out <- list(rep(NA, length(measurement.error)))
 
@@ -145,9 +145,50 @@ cmsens <- function(cmest_out = NULL, sens = "uc",
 
           }
 
-          names(sens_out) <- paste("measurement.error = ", measurement.error)
+         } else if (MEvariable %in% c(mediator)) {
 
-          class(sens_out) <- "cmsens.me"
+           sens_out <- list(rep(NA, length(measurement.error)))
+
+           for (j in 1:length(measurement.error)) {
+
+             outcome_regression_naive <- regressions_naive$outcome_regression
+
+             outcome_regression_simex <- simex(model = outcome_regression_naive,
+                                               SIMEXvariable = MEvariable,
+                                               measurement.error = measurement.error[j],
+                                               asymptotic = FALSE)
+
+             mediator_regression_simex <- list()
+
+             for (i in 1:length(mediator)) {
+
+               mediator_regression_naive <- regressions_naive$mediator_regression[[i]]
+
+               if (MEvariable %in% names(attr(mediator_regression_naive$terms,"dataClasses"))) {
+
+                 mediator_regression_simex[[i]] <- simex(model = mediator_regression_naive,
+                                                       SIMEXvariable = MEvariable,
+                                                       measurement.error = measurement.error[j],
+                                                       asymptotic = FALSE)
+
+               } else mediator_regression_simex[[i]] <- NULL
+
+             }
+
+             reg.simex <- list(outcome_regression = outcome_regression_simex,
+                               mediator_regression = mediator_regression_simex)
+
+             sens_out[[j]] <- summary(cmest(data = data, model = model,
+                                            outcome = outcome, event = event, exposure = exposure,
+                                            mediator = mediator, EMint = EMint,
+                                            prec = prec, postc = postc,
+                                            yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg,
+                                            wmreg = wmreg, reg.simex = reg.simex,
+                                            astar = astar, a = a, mval = mval, yref = yref, precval = precval,
+                                            estimation = estimation, inference = inference,
+                                            nboot = nboot, nrep = nrep))
+
+           }
 
          } else if (MEvariable == outcome) {
 
@@ -176,17 +217,16 @@ cmsens <- function(cmest_out = NULL, sens = "uc",
 
            }
 
-           names(sens_out) <- paste("measurement.error = ", measurement.error)
 
-           class(sens_out) <- "cmsens.me"
 
-        }
+         }
+
+         names(sens_out) <- paste("measurement.error = ", measurement.error)
+
+         class(sens_out) <- "cmsens.me"
       }
 
-
-
     }
-
 
   }
 
