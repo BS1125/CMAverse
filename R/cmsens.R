@@ -22,17 +22,17 @@ cmsens <- function(cmest_out = NULL, sens = "uc",
 
     if (model %in% c("rb", "wb", "msm", "g-formula")) {
 
-        index_biased <- 1:6
+      index_biased <- 1:6
 
-      } else if (model == "iorw") {
+    } else if (model == "iorw") {
 
-        index_biased <- 1:3
+      index_biased <- 1:3
 
-      } else if (model == "ne") {
+    } else if (model == "ne") {
 
-        index_biased <- 1:length(cmest_out$effect_estimate)
+      index_biased <- 1:length(cmest_out$effect_estimate)
 
-      }
+    }
 
     est <- c()
 
@@ -57,13 +57,13 @@ cmsens <- function(cmest_out = NULL, sens = "uc",
         est <- c(est, exp(0.91 * d))
 
         evalues <- evalues.RR(est = exp(0.91 * d), lo = exp(0.91 * d - 1.78 * sd),
-                                hi = exp(0.91 * d + 1.78 * sd))
+                              hi = exp(0.91 * d + 1.78 * sd))
 
         evalue_pe <- c(evalue_pe, unname(evalues["E-values","point"]))
 
         evalue_ci <- c(evalue_ci, unname(evalues["E-values",c("lower", "upper")][which(!is.na(evalues["E-values",c("lower", "upper")]))]))
 
-        }
+      }
 
     } else {
 
@@ -90,21 +90,21 @@ cmsens <- function(cmest_out = NULL, sens = "uc",
   } else if (sens == "me") {
 
     formulas <- create_formulas(data = data, model = model,
-                                  outcome = outcome, event = event,
-                                  exposure = exposure, mediator = mediator, EMint = EMint,
-                                  prec = prec, postc = postc,
-                                  yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg, wmreg = wmreg)
+                                outcome = outcome, event = event,
+                                exposure = exposure, mediator = mediator, EMint = EMint,
+                                prec = prec, postc = postc,
+                                yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg, wmreg = wmreg)
 
 
     if (MEvariable.type == "continuous") {
 
       regressions_naive <- run_regressions(formulas = formulas, data = data, model = model,
-                                     exposure = exposure, mediator = mediator, postc = postc,
-                                     yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg, wmreg = wmreg)
+                                           exposure = exposure, mediator = mediator, postc = postc,
+                                           yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg, wmreg = wmreg)
 
-       if (model == "rb") {
+      if (model == "rb") {
 
-         if (MEvariable %in% c(exposure, prec)) {
+        if (MEvariable %in% c(exposure, prec)) {
 
           sens_out <- list(rep(NA, length(measurement.error)))
 
@@ -124,9 +124,9 @@ cmsens <- function(cmest_out = NULL, sens = "uc",
               mediator_regression_naive <- regressions_naive$mediator_regression[[i]]
 
               mediator_regression_simex[[i]] <- simex(model = mediator_regression_naive,
-                                              SIMEXvariable = MEvariable,
-                                              measurement.error = measurement.error[j],
-                                              asymptotic = FALSE)
+                                                      SIMEXvariable = MEvariable,
+                                                      measurement.error = measurement.error[j],
+                                                      asymptotic = FALSE)
 
             }
 
@@ -134,96 +134,96 @@ cmsens <- function(cmest_out = NULL, sens = "uc",
                               mediator_regression = mediator_regression_simex)
 
             sens_out[[j]] <- summary(cmest(data = data, model = model,
-                               outcome = outcome, event = event, exposure = exposure,
-                               mediator = mediator, EMint = EMint,
-                               prec = prec, postc = postc,
-                               yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg,
-                               wmreg = wmreg, reg.simex = reg.simex,
-                               astar = astar, a = a, mval = mval, yref = yref, precval = precval,
-                               estimation = estimation, inference = inference,
-                               nboot = nboot, nrep = nrep))
+                                           outcome = outcome, event = event, exposure = exposure,
+                                           mediator = mediator, EMint = EMint,
+                                           prec = prec, postc = postc,
+                                           yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg,
+                                           wmreg = wmreg, reg.simex = reg.simex,
+                                           astar = astar, a = a, mval = mval, yref = yref, precval = precval,
+                                           estimation = estimation, inference = inference,
+                                           nboot = nboot, nrep = nrep))
 
           }
 
-         } else if (MEvariable %in% c(mediator)) {
+        } else if (MEvariable %in% c(mediator)) {
 
-           sens_out <- list(rep(NA, length(measurement.error)))
+          sens_out <- list(rep(NA, length(measurement.error)))
 
-           for (j in 1:length(measurement.error)) {
+          for (j in 1:length(measurement.error)) {
 
-             outcome_regression_naive <- regressions_naive$outcome_regression
+            outcome_regression_naive <- regressions_naive$outcome_regression
 
-             outcome_regression_simex <- simex(model = outcome_regression_naive,
-                                               SIMEXvariable = MEvariable,
-                                               measurement.error = measurement.error[j],
-                                               asymptotic = FALSE)
+            outcome_regression_simex <- simex(model = outcome_regression_naive,
+                                              SIMEXvariable = MEvariable,
+                                              measurement.error = measurement.error[j],
+                                              asymptotic = FALSE)
 
-             mediator_regression_simex <- list()
+            mediator_regression_simex <- list()
 
-             for (i in 1:length(mediator)) {
+            for (i in 1:length(mediator)) {
 
-               mediator_regression_naive <- regressions_naive$mediator_regression[[i]]
+              mediator_regression_naive <- regressions_naive$mediator_regression[[i]]
 
-               if (MEvariable %in% names(attr(mediator_regression_naive$terms,"dataClasses"))) {
+              if (MEvariable %in% names(attr(mediator_regression_naive$terms,"dataClasses"))) {
 
-                 mediator_regression_simex[[i]] <- simex(model = mediator_regression_naive,
-                                                       SIMEXvariable = MEvariable,
-                                                       measurement.error = measurement.error[j],
-                                                       asymptotic = FALSE)
+                mediator_regression_simex[[i]] <- simex(model = mediator_regression_naive,
+                                                        SIMEXvariable = MEvariable,
+                                                        measurement.error = measurement.error[j],
+                                                        asymptotic = FALSE)
 
-               } else mediator_regression_simex[[i]] <- NULL
+              } else mediator_regression_simex[i] <- list(NULL)
 
-             }
+            }
 
-             reg.simex <- list(outcome_regression = outcome_regression_simex,
-                               mediator_regression = mediator_regression_simex)
+            reg.simex <- list(outcome_regression = outcome_regression_simex,
+                              mediator_regression = mediator_regression_simex)
 
-             sens_out[[j]] <- summary(cmest(data = data, model = model,
-                                            outcome = outcome, event = event, exposure = exposure,
-                                            mediator = mediator, EMint = EMint,
-                                            prec = prec, postc = postc,
-                                            yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg,
-                                            wmreg = wmreg, reg.simex = reg.simex,
-                                            astar = astar, a = a, mval = mval, yref = yref, precval = precval,
-                                            estimation = estimation, inference = inference,
-                                            nboot = nboot, nrep = nrep))
+            sens_out[[j]] <- summary(cmest(data = data, model = model,
+                                           outcome = outcome, event = event, exposure = exposure,
+                                           mediator = mediator, EMint = EMint,
+                                           prec = prec, postc = postc,
+                                           yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg,
+                                           wmreg = wmreg, reg.simex = reg.simex,
+                                           astar = astar, a = a, mval = mval, yref = yref, precval = precval,
+                                           estimation = estimation, inference = inference,
+                                           nboot = nboot, nrep = nrep))
 
-           }
+          }
 
-         } else if (MEvariable == outcome) {
+        } else if (MEvariable == outcome) {
 
-           sens_out <- list(rep(NA, length(measurement.error)))
+          sens_out <- list(rep(NA, length(measurement.error)))
 
-           for (j in 1:length(measurement.error)) {
+          for (j in 1:length(measurement.error)) {
 
-             outcome_regression_naive <- regressions_naive$outcome_regression
+            outcome_regression_naive <- regressions_naive$outcome_regression
 
-             outcome_regression_simex <- simex(model = outcome_regression_naive,
-                                               SIMEXvariable = MEvariable,
-                                               measurement.error = measurement.error[j],
-                                               asymptotic = FALSE)
+            outcome_regression_simex <- simex(model = outcome_regression_naive,
+                                              SIMEXvariable = MEvariable,
+                                              measurement.error = measurement.error[j],
+                                              asymptotic = FALSE)
 
-             reg.simex <- list(outcome_regression = outcome_regression_simex)
+            reg.simex <- list(outcome_regression = outcome_regression_simex)
 
-             sens_out[[j]] <- summary(cmest(data = data, model = model,
-                                            outcome = outcome, event = event, exposure = exposure,
-                                            mediator = mediator, EMint = EMint,
-                                            prec = prec, postc = postc,
-                                            yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg,
-                                            wmreg = wmreg, reg.simex = reg.simex,
-                                            astar = astar, a = a, mval = mval, yref = yref, precval = precval,
-                                            estimation = estimation, inference = inference,
-                                            nboot = nboot, nrep = nrep))
+            sens_out[[j]] <- summary(cmest(data = data, model = model,
+                                           outcome = outcome, event = event, exposure = exposure,
+                                           mediator = mediator, EMint = EMint,
+                                           prec = prec, postc = postc,
+                                           yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg,
+                                           wmreg = wmreg, reg.simex = reg.simex,
+                                           astar = astar, a = a, mval = mval, yref = yref, precval = precval,
+                                           estimation = estimation, inference = inference,
+                                           nboot = nboot, nrep = nrep))
 
-           }
+          }
 
 
 
-         }
+        }
 
-         names(sens_out) <- paste("measurement.error = ", measurement.error)
+        names(sens_out) <- paste("measurement.error = ", measurement.error)
 
-         class(sens_out) <- "cmsens.me"
+        class(sens_out) <- "cmsens.me"
       }
 
     }
