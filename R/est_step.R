@@ -66,7 +66,7 @@ est_step <- function(data, indices, model,
       } else {mstar <- mval[[1]]}
 
       coef <- get_coef(formulas = formulas, regressions = regressions, model = model,
-                     yreg = yreg, mreg = mreg, data = data)
+                       yreg = yreg, mreg = mreg, data = data)
 
       elevel <- ifelse(is.character(data_boot[, exposure])|is.factor(data_boot[, exposure]),
                        length(levels(data_boot[, exposure])), 2)
@@ -352,7 +352,7 @@ est_step <- function(data, indices, model,
 
           for (i in 1:length(postc_regression)) {
 
-           if (!is.null(reg.simex$postc_regression[[i]])) postc_regression_pred[[i]] <- reg.simex$postc_regression[[i]]
+            if (!is.null(reg.simex$postc_regression[[i]])) postc_regression_pred[[i]] <- reg.simex$postc_regression[[i]]
 
           }
 
@@ -458,13 +458,14 @@ est_step <- function(data, indices, model,
 
             for (i in 2:length(postc)) {
 
-              postcdesign_a <- data_frame(postcdesign_a, postc_a[, i-1])
+              postcdesign_a <- cbind(postcdesign_a, postc_a[, i-1])
 
-              colnames(postcdesign_a) <- c(colnames(postcdesign_a), postc[i-1])
+              colnames(postcdesign_a) <- c(colnames(postcdesign_a)[1:(length(colnames(postcdesign_a))-1)],
+                                           postc[i-1])
 
-              postcdesign_astar <- data_frame(postcdesign_astar, postc_astar[, i-1])
+              postcdesign_astar <- cbind(postcdesign_astar, postc_astar[, i-1])
 
-              colnames(postcdesign_astar) <- c(colnames(postcdesign_astar), postc[i-1])
+              colnames(postcdesign_astar) <- c(colnames(postcdesign_astar)[1:(length(colnames(postcdesign_a))-1)], postc[i-1])
 
               if (identical(class(postc_regression[[i]]), "lm") |
                   (identical(class(postc_regression[[i]]), c("glm", "lm")) &&
@@ -543,9 +544,9 @@ est_step <- function(data, indices, model,
                 }
               }
 
-              postc_a <- data_frame(postc_a, mid_a)
+              postc_a <- cbind(postc_a, mid_a)
 
-              postc_astar <- data_frame(postc_a, mid_astar)
+              postc_astar <- cbind(postc_a, mid_astar)
 
             }
           }
@@ -679,13 +680,15 @@ est_step <- function(data, indices, model,
 
         for (i in 2:length(mediator)) {
 
-          mdesign_a <- data_frame(mdesign_a, m_a[, i-1])
+          mdesign_a <- cbind(mdesign_a, m_a[, i-1])
 
-          colnames(mdesign_a) <- c(colnames(mdesign_a), mediator[i-1])
+          colnames(mdesign_a) <- c(colnames(mdesign_a)[1:(length(colnames(mdesign_a))-1)],
+                                   mediator[i-1])
 
-          mdesign_astar <- data_frame(mdesign_astar, m_astar[, i-1])
+          mdesign_astar <- cbind(mdesign_astar, m_astar[, i-1])
 
-          colnames(mdesign_astar) <- c(colnames(mdesign_astar), mediator[i-1])
+          colnames(mdesign_astar) <- c(colnames(mdesign_astar)[1:(length(colnames(mdesign_a))-1)],
+                                       mediator[i-1])
 
           if (identical(class(mediator_regression[[i]]), "lm") |
               (identical(class(mediator_regression[[i]]), c("glm", "lm")) &&
@@ -764,9 +767,9 @@ est_step <- function(data, indices, model,
             }
           }
 
-          m_a <- data_frame(m_a, mid_a)
+          m_a <- cbind(m_a, mid_a)
 
-          m_astar <- data_frame(m_a, mid_astar)
+          m_astar <- cbind(m_a, mid_astar)
 
         }
       }
@@ -902,21 +905,21 @@ est_step <- function(data, indices, model,
       exposure_regression <- regressions$exposure_regression
 
       if (!is.null(reg.simex$exposure_regression)) {
-       exposure_regression_pred <- reg.simex$exposure_regression
+        exposure_regression_pred <- reg.simex$exposure_regression
       } else {exposure_regression_pred <- exposure_regression}
 
       outcome_regression <- regressions$outcome_regression
 
       if (!(identical(class(outcome_regression), "lm") |
-           (identical(class(outcome_regression), c("glm", "lm")) &&
-            family(outcome_regression)$family %in% c("gaussian","Gamma","inverse.gaussian","quasi",
-                                                     "binomial", "quasibinomial","poisson", "quasipoisson"))|
-           (identical(class(outcome_regression), c("gam", "glm", "lm")) &&
-            (family(outcome_regression)$family %in% c("gaussian","Gamma","inverse.gaussian","quasi",
-                                                      "binomial", "quasibinomial","poisson", "quasipoisson") |
-             startsWith(family(outcome_regression)$family,"Negative Binomial")))|
-           identical(class(outcome_regression), "nls")|
-           identical(class(outcome_regression), c("negbin", "glm", "lm")))) {
+            (identical(class(outcome_regression), c("glm", "lm")) &&
+             family(outcome_regression)$family %in% c("gaussian","Gamma","inverse.gaussian","quasi",
+                                                      "binomial", "quasibinomial","poisson", "quasipoisson"))|
+            (identical(class(outcome_regression), c("gam", "glm", "lm")) &&
+             (family(outcome_regression)$family %in% c("gaussian","Gamma","inverse.gaussian","quasi",
+                                                       "binomial", "quasibinomial","poisson", "quasipoisson") |
+              startsWith(family(outcome_regression)$family,"Negative Binomial")))|
+            identical(class(outcome_regression), "nls")|
+            identical(class(outcome_regression), c("negbin", "glm", "lm")))) {
 
         stop("The selected model doesn't support this outcome regression")
 
@@ -941,15 +944,15 @@ est_step <- function(data, indices, model,
       index_a <- which(data_boot[, exposure] == a)
 
       wnom <- left_join(select(data_boot, exposure),
-                         count(data_boot, !!as.name(exposure)),
-                         by = exposure)[, "n"]/nrow(data_boot)
+                        count(data_boot, !!as.name(exposure)),
+                        by = exposure)[, "n"]/nrow(data_boot)
 
 
       if (inherits(exposure_regression, "glm") &&
           family(exposure_regression)$family %in% c("binomial", "quasibinomial")) {
 
         wdenom.prob <- predict(exposure_regression_pred, newdata = data_boot,
-                                type = "response")
+                               type = "response")
 
         class <- as.numeric(as.factor(data_boot[, exposure])) - 1
 
@@ -962,9 +965,9 @@ est_step <- function(data, indices, model,
                  inherits(exposure_regression, "multinom")|inherits(exposure_regression, "polr")) {
 
         wdenom.prob <- predict(exposure_regression_pred, newdata = data_boot,
-                                type = ifelse(inherits(exposure_regression, "multinom")|
-                                                inherits(exposure_regression, "polr"),
-                                              "probs","response"))
+                               type = ifelse(inherits(exposure_regression, "multinom")|
+                                               inherits(exposure_regression, "polr"),
+                                             "probs","response"))
 
         class <- as.numeric(as.factor(data_boot[, exposure]))
 
@@ -1153,4 +1156,4 @@ est_step <- function(data, indices, model,
 
   return(out)
 
-}
+  }
