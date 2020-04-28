@@ -546,7 +546,7 @@ est_step <- function(data, indices, model,
 
               postc_a <- cbind(postc_a, mid_a)
 
-              postc_astar <- cbind(postc_a, mid_astar)
+              postc_astar <- cbind(postc_astar, mid_astar)
 
             }
           }
@@ -769,7 +769,7 @@ est_step <- function(data, indices, model,
 
           m_a <- cbind(m_a, mid_a)
 
-          m_astar <- cbind(m_a, mid_astar)
+          m_astar <- cbind(m_astar, mid_astar)
 
         }
       }
