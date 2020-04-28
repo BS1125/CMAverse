@@ -602,10 +602,15 @@ run_regressions <- function(formulas, data, model, exposure, mediator, postc,
                                                      formula. = formula(regressions$mediator_regression[[i]]))
     }
 
-    for (i in 1:length(postc_regression)) {
+    if (!is.null(postc_regression)) {
+
+      for (i in 1:length(postc_regression)) {
       regressions$postc_regression[[i]] <- update(regressions$postc_regression[[i]],
                                                      formula. = formula(regressions$postc_regression[[i]]))
     }
+   }
+
+
 
   } else if (model == "iorw") {
 

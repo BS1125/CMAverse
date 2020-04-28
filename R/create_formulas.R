@@ -116,7 +116,7 @@ create_formulas <- function(data, model,
                                              collapse = "+"))
                               } else NULL})
 
-  }
+  } else {postc_formula <- NULL}
 
   #######################################Return Formula List#########################################
 
