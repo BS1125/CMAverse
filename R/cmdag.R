@@ -1,5 +1,4 @@
-cmdag <- function(outcome = NULL, exposure = NULL, mediator = NULL,
-                  prec = NULL, postc = NULL) {
+cmdag <- function(outcome = NULL, exposure = NULL, mediator = NULL) {
 
   require(ggdag)
   require(gridExtra)
@@ -11,7 +10,7 @@ cmdag <- function(outcome = NULL, exposure = NULL, mediator = NULL,
 
   grid.arrange(ggdag(dag,node=FALSE,text_col = "black") + theme_dag_blank(),
                bottom = textGrob(paste0("A(Exposure):", exposure, "\n M(Mediator):", paste(mediator, collapse = ", "),
-                                        "\n Y(Outcome):", outcome, "\n C(Pre-exposure confounders)"), x = 1,
+                                        "\n Y(Outcome):", outcome, "\n C(Pre-exposure confounders): prec"), x = 1,
                                  hjust = 1, gp = gpar(fontface = 3L, fontsize = 8)))
 
   } else {
@@ -21,8 +20,7 @@ cmdag <- function(outcome = NULL, exposure = NULL, mediator = NULL,
     grid.arrange(ggdag(dag,node=FALSE,text_col = "black") + theme_dag_blank(),
                  bottom = textGrob(paste0("A(Exposure):", exposure, "\n M(Mediator):",
                                           paste(mediator, collapse = ", "), "\n Y(Outcome):",
-                                          outcome, "\n C(Pre-exposure confounders) \n L(Post-exposure confounders):",
-                                          paste(postc, collapse = ", ")),
+                                          outcome, "\n C(Pre-exposure confounders): prec \n L(Post-exposure confounders):postc"),
                                    x = 1,
                                    hjust = 1, gp = gpar(fontface = 3L, fontsize = 8)))
 
