@@ -1,9 +1,8 @@
-get_coef <- function(formulas, regressions, model, yreg, mreg) {
+get_coef <- function(formulas, regressions, model, yreg, mreg, data) {
 
   if (model == "rb") {
 
-    mediator_regression <- update(regressions$mediator_regression[[1]],
-                                  formula. = formula(regressions$mediator_regression[[1]]))
+    mediator_regression <- regressions$mediator_regression[[1]]
 
     outcome_regression <- regressions$outcome_regression
 
@@ -36,11 +35,11 @@ get_coef <- function(formulas, regressions, model, yreg, mreg) {
     tot_regression = regressions$tot_regression
     dir_regression = regressions$dir_regression
 
-    if (is.factor(tot_regression$data[, exposure])) {
+    if (is.factor(data[, exposure])) {
 
-      dir_coef <- unname(coef(dir_regression)[2+(0:(length(levels(dir_regression$data[, exposure]))-2))])
+      dir_coef <- unname(coef(dir_regression)[2+(0:(length(levels(data[, exposure]))-2))])
 
-      tot_coef <- unname(coef(tot_regression)[2+(0:(length(levels(tot_regression$data[, exposure]))-2))])
+      tot_coef <- unname(coef(tot_regression)[2+(0:(length(levels(data[, exposure]))-2))])
 
     } else {
 

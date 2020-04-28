@@ -1,6 +1,6 @@
 est_step <- function(data, indices, model,
                      outcome, event, exposure, mediator, EMint, prec, postc,
-                     yreg, mreg, ereg, postcreg, wmreg,
+                     yreg, mreg, ereg, postcreg, wmreg, reg.simex,
                      astar, a, mval, yref, vecc,
                      estimation) {
 
@@ -52,14 +52,9 @@ est_step <- function(data, indices, model,
            negbin, coxph, aft_exp, aft_weibull} and mreg in {linear, logistic, multinominal}")
     }
 
-    mediator_regression <- regressions$mediator_regression
 
-    coef <- get_coef(formulas = formulas, regressions = regressions, model = model,
-                     yreg = yreg, mreg = mreg)
 
     if (model == "rb"){
-
-      mediator_regression <- mediator_regression[[1]]
 
       if (is.character(data_boot[, exposure])|is.factor(data_boot[, exposure])) {
         a <- as.numeric(levels(as.factor(data_boot[, exposure])) == a)[-1]
@@ -69,6 +64,9 @@ est_step <- function(data, indices, model,
       if (is.character(data_boot[, mediator])|is.factor(data_boot[, mediator])) {
         mstar <- as.numeric(levels(as.factor(data_boot[, mediator])) == mval[[1]])[-1]
       }
+
+      coef <- get_coef(formulas = formulas, regressions = regressions, model = model,
+                     yreg = yreg, mreg = mreg, data = data)
 
       elevel <- ifelse(is.character(data_boot[, exposure])|is.factor(data_boot[, exposure]),
                        length(levels(data_boot[, exposure])), 2)
@@ -298,6 +296,14 @@ est_step <- function(data, indices, model,
 
     } else if (model == "iorw") {
 
+      regressions_coef <- regressions
+
+      if (!is.null(reg.simex$tot_outcome_regression)) regressions_coef$tot_outcome_regression <- reg.simex$tot_outcome_regression
+      if (!is.null(reg.simex$dir_outcome_regression)) regressions_coef$dir_outcome_regression <- reg.simex$dir_outcome_regression
+
+      coef <- get_coef(formulas = formulas, regressions = regressions_coef, model = model,
+                       yreg = yreg, mreg = mreg, data = data)
+
       if (yreg == "linear") {
 
         dir <- unname(ifelse(sum(a) == 0, 0, coef[1:(elevel - 1)] %*% a) -
@@ -342,6 +348,14 @@ est_step <- function(data, indices, model,
 
           postc_regression <- regressions$postc_regression
 
+          postc_regression_pred <- postc_regression
+
+          for (i in 1:length(postc_regression)) {
+
+           if (!is.null(reg.simex$postc_regression[[i]])) postc_regression_pred[[i]] <- reg.simex$postc_regression[[i]]
+
+          }
+
           postcdesign_a <- data.frame(c(rep(a,nrow(data_boot))),
                                       data_boot[,prec])
 
@@ -370,20 +384,20 @@ est_step <- function(data, indices, model,
               identical(class(postc_regression[[1]]), "nls")|
               identical(class(postc_regression[[1]]), c("negbin", "glm", "lm"))) {
 
-            postc_a <- predict(postc_regression[[1]], newdata = postcdesign_a, type = "response")
+            postc_a <- predict(postc_regression_pred[[1]], newdata = postcdesign_a, type = "response")
 
-            postc_astar <- predict(postc_regression[[1]], newdata = postcdesign_astar, type = "response")
+            postc_astar <- predict(postc_regression_pred[[1]], newdata = postcdesign_astar, type = "response")
 
           } else if ((identical(class(postc_regression[[1]]), c("glm", "lm")) &&
                       family(postc_regression[[1]])$family %in% c("binomial", "quasibinomial"))|
                      (identical(class(postc_regression[[1]]), c("gam", "glm", "lm")) &&
                       (family(postc_regression[[1]])$family %in% c("binomial", "quasibinomial")))) {
 
-            prob_a <- predict(postc_regression[[1]], newdata = postcdesign_a, type = "response")
+            prob_a <- predict(postc_regression_pred[[1]], newdata = postcdesign_a, type = "response")
 
             pred_a <- rbinom(nrow(postcdesign_a), size=1, prob=prob_a)
 
-            prob_astar <- predict(postc_regression[[1]], newdata = postcdesign_astar, type = "response")
+            prob_astar <- predict(postc_regression_pred[[1]], newdata = postcdesign_astar, type = "response")
 
             pred_astar <- rbinom(nrow(postcdesign_astar), size=1, prob=prob_astar)
 
@@ -409,12 +423,12 @@ est_step <- function(data, indices, model,
                      identical(class(postc_regression[[1]]), c("multinom", "nnet"))|
                      identical(class(postc_regression[[1]]), "polr")) {
 
-            prob_a <- predict(postc_regression[[1]], newdata = postcdesign_a,
+            prob_a <- predict(postc_regression_pred[[1]], newdata = postcdesign_a,
                               type = ifelse(inherits(postc_regression[[1]], "gam"), "response", "probs"))
 
             pred_a <- apply(prob_a, 1, FUN = function(x) apply(t(rmultinom(1, 1, prob = x)), 1, which.max))
 
-            prob_astar <- predict(postc_regression[[1]], newdata = postcdesign_astar,
+            prob_astar <- predict(postc_regression_pred[[1]], newdata = postcdesign_astar,
                                   type = ifelse(inherits(postc_regression[[1]], "gam"), "response", "probs"))
 
             pred_astar <- apply(prob_astar, 1, FUN = function(x) apply(t(rmultinom(1, 1, prob = x)), 1, which.max))
@@ -463,20 +477,20 @@ est_step <- function(data, indices, model,
                   identical(class(postc_regression[[i]]), "nls")|
                   identical(class(postc_regression[[i]]), c("negbin", "glm", "lm"))) {
 
-                mid_a <- predict(postc_regression[[i]], newdata = postcdesign_a, type = "response")
+                mid_a <- predict(postc_regression_pred[[i]], newdata = postcdesign_a, type = "response")
 
-                mid_astar <- predict(postc_regression[[i]], newdata = postcdesign_astar, type = "response")
+                mid_astar <- predict(postc_regression_pred[[i]], newdata = postcdesign_astar, type = "response")
 
               } else if ((identical(class(postc_regression[[i]]), c("glm", "lm")) &&
                           family(postc_regression[[i]])$family %in% c("binomial", "quasibinomial"))|
                          (identical(class(postc_regression[[i]]), c("gam", "glm", "lm")) &&
                           (family(postc_regression[[i]])$family %in% c("binomial", "quasibinomial")))) {
 
-                prob_a <- predict(postc_regression[[i]], newdata = postcdesign_a, type = "response")
+                prob_a <- predict(postc_regression_pred[[i]], newdata = postcdesign_a, type = "response")
 
                 pred_a <- rbinom(nrow(postcdesign_a), size=1, prob=prob_a)
 
-                prob_astar <- predict(postc_regression[[i]], newdata = postcdesign_astar, type = "response")
+                prob_astar <- predict(postc_regression_pred[[i]], newdata = postcdesign_astar, type = "response")
 
                 pred_astar <- rbinom(nrow(postcdesign_astar), size=1, prob=prob_astar)
 
@@ -502,12 +516,12 @@ est_step <- function(data, indices, model,
                          identical(class(postc_regression[[i]]), c("multinom", "nnet"))|
                          identical(class(postc_regression[[i]]), "polr")) {
 
-                prob_a <- predict(postc_regression[[i]], newdata = postcdesign_a,
+                prob_a <- predict(postc_regression_pred[[i]], newdata = postcdesign_a,
                                   type = ifelse(inherits(postc_regression[[i]], "gam"), "response", "probs"))
 
                 pred_a <- apply(prob_a, 1, FUN = function(x) apply(t(rmultinom(1, 1, prob = x)), 1, which.max))
 
-                prob_astar <- predict(postc_regression[[i]], newdata = postcdesign_astar,
+                prob_astar <- predict(postc_regression_pred[[i]], newdata = postcdesign_astar,
                                       type = ifelse(inherits(postc_regression[[i]], "gam"), "response", "probs"))
 
                 pred_astar <- apply(prob_astar, 1, FUN = function(x) apply(t(rmultinom(1, 1, prob = x)), 1, which.max))
@@ -564,6 +578,14 @@ est_step <- function(data, indices, model,
 
       mediator_regression <- regressions$mediator_regression
 
+      mediator_regression_pred <- mediator_regression
+
+      for (i in 1:length(mediator_regression)) {
+
+        if (!is.null(reg.simex$mediator_regression[[i]])) mediator_regression_pred[[i]] <- reg.simex$mediator_regression[[i]]
+
+      }
+
       if (is.factor(data_boot[, exposure])) {
 
         mdesign_a[, exposure] <- factor(mdesign_a[, exposure], levels = levels(data_boot[, exposure]))
@@ -583,20 +605,20 @@ est_step <- function(data, indices, model,
           identical(class(mediator_regression[[1]]), "nls")|
           identical(class(mediator_regression[[1]]), c("negbin", "glm", "lm"))) {
 
-        m_a <- predict(mediator_regression[[1]], newdata = mdesign_a, type = "response")
+        m_a <- predict(mediator_regression_pred[[1]], newdata = mdesign_a, type = "response")
 
-        m_astar <- predict(mediator_regression[[1]], newdata = mdesign_astar, type = "response")
+        m_astar <- predict(mediator_regression_pred[[1]], newdata = mdesign_astar, type = "response")
 
       } else if ((identical(class(mediator_regression[[1]]), c("glm", "lm")) &&
                   family(mediator_regression[[1]])$family %in% c("binomial", "quasibinomial"))|
                  (identical(class(mediator_regression[[1]]), c("gam", "glm", "lm")) &&
                   (family(mediator_regression[[1]])$family %in% c("binomial", "quasibinomial")))) {
 
-        prob_a <- predict(mediator_regression[[1]], newdata = mdesign_a, type = "response")
+        prob_a <- predict(mediator_regression_pred[[1]], newdata = mdesign_a, type = "response")
 
         pred_a <- rbinom(nrow(mdesign_a), size=1, prob=prob_a)
 
-        prob_astar <- predict(mediator_regression[[1]], newdata = mdesign_astar, type = "response")
+        prob_astar <- predict(mediator_regression_pred[[1]], newdata = mdesign_astar, type = "response")
 
         pred_astar <- rbinom(nrow(mdesign_astar), size=1, prob=prob_astar)
 
@@ -622,12 +644,12 @@ est_step <- function(data, indices, model,
                  identical(class(mediator_regression[[1]]), c("multinom", "nnet"))|
                  identical(class(mediator_regression[[1]]), "polr")) {
 
-        prob_a <- predict(mediator_regression[[1]], newdata = mdesign_a,
+        prob_a <- predict(mediator_regression_pred[[1]], newdata = mdesign_a,
                           type = ifelse(inherits(mediator_regression[[1]], "gam"), "response", "probs"))
 
         pred_a <- apply(prob_a, 1, FUN = function(x) apply(t(rmultinom(1, 1, prob = x)), 1, which.max))
 
-        prob_astar <- predict(mediator_regression[[1]], newdata = mdesign_astar,
+        prob_astar <- predict(mediator_regression_pred[[1]], newdata = mdesign_astar,
                               type = ifelse(inherits(mediator_regression[[1]], "gam"), "response", "probs"))
 
         pred_astar <- apply(prob_astar, 1, FUN = function(x) apply(t(rmultinom(1, 1, prob = x)), 1, which.max))
@@ -676,20 +698,20 @@ est_step <- function(data, indices, model,
               identical(class(mediator_regression[[i]]), "nls")|
               identical(class(mediator_regression[[i]]), c("negbin", "glm", "lm"))) {
 
-            mid_a <- predict(mediator_regression[[i]], newdata = mdesign_a, type = "response")
+            mid_a <- predict(mediator_regression_pred[[i]], newdata = mdesign_a, type = "response")
 
-            mid_astar <- predict(mediator_regression[[i]], newdata = mdesign_astar, type = "response")
+            mid_astar <- predict(mediator_regression_pred[[i]], newdata = mdesign_astar, type = "response")
 
           } else if ((identical(class(mediator_regression[[i]]), c("glm", "lm")) &&
                       family(mediator_regression[[i]])$family %in% c("binomial", "quasibinomial"))|
                      (identical(class(mediator_regression[[i]]), c("gam", "glm", "lm")) &&
                       (family(mediator_regression[[i]])$family %in% c("binomial", "quasibinomial")))) {
 
-            prob_a <- predict(mediator_regression[[i]], newdata = mdesign_a, type = "response")
+            prob_a <- predict(mediator_regression_pred[[i]], newdata = mdesign_a, type = "response")
 
             pred_a <- rbinom(nrow(mdesign_a), size=1, prob=prob_a)
 
-            prob_astar <- predict(mediator_regression[[i]], newdata = mdesign_astar, type = "response")
+            prob_astar <- predict(mediator_regression_pred[[i]], newdata = mdesign_astar, type = "response")
 
             pred_astar <- rbinom(nrow(mdesign_astar), size=1, prob=prob_astar)
 
@@ -715,12 +737,12 @@ est_step <- function(data, indices, model,
                      identical(class(mediator_regression[[i]]), c("multinom", "nnet"))|
                      identical(class(mediator_regression[[i]]), "polr")) {
 
-            prob_a <- predict(mediator_regression[[i]], newdata = mdesign_a,
+            prob_a <- predict(mediator_regression_pred[[i]], newdata = mdesign_a,
                               type = ifelse(inherits(mediator_regression[[i]], "gam"), "response", "probs"))
 
             pred_a <- apply(prob_a, 1, FUN = function(x) apply(t(rmultinom(1, 1, prob = x)), 1, which.max))
 
-            prob_astar <- predict(mediator_regression[[i]], newdata = mdesign_astar,
+            prob_astar <- predict(mediator_regression_pred[[i]], newdata = mdesign_astar,
                                   type = ifelse(inherits(mediator_regression[[i]], "gam"), "response", "probs"))
 
             pred_astar <- apply(prob_astar, 1, FUN = function(x) apply(t(rmultinom(1, 1, prob = x)), 1, which.max))
@@ -821,6 +843,10 @@ est_step <- function(data, indices, model,
         }
       }
 
+      if (!is.null(reg.simex$outcome_regression)) {
+        outcome_regression_pred <- reg.simex$outcome_regression
+      } else {outcome_regression_pred <- outcome_regression}
+
       if (identical(class(outcome_regression), "lm") |
           (identical(class(outcome_regression), c("glm", "lm")) &&
            family(outcome_regression)$family %in% c("gaussian","Gamma","inverse.gaussian","quasi",
@@ -836,17 +862,17 @@ est_step <- function(data, indices, model,
 
         type <- ifelse(inherits(outcome_regression, "coxph"), "risk", "response")
 
-        EY0m <- mean(predict(outcome_regression, newdata =  ydesign0m, type = type), na.rm = TRUE)
+        EY0m <- mean(predict(outcome_regression_pred, newdata =  ydesign0m, type = type), na.rm = TRUE)
 
-        EY1m <- mean(predict(outcome_regression, newdata =  ydesign1m, type = type), na.rm = TRUE)
+        EY1m <- mean(predict(outcome_regression_pred, newdata =  ydesign1m, type = type), na.rm = TRUE)
 
-        EY00 <- mean(predict(outcome_regression, newdata =  ydesign00, type = type), na.rm = TRUE)
+        EY00 <- mean(predict(outcome_regression_pred, newdata =  ydesign00, type = type), na.rm = TRUE)
 
-        EY01 <- mean(predict(outcome_regression, newdata =  ydesign01, type = type), na.rm = TRUE)
+        EY01 <- mean(predict(outcome_regression_pred, newdata =  ydesign01, type = type), na.rm = TRUE)
 
-        EY10 <- mean(predict(outcome_regression, newdata =  ydesign10, type = type), na.rm = TRUE)
+        EY10 <- mean(predict(outcome_regression_pred, newdata =  ydesign10, type = type), na.rm = TRUE)
 
-        EY11 <- mean(predict(outcome_regression, newdata =  ydesign11, type = type), na.rm = TRUE)
+        EY11 <- mean(predict(outcome_regression_pred, newdata =  ydesign11, type = type), na.rm = TRUE)
 
 
       } else if ((identical(class(outcome_regression), c("gam", "glm", "lm")) &&
@@ -857,23 +883,27 @@ est_step <- function(data, indices, model,
 
         type = ifelse(inherits(outcome_regression, "gam"), "response", "probs")
 
-        EY0m <- mean(predict(outcome_regression, newdata =  ydesign0m, type = type)[, yref], na.rm = TRUE)
+        EY0m <- mean(predict(outcome_regression_pred, newdata =  ydesign0m, type = type)[, yref], na.rm = TRUE)
 
-        EY1m <- mean(predict(outcome_regression, newdata =  ydesign1m, type = type)[, yref], na.rm = TRUE)
+        EY1m <- mean(predict(outcome_regression_pred, newdata =  ydesign1m, type = type)[, yref], na.rm = TRUE)
 
-        EY00 <- mean(predict(outcome_regression, newdata =  ydesign00, type = type)[, yref], na.rm = TRUE)
+        EY00 <- mean(predict(outcome_regression_pred, newdata =  ydesign00, type = type)[, yref], na.rm = TRUE)
 
-        EY01 <- mean(predict(outcome_regression, newdata =  ydesign01, type = type)[, yref], na.rm = TRUE)
+        EY01 <- mean(predict(outcome_regression_pred, newdata =  ydesign01, type = type)[, yref], na.rm = TRUE)
 
-        EY10 <- mean(predict(outcome_regression, newdata =  ydesign10, type = type)[, yref], na.rm = TRUE)
+        EY10 <- mean(predict(outcome_regression_pred, newdata =  ydesign10, type = type)[, yref], na.rm = TRUE)
 
-        EY11 <- mean(predict(outcome_regression, newdata =  ydesign11, type = type)[, yref], na.rm = TRUE)
+        EY11 <- mean(predict(outcome_regression_pred, newdata =  ydesign11, type = type)[, yref], na.rm = TRUE)
 
       }
 
     } else if (model == "wb") {
 
       exposure_regression <- regressions$exposure_regression
+
+      if (!is.null(reg.simex$exposure_regression)) {
+       exposure_regression_pred <- reg.simex$exposure_regression
+      } else {exposure_regression_pred <- exposure_regression}
 
       outcome_regression <- regressions$outcome_regression
 
@@ -918,7 +948,7 @@ est_step <- function(data, indices, model,
       if (inherits(exposure_regression, "glm") &&
           family(exposure_regression)$family %in% c("binomial", "quasibinomial")) {
 
-        wdenom.prob <- predict(exposure_regression, newdata = data_boot,
+        wdenom.prob <- predict(exposure_regression_pred, newdata = data_boot,
                                 type = "response")
 
         class <- as.numeric(as.factor(data_boot[, exposure])) - 1
@@ -931,7 +961,7 @@ est_step <- function(data, indices, model,
                    startsWith(family(exposure_regression)$family, "Ordered Categorical")))|
                  inherits(exposure_regression, "multinom")|inherits(exposure_regression, "polr")) {
 
-        wdenom.prob <- predict(exposure_regression, newdata = data_boot,
+        wdenom.prob <- predict(exposure_regression_pred, newdata = data_boot,
                                 type = ifelse(inherits(exposure_regression, "multinom")|
                                                 inherits(exposure_regression, "polr"),
                                               "probs","response"))

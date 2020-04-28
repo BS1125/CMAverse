@@ -3,9 +3,10 @@ cmest <- function(data = NULL, model = "rb",
                   exposure = NULL, mediator = NULL, EMint = FALSE,
                   prec = NULL, postc = NULL,
                   yreg = "linear", mreg = "linear", ereg = NULL, postcreg = NULL, wmreg = NULL,
+                  reg.simex = NULL,
                   astar = 0, a = 1, mval = NULL, yref = NULL, precval = NULL,
                   estimation = "paramfunc", inference = "delta",
-                  nboot = 200, nrep = 5, conf = 0.95) {
+                  nboot = 200, nrep = 5) {
 
   require(dplyr)
 
@@ -136,11 +137,23 @@ cmest <- function(data = NULL, model = "rb",
 
     n <- nrow(data)
 
+    formulas <- create_formulas(data = data_boot, model = model,
+                                outcome = outcome, event = event,
+                                exposure = exposure, mediator = mediator, EMint = EMint,
+                                prec = prec, postc = postc,
+                                yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg, wmreg = wmreg)
+
+    regressions <- run_regressions(formulas = formulas, data = data, model = model,
+                                   exposure = exposure, mediator = mediator, postc = postc,
+                                   yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg,
+                                   wmreg = wmreg, wreg.simex = NULL)
+
     effect_estimate <- est_step(data = data, indices = 1:n, model = model,
                                 outcome = outcome, event = event, exposure = exposure,
                                 mediator = mediator, EMint = EMint,
                                 prec = prec, postc = postc,
-                                yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg, wmreg = wmreg,
+                                yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg,
+                                wmreg = wmreg, reg.simex = reg.simex,
                                 astar = astar, a = a, mval = mval, yref = yref, vecc = vecc,
                                 estimation = estimation)
 
@@ -149,25 +162,32 @@ cmest <- function(data = NULL, model = "rb",
                           mediator = mediator, EMint = EMint,
                           prec = prec, postc = postc,
                           yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg, wmreg = wmreg,
+                          reg.simex = reg.simex,
                           astar = astar, a = a, mval = mval, yref = yref, vecc = vecc,
                           estimation = estimation, inference = inference)
 
-    results <- list(effect_estimate = effect_estimate, effect_se = effect_se)
+    out <- list(data = data,
+                    regressions = regressions,
+                    effect_estimate = effect_estimate,
+                    effect_se = effect_se)
 
 
   } else if (model == "ne") {
 
-    formulas <- create_formulas(data = data_boot, model = model,
+    formulas <- create_formulas(data = data, model = model,
                                 outcome = outcome, event = event,
                                 exposure = exposure, mediator = mediator, EMint = EMint,
                                 prec = prec, postc = postc,
                                 yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg, wmreg = wmreg)
 
-    regressions <- run_regressions(formulas = formulas, data = data_boot, model = model,
+    regressions <- run_regressions(formulas = formulas, data = data, model = model,
                                    exposure = exposure, mediator = mediator, postc = postc,
-                                   yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg, wmreg = wmreg)
+                                   yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg,
+                                   wmreg = wmreg, wreg.simex = NULL)
 
-    expData <- medflex::neImpute(regressions$outcome_regression, data = data,
+    outcome_regression <- regressions$outcome_regression
+
+    expData <- medflex::neImpute(outcome_regression, data = data,
                                  nMed = length(mediator), nrep = nrep)
 
     if (EMint == TRUE) {
@@ -186,11 +206,13 @@ cmest <- function(data = NULL, model = "rb",
 
     assign("medflex_formula", medflex_formula, envir = globalenv())
 
-    family <- regressions$outcome_regression$family
+    assign("outcome_formula", formula(outcome_regression), envir = globalenv())
+
+    family <- outcome_regression$family
 
     se <- ifelse(inference == "delta", "robust", "bootstrap")
 
-    results <- summary(medflex::neEffdecomp(medflex::neModel(as.formula(medflex_formula),
+    results <- summary(medflex::neEffdecomp(medflex::neModel(formula = as.formula(medflex_formula),
                                                              family = family,
                                                              expData = expData, se = se),
                                             xRef = c(astar, a)))$coefficients[, c("Estimate", "Std. Error")]
@@ -208,17 +230,19 @@ cmest <- function(data = NULL, model = "rb",
     }
 
     rm(medflex_formula, pos = ".GlobalEnv")
+    rm(outcome_formula, pos = ".GlobalEnv")
 
     effect_estimate <- results[, "Estimate"]
     effect_se <- results[, "Std. Error"]
 
-    results <- list(effect_estimate = effect_estimate, effect_se = effect_se)
+    out <- list(data = data,
+                    regressions = regressions,
+                    effect_estimate = effect_estimate,
+                    effect_se = effect_se)
 
   }
 
-  out <- format_df(results = results, conf = conf, n = nrow(data), yreg = yreg, model = model)
-
-  class(out) <- c("cmest", "data.frame")
+  class(out) <- "cmest"
 
   return(out)
 

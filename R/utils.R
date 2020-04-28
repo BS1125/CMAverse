@@ -1,11 +1,9 @@
 
-z_p <- function(s, n, yreg, model) {
+z_p <- function(cmest_out) {
 
-  z <- NULL
+  n <- nrow(cmest_out$data)
 
-  pval <- NULL
-
-  z <- s$Estimate / s$Std.error
+  z <- cmest_out$effect_estimate / cmest_out$effect_se
 
   pval <- 2 * pt(-abs(z), n - 1)
 
@@ -14,9 +12,9 @@ z_p <- function(s, n, yreg, model) {
 }
 
 
-format_df <- function(results, conf, n, yreg, model) {
+format_df <- function(cmest_out, conf = 0.95) {
 
-  d_all <- data.frame(matrix(NA, length(results$effect_estimate), 4))
+  d_all <- data.frame(matrix(NA, length(cmest_out$effect_estimate), 4))
 
   alpha <- (1 - conf) / 2
 
@@ -26,23 +24,41 @@ format_df <- function(results, conf, n, yreg, model) {
 
   colnames(d_all) <- c("Estimate", "Std.error", label_CI[1], label_CI[2])
 
-  rownames(d_all) <- names(results$effect_estimate)
+  rownames(d_all) <- names(cmest_out$effect_estimate)
 
   for (name in rownames(d_all)) {
 
-    d_all[name, ] <- c(unname(results$effect_estimate[name]), unname(results$effect_se[which(rownames(d_all)==name)]),
-                       unname(results$effect_estimate[name]-z*results$effect_se[which(rownames(d_all)==name)]),
-                       unname(results$effect_estimate[name]+z*results$effect_se[which(rownames(d_all)==name)]))
+    d_all[name, ] <- c(unname(cmest_out$effect_estimate[name]), unname(cmest_out$effect_se[which(rownames(d_all)==name)]),
+                       unname(cmest_out$effect_estimate[name]-z*cmest_out$effect_se[which(rownames(d_all)==name)]),
+                       unname(cmest_out$effect_estimate[name]+z*cmest_out$effect_se[which(rownames(d_all)==name)]))
 
   }
 
-  return(cbind(d_all, z_p(d_all, n = n, yreg = yreg, model = model)))
+  return(cbind(d_all, z_p(cmest_out)))
 
 }
 
-print.cmest <- function(results, digits = 4) {
+summary.cmest <- function(cmest_out, digits = 4) {
 
-  printCoefmat(results, digits = digits, has.Pvalue = TRUE)
+  format_df(cmest_out = cmest_out)
 
+}
+
+print.summary.cmest <- function(cmest_out, digits = 4) {
+
+  out <- format_df(cmest_out = cmest_out)
+
+  printCoefmat(out, digits = digits, has.Pvalue = TRUE)
+
+}
+
+print.cmsens.me <- function(cmsens_out, digits = 4) {
+
+  for (i in 1:length(cmsens_out)) {
+
+    cat(paste("\n", names(cmsens_out)[i],"\n"))
+    printCoefmat(cmsens_out[[i]], digits = digits, has.Pvalue = TRUE)
+    cat("--------------------------------------------------------------\n")
+  }
 }
 

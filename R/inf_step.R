@@ -1,6 +1,6 @@
 inf_step <- function(nboot, data, model,
                      outcome, event, exposure, mediator, EMint, prec, postc,
-                     yreg, mreg, ereg, postcreg, wmreg,
+                     yreg, mreg, ereg, postcreg, wmreg, reg.simex,
                      astar, a, mval, yref, vecc,
                      estimation, inference) {
 
@@ -436,6 +436,7 @@ inf_step <- function(nboot, data, model,
                         mediator = mediator, EMint = EMint,
                         prec = prec, postc = postc,
                         yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg, wmreg = wmreg,
+                        reg.simex = reg.simex,
                         astar = astar, a = a, mval = mval, yref = yref, vecc = vecc,
                         estimation = estimation)
 

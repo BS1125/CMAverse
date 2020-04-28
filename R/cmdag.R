@@ -22,7 +22,7 @@ cmdag <- function(outcome = NULL, exposure = NULL, mediator = NULL,
                  bottom = textGrob(paste0("A(Exposure):", exposure, "\n M(Mediator):",
                                           paste(mediator, collapse = ", "), "\n Y(Outcome):",
                                           outcome, "\n C(Pre-exposure confounders) \n L(Post-exposure confounders):",
-                                          covariates.post),
+                                          paste(covariates.post, collapse = ", ")),
                                    x = 1,
                                    hjust = 1, gp = gpar(fontface = 3L, fontsize = 8)))
 

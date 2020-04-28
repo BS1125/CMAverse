@@ -1,5 +1,5 @@
 run_regressions <- function(formulas, data, model, exposure, mediator, postc,
-                            yreg, mreg, ereg, postcreg, wmreg) {
+                            yreg, mreg, ereg, postcreg, wmreg, wreg.simex) {
 
   require(dplyr)
   require(survival)
@@ -60,10 +60,16 @@ run_regressions <- function(formulas, data, model, exposure, mediator, postc,
                       count(data, !!as.name(exposure)),
                       by = exposure)[, "n"]/nrow(data)
 
+      if (!is.null(wreg.simex$exposure_regression)) {
+
+        exposure_regression_pred <- wreg.simex$exposure_regression
+
+      } else {exposure_regression_pred <- exposure_regression}
+
       if (inherits(exposure_regression, "glm") &&
           family(exposure_regression)$family %in% c("binomial", "quasibinomial")) {
 
-        wadenom.prob <- predict(exposure_regression, newdata = data,
+        wadenom.prob <- predict(exposure_regression_pred, newdata = data,
                                 type = "response")
 
         class <- as.numeric(as.factor(data[, exposure])) - 1
@@ -76,7 +82,7 @@ run_regressions <- function(formulas, data, model, exposure, mediator, postc,
                    startsWith(family(exposure_regression)$family, "Ordered Categorical")))|
                  inherits(exposure_regression, "multinom")|inherits(exposure_regression, "polr")) {
 
-        wadenom.prob <- predict(exposure_regression, newdata = data,
+        wadenom.prob <- predict(exposure_regression_pred, newdata = data,
                                 type = ifelse(inherits(exposure_regression, "multinom")|
                                                 inherits(exposure_regression, "polr"),
                                               "probs","response"))
@@ -91,10 +97,16 @@ run_regressions <- function(formulas, data, model, exposure, mediator, postc,
 
     } else if (model == "iorw") {
 
+      if (!is.null(wreg.simex$exposure_regression)) {
+
+        exposure_regression_pred <- wreg.simex$exposure_regression
+
+      } else {exposure_regression_pred <- exposure_regression}
+
       if (inherits(exposure_regression, "glm") &&
           family(exposure_regression)$family %in% c("binomial", "quasibinomial")) {
 
-        wadenom.prob <- predict(exposure_regression, newdata = data,
+        wadenom.prob <- predict(exposure_regression_pred, newdata = data,
                                 type = "response")
 
         class <- as.numeric(as.factor(data[, exposure])) - 1
@@ -109,7 +121,7 @@ run_regressions <- function(formulas, data, model, exposure, mediator, postc,
                    startsWith(family(exposure_regression)$family, "Ordered Categorical")))|
                  inherits(exposure_regression, "multinom")|inherits(exposure_regression, "polr")) {
 
-        wadenom.prob <- predict(exposure_regression, newdata = data,
+        wadenom.prob <- predict(exposure_regression_pred, newdata = data,
                                 type = ifelse(inherits(exposure_regression, "multinom")|
                                                 inherits(exposure_regression, "polr"),
                                               "probs","response"))
@@ -298,6 +310,23 @@ run_regressions <- function(formulas, data, model, exposure, mediator, postc,
 
     }
 
+
+    wmnom_regression_pred <- wmnom_regression
+
+    for (i in 1:length(wmnom_regression)) {
+
+      if (!is.null(reg.simex$wmnom_regression[[i]])) wmnom_regression_pred[[i]] <- reg.simex$wmnom_regression[[i]]
+
+    }
+
+    wmdenom_regression_pred <- wmdenom_regression
+
+    for (i in 1:length(wmdenom_regression)) {
+
+      if (!is.null(reg.simex$wmdenom_regression[[i]])) wmdenom_regression_pred[[i]] <- reg.simex$wmdenom_regression[[i]]
+
+    }
+
     wmnom <- rep(1, nrow(data))
 
     wmdenom <- rep(1, nrow(data))
@@ -307,10 +336,10 @@ run_regressions <- function(formulas, data, model, exposure, mediator, postc,
       if (inherits(wmdenom_regression[[i]], "glm") &&
           family(wmdenom_regression[[i]])$family %in% c("binomial", "quasibinomial")) {
 
-        wmdenom.prob <- predict(wmdenom_regression[[i]], newdata = data,
+        wmdenom.prob <- predict(wmdenom_regression_pred[[i]], newdata = data,
                                 type = "response")
 
-        wmnom.prob <- predict(wmnom_regression[[i]], newdata = data,
+        wmnom.prob <- predict(wmnom_regression_pred[[i]], newdata = data,
                               type = "response")
 
         class <- as.numeric(as.factor(data[, mediator[i]])) - 1
@@ -326,12 +355,12 @@ run_regressions <- function(formulas, data, model, exposure, mediator, postc,
                    startsWith(family(wmdenom_regression[[i]])$family, "Ordered Categorical")))|
                  inherits(wmdenom_regression[[i]], "multinom")|inherits(wmdenom_regression[[i]], "polr")) {
 
-        wmdenom.prob <- predict(wmdenom_regression[[i]], newdata = data,
+        wmdenom.prob <- predict(wmdenom_regression_pred[[i]], newdata = data,
                                 type = ifelse(inherits(wmdenom_regression[[i]], "multinom")|
                                                 inherits(wmdenom_regression[[i]], "polr"),
                                               "probs","response"))
 
-        wmnom.prob <- predict(wmnom_regression[[i]], newdata = data,
+        wmnom.prob <- predict(wmnom_regression_pred[[i]], newdata = data,
                               type = ifelse(inherits(wmnom_regression[[i]], "multinom")|
                                               inherits(wmnom_regression[[i]], "polr"),
                                             "probs","response"))
@@ -540,10 +569,24 @@ run_regressions <- function(formulas, data, model, exposure, mediator, postc,
     regressions <- list(mediator_regression = mediator_regression,
                         outcome_regression =  outcome_regression)
 
+    regressions$outcome_regression <- update(regressions$outcome_regression,
+                                             formula. = formula(regressions$outcome_regression))
+
+    for (i in 1:length(mediator_regression)) {
+      regressions$mediator_regression[[i]] <- update(regressions$mediator_regression[[i]],
+                                                     formula. = formula(regressions$mediator_regression[[i]]))
+    }
+
   } else if (model == "wb") {
 
     regressions <- list(exposure_regression = exposure_regression,
                         outcome_regression =  outcome_regression)
+
+    regressions$outcome_regression <- update(regressions$outcome_regression,
+                                             formula. = formula(regressions$outcome_regression))
+
+    regressions$exposure_regression <- update(regressions$exposure_regression,
+                                             formula. = formula(regressions$exposure_regression))
 
   } else if (model == "g-formula") {
 
@@ -551,14 +594,36 @@ run_regressions <- function(formulas, data, model, exposure, mediator, postc,
                         mediator_regression = mediator_regression,
                         outcome_regression = outcome_regression)
 
+    regressions$outcome_regression <- update(regressions$outcome_regression,
+                                             formula. = formula(regressions$outcome_regression))
+
+    for (i in 1:length(mediator_regression)) {
+      regressions$mediator_regression[[i]] <- update(regressions$mediator_regression[[i]],
+                                                     formula. = formula(regressions$mediator_regression[[i]]))
+    }
+
+    for (i in 1:length(postc_regression)) {
+      regressions$postc_regression[[i]] <- update(regressions$postc_regression[[i]],
+                                                     formula. = formula(regressions$postc_regression[[i]]))
+    }
+
   } else if (model == "iorw") {
 
     regressions <- list(tot_outcome_regression = tot_outcome_regression,
                         dir_outcome_regression = dir_outcome_regression)
 
+    regressions$tot_outcome_regression <- update(regressions$tot_outcome_regression,
+                                             formula. = formula(regressions$tot_outcome_regression))
+
+    regressions$dir_outcome_regression <- update(regressions$dir_outcome_regression,
+                                             formula. = formula(regressions$dir_outcome_regression))
+
   } else if (model == "ne") {
 
     regressions <- list(outcome_regression =  outcome_regression)
+
+    regressions$outcome_regression <- update(regressions$outcome_regression,
+                                             formula. = formula(regressions$outcome_regression))
 
   }
 
