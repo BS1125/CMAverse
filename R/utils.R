@@ -116,7 +116,8 @@ plot.cmsens.me <- function(cmsens_out) {
                  data = effect_df[which(effect_df$ReliabilityRatio==1),],
                  position = position_dodge2(width=0.1)) +
       ylab("Point Estimate and 95% CI")+
-      scale_colour_gradient(low = "lightblue", high = "darkblue")
+      scale_colour_gradient(low = "lightblue", high = "darkblue")+
+      geom_hline(yintercept = 0, color = "red")
 
   }
 
