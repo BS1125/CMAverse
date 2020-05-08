@@ -14,6 +14,8 @@ cmsens <- function(cmest_out = NULL, sens = "uc",
 
   mediator <- cmest_out$variables$mediator
 
+  EMint <- cmest_out$reg$EMint
+
   prec <- cmest_out$variables$prec
 
   postc <- cmest_out$variables$postc
