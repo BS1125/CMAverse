@@ -1,10 +1,9 @@
 run_regressions <- function(formulas, data, model, exposure, mediator, postc,
-                            yreg, mreg, ereg, postcreg, wmreg, wreg.simex) {
-
-  require(dplyr)
-  require(survival)
+                            yreg, mreg, ereg, postcreg, wmreg) {
 
   ###########################################Exposure Regression####################################
+
+  # run the exposure regression
 
   if (model %in% c("wb", "iorw", "msm")) {
 
@@ -30,7 +29,7 @@ run_regressions <- function(formulas, data, model, exposure, mediator, postc,
 
       } else {
 
-        stop("Selected model only supports logistic/multinomial/ordinal non user-defined exposure regression model")
+        stop("Selected model only supports logistic/loglinear/multinomial/ordinal non user-defined exposure regression objects")
 
       }
 
@@ -45,92 +44,12 @@ run_regressions <- function(formulas, data, model, exposure, mediator, postc,
             identical(class(ereg), c("multinom", "nnet"))|
             identical(class(ereg), "polr"))){
 
-        stop("Selected model doesn't support this user-defined exposure regression object")
+        stop("The selected model only applies when the exposure is categorical")
 
       }
 
       exposure_regression <- update(ereg, data = data,
                                     formula. = formula(ereg))
-
-    }
-
-    if (model == "msm") {
-
-      pa <- left_join(select(data, exposure),
-                      count(data, !!as.name(exposure)),
-                      by = exposure)[, "n"]/nrow(data)
-
-      if (!is.null(wreg.simex$exposure_regression)) {
-
-        exposure_regression_pred <- wreg.simex$exposure_regression
-
-      } else {exposure_regression_pred <- exposure_regression}
-
-      if (inherits(exposure_regression, "glm") &&
-          family(exposure_regression)$family %in% c("binomial", "quasibinomial")) {
-
-        wadenom.prob <- predict(exposure_regression_pred, newdata = data,
-                                type = "response")
-
-        class <- as.numeric(as.factor(data[, exposure])) - 1
-
-        wadenom <-  wadenom.prob ^class *
-          (1 - wadenom.prob)^(1 - class)
-
-      } else if ((inherits(exposure_regression, "gam") &&
-                  (family(exposure_regression)$family == "multinom" |
-                   startsWith(family(exposure_regression)$family, "Ordered Categorical")))|
-                 inherits(exposure_regression, "multinom")|inherits(exposure_regression, "polr")) {
-
-        wadenom.prob <- predict(exposure_regression_pred, newdata = data,
-                                type = ifelse(inherits(exposure_regression, "multinom")|
-                                                inherits(exposure_regression, "polr"),
-                                              "probs","response"))
-
-        class <- as.numeric(as.factor(data[, exposure]))
-
-        wadenom <- sapply(1:nrow(data),FUN = function(i) wadenom.prob[i, class[i]])
-
-      }
-
-      wa <- pa/wadenom
-
-    } else if (model == "iorw") {
-
-      if (!is.null(wreg.simex$exposure_regression)) {
-
-        exposure_regression_pred <- wreg.simex$exposure_regression
-
-      } else {exposure_regression_pred <- exposure_regression}
-
-      if (inherits(exposure_regression, "glm") &&
-          family(exposure_regression)$family %in% c("binomial", "quasibinomial")) {
-
-        wadenom.prob <- predict(exposure_regression_pred, newdata = data,
-                                type = "response")
-
-        class <- as.numeric(as.factor(data[, exposure])) - 1
-
-        wa <-  (1 - wadenom.prob) /
-          (wadenom.prob ^ class *
-             (1 - wadenom.prob) ^ (1 - class))
-
-
-      } else if ((inherits(exposure_regression, "gam") &&
-                  (family(exposure_regression)$family == "multinom" |
-                   startsWith(family(exposure_regression)$family, "Ordered Categorical")))|
-                 inherits(exposure_regression, "multinom")|inherits(exposure_regression, "polr")) {
-
-        wadenom.prob <- predict(exposure_regression_pred, newdata = data,
-                                type = ifelse(inherits(exposure_regression, "multinom")|
-                                                inherits(exposure_regression, "polr"),
-                                              "probs","response"))
-
-        class <- as.numeric(as.factor(data[, exposure]))
-
-        wa <- prob[, 1] / sapply(1:nrow(data),FUN = function(i) wadenom.prob[i, class[i]])
-
-      }
 
     }
 
@@ -151,19 +70,14 @@ run_regressions <- function(formulas, data, model, exposure, mediator, postc,
     for (i in mediator.model.index) {
 
       if (!(identical(class(mreg[[i]]), "lm") |
-            (identical(class(mreg[[i]]), c("glm", "lm")) &&
-             family(mreg[[i]])$family %in% c("gaussian","Gamma","inverse.gaussian","quasi",
-                                             "binomial", "quasibinomial","poisson", "quasipoisson"))|
-            (identical(class(mreg[[i]]), c("gam", "glm", "lm")) &&
-             (family(mreg[[i]])$family %in% c("gaussian","Gamma","inverse.gaussian","quasi","multinom",
-                                              "binomial", "quasibinomial","poisson", "quasipoisson") |
-              startsWith(family(mreg[[i]])$family,"Negative Binomial")|
-              startsWith(family(mreg[[i]])$family,"Ordered Categorical")))|
+            (identical(class(mreg[[i]]), c("glm", "lm")))|
+            (identical(class(mreg[[i]]), c("gam", "glm", "lm")))|
             identical(class(mreg[[i]]), c("multinom", "nnet"))|
-            identical(class(mreg[[i]]), "polr")|identical(class(mreg[[i]]), "nls")|
-            identical(class(mreg[[i]]), c("negbin", "glm", "lm")))){
+            identical(class(mreg[[i]]), "polr")|
+            identical(class(mreg[[i]]), "nls")|
+            identical(class(mreg[[i]]), c("negbin", "glm", "lm")))) {
 
-        stop("Unsupported user-defined mediator regression object")
+        stop("For mediator regression object, only lm(), glm(), glm.nb(), gam(), multinom(), polr() and nls() are supported")
 
       }
 
@@ -176,7 +90,7 @@ run_regressions <- function(formulas, data, model, exposure, mediator, postc,
 
       if (mreg[[i]] == "linear") {
 
-        mediator_regression[[i]] <- glm(mediator_formula[[i]], family = gaussian(), data = data)
+        mediator_regression[[i]] <- lm(mediator_formula[[i]], data = data)
 
       } else if (mreg[[i]] == "logistic") {
 
@@ -209,13 +123,14 @@ run_regressions <- function(formulas, data, model, exposure, mediator, postc,
         mediator_regression[[i]] <- MASS::polr(mediator_formula[[i]], data = data)
 
       } else {
-        stop("Unsupported non user-defined mediator regression model")
+        stop("Only supports linear/logistic/loglinear/poisson/quasipoisson/negbin/multinomial/ordinal non user-defined mediator regression objects")
       }
     }
 
+
     if (model == "msm") {
 
-      for (i in length(mediator_regression)) {
+      for (i in 1:length(mediator_regression)) {
 
         if (!((identical(class(mediator_regression[[i]]), c("glm", "lm")) &&
                family(mediator_regression[[i]])$family %in% c("binomial", "quasibinomial"))|
@@ -226,18 +141,11 @@ run_regressions <- function(formulas, data, model, exposure, mediator, postc,
               identical(class(mediator_regression[[i]]), c("multinom", "nnet"))|
               identical(class(mediator_regression[[i]]), "polr"))){
 
-          stop("Selected model doesn't support this mediator regression object")
+          stop("The selected model only applies for categorical mediators")
 
         }
-
-        mediator_regression[[i]]$call[["weights"]] <- wa
-
-        mediator_regression[[i]] <- update(mediator_regression[[i]],
-                                           formula. = formula(mediator_regression[[i]]))
-
       }
     }
-
   } else mediator_regression <- NULL
 
   ####################################Mediator Regression For Weights##############################
@@ -265,7 +173,7 @@ run_regressions <- function(formulas, data, model, exposure, mediator, postc,
             identical(class(wmreg[[i]]), c("multinom", "nnet"))|
             identical(class(wmreg[[i]]), "polr"))){
 
-        stop("Selected model doesn't support this user-defined mediator regression object for weights")
+        stop("The selected model only applies for categorical mediators")
 
       }
 
@@ -295,10 +203,10 @@ run_regressions <- function(formulas, data, model, exposure, mediator, postc,
         wmdenom_regression[[i]] <- MASS::polr(mediator_formula[[i]], data = data)
 
       } else {
-        stop("Selected model doesn't support this non user-defined mediator regression model for weights")
+        stop("Selected model only supports logistic/loglinear/multinomial/ordinal non user-defined mediator regression objects for weights")
+
       }
     }
-
 
     wmnom_regression <- list()
 
@@ -309,76 +217,6 @@ run_regressions <- function(formulas, data, model, exposure, mediator, postc,
 
 
     }
-
-
-    wmnom_regression_pred <- wmnom_regression
-
-    for (i in 1:length(wmnom_regression)) {
-
-      if (!is.null(reg.simex$wmnom_regression[[i]])) wmnom_regression_pred[[i]] <- reg.simex$wmnom_regression[[i]]
-
-    }
-
-    wmdenom_regression_pred <- wmdenom_regression
-
-    for (i in 1:length(wmdenom_regression)) {
-
-      if (!is.null(reg.simex$wmdenom_regression[[i]])) wmdenom_regression_pred[[i]] <- reg.simex$wmdenom_regression[[i]]
-
-    }
-
-    wmnom <- rep(1, nrow(data))
-
-    wmdenom <- rep(1, nrow(data))
-
-    for (i in 1:length(wmdenom_regression)) {
-
-      if (inherits(wmdenom_regression[[i]], "glm") &&
-          family(wmdenom_regression[[i]])$family %in% c("binomial", "quasibinomial")) {
-
-        wmdenom.prob <- predict(wmdenom_regression_pred[[i]], newdata = data,
-                                type = "response")
-
-        wmnom.prob <- predict(wmnom_regression_pred[[i]], newdata = data,
-                              type = "response")
-
-        class <- as.numeric(as.factor(data[, mediator[i]])) - 1
-
-        wmdenom <-  wmdenom * wmdenom.prob ^ class *
-          (1 - wmdenom.prob)^(1 - class)
-
-        wmnom <-  wmnom * wmnom.prob ^ class *
-          (1 - wmnom.prob)^(1 - class)
-
-      } else if ((inherits(wmdenom_regression[[i]], "gam") &&
-                  (family(wmdenom_regression[[i]])$family == "multinom" |
-                   startsWith(family(wmdenom_regression[[i]])$family, "Ordered Categorical")))|
-                 inherits(wmdenom_regression[[i]], "multinom")|inherits(wmdenom_regression[[i]], "polr")) {
-
-        wmdenom.prob <- predict(wmdenom_regression_pred[[i]], newdata = data,
-                                type = ifelse(inherits(wmdenom_regression[[i]], "multinom")|
-                                                inherits(wmdenom_regression[[i]], "polr"),
-                                              "probs","response"))
-
-        wmnom.prob <- predict(wmnom_regression_pred[[i]], newdata = data,
-                              type = ifelse(inherits(wmnom_regression[[i]], "multinom")|
-                                              inherits(wmnom_regression[[i]], "polr"),
-                                            "probs","response"))
-
-        class <- as.numeric(as.factor(data[, mediator[i]]))
-
-        wmdenom <- wmdenom * sapply(1:nrow(data), FUN = function(i) wmdenom.prob[i, class[i]])
-
-        wmnom <- wmnom * sapply(1:nrow(data), FUN = function(i) wmnom.prob[i, class[i]])
-
-      }
-
-    }
-
-    wm <- wmnom / wmdenom
-
-    wy <- wa * wm
-
   }
 
   #####################################Post-exposure Confounder Regression###########################
@@ -396,19 +234,14 @@ run_regressions <- function(formulas, data, model, exposure, mediator, postc,
     for (i in postc.model.index) {
 
       if (!(identical(class(postcreg[[i]]), "lm") |
-            (identical(class(postcreg[[i]]), c("glm", "lm")) &&
-             family(postcreg[[i]])$family %in% c("gaussian","Gamma","inverse.gaussian","quasi",
-                                                 "binomial", "quasibinomial","poisson", "quasipoisson"))|
-            (identical(class(postcreg[[i]]), c("gam", "glm", "lm")) &&
-             (family(postcreg[[i]])$family %in% c("gaussian","Gamma","inverse.gaussian","quasi","multinom",
-                                                  "binomial", "quasibinomial","poisson", "quasipoisson") |
-              startsWith(family(postcreg[[i]])$family,"Negative Binomial")|
-              startsWith(family(postcreg[[i]])$family,"Ordered Categorical")))|
+            identical(class(postcreg[[i]]), c("glm", "lm"))|
+            identical(class(postcreg[[i]]), c("gam", "glm", "lm"))|
             identical(class(postcreg[[i]]), c("multinom", "nnet"))|
-            identical(class(postcreg[[i]]), "polr")|identical(class(postcreg[[i]]), "nls")|
+            identical(class(postcreg[[i]]), "polr")|
+            identical(class(postcreg[[i]]), "nls")|
             identical(class(postcreg[[i]]), c("negbin", "glm", "lm")))){
 
-        stop("Unsupported user-defined post-exposure counfounder regression object")
+        stop("For post-exposure confounder regression object, only lm(), glm(), glm.nb(), gam(), multinom(), polr() and nls() are supported")
 
       }
 
@@ -421,7 +254,7 @@ run_regressions <- function(formulas, data, model, exposure, mediator, postc,
 
       if (postcreg[[i]] == "linear") {
 
-        postc_regression[[i]] <- glm(postc_formula[[i]], family = gaussian(), data = data)
+        postc_regression[[i]] <- lm(postc_formula[[i]], data = data)
 
       } else if (postcreg[[i]] == "logistic") {
 
@@ -454,12 +287,11 @@ run_regressions <- function(formulas, data, model, exposure, mediator, postc,
         postc_regression[[i]] <- MASS::polr(postc_formula[[i]], data = data)
 
       } else {
-        stop("Unsupported non user-defined post-exposure confounder regression model")
+        stop("Only supports linear/logistic/loglinear/poisson/quasipoisson/negbin/multinomial/ordinal non user-defined post-exposure confounder regression objects")
       }
     }
 
   } else postc_regression <- NULL
-
 
   ###########################################Outcome Regression######################################
 
@@ -469,7 +301,7 @@ run_regressions <- function(formulas, data, model, exposure, mediator, postc,
 
     if (yreg == "linear") {
 
-      outcome_regression  <- glm(outcome_formula, family = gaussian(), data = data)
+      outcome_regression  <- lm(outcome_formula, data = data)
 
     } else if (yreg == "logistic") {
 
@@ -505,34 +337,29 @@ run_regressions <- function(formulas, data, model, exposure, mediator, postc,
 
     } else if (yreg == "aft_exp") {
 
-      outcome_regression <- survreg(as.formula(outcome_formula), dist = "exponential", data = data)
+      outcome_regression <- survival::survreg(as.formula(outcome_formula), dist = "exponential", data = data)
 
     } else if (yreg == "aft_weibull") {
 
-      outcome_regression <- survreg(as.formula(outcome_formula), dist = "weibull", data = data)
+      outcome_regression <- survival::survreg(as.formula(outcome_formula), dist = "weibull", data = data)
 
     } else {
-      stop("Unsupported non user-defined outcome regression")
+      stop("Only supports linear/logistic/loglinear/poisson/quasipoisson/negbin/multinomial/ordinal/coxph/aft_exp/aft_weibull non user-defined outcome regression objects")
     }
 
   } else {
 
     if (!(identical(class(yreg), "lm") |
-          (identical(class(yreg), c("glm", "lm")) &&
-           family(yreg)$family %in% c("gaussian","Gamma","inverse.gaussian","quasi",
-                                      "binomial", "quasibinomial","poisson", "quasipoisson"))|
-          (identical(class(yreg), c("gam", "glm", "lm")) &&
-           (family(yreg)$family %in% c("gaussian","Gamma","inverse.gaussian","quasi","multinom",
-                                       "binomial", "quasibinomial","poisson", "quasipoisson") |
-            startsWith(family(yreg)$family,"Negative Binomial")|
-            startsWith(family(yreg)$family,"Ordered Categorical")))|
+          identical(class(yreg), c("glm", "lm"))|
+          identical(class(yreg), c("gam", "glm", "lm"))|
           identical(class(yreg), c("multinom", "nnet"))|
-          identical(class(yreg), "polr")|identical(class(yreg), "nls")|
+          identical(class(yreg), "polr")|
+          identical(class(yreg), "nls")|
           identical(class(yreg), c("negbin", "glm", "lm"))|
           identical(class(yreg), "survreg")|
           identical(class(yreg), "coxph"))){
 
-      stop("Unsupported user-defined outcome regression object")
+      stop("For outcome regression object, only lm(), glm(), glm.nb(), gam(), multinom(), polr(), nls(), coxph() and survreg() are supported")
 
     }
 
@@ -541,30 +368,9 @@ run_regressions <- function(formulas, data, model, exposure, mediator, postc,
 
   }
 
-  if (model == "msm") {
-
-    outcome_regression$call[["weights"]] <- wy
-
-    outcome_regression <- update(outcome_regression,
-                                 formula. = formula(outcome_regression))
-
-  } else if (model == "iorw") {
-
-    tot_regression <- outcome_regression
-
-    dir_regression <- outcome_regression
-
-    dir_regression$call[["weights"]] <- wa
-
-    dir_regression <- update(dir_regression,
-                             formula. = formula(dir_regression))
-
-  }
-
-
   ###########################################Return Regression List#############################
 
-  if (model %in% c("rb", "msm")) {
+  if (model == "rb") {
 
     regressions <- list(mediator_regression = mediator_regression,
                         outcome_regression =  outcome_regression)
@@ -577,6 +383,33 @@ run_regressions <- function(formulas, data, model, exposure, mediator, postc,
                                                      formula. = formula(regressions$mediator_regression[[i]]))
     }
 
+  } else if (model == "msm") {
+
+    regressions <- list(exposure_regression = exposure_regression,
+                        wmnom_regression = wmnom_regression,
+                        wmdenom_regression = wmdenom_regression,
+                        mediator_regression = mediator_regression,
+                        outcome_regression =  outcome_regression)
+
+    regressions$outcome_regression <- update(regressions$outcome_regression,
+                                             formula. = formula(regressions$outcome_regression))
+
+    regressions$exposure_regression <- update(regressions$exposure_regression,
+                                              formula. = formula(regressions$exposure_regression))
+
+    for (i in 1:length(mediator)) {
+
+      regressions$mediator_regression[[i]] <- update(regressions$mediator_regression[[i]],
+                                                     formula. = formula(regressions$mediator_regression[[i]]))
+
+      regressions$wmnom_regression[[i]] <- update(regressions$wmnom_regression[[i]],
+                                                  formula. = formula(regressions$wmnom_regression[[i]]))
+
+      regressions$wmdenom_regression[[i]] <- update(regressions$wmdenom_regression[[i]],
+                                                    formula. = formula(regressions$wmdenom_regression[[i]]))
+
+    }
+
   } else if (model == "wb") {
 
     regressions <- list(exposure_regression = exposure_regression,
@@ -586,7 +419,7 @@ run_regressions <- function(formulas, data, model, exposure, mediator, postc,
                                              formula. = formula(regressions$outcome_regression))
 
     regressions$exposure_regression <- update(regressions$exposure_regression,
-                                             formula. = formula(regressions$exposure_regression))
+                                              formula. = formula(regressions$exposure_regression))
 
   } else if (model == "g-formula") {
 
@@ -605,23 +438,21 @@ run_regressions <- function(formulas, data, model, exposure, mediator, postc,
     if (!is.null(postc_regression)) {
 
       for (i in 1:length(postc_regression)) {
-      regressions$postc_regression[[i]] <- update(regressions$postc_regression[[i]],
-                                                     formula. = formula(regressions$postc_regression[[i]]))
+        regressions$postc_regression[[i]] <- update(regressions$postc_regression[[i]],
+                                                    formula. = formula(regressions$postc_regression[[i]]))
+      }
     }
-   }
-
-
 
   } else if (model == "iorw") {
 
-    regressions <- list(tot_outcome_regression = tot_outcome_regression,
-                        dir_outcome_regression = dir_outcome_regression)
+    regressions <- list(exposure_regression = exposure_regression,
+                        outcome_regression = outcome_regression)
 
-    regressions$tot_outcome_regression <- update(regressions$tot_outcome_regression,
-                                             formula. = formula(regressions$tot_outcome_regression))
+    regressions$exposure_regression <- update(regressions$exposure_regression,
+                                              formula. = formula(regressions$exposure_regression))
 
-    regressions$dir_outcome_regression <- update(regressions$dir_outcome_regression,
-                                             formula. = formula(regressions$dir_outcome_regression))
+    regressions$outcome_regression <- update(regressions$outcome_regression,
+                                             formula. = formula(regressions$outcome_regression))
 
   } else if (model == "ne") {
 

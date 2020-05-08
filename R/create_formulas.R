@@ -1,6 +1,5 @@
-create_formulas <- function(data, model,
-                            outcome, event, exposure, mediator, EMint, prec, postc,
-                            yreg, mreg, ereg, postcreg, wmreg) {
+create_formulas <- function(model, yreg, mreg, ereg, postcreg, wmreg,
+                            outcome, event, exposure, mediator, EMint, prec, postc) {
 
   ########################################Outcome Regression Formula################################
 

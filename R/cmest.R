@@ -3,7 +3,6 @@ cmest <- function(data = NULL, model = "rb",
                   exposure = NULL, mediator = NULL, EMint = FALSE,
                   prec = NULL, postc = NULL,
                   yreg = "linear", mreg = "linear", ereg = NULL, postcreg = NULL, wmreg = NULL,
-                  reg.simex = NULL,
                   astar = 0, a = 1, mval = NULL, yref = NULL, precval = NULL,
                   estimation = "paramfunc", inference = "delta",
                   nboot = 200, nrep = 5) {
@@ -127,7 +126,7 @@ cmest <- function(data = NULL, model = "rb",
         }
       }
     }
-  }
+  } else vecc <- NULL
 
 
   ######################################Effect estimation and inference###########################
@@ -137,7 +136,7 @@ cmest <- function(data = NULL, model = "rb",
 
     n <- nrow(data)
 
-    formulas <- create_formulas(data = data_boot, model = model,
+    formulas <- create_formulas(model = model,
                                 outcome = outcome, event = event,
                                 exposure = exposure, mediator = mediator, EMint = EMint,
                                 prec = prec, postc = postc,
@@ -146,14 +145,13 @@ cmest <- function(data = NULL, model = "rb",
     regressions <- run_regressions(formulas = formulas, data = data, model = model,
                                    exposure = exposure, mediator = mediator, postc = postc,
                                    yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg,
-                                   wmreg = wmreg, wreg.simex = NULL)
+                                   wmreg = wmreg)
 
     effect_estimate <- est_step(data = data, indices = 1:n, model = model,
                                 outcome = outcome, event = event, exposure = exposure,
                                 mediator = mediator, EMint = EMint,
                                 prec = prec, postc = postc,
-                                yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg,
-                                wmreg = wmreg, reg.simex = reg.simex,
+                                regressions = regressions,
                                 astar = astar, a = a, mval = mval, yref = yref, vecc = vecc,
                                 estimation = estimation)
 
@@ -161,20 +159,16 @@ cmest <- function(data = NULL, model = "rb",
                           outcome = outcome, event = event, exposure = exposure,
                           mediator = mediator, EMint = EMint,
                           prec = prec, postc = postc,
-                          yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg, wmreg = wmreg,
-                          reg.simex = reg.simex,
+                          regressions = regressions,
                           astar = astar, a = a, mval = mval, yref = yref, vecc = vecc,
                           estimation = estimation, inference = inference)
 
-    out <- list(data = data,
-                    regressions = regressions,
-                    effect_estimate = effect_estimate,
-                    effect_se = effect_se)
-
+    out <- list(effect_estimate = effect_estimate,
+                effect_se = effect_se)
 
   } else if (model == "ne") {
 
-    formulas <- create_formulas(data = data, model = model,
+    formulas <- create_formulas(model = model,
                                 outcome = outcome, event = event,
                                 exposure = exposure, mediator = mediator, EMint = EMint,
                                 prec = prec, postc = postc,
@@ -182,8 +176,8 @@ cmest <- function(data = NULL, model = "rb",
 
     regressions <- run_regressions(formulas = formulas, data = data, model = model,
                                    exposure = exposure, mediator = mediator, postc = postc,
-                                   yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg,
-                                   wmreg = wmreg, wreg.simex = NULL)
+                                   regressions = regressions,
+                                   wmreg = wmreg)
 
     outcome_regression <- regressions$outcome_regression
 
@@ -235,12 +229,26 @@ cmest <- function(data = NULL, model = "rb",
     effect_estimate <- results[, "Estimate"]
     effect_se <- results[, "Std. Error"]
 
-    out <- list(data = data,
-                    regressions = regressions,
-                    effect_estimate = effect_estimate,
-                    effect_se = effect_se)
+    out <- list(effect_estimate = effect_estimate,
+                effect_se = effect_se)
 
   }
+
+  out$data <- data
+
+  out$model <- model
+
+  out$variables <- list(outcome = outcome, event = event,
+                     exposure = exposure, mediator = mediator,
+                     prec = prec, postc = postc)
+
+  out$ref <- list(astar = astar, a = a, mval = mval, yref = yref, vecc = vecc)
+
+  out$method <- c(estimation = estimation, inference = inference)
+
+  if(inference == "bootstrap") out$nboot <- nboot
+
+  out$regressions <- regressions
 
   class(out) <- "cmest"
 

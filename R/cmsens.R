@@ -1,24 +1,57 @@
 cmsens <- function(cmest_out = NULL, sens = "uc",
                    MEvariable = NULL, MEvariable.type = NULL, measurement.error = NULL,
-                   data = NULL, model = "rb",
-                   outcome = NULL, event = NULL,
-                   exposure = NULL, mediator = NULL, EMint = FALSE,
-                   prec = NULL, postc = NULL,
-                   yreg = "linear", mreg = "linear", ereg = NULL, postcreg = NULL, wmreg = NULL,
-                   astar = 0, a = 1, mval = NULL, yref = NULL, precval = NULL,
-                   estimation = "paramfunc", inference = "delta",
-                   nboot = 200, nrep = 5) {
+                   lambda = c(0.5, 1, 1.5, 2), B = 100) {
 
+  data <- cmest_out$data
 
-  require(EValue)
-  require(simex)
+  model <- cmest_out$model
+
+  outcome <- cmest_out$variables$outcome
+
+  event <- cmest_out$variables$event
+
+  exposure <- cmest_out$variables$exposure
+
+  mediator <- cmest_out$variables$mediator
+
+  prec <- cmest_out$variables$prec
+
+  postc <- cmest_out$variables$postc
+
+  astar <- cmest_out$ref$astar
+
+  a <- cmest_out$ref$a
+
+  mval <- cmest_out$ref$mval
+
+  yref <- cmest_out$ref$yref
+
+  vecc <- cmest_out$ref$vecc
+
+  estimation <- cmest_out$method["estimation"]
+
+  inference <- cmest_out$method["inference"]
+
+  if(inference == "bootstrap") nboot <- cmest_out$nboot
+
+  regression <- cmest_out$regressions
+
+  outcome_regression <- regression$outcome_regression
+
+  effect_estimate <- cmest_out$effect_estimate
+
+  effect_se <- cmest_out$effect_se
 
   if (!sens %in% c("uc", "me")) {
     stop("Only supports sensitivity analysis for unmeasured confounding and measurement error")
   }
 
-  if (sens == "uc") {
 
+  #################################################################################################
+  ############################Sensitiviti Analysis for Unmeasure Confounding#######################
+  #################################################################################################
+
+  if (sens == "uc") {
 
     if (model %in% c("rb", "wb", "msm", "g-formula")) {
 
@@ -30,7 +63,7 @@ cmsens <- function(cmest_out = NULL, sens = "uc",
 
     } else if (model == "ne") {
 
-      index_biased <- 1:length(cmest_out$effect_estimate)
+      index_biased <- 1:length(effect_estimate)
 
     }
 
@@ -38,198 +71,142 @@ cmsens <- function(cmest_out = NULL, sens = "uc",
 
     evalue_pe <- c()
 
-    evalue_ci <- c()
+    evalue_ci_lo <- c()
 
-    if (yreg == "linear"|
-        (identical(class(yreg), "lm") |
-         (identical(class(yreg), c("glm", "lm")) &&
-          family(yreg)$family %in% c("gaussian","Gamma","inverse.gaussian","quasi"))|
-         (identical(class(yreg), c("gam", "glm", "lm")) &&
-          (family(yreg)$family %in% c("gaussian","Gamma","inverse.gaussian","quasi")))|
-         identical(class(yreg), "nls"))) {
+    evalue_ci_hi <- c()
+
+    if (identical(class(outcome_regression), "lm") |
+        (identical(class(outcome_regression), c("glm", "lm")) &&
+         (family(outcome_regression)$family %in% c("gaussian","Gamma","inverse.gaussian","quasi")))|
+        (identical(class(outcome_regression), c("gam", "glm", "lm")) &&
+         (family(outcome_regression)$family %in% c("gaussian","Gamma","inverse.gaussian","quasi",
+                                                   "gaulss", "gevlss")|
+          startsWith(family(outcome_regression)$family, "Tweedie")|
+          startsWith(family(outcome_regression)$family, "Beta regression")|
+          startsWith(family(outcome_regression)$family, "Scaled t")))|
+        identical(class(outcome_regression), "nls")) {
 
       for (i in index_biased) {
 
-        d <- unname(cmest_out$effect_estimate[i] / sd(data[, outcome]))
+        d <- unname(effect_estimate[i] / sd(data[, outcome]))
 
-        sd <- unname(cmest_out$effect_se[i] / sd(data[, outcome]))
+        sd <- unname(effect_se[i] / sd(data[, outcome]))
 
         est <- c(est, exp(0.91 * d))
 
-        evalues <- evalues.RR(est = exp(0.91 * d), lo = exp(0.91 * d - 1.78 * sd),
-                              hi = exp(0.91 * d + 1.78 * sd))
+        evalues <- EValue::evalues.RR(est = exp(0.91 * d), lo = exp(0.91 * d - 1.78 * sd),
+                                      hi = exp(0.91 * d + 1.78 * sd))
 
         evalue_pe <- c(evalue_pe, unname(evalues["E-values","point"]))
 
-        evalue_ci <- c(evalue_ci, unname(evalues["E-values",c("lower", "upper")][which(!is.na(evalues["E-values",c("lower", "upper")]))]))
+        evalue_ci_lo <- c(evalue_ci_lo, unname(evalues["E-values","lower"]))
+
+        evalue_ci_hi <- c(evalue_ci_hi, unname(evalues["E-values","upper"]))
 
       }
-
     } else {
 
       for (i in index_biased) {
 
-        est <- c(est, cmest_out$effect_estimate[i])
+        est <- c(est, effect_estimate[i])
 
-        evalues <- evalues.RR(est = cmest_out$effect_estimate[i],
-                              lo = cmest_out$effect_estimate[i] - 1.96 * cmest_out$effect_se[i],
-                              hi = cmest_out$effect_estimate[i] + 1.96 * cmest_out$effect_se[i])
+        evalues <- EValue::evalues.RR(est = effect_estimate[i],
+                                      lo = effect_estimate[i] - 1.96 * effect_se[i],
+                                      hi = effect_estimate[i] + 1.96 * effect_se[i])
 
         evalue_pe <- c(evalue_pe, unname(evalues["E-values","point"]))
 
-        evalue_ci <- c(evalue_ci, unname(evalues["E-values",c("lower", "upper")][which(!is.na(evalues["E-values",c("lower", "upper")]))]))
+        evalue_ci_lo <- c(evalue_ci_lo, unname(evalues["E-values","lower"]))
+
+        evalue_ci_hi <- c(evalue_ci_hi, unname(evalues["E-values","upper"]))
 
       }
 
     }
 
-    sens_out <- cbind(Point = evalue_pe, CI = evalue_ci)
+    out <- cbind(Point = evalue_pe, CIlower = evalue_ci_lo, CIupper = evalue_ci_hi)
 
-    rownames(sens_out) <- names(cmest_out$effect_estimate)[index_biased]
+    rownames(out) <- names(effect_estimate)[index_biased]
+
+    class(out) <- "cmsens.uc"
+
+    #################################################################################################
+    ############################Sensitiviti Analysis for Unmeasure Confounding#######################
+    #################################################################################################
 
   } else if (sens == "me") {
 
-    formulas <- create_formulas(data = data, model = model,
-                                outcome = outcome, event = event,
-                                exposure = exposure, mediator = mediator, EMint = EMint,
-                                prec = prec, postc = postc,
-                                yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg, wmreg = wmreg)
+    out <- list(rep(NA, length(measurement.error)))
 
+    for (i in 1:length(measurement.error)) {
 
-    if (MEvariable.type == "continuous") {
+      n <- nrow(data)
 
-      regressions_naive <- run_regressions(formulas = formulas, data = data, model = model,
-                                           exposure = exposure, mediator = mediator, postc = postc,
-                                           yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg, wmreg = wmreg)
+      effect_estimate <- est_step(data = data, indices = 1:n, model = model,
+                                  outcome = outcome, event = event, exposure = exposure,
+                                  mediator = mediator, EMint = EMint,
+                                  prec = prec, postc = postc,
+                                  regressions = regressions,
+                                  astar = astar, a = a, mval = mval, yref = yref, vecc = vecc,
+                                  estimation = estimation,
+                                  ME = TRUE, MEvariable = MEvariable,
+                                  MEvariable.type = MEvariable.type,
+                                  measurement.error = measurement.error[[i]], lambda = lambda, B = B)
 
-      if (model == "rb") {
+      effect_se <- inf_step(data = data, nboot = nboot, model = model,
+                            outcome = outcome, event = event, exposure = exposure,
+                            mediator = mediator, EMint = EMint,
+                            prec = prec, postc = postc,
+                            regressions = regressions,
+                            astar = astar, a = a, mval = mval, yref = yref, vecc = vecc,
+                            estimation = estimation, inference = inference,
+                            ME = TRUE, MEvariable = MEvariable,
+                            MEvariable.type = MEvariable.type,
+                            measurement.error = measurement.error[[i]], lambda = lambda, B = B)
 
-        if (MEvariable %in% c(exposure, prec)) {
+      out[[i]] <- list(data = data,
+                       effect_estimate = effect_estimate,
+                            effect_se = effect_se)
 
-          sens_out <- list(rep(NA, length(measurement.error)))
+      class(out[[i]]) <- "cmest"
 
-          for (j in 1:length(measurement.error)) {
-
-            outcome_regression_naive <- regressions_naive$outcome_regression
-
-            outcome_regression_simex <- simex(model = outcome_regression_naive,
-                                              SIMEXvariable = MEvariable,
-                                              measurement.error = measurement.error[j],
-                                              asymptotic = FALSE)
-
-            mediator_regression_simex <- list()
-
-            for (i in 1:length(mediator)) {
-
-              mediator_regression_naive <- regressions_naive$mediator_regression[[i]]
-
-              mediator_regression_simex[[i]] <- simex(model = mediator_regression_naive,
-                                                      SIMEXvariable = MEvariable,
-                                                      measurement.error = measurement.error[j],
-                                                      asymptotic = FALSE)
-
-            }
-
-            reg.simex <- list(outcome_regression = outcome_regression_simex,
-                              mediator_regression = mediator_regression_simex)
-
-            sens_out[[j]] <- summary(cmest(data = data, model = model,
-                                           outcome = outcome, event = event, exposure = exposure,
-                                           mediator = mediator, EMint = EMint,
-                                           prec = prec, postc = postc,
-                                           yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg,
-                                           wmreg = wmreg, reg.simex = reg.simex,
-                                           astar = astar, a = a, mval = mval, yref = yref, precval = precval,
-                                           estimation = estimation, inference = inference,
-                                           nboot = nboot, nrep = nrep))
-
-          }
-
-        } else if (MEvariable %in% c(mediator)) {
-
-          sens_out <- list(rep(NA, length(measurement.error)))
-
-          for (j in 1:length(measurement.error)) {
-
-            outcome_regression_naive <- regressions_naive$outcome_regression
-
-            outcome_regression_simex <- simex(model = outcome_regression_naive,
-                                              SIMEXvariable = MEvariable,
-                                              measurement.error = measurement.error[j],
-                                              asymptotic = FALSE)
-
-            mediator_regression_simex <- list()
-
-            for (i in 1:length(mediator)) {
-
-              mediator_regression_naive <- regressions_naive$mediator_regression[[i]]
-
-              if (MEvariable %in% names(attr(mediator_regression_naive$terms,"dataClasses"))) {
-
-                mediator_regression_simex[[i]] <- simex(model = mediator_regression_naive,
-                                                        SIMEXvariable = MEvariable,
-                                                        measurement.error = measurement.error[j],
-                                                        asymptotic = FALSE)
-
-              } else mediator_regression_simex[i] <- list(NULL)
-
-            }
-
-            reg.simex <- list(outcome_regression = outcome_regression_simex,
-                              mediator_regression = mediator_regression_simex)
-
-            sens_out[[j]] <- summary(cmest(data = data, model = model,
-                                           outcome = outcome, event = event, exposure = exposure,
-                                           mediator = mediator, EMint = EMint,
-                                           prec = prec, postc = postc,
-                                           yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg,
-                                           wmreg = wmreg, reg.simex = reg.simex,
-                                           astar = astar, a = a, mval = mval, yref = yref, precval = precval,
-                                           estimation = estimation, inference = inference,
-                                           nboot = nboot, nrep = nrep))
-
-          }
-
-        } else if (MEvariable == outcome) {
-
-          sens_out <- list(rep(NA, length(measurement.error)))
-
-          for (j in 1:length(measurement.error)) {
-
-            outcome_regression_naive <- regressions_naive$outcome_regression
-
-            outcome_regression_simex <- simex(model = outcome_regression_naive,
-                                              SIMEXvariable = MEvariable,
-                                              measurement.error = measurement.error[j],
-                                              asymptotic = FALSE)
-
-            reg.simex <- list(outcome_regression = outcome_regression_simex)
-
-            sens_out[[j]] <- summary(cmest(data = data, model = model,
-                                           outcome = outcome, event = event, exposure = exposure,
-                                           mediator = mediator, EMint = EMint,
-                                           prec = prec, postc = postc,
-                                           yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg,
-                                           wmreg = wmreg, reg.simex = reg.simex,
-                                           astar = astar, a = a, mval = mval, yref = yref, precval = precval,
-                                           estimation = estimation, inference = inference,
-                                           nboot = nboot, nrep = nrep))
-
-          }
-
-
-
-        }
-
-        names(sens_out) <- paste("measurement.error = ", measurement.error)
-
-        class(sens_out) <- "cmsens.me"
-      }
+      out[[i]] <- summary(out[[i]])
 
     }
 
+    if (MEvariable.type == "continuous") {
+
+      relia_ratio <- 1 - measurement.error/sd(data[, MEvariable])
+
+      names(out) <- paste("Sigma = ", measurement.error, ", Reliability Ratio = ",
+                               round(relia_ratio, 4), sep = "")
+
+    } else if (MEvariable.type == "categorical") {
+
+      name_vec <- c()
+
+      for (i in 1:length(measurement.error)) {
+
+        name_vec <- c(name_vec, paste("Misclassification Matrix = matrix(c(",
+                                      paste(as.vector(measurement.error[[i]]), sep = "", collapse = ","), "), nrow = ",
+                                      length(unique(data[, MEvariable])), ")", sep = ""))
+      }
+
+      names(out) <- name_vec
+
+    }
+
+    out <- list(cmsens = out)
+
+    out$cmest <- cmest_out
+
+    out$ME <- list(MEvariable = MEvariable, MEvariable.type = MEvariable.type,
+                   measurement.error = measurement.error, lambda = lambda, B = B)
+
+    class(out) <- "cmsens.me"
+
   }
 
-  return(sens_out)
+  return(out)
 
 }

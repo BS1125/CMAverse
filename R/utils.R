@@ -46,7 +46,7 @@ summary.cmest <- function(cmest_out, digits = 4) {
 
   out
 
-  }
+}
 
 print.summary.cmest <- function(summary.cmest, digits = 4) {
 
@@ -56,11 +56,68 @@ print.summary.cmest <- function(summary.cmest, digits = 4) {
 
 print.cmsens.me <- function(cmsens_out, digits = 4) {
 
-  for (i in 1:length(cmsens_out)) {
+  for (i in 1:length(cmsens_out$cmsens)) {
 
-    cat(paste("\n", names(cmsens_out)[i],"\n"))
-    printCoefmat(cmsens_out[[i]], digits = digits, has.Pvalue = TRUE)
+    cat(paste("\n", names(cmsens_out$cmsens)[[i]],"\n"))
+    printCoefmat(cmsens_out$cmsens[[i]], digits = digits, has.Pvalue = TRUE)
     cat("--------------------------------------------------------------\n")
+
   }
+
+}
+
+plot.cmsens.me <- function(cmsens_out) {
+
+  require(ggplot2)
+
+  if (cmsens_out$cmest$model %in% c("rb", "wb", "msm", "g-formula")) {
+
+    index_out <- 1:6
+
+  } else if (cmsens_out$cmest$model == "iorw") {
+
+    index_out <- 1:3
+
+  }
+
+  effect_df <- data.frame(Effect = factor(rownames(summary(cmsens_out$cmest))[index_out]),
+                          Point = summary(cmsens_out$cmest)[index_out, 1],
+                          CIlower = summary(cmsens_out$cmest)[index_out, 3],
+                          CIupper = summary(cmsens_out$cmest)[index_out, 4],
+                          ReliabilityRatio = rep(1, length(index_out)))
+
+  if (cmsens_out$ME$MEvariable.type == "continuous") {
+
+    for (i in 1:length(cmsens_out$cmsens)) {
+
+      effect_df <- rbind(effect_df,
+                         data.frame(Effect = rownames(cmsens_out$cmsens[[i]])[index_out],
+                                    Point = cmsens_out$cmsens[[i]][index_out, 1],
+                                    CIlower = cmsens_out$cmsens[[i]][index_out, 3],
+                                    CIupper = cmsens_out$cmsens[[i]][index_out, 4],
+                                    ReliabilityRatio = round((1 - cmsens_out$ME$measurement.error[i]/
+                                                                sd(cmsens_out$cmest$data[, cmsens_out$ME$MEvariable])), 2)))
+
+    }
+
+    ggplot() +
+      geom_errorbar(aes(x = Effect, ymin = CIlower, ymax = CIupper,
+                        colour = ReliabilityRatio), width = 0.1,
+                    data = effect_df[which(effect_df$ReliabilityRatio!=1),],
+                    position = position_dodge2(width=0.5))+
+      geom_point(aes(x = Effect, y = Point, colour = ReliabilityRatio),
+                 data = effect_df[which(effect_df$ReliabilityRatio!=1),],
+                 position = position_dodge2(width=0.1)) +
+      geom_errorbar(aes(x = Effect, ymin = CIlower, ymax = CIupper), color = "orange", width = 0.1,
+                    data = effect_df[which(effect_df$ReliabilityRatio==1),],
+                    position = position_dodge2(width=0.5)) +
+      geom_point(aes(x = Effect, y = Point), colour = "orange",
+                 data = effect_df[which(effect_df$ReliabilityRatio==1),],
+                 position = position_dodge2(width=0.1)) +
+      ylab("Point Estimate and 95% CI")+
+      scale_colour_gradient(low = "lightblue", high = "darkblue")
+
+  }
+
 }
 

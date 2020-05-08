@@ -1,8 +1,10 @@
 inf_step <- function(nboot, data, model,
                      outcome, event, exposure, mediator, EMint, prec, postc,
-                     yreg, mreg, ereg, postcreg, wmreg, reg.simex,
+                     regressions,
                      astar, a, mval, yref, vecc,
-                     estimation, inference) {
+                     estimation, inference,
+                     ME = FALSE, MEvariable = NULL, MEvariable.type = NULL,
+                     measurement.error = NULL, lambda = c(0.5, 1, 1.5, 2), B = 100) {
 
   if (inference == "delta") {
 
@@ -16,16 +18,6 @@ inf_step <- function(nboot, data, model,
       stop("Delta method inference doesn't support direct imputation estimation")
     }
 
-    formulas <- create_formulas(data = data, model = model,
-                                outcome = outcome, event = event,
-                                exposure = exposure, mediator = mediator, EMint = EMint,
-                                prec = prec, postc = postc,
-                                yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg, wmreg = wmreg)
-
-    regressions <- run_regressions(formulas = formulas, data = data, model = model,
-                                   exposure = exposure, mediator = mediator, postc = postc,
-                                   yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg, wmreg = wmreg)
-
     if (is.character(data[, exposure])|is.factor(data[, exposure])) {
       a <- as.numeric(levels(as.factor(data[, exposure])) == a)[-1]
       astar <- as.numeric(levels(as.factor(data[, exposure])) == astar)[-1]
@@ -35,22 +27,61 @@ inf_step <- function(nboot, data, model,
       mstar <- as.numeric(levels(as.factor(data[, mediator])) == mval[[1]])[-1]
     } else {mstar <- mval[[1]]}
 
-    coef <- get_coef(formulas = formulas, regressions = regressions, model = model,
-                    yreg = yreg, mreg = mreg)
-
     elevel <- ifelse(is.character(data[, exposure])|is.factor(data[, exposure]),
                      length(levels(data[, exposure])), 2)
 
     mlevel <- ifelse(is.character(data[, mediator])|is.factor(data[, mediator]),
                      length(levels(data[, mediator])), 2)
 
-    thetas <- coef$thetas
+    outcome_regression <- regressions$outcome_regression
 
-    betas <- coef$betas
+    mediator_regression <- regressions$mediator_regression[[1]]
 
-    variance <- coef$variance
+    if (ME && MEvariable %in% all.vars(formula(outcome_regression))) {
 
-    vcov_block <- coef$vcov_block
+      outcome_SIMEXreg <- simex_reg(reg = outcome_regression, data = data,
+                                    MEvariable = MEvariable, MEvariable.type = MEvariable.type,
+                                    measurement.error = measurement.error, lambda = lambda,
+                                    B = B)
+
+      thetas <- outcome_SIMEXreg$SIMEXcoef
+
+      vcov_thetas <- outcome_SIMEXreg$SIMEXvar
+
+    } else {
+
+      thetas <- coef(outcome_regression)
+
+      vcov_thetas <- vcov(outcome_regression)
+
+      }
+
+    if (ME && MEvariable %in% all.vars(formula(mediator_regression))) {
+
+      mediator_SIMEXreg <- simex_reg(reg = mediator_regression, data = data,
+                                     MEvariable = MEvariable, MEvariable.type = MEvariable.type,
+                                     measurement.error = measurement.error, lambda = lambda,
+                                     B = B)
+
+      betas <- mediator_SIMEXreg$SIMEXcoef
+
+      if (mreg == "linear") { variance <- mediator_SIMEXreg$SIMEXsigma^2
+      } else variance <- NULL
+
+      vcov_betas <- mediator_SIMEXreg$SIMEXvar
+
+    } else {
+
+      betas  <- as.vector(t(coef(mediator_regression)))
+
+      if (mreg == "linear") { variance <- sigma(mediator_regression)^2
+      } else variance <- NULL
+
+      vcov_betas <- vcov(mediator_regression)
+
+    }
+
+    vcov_block <- Matrix::bdiag(vcov_thetas, vcov_betas)
 
     theta0 <- "x1"
 
@@ -439,10 +470,11 @@ inf_step <- function(nboot, data, model,
                         outcome = outcome, event = event, exposure = exposure,
                         mediator = mediator, EMint = EMint,
                         prec = prec, postc = postc,
-                        yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg, wmreg = wmreg,
-                        reg.simex = reg.simex,
+                        regressions = regressions,
                         astar = astar, a = a, mval = mval, yref = yref, vecc = vecc,
-                        estimation = estimation)
+                        estimation = estimation,
+                        ME = ME, MEvariable = MEvariable, MEvariable.type = MEvariable.type,
+                        measurement.error = measurement.error, lambda = lambda, B = B)
 
     effect_se <- apply(boots$t, 2, sd)
 

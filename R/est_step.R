@@ -1,34 +1,27 @@
-est_step <- function(data, indices, model,
+est_step <- function(data, indices, model, regressions,
                      outcome, event, exposure, mediator, EMint, prec, postc,
-                     yreg, mreg, ereg, postcreg, wmreg, reg.simex,
                      astar, a, mval, yref, vecc,
-                     estimation) {
+                     estimation,
+                     ME = FALSE, MEvariable = NULL, MEvariable.type = NULL,
+                     measurement.error = NULL, lambda = c(0.5, 1, 1.5, 2), B = 100) {
 
   data_boot <- data[indices, ]
 
-  formulas <- create_formulas(data = data_boot, model = model,
-                              outcome = outcome, event = event,
-                              exposure = exposure, mediator = mediator, EMint = EMint,
-                              prec = prec, postc = postc,
-                              yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg, wmreg = wmreg)
+  outcome_regression <- update(regressions$outcome_regression, data = data_boot)
 
-  regressions <- run_regressions(formulas = formulas, data = data_boot, model = model,
-                                 exposure = exposure, mediator = mediator, postc = postc,
-                                 yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg, wmreg = wmreg)
-
-  outcome_regression <- regressions$outcome_regression
-
-  if ((identical(class(outcome_regression), c("gam", "glm", "lm")) &&
-       (family(outcome_regression)$family %in% c("multinom") |
-        startsWith(family(outcome_regression)$family,"Ordered Categorical")))|
-      identical(class(outcome_regression), c("multinom", "nnet"))|
-      identical(class(outcome_regression), "polr")) {
+  if ((inherits(outcome_regression, "gam") &&
+       (family(outcome_regression)$family == "multinom" |
+        startsWith(family(outcome_regression)$family, "Ordered Categorical")))|
+      (inherits(outcome_regression, "multinom") && length(outcome_regression$lev) > 2)|
+      inherits(outcome_regression, "polr")) {
 
     if (is.null(yref)) {
+      warnings("Unspecified yref, 1 is used")
       yref = 1
     } else {
       yref = which(levels(as.factor(data_boot[, outcome])) == yref)
     }
+
   }
 
   ###################################################################################################
@@ -52,21 +45,16 @@ est_step <- function(data, indices, model,
            negbin, coxph, aft_exp, aft_weibull} and mreg in {linear, logistic, multinominal}")
     }
 
-
+    if (is.factor(data_boot[, exposure]) | is.character(data_boot[, exposure])) {
+      a <- as.numeric(levels(as.factor(data_boot[, exposure])) == a)[-1]
+      astar <- as.numeric(levels(as.factor(data_boot[, exposure])) == astar)[-1]
+    }
 
     if (model == "rb"){
 
-      if (is.character(data_boot[, exposure])|is.factor(data_boot[, exposure])) {
-        a <- as.numeric(levels(as.factor(data_boot[, exposure])) == a)[-1]
-        astar <- as.numeric(levels(as.factor(data_boot[, exposure])) == astar)[-1]
-      }
-
-      if (is.character(data_boot[, mediator])|is.factor(data_boot[, mediator])) {
+      if (is.factor(data_boot[, mediator])|is.character(data_boot[, mediator])) {
         mstar <- as.numeric(levels(as.factor(data_boot[, mediator])) == mval[[1]])[-1]
       } else {mstar <- mval[[1]]}
-
-      coef <- get_coef(formulas = formulas, regressions = regressions, model = model,
-                       yreg = yreg, mreg = mreg, data = data)
 
       elevel <- ifelse(is.character(data_boot[, exposure])|is.factor(data_boot[, exposure]),
                        length(levels(data_boot[, exposure])), 2)
@@ -74,11 +62,39 @@ est_step <- function(data, indices, model,
       mlevel <- ifelse(is.character(data_boot[, mediator])|is.factor(data_boot[, mediator]),
                        length(levels(data_boot[, mediator])), 2)
 
-      thetas <- coef$thetas
+      mediator_regression <- update(regressions$mediator_regression[[1]], data = data_boot)
 
-      betas <- coef$betas
+      if (ME && MEvariable %in% all.vars(formula(outcome_regression))) {
 
-      variance <- coef$variance
+        outcome_SIMEXreg <- simex_reg(reg = outcome_regression, data = data_boot,
+                                      MEvariable = MEvariable, MEvariable.type = MEvariable.type,
+                                      measurement.error = measurement.error, lambda = lambda,
+                                      B = B)
+
+        thetas <- outcome_SIMEXreg$SIMEXcoef
+
+      } else thetas <- coef(outcome_regression)
+
+      if (ME && MEvariable %in% all.vars(formula(mediator_regression))) {
+
+        mediator_SIMEXreg <- simex_reg(reg = mediator_regression, data = data_boot,
+                                       MEvariable = MEvariable, MEvariable.type = MEvariable.type,
+                                       measurement.error = measurement.error, lambda = lambda,
+                                       B = B)
+
+        betas <- mediator_SIMEXreg$SIMEXcoef
+
+        if (mreg == "linear") { variance <- mediator_SIMEXreg$SIMEXsigma^2
+        } else variance <- NULL
+
+      } else {
+
+        betas  <- as.vector(t(coef(mediator_regression)))
+
+        if (mreg == "linear") { variance <- sigma(mediator_regression)^2
+        } else variance <- NULL
+
+      }
 
       theta0 <- thetas[1]
 
@@ -296,21 +312,108 @@ est_step <- function(data, indices, model,
 
     } else if (model == "iorw") {
 
-      regressions_coef <- regressions
+      tot_regression <- update(outcome_regression, data = data_boot)
 
-      if (!is.null(reg.simex$tot_outcome_regression)) regressions_coef$tot_outcome_regression <- reg.simex$tot_outcome_regression
-      if (!is.null(reg.simex$dir_outcome_regression)) regressions_coef$dir_outcome_regression <- reg.simex$dir_outcome_regression
+      dir_regression <- update(outcome_regression, data = data_boot)
 
-      coef <- get_coef(formulas = formulas, regressions = regressions_coef, model = model,
-                       yreg = yreg, mreg = mreg, data = data)
+      exposure_regression <- update(regressions$exposure_regression, data = data_boot)
+
+      exposure_regression_pred <- exposure_regression
+
+      if (ME && MEvariable %in% all.vars(formula(exposure_regression))) {
+
+        exposure_regression_pred <- simex_reg(reg = exposure_regression_pred,
+                                              data = data_boot, MEvariable = MEvariable,
+                                              MEvariable.type = MEvariable.type,
+                                              measurement.error = measurement.error,
+                                              lambda = lambda, B = B)
+
+      }
+
+      if ((inherits(exposure_regression, "glm") &&
+           family(exposure_regression)$family %in% c("binomial", "quasibinomial"))|
+          (identical(class(exposure_regression), c("multinom", "nnet"))&&
+           length(exposure_regression$lev)==2)) {
+
+        category <- as.numeric(as.factor(data_boot[, exposure])) - 1
+
+        wadenom.prob <- predict(exposure_regression_pred, newdata = data_boot,
+                                type = ifelse(inherits(exposure_regression, "multinom"),
+                                              "probs", "response"))
+
+        wadenom <-  wadenom.prob ^ category *
+          (1 - wadenom.prob)^(1 - category)
+
+        wanom <- 1 - wadenom.prob
+
+      } else {
+
+        data_pred <- data_boot[, exposure, drop = FALSE]
+
+        data_pred[, exposure] <- as.factor(data_pred[, exposure])
+
+        category <- model.matrix(as.formula(paste("~0+", exposure, sep = "")), data = data_pred)
+
+        wadenom.prob <- predict(exposure_regression_pred, newdata = data_boot,
+                                type = ifelse(inherits(exposure_regression, "multinom")|
+                                                inherits(exposure_regression, "polr"),
+                                              "probs", "response"))
+
+        wadenom <- rowSums(category * wadenom.prob)
+
+        wanom <- wadenom.prob[, 1]
+
+      }
+
+      wa <- wanom/wadenom
+
+      dir_regression$call[["weights"]] <- wa
+
+      dir_regression <- update(dir_regression)
+
+
+      if (ME && MEvariable %in% all.vars(formula(outcome_regression))) {
+
+        dir_coef <- simex_reg(reg = dir_regression,
+                              data = data_boot, MEvariable = MEvariable,
+                              MEvariable.type = MEvariable.type,
+                              measurement.error = measurement.error,
+                              lambda = lambda, B = B)$SIMEXcoef
+
+        tot_coef <- simex_reg(reg = tot_regression,
+                              data = data_boot, MEvariable = MEvariable,
+                              MEvariable.type = MEvariable.type,
+                              measurement.error = measurement.error,
+                              lambda = lambda, B = B)$SIMEXcoef
+
+      } else {
+
+        dir_coef <- coef(dir_regression)
+
+        tot_coef <- coef(tot_regression)
+
+      }
+
+
+      if (is.factor(data_boot[, exposure]) | is.character(data_boot[, exposure])) {
+
+        dir_coef <- unname(dir_coef[2+(0:(length(unique(data[, exposure]))-2))])
+
+        tot_coef <- unname(tot_coef[2+(0:(length(unique(data[, exposure]))-2))])
+
+      } else {
+
+        dir_coef <- unname(coef(dir_regression)[2])
+
+        tot_coef <- unname(coef(tot_regression)[2])
+
+      }
 
       if (yreg == "linear") {
 
-        dir <- unname(ifelse(sum(a) == 0, 0, coef[1:(elevel - 1)] %*% a) -
-                        ifelse(sum(astar) == 0, 0, coef[1:(elevel - 1)] %*% astar))
+        dir <- unname(dir_coef %*% a - dir_coef %*% astar)
 
-        tot <- unname(ifelse(sum(a) == 0, 0, coef[elevel:(2*(elevel - 1))] %*% a) -
-                        ifelse(sum(astar) == 0, 0, coef[elevel:(2*(elevel - 1))] %*% astar))
+        dir <- unname(tot_coef %*% a - tot_coef %*% astar)
 
         ind <- tot - dir
 
@@ -318,20 +421,15 @@ est_step <- function(data, indices, model,
 
       } else {
 
-        RRdir <- unname(exp(ifelse(sum(a) == 0, 0, coef[1:(elevel - 1)] %*% a) -
-                              ifelse(sum(astar) == 0, 0, coef[1:(elevel - 1)] %*% astar)))
+        RRdir <- unname(exp(dir_coef %*% a - dir_coef %*% astar))
 
-        RRtot <- unname(exp(ifelse(sum(a) == 0, 0, coef[elevel:(2*(elevel - 1))] %*% a) -
-                              ifelse(sum(astar) == 0, 0, coef[elevel:(2*(elevel - 1))] %*% astar)))
-
-
+        RRtot <- unname((tot_coef %*% a - tot_coef %*% astar))
 
         RRind <- RRtot / RRdir
 
         out <- c(RRtot = RRtot, RRdir = RRdir, RRind = RRind)
 
       }
-
     }
 
     ###################################################################################################
@@ -342,250 +440,322 @@ est_step <- function(data, indices, model,
 
     if (model %in% c("rb", "msm", "g-formula")) {
 
-      if (model == "g-formula") {
+      if (model == "msm") {
 
-        if (!is.null(postc)){
+        # calculate P(A=ai)/P(A=ai|C=ci)
 
-          postc_regression <- regressions$postc_regression
+        exposure_regression <- update(regressions$exposure_regression, data = data_boot)
 
-          postc_regression_pred <- postc_regression
+        exposure_regression_pred <- exposure_regression
 
-          for (i in 1:length(postc_regression)) {
+        if (ME && MEvariable %in% all.vars(formula(exposure_regression))) {
 
-            if (!is.null(reg.simex$postc_regression[[i]])) postc_regression_pred[[i]] <- reg.simex$postc_regression[[i]]
+          exposure_regression_pred <- simex_reg(reg = exposure_regression,
+                                                data = data_boot, MEvariable = MEvariable,
+                                                MEvariable.type = MEvariable.type,
+                                                measurement.error = measurement.error,
+                                                lambda = lambda, B = B)
+
+        }
+
+        wanom <- left_join(select(data_boot, exposure),
+                           count(data_boot, !!as.name(exposure)),
+                           by = exposure)[, "n"]/nrow(data_boot)
+
+        if ((inherits(exposure_regression, "glm") &&
+             family(exposure_regression)$family %in% c("binomial", "quasibinomial"))|
+            (inherits(exposure_regression, "multinom")&&
+             length(exposure_regression$lev)==2)) {
+
+          category <- as.numeric(as.factor(data_boot[, exposure])) - 1
+
+          wadenom.prob <- predict(exposure_regression, newdata = data_boot,
+                                  type = ifelse(inherits(exposure_regression, "multinom"),
+                                                "probs", "response"))
+
+          wadenom <-  wadenom.prob ^ category *
+            (1 - wadenom.prob)^(1 - category)
+
+        } else {
+
+          data_pred <- data_boot[, exposure, drop = FALSE]
+
+          data_pred[, exposure] <- as.factor(data_pred[, exposure])
+
+          category <- model.matrix(as.formula(paste("~0+", exposure, sep = "")), data = data_pred)
+
+          wadenom.prob <- predict(exposure_regression, newdata = data_boot,
+                                  type = ifelse(inherits(exposure_regression, "multinom")|
+                                                  inherits(exposure_regression, "polr"),
+                                                "probs", "response"))
+
+          wadenom <- rowSums(category * wadenom.prob)
+
+        }
+
+        wa <- wanom/wadenom
+
+        # calculate P(Mp=Mp,i|A=ai)/P(Mp=Mp,i|A=ai,C=ci,L=Li)
+
+        wmnom_regression <- wmnom_regression_pred <- wmdenom_regression <-
+          wmdenom_regression_pred <- list()
+
+         for (i in 1:length(mediator)) {
+
+            wmnom_regression[[i]] <- update(regressions$wmnom_regression[[i]], data = data_boot)
+
+            if (ME && MEvariable %in% all.vars(formula(wmnom_regression[[i]]))) {
+
+              wmnom_regression_pred[[i]] <- simex_reg(reg = wmnom_regression[[i]],
+                                                      data = data_boot, MEvariable = MEvariable,
+                                                      MEvariable.type = MEvariable.type,
+                                                      measurement.error = measurement.error,
+                                                      lambda = lambda, B = B)
+
+            } else wmnom_regression_pred[[i]] <- wmnom_regression[[i]]
+
+            wmdenom_regression[[i]] <- update(regressions$wmdenom_regression[[i]], data = data_boot)
+
+            if (ME && MEvariable %in% all.vars(formula(wmdenom_regression[[i]]))) {
+
+              wmdenom_regression_pred[[i]] <- simex_reg(reg = wmdenom_regression[[i]],
+                                                        data = data_boot, MEvariable = MEvariable,
+                                                        MEvariable.type = MEvariable.type,
+                                                        measurement.error = measurement.error,
+                                                        lambda = lambda, B = B)
+
+            } else wmdenom_regression_pred[[i]] <- wmdenom_regression[[i]]
+          }
+
+
+        wmnom <- rep(1, nrow(data_boot))
+
+        wmdenom <- rep(1, nrow(data_boot))
+
+        for (i in 1:length(wmdenom_regression)) {
+
+          if ((inherits(wmdenom_regression[[i]], "glm") &&
+               family(wmdenom_regression[[i]])$family %in% c("binomial", "quasibinomial"))|
+              (identical(class(wmdenom_regression[[i]]), c("multinom", "nnet"))&&
+               length(wmdenom_regression[[i]]$lev) == 2)) {
+
+            category <- as.numeric(as.factor(data_boot[, mediator[i]])) - 1
+
+            wmdenom.prob <- predict(wmdenom_regression_pred[[i]], newdata = data_boot,
+                                    type = ifelse(inherits(wmdenom_regression[[i]], "multinom"),
+                                                  "probs", "response"))
+
+            wmnom.prob <- predict(wmnom_regression_pred[[i]], newdata = data_boot,
+                                  type = ifelse(inherits(wmdenom_regression[[i]], "multinom"),
+                                                "probs", "response"))
+
+            wmdenom <-  wmdenom * wmdenom.prob ^ category *
+              (1 - wmdenom.prob)^(1 - category)
+
+            wmnom <-  wmnom * wmnom.prob ^ category *
+              (1 - wmnom.prob)^(1 - category)
+
+          } else {
+
+            data_pred <- data_boot[, mediator[i], drop = FALSE]
+
+            data_pred[, mediator[i]] <- as.factor(data_pred[, mediator[i]])
+
+            category <- model.matrix(as.formula(paste("~0+", mediator[i], sep = "")), data = data_pred)
+
+            wmdenom.prob <- predict(wmdenom_regression_pred[[i]], newdata = data_boot,
+                                    type = ifelse(inherits(wmdenom_regression[[i]], "multinom")|
+                                                    inherits(wmdenom_regression[[i]], "polr"),
+                                                  "probs","response"))
+
+            wmnom.prob <- predict(wmnom_regression_pred[[i]], newdata = data_boot,
+                                  type = ifelse(inherits(wmnom_regression[[i]], "multinom")|
+                                                  inherits(wmnom_regression[[i]], "polr"),
+                                                "probs","response"))
+
+            wmdenom <- wmdenom * rowSums(category * wmdenom.prob)
+
+            wmnom <- wmnom * rowSums(category * wmnom.prob)
 
           }
 
-          postcdesign_a <- data.frame(c(rep(a,nrow(data_boot))),
-                                      data_boot[,prec])
+        }
 
-          postcdesign_astar <- data.frame(c(rep(astar,nrow(data_boot))),
-                                          data_boot[,prec])
+        wm <- wmnom / wmdenom
 
-          colnames(postcdesign_a) <- colnames(postcdesign_astar) <-
-            c(exposure, prec)
+        wy <- wa * wm
 
-          if (is.factor(data_boot[, exposure])) {
 
-            postcdesign_a[, exposure] <- factor(postcdesign_a[, exposure], levels = levels(data_boot[, exposure]))
+        mediator_regression <- regressions$mediator_regression
 
-            postcdesign_astar[, exposure] <- factor(postcdesign_astar[, exposure], levels = levels(data_boot[, exposure]))
+        for (i in 1:length(mediator_regression)) {
 
-          }
+          mediator_regression[[i]] <- update(mediator_regression[[i]],
+                                             data = data_boot, weights = wa)
 
-          if (identical(class(postc_regression[[1]]), "lm") |
-              (identical(class(postc_regression[[1]]), c("glm", "lm")) &&
-               family(postc_regression[[1]])$family %in% c("gaussian","Gamma","inverse.gaussian","quasi",
-                                                           "poisson", "quasipoisson"))|
-              (identical(class(postc_regression[[1]]), c("gam", "glm", "lm")) &&
-               (family(postc_regression[[1]])$family %in% c("gaussian","Gamma","inverse.gaussian","quasi",
-                                                            "poisson", "quasipoisson") |
-                startsWith(family(postc_regression[[1]])$family,"Negative Binomial")))|
-              identical(class(postc_regression[[1]]), "nls")|
-              identical(class(postc_regression[[1]]), c("negbin", "glm", "lm"))) {
+        }
 
-            postc_a <- predict(postc_regression_pred[[1]], newdata = postcdesign_a, type = "response")
+        outcome_regression <- update(outcome_regression, weights = wy)
 
-            postc_astar <- predict(postc_regression_pred[[1]], newdata = postcdesign_astar, type = "response")
+      }
 
-          } else if ((identical(class(postc_regression[[1]]), c("glm", "lm")) &&
-                      family(postc_regression[[1]])$family %in% c("binomial", "quasibinomial"))|
-                     (identical(class(postc_regression[[1]]), c("gam", "glm", "lm")) &&
-                      (family(postc_regression[[1]])$family %in% c("binomial", "quasibinomial")))) {
 
-            prob_a <- predict(postc_regression_pred[[1]], newdata = postcdesign_a, type = "response")
+      if (model == "g-formula" && !is.null(postc)) {
 
-            pred_a <- rbinom(nrow(postcdesign_a), size=1, prob=prob_a)
+        postcdesign_a <- data.frame(c(rep(a,nrow(data_boot))),
+                                    data_boot[,prec])
 
-            prob_astar <- predict(postc_regression_pred[[1]], newdata = postcdesign_astar, type = "response")
+        postcdesign_astar <- data.frame(c(rep(astar,nrow(data_boot))),
+                                        data_boot[,prec])
 
-            pred_astar <- rbinom(nrow(postcdesign_astar), size=1, prob=prob_astar)
+        if (is.factor(data_boot[, exposure])) {
 
-            if (is.numeric(data_boot[, postc[1]])) {
+          postcdesign_a[, exposure] <- factor(postcdesign_a[, exposure], levels = levels(data_boot[, exposure]))
 
-              postc_a <- as.numeric(levels(as.factor(data_boot[, postc[1]]))[pred_a + 1])
+          postcdesign_astar[, exposure] <- factor(postcdesign_astar[, exposure], levels = levels(data_boot[, exposure]))
 
-              postc_astar <- as.numeric(levels(as.factor(data_boot[, postc[1]]))[pred_star + 1])
+        }
 
-            } else if (is.factor(data_boot[, postc[1]])) {
+        postc_regression <- postc_regression_pred <- list()
 
-              postc_a <- factor(levels(as.factor(data_boot[, postc[1]]))[pred_a + 1],
-                                levels = levels(as.factor(data_boot[, postc[1]])))
+        for (i in 1:length(postc_regression)) {
 
-              postc_astar <- factor(levels(as.factor(data_boot[, postc[1]]))[pred_star + 1],
-                                    levels = levels(as.factor(data_boot[, postc[1]])))
+          postc_regression[[i]] <- update(regressions$postc_regression[[i]], data = data_boot)
+
+            if (ME && MEvariable %in% all.vars(formula(postc_regression[[i]]))) {
+
+              postc_regression_pred[[i]] <- simex_reg(reg = postc_regression[[i]],
+                                                      data = data_boot, MEvariable = MEvariable,
+                                                      MEvariable.type = MEvariable.type,
+                                                      measurement.error = measurement.error,
+                                                      lambda = lambda, B = B)
+
+            } else postc_regression_pred[[i]] <- postc_regression[[i]]
 
             }
 
-          } else if ((identical(class(postc_regression[[1]]), c("gam", "glm", "lm")) &&
-                      (family(postc_regression[[1]])$family %in% c("multinom") |
-                       startsWith(family(postc_regression[[1]])$family,"Ordered Categorical")))|
-                     identical(class(postc_regression[[1]]), c("multinom", "nnet"))|
-                     identical(class(postc_regression[[1]]), "polr")) {
 
-            prob_a <- predict(postc_regression_pred[[1]], newdata = postcdesign_a,
-                              type = ifelse(inherits(postc_regression[[1]], "gam"), "response", "probs"))
+        postc_a <- data.frame(matrix(nrow = nrow(data_boot), ncol = length(postc)))
+
+        postc_astar <- data.frame(matrix(nrow = nrow(data_boot), ncol = length(postc)))
+
+        colnames(postc_a) <- colnames(postc_astar) <-postc
+
+        for (i in 1:length(postc)) {
+
+          postcdesign_a <- cbind(postcdesign_a, postc_a[, i-1, drop = FALSE])
+
+          postcdesign_astar <- cbind(postcdesign_astar, postc_astar[, i-1, drop = FALSE])
+
+          if ((inherits(postc_regression[[i]], "glm") &&
+               (family(postc_regression[[i]])$family %in% c("binomial", "quasibinomial")))|
+              (identical(class(postc_regression[[i]]), c("multinom", "nnet"))&&
+               length(postc_regression[[i]]$lev) == 2)) {
+
+            prob_a <- predict(postc_regression_pred[[i]], newdata = postcdesign_a,
+                              type = ifelse(inherits(postc_regression[[i]], "multinom"),
+                                            "probs", "response"))
+
+            pred_a <- rbinom(nrow(postcdesign_a), size = 1, prob = prob_a)
+
+            prob_astar <- predict(postc_regression_pred[[i]], newdata = postcdesign_astar,
+                                  type = ifelse(inherits(postc_regression[[i]], "multinom"),
+                                                "probs", "response"))
+
+            pred_astar <- rbinom(nrow(postcdesign_astar), size = 1, prob = prob_astar)
+
+            if (is.numeric(data_boot[, postc[i]])) {
+
+              mid_a <- as.numeric(levels(as.factor(data_boot[, postc[i]]))[pred_a + 1])
+
+              mid_astar <- as.numeric(levels(as.factor(data_boot[, postc[i]]))[pred_astar + 1])
+
+            } else if (is.factor(data_boot[, postc[i]])) {
+
+              mid_a <- factor(levels(data_boot[, postc[i]])[pred_a + 1],
+                              levels = levels(data_boot[, postc[i]]))
+
+              mid_astar <- factor(levels(data_boot[, postc[i]])[pred_astar + 1],
+                                  levels = levels(data_boot[, postc[i]]))
+
+            } else if (is.character(data_boot[, postc[i]])) {
+
+              mid_a <- levels(as.factor(data_boot[, postc[i]]))[pred_a + 1]
+
+              mid_astar <- levels(as.factor(data_boot[, postc[i]]))[pred_astar + 1]
+
+            }
+
+          } else if ((identical(class(postc_regression[[i]]), c("gam", "glm", "lm")) &&
+                      (family(postc_regression[[i]])$family %in% c("multinom") |
+                       startsWith(family(postc_regression[[i]])$family,"Ordered Categorical")))|
+                     (identical(class(postc_regression[[i]]), c("multinom", "nnet")) &&
+                      length(postc_regression[[i]]$lev) > 2)|
+                     identical(class(postc_regression[[i]]), "polr")) {
+
+            prob_a <- predict(postc_regression_pred[[i]], newdata = postcdesign_a,
+                              type = ifelse(inherits(postc_regression[[i]], "gam"), "response", "probs"))
 
             pred_a <- apply(prob_a, 1, FUN = function(x) apply(t(rmultinom(1, 1, prob = x)), 1, which.max))
 
-            prob_astar <- predict(postc_regression_pred[[1]], newdata = postcdesign_astar,
-                                  type = ifelse(inherits(postc_regression[[1]], "gam"), "response", "probs"))
+            prob_astar <- predict(postc_regression_pred[[i]], newdata = postcdesign_astar,
+                                  type = ifelse(inherits(postc_regression[[i]], "gam"), "response", "probs"))
 
             pred_astar <- apply(prob_astar, 1, FUN = function(x) apply(t(rmultinom(1, 1, prob = x)), 1, which.max))
 
-            if (is.numeric(data_boot[, postc[1]])) {
+            if (is.numeric(data_boot[, postc[i]])) {
 
-              postc_a <- as.numeric(levels(as.factor(data_boot[, postc[1]]))[pred_a])
+              mid_a <- as.numeric(levels(as.factor(data_boot[, postc[i]]))[pred_a])
 
-              postc_astar <- as.numeric(levels(as.factor(data_boot[, postc[1]]))[pred_astar])
+              mid_astar <- as.numeric(levels(as.factor(data_boot[, postc[i]]))[pred_astar])
 
-            } else if (is.factor(data_boot[, postc[1]])) {
+            } else if (is.factor(data_boot[, postc[i]])) {
 
-              postc_a <- factor(levels(as.factor(data_boot[, postc[1]]))[pred_a],
-                                levels = levels(as.factor(data_boot[, postc[1]])))
+              mid_a <- factor(levels(data_boot[, postc[i]])[pred_a],
+                              levels = levels(data_boot[, postc[i]]))
 
-              postc_astar <- factor(levels(as.factor(data_boot[, postc[1]]))[pred_astar],
-                                    levels = levels(as.factor(data_boot[, postc[1]])))
+              mid_astar <- factor(levels(data_boot[, postc[i]])[pred_astar],
+                                  levels = levels(data_boot[, postc[i]]))
 
-            }
-          }
+            } else if (is.character(data_boot[, postc[i]])) {
 
-          postc_a <- data_frame(postc_a)
+              mid_a <- levels(as.factor(data_boot[, postc[i]]))[pred_a]
 
-          postc_astar <- data_frame(postc_astar)
-
-          if (length(postc) > 1) {
-
-            for (i in 2:length(postc)) {
-
-              postcdesign_a <- cbind(postcdesign_a, postc_a[, i-1])
-
-              colnames(postcdesign_a) <- c(colnames(postcdesign_a)[1:(length(colnames(postcdesign_a))-1)],
-                                           postc[i-1])
-
-              postcdesign_astar <- cbind(postcdesign_astar, postc_astar[, i-1])
-
-              colnames(postcdesign_astar) <- c(colnames(postcdesign_astar)[1:(length(colnames(postcdesign_a))-1)], postc[i-1])
-
-              if (identical(class(postc_regression[[i]]), "lm") |
-                  (identical(class(postc_regression[[i]]), c("glm", "lm")) &&
-                   family(postc_regression[[i]])$family %in% c("gaussian","Gamma","inverse.gaussian","quasi",
-                                                               "poisson", "quasipoisson"))|
-                  (identical(class(postc_regression[[i]]), c("gam", "glm", "lm")) &&
-                   (family(postc_regression[[i]])$family %in% c("gaussian","Gamma","inverse.gaussian","quasi",
-                                                                "poisson", "quasipoisson") |
-                    startsWith(family(postc_regression[[i]])$family,"Negative Binomial")))|
-                  identical(class(postc_regression[[i]]), "nls")|
-                  identical(class(postc_regression[[i]]), c("negbin", "glm", "lm"))) {
-
-                mid_a <- predict(postc_regression_pred[[i]], newdata = postcdesign_a, type = "response")
-
-                mid_astar <- predict(postc_regression_pred[[i]], newdata = postcdesign_astar, type = "response")
-
-              } else if ((identical(class(postc_regression[[i]]), c("glm", "lm")) &&
-                          family(postc_regression[[i]])$family %in% c("binomial", "quasibinomial"))|
-                         (identical(class(postc_regression[[i]]), c("gam", "glm", "lm")) &&
-                          (family(postc_regression[[i]])$family %in% c("binomial", "quasibinomial")))) {
-
-                prob_a <- predict(postc_regression_pred[[i]], newdata = postcdesign_a, type = "response")
-
-                pred_a <- rbinom(nrow(postcdesign_a), size=1, prob=prob_a)
-
-                prob_astar <- predict(postc_regression_pred[[i]], newdata = postcdesign_astar, type = "response")
-
-                pred_astar <- rbinom(nrow(postcdesign_astar), size=1, prob=prob_astar)
-
-                if (is.numeric(data_boot[, postc[i]])) {
-
-                  mid_a <- as.numeric(levels(as.factor(data_boot[, postc[i]]))[pred_a + 1])
-
-                  mid_astar <- as.numeric(levels(as.factor(data_boot[, postc[i]]))[pred_star + 1])
-
-                } else if (is.factor(data_boot[, postc[i]])) {
-
-                  mid_a <- factor(levels(as.factor(data_boot[, postc[i]]))[pred_a + 1],
-                                  levels = levels(as.factor(data_boot[, postc[i]])))
-
-                  mid_astar <- factor(levels(as.factor(data_boot[, postc[i]]))[pred_star + 1],
-                                      levels = levels(as.factor(data_boot[, postc[i]])))
-
-                }
-
-              } else if ((identical(class(postc_regression[[i]]), c("gam", "glm", "lm")) &&
-                          (family(postc_regression[[i]])$family %in% c("multinom") |
-                           startsWith(family(postc_regression[[i]])$family,"Ordered Categorical")))|
-                         identical(class(postc_regression[[i]]), c("multinom", "nnet"))|
-                         identical(class(postc_regression[[i]]), "polr")) {
-
-                prob_a <- predict(postc_regression_pred[[i]], newdata = postcdesign_a,
-                                  type = ifelse(inherits(postc_regression[[i]], "gam"), "response", "probs"))
-
-                pred_a <- apply(prob_a, 1, FUN = function(x) apply(t(rmultinom(1, 1, prob = x)), 1, which.max))
-
-                prob_astar <- predict(postc_regression_pred[[i]], newdata = postcdesign_astar,
-                                      type = ifelse(inherits(postc_regression[[i]], "gam"), "response", "probs"))
-
-                pred_astar <- apply(prob_astar, 1, FUN = function(x) apply(t(rmultinom(1, 1, prob = x)), 1, which.max))
-
-                if (is.numeric(data_boot[, postc[i]])) {
-
-                  mid_a <- as.numeric(levels(as.factor(data_boot[, postc[i]]))[pred_a])
-
-                  mid_astar <- as.numeric(levels(as.factor(data_boot[, postc[i]]))[pred_astar])
-
-                } else if (is.factor(data_boot[, postc[i]])) {
-
-                  mid_a <- factor(levels(as.factor(data_boot[, postc[i]]))[pred_a],
-                                  levels = levels(as.factor(data_boot[, postc[i]])))
-
-                  mid_astar <- factor(levels(as.factor(data_boot[, postc[i]]))[pred_astar],
-                                      levels = levels(as.factor(data_boot[, postc[i]])))
-
-                }
-              }
-
-              postc_a <- cbind(postc_a, mid_a)
-
-              postc_astar <- cbind(postc_astar, mid_astar)
+              mid_astar <- levels(as.factor(data_boot[, postc[i]]))[pred_astar]
 
             }
+
+          } else {
+
+            mid_a <- predict(postc_regression_pred[[i]], newdata = postcdesign_a, type = "response")
+
+            mid_astar <- predict(postc_regression_pred[[i]], newdata = postcdesign_astar, type = "response")
+
           }
 
-        } else {
-          postc_astar <- postc_a <-data.frame()[1:nrow(data_boot), ]
+          postc_a[, i] <- mid_a
+
+          postc_astar[, i] <- mid_astar
+
         }
 
 
-        mdesign_a <- data.frame(c(rep(a,nrow(data_boot))),
-                                data_boot[,prec],
-                                postc_a)
-
-        mdesign_astar <- data.frame(c(rep(astar,nrow(data_boot))),
-                                    data_boot[,prec],
-                                    postc_astar)
-
-        colnames(mdesign_a) <- colnames(mdesign_astar) <- c(exposure, prec, postc)
-
       } else {
 
-        mdesign_a <- data.frame(rep(a,nrow(data_boot)),data_boot[,prec])
-
-        mdesign_astar <- data.frame(rep(astar,nrow(data_boot)),data_boot[,prec])
-
-        colnames(mdesign_a) <- colnames(mdesign_astar) <- c(exposure, prec)
+        postc_a <- postc_astar <- data.frame()[1:nrow(data_boot), ]
 
       }
 
+      mdesign_a <- data.frame(c(rep(a,nrow(data_boot))),
+                              data_boot[,prec],
+                              postc_a)
 
-      mediator_regression <- regressions$mediator_regression
+      mdesign_astar <- data.frame(c(rep(astar,nrow(data_boot))),
+                                  data_boot[,prec],
+                                  postc_astar)
 
-      mediator_regression_pred <- mediator_regression
+      colnames(mdesign_a) <- colnames(mdesign_astar) <- c(exposure, prec, postc)
 
-      for (i in 1:length(mediator_regression)) {
-
-        if (!is.null(reg.simex$mediator_regression[[i]])) mediator_regression_pred[[i]] <- reg.simex$mediator_regression[[i]]
-
-      }
 
       if (is.factor(data_boot[, exposure])) {
 
@@ -595,232 +765,172 @@ est_step <- function(data, indices, model,
 
       }
 
-      if (identical(class(mediator_regression[[1]]), "lm") |
-          (identical(class(mediator_regression[[1]]), c("glm", "lm")) &&
-           family(mediator_regression[[1]])$family %in% c("gaussian","Gamma","inverse.gaussian","quasi",
-                                                          "poisson", "quasipoisson"))|
-          (identical(class(mediator_regression[[1]]), c("gam", "glm", "lm")) &&
-           (family(mediator_regression[[1]])$family %in% c("gaussian","Gamma","inverse.gaussian","quasi",
-                                                           "poisson", "quasipoisson") |
-            startsWith(family(mediator_regression[[1]])$family,"Negative Binomial")))|
-          identical(class(mediator_regression[[1]]), "nls")|
-          identical(class(mediator_regression[[1]]), c("negbin", "glm", "lm"))) {
+      mediator_regression <- mediator_regression_pred <- list()
 
-        m_a <- predict(mediator_regression_pred[[1]], newdata = mdesign_a, type = "response")
+      for (i in 1:length(mediator)) {
 
-        m_astar <- predict(mediator_regression_pred[[1]], newdata = mdesign_astar, type = "response")
+        mediator_regression[[i]] <- update(regressions$mediator_regression[[i]], data = data_boot)
 
-      } else if ((identical(class(mediator_regression[[1]]), c("glm", "lm")) &&
-                  family(mediator_regression[[1]])$family %in% c("binomial", "quasibinomial"))|
-                 (identical(class(mediator_regression[[1]]), c("gam", "glm", "lm")) &&
-                  (family(mediator_regression[[1]])$family %in% c("binomial", "quasibinomial")))) {
+          if (ME && MEvariable %in% all.vars(formula(mediator_regression[[i]]))) {
 
-        prob_a <- predict(mediator_regression_pred[[1]], newdata = mdesign_a, type = "response")
+            mediator_regression_pred[[i]] <- simex_reg(reg = mediator_regression[[i]],
+                                                       data = data_boot, MEvariable = MEvariable,
+                                                       MEvariable.type = MEvariable.type,
+                                                       measurement.error = measurement.error,
+                                                       lambda = lambda, B = B)
 
-        pred_a <- rbinom(nrow(mdesign_a), size=1, prob=prob_a)
+          } else mediator_regression_pred[[i]] <- mediator_regression[[i]]
 
-        prob_astar <- predict(mediator_regression_pred[[1]], newdata = mdesign_astar, type = "response")
-
-        pred_astar <- rbinom(nrow(mdesign_astar), size=1, prob=prob_astar)
-
-        if (is.numeric(data_boot[, mediator[1]])) {
-
-          m_a <- as.numeric(levels(as.factor(data_boot[, mediator[1]]))[pred_a + 1])
-
-          m_astar <- as.numeric(levels(as.factor(data_boot[, mediator[1]]))[pred_star + 1])
-
-        } else if (is.factor(data_boot[, mediator[1]])) {
-
-          m_a <- factor(levels(as.factor(data_boot[, mediator[1]]))[pred_a + 1],
-                        levels = levels(as.factor(data_boot[, mediator[1]])))
-
-          m_astar <- factor(levels(as.factor(data_boot[, mediator[1]]))[pred_star + 1],
-                            levels = levels(as.factor(data_boot[, mediator[1]])))
-
-        }
-
-      } else if ((identical(class(mediator_regression[[1]]), c("gam", "glm", "lm")) &&
-                  (family(mediator_regression[[1]])$family %in% c("multinom") |
-                   startsWith(family(mediator_regression[[1]])$family,"Ordered Categorical")))|
-                 identical(class(mediator_regression[[1]]), c("multinom", "nnet"))|
-                 identical(class(mediator_regression[[1]]), "polr")) {
-
-        prob_a <- predict(mediator_regression_pred[[1]], newdata = mdesign_a,
-                          type = ifelse(inherits(mediator_regression[[1]], "gam"), "response", "probs"))
-
-        pred_a <- apply(prob_a, 1, FUN = function(x) apply(t(rmultinom(1, 1, prob = x)), 1, which.max))
-
-        prob_astar <- predict(mediator_regression_pred[[1]], newdata = mdesign_astar,
-                              type = ifelse(inherits(mediator_regression[[1]], "gam"), "response", "probs"))
-
-        pred_astar <- apply(prob_astar, 1, FUN = function(x) apply(t(rmultinom(1, 1, prob = x)), 1, which.max))
-
-        if (is.numeric(data_boot[, mediator[1]])) {
-
-          m_a <- as.numeric(levels(as.factor(data_boot[, mediator[1]]))[pred_a])
-
-          m_astar <- as.numeric(levels(as.factor(data_boot[, mediator[1]]))[pred_astar])
-
-        } else if (is.factor(data_boot[, mediator[1]])) {
-
-          m_a <- factor(levels(as.factor(data_boot[, mediator[1]]))[pred_a],
-                        levels = levels(as.factor(data_boot[, mediator[1]])))
-
-          m_astar <- factor(levels(as.factor(data_boot[, mediator[1]]))[pred_astar],
-                            levels = levels(as.factor(data_boot[, mediator[1]])))
-
-        }
-      }
-
-      m_a <- data_frame(m_a)
-
-      m_astar <- data_frame(m_astar)
-
-      if (length(mediator) > 1) {
-
-        for (i in 2:length(mediator)) {
-
-          mdesign_a <- cbind(mdesign_a, m_a[, i-1])
-
-          colnames(mdesign_a) <- c(colnames(mdesign_a)[1:(length(colnames(mdesign_a))-1)],
-                                   mediator[i-1])
-
-          mdesign_astar <- cbind(mdesign_astar, m_astar[, i-1])
-
-          colnames(mdesign_astar) <- c(colnames(mdesign_astar)[1:(length(colnames(mdesign_a))-1)],
-                                       mediator[i-1])
-
-          if (identical(class(mediator_regression[[i]]), "lm") |
-              (identical(class(mediator_regression[[i]]), c("glm", "lm")) &&
-               family(mediator_regression[[i]])$family %in% c("gaussian","Gamma","inverse.gaussian","quasi",
-                                                              "poisson", "quasipoisson"))|
-              (identical(class(mediator_regression[[i]]), c("gam", "glm", "lm")) &&
-               (family(mediator_regression[[i]])$family %in% c("gaussian","Gamma","inverse.gaussian","quasi",
-                                                               "poisson", "quasipoisson") |
-                startsWith(family(mediator_regression[[i]])$family,"Negative Binomial")))|
-              identical(class(mediator_regression[[i]]), "nls")|
-              identical(class(mediator_regression[[i]]), c("negbin", "glm", "lm"))) {
-
-            mid_a <- predict(mediator_regression_pred[[i]], newdata = mdesign_a, type = "response")
-
-            mid_astar <- predict(mediator_regression_pred[[i]], newdata = mdesign_astar, type = "response")
-
-          } else if ((identical(class(mediator_regression[[i]]), c("glm", "lm")) &&
-                      family(mediator_regression[[i]])$family %in% c("binomial", "quasibinomial"))|
-                     (identical(class(mediator_regression[[i]]), c("gam", "glm", "lm")) &&
-                      (family(mediator_regression[[i]])$family %in% c("binomial", "quasibinomial")))) {
-
-            prob_a <- predict(mediator_regression_pred[[i]], newdata = mdesign_a, type = "response")
-
-            pred_a <- rbinom(nrow(mdesign_a), size=1, prob=prob_a)
-
-            prob_astar <- predict(mediator_regression_pred[[i]], newdata = mdesign_astar, type = "response")
-
-            pred_astar <- rbinom(nrow(mdesign_astar), size=1, prob=prob_astar)
-
-            if (is.numeric(data_boot[, mediator[i]])) {
-
-              mid_a <- as.numeric(levels(as.factor(data_boot[, mediator[i]]))[pred_a + 1])
-
-              mid_astar <- as.numeric(levels(as.factor(data_boot[, mediator[i]]))[pred_star + 1])
-
-            } else if (is.factor(data_boot[, mediator[i]])) {
-
-              mid_a <- factor(levels(as.factor(data_boot[, mediator[i]]))[pred_a + 1],
-                              levels = levels(as.factor(data_boot[, mediator[i]])))
-
-              mid_astar <- factor(levels(as.factor(data_boot[, mediator[i]]))[pred_star + 1],
-                                  levels = levels(as.factor(data_boot[, mediator[i]])))
-
-            }
-
-          } else if ((identical(class(mediator_regression[[i]]), c("gam", "glm", "lm")) &&
-                      (family(mediator_regression[[i]])$family %in% c("multinom") |
-                       startsWith(family(mediator_regression[[i]])$family,"Ordered Categorical")))|
-                     identical(class(mediator_regression[[i]]), c("multinom", "nnet"))|
-                     identical(class(mediator_regression[[i]]), "polr")) {
-
-            prob_a <- predict(mediator_regression_pred[[i]], newdata = mdesign_a,
-                              type = ifelse(inherits(mediator_regression[[i]], "gam"), "response", "probs"))
-
-            pred_a <- apply(prob_a, 1, FUN = function(x) apply(t(rmultinom(1, 1, prob = x)), 1, which.max))
-
-            prob_astar <- predict(mediator_regression_pred[[i]], newdata = mdesign_astar,
-                                  type = ifelse(inherits(mediator_regression[[i]], "gam"), "response", "probs"))
-
-            pred_astar <- apply(prob_astar, 1, FUN = function(x) apply(t(rmultinom(1, 1, prob = x)), 1, which.max))
-
-            if (is.numeric(data_boot[, mediator[i]])) {
-
-              mid_a <- as.numeric(levels(as.factor(data_boot[, mediator[i]]))[pred_a])
-
-              mid_astar <- as.numeric(levels(as.factor(data_boot[, mediator[i]]))[pred_astar])
-
-            } else if (is.factor(data_boot[, mediator[i]])) {
-
-              mid_a <- factor(levels(as.factor(data_boot[, mediator[i]]))[pred_a],
-                              levels = levels(as.factor(data_boot[, mediator[i]])))
-
-              mid_astar <- factor(levels(as.factor(data_boot[, mediator[i]]))[pred_astar],
-                                  levels = levels(as.factor(data_boot[, mediator[i]])))
-
-            }
           }
 
-          m_a <- cbind(m_a, mid_a)
 
-          m_astar <- cbind(m_astar, mid_astar)
+      m_a <- data.frame(matrix(nrow = nrow(data_boot), ncol = length(mediator)))
+
+      m_astar <- data.frame(matrix(nrow = nrow(data_boot), ncol = length(mediator)))
+
+      colnames(m_a) <- colnames(m_astar) <- mediator
+
+      for (i in 1:length(mediator)) {
+
+        mdesign_a <- cbind(mdesign_a, m_a[, i-1, drop = FALSE])
+
+        mdesign_astar <- cbind(mdesign_astar, m_astar[, i-1, drop = FALSE])
+
+        if ((inherits(mediator_regression[[i]], "glm") &&
+             (family(mediator_regression[[i]])$family %in% c("binomial", "quasibinomial")))|
+            (identical(class(mediator_regression[[i]]), c("multinom", "nnet"))&&
+             length(mediator_regression[[i]]$lev) == 2)) {
+
+          prob_a <- predict(mediator_regression_pred[[i]], newdata = mdesign_a,
+                            type = ifelse(inherits(mediator_regression[[i]], "multinom"),
+                                          "probs", "response"))
+
+          pred_a <- rbinom(nrow(mdesign_a), size = 1, prob = prob_a)
+
+          prob_astar <- predict(mediator_regression_pred[[i]], newdata = mdesign_astar,
+                                type = ifelse(inherits(mediator_regression[[i]], "multinom"),
+                                              "probs", "response"))
+
+          pred_astar <- rbinom(nrow(mdesign_astar), size = 1, prob = prob_astar)
+
+          if (is.numeric(data_boot[, mediator[i]])) {
+
+            mid_a <- as.numeric(levels(as.factor(data_boot[, mediator[i]]))[pred_a + 1])
+
+            mid_astar <- as.numeric(levels(as.factor(data_boot[, mediator[i]]))[pred_astar + 1])
+
+          } else if (is.factor(data_boot[, mediator[i]])) {
+
+            mid_a <- factor(levels(data_boot[, mediator[i]])[pred_a + 1],
+                            levels = levels(data_boot[, mediator[i]]))
+
+            mid_astar <- factor(levels(data_boot[, mediator[i]])[pred_astar + 1],
+                                levels = levels(data_boot[, mediator[i]]))
+
+          } else if (is.character(data_boot[, mediator[i]])) {
+
+            mid_a <- levels(as.factor(data_boot[, mediator[i]]))[pred_a + 1]
+
+            mid_astar <- levels(as.factor(data_boot[, mediator[i]]))[pred_astar + 1]
+
+          }
+
+        } else if ((identical(class(mediator_regression[[i]]), c("gam", "glm", "lm")) &&
+                    (family(mediator_regression[[i]])$family %in% c("multinom") |
+                     startsWith(family(mediator_regression[[i]])$family,"Ordered Categorical")))|
+                   (identical(class(mediator_regression[[i]]), c("multinom", "nnet")) &&
+                    length(mediator_regression[[i]]$lev) > 2)|
+                   identical(class(mediator_regression[[i]]), "polr")) {
+
+          prob_a <- predict(mediator_regression_pred[[i]], newdata = mdesign_a,
+                            type = ifelse(inherits(mediator_regression[[i]], "gam"), "response", "probs"))
+
+          pred_a <- apply(prob_a, 1, FUN = function(x) apply(t(rmultinom(1, 1, prob = x)), 1, which.max))
+
+          prob_astar <- predict(mediator_regression_pred[[i]], newdata = mdesign_astar,
+                                type = ifelse(inherits(mediator_regression[[i]], "gam"), "response", "probs"))
+
+          pred_astar <- apply(prob_astar, 1, FUN = function(x) apply(t(rmultinom(1, 1, prob = x)), 1, which.max))
+
+          if (is.numeric(data_boot[, mediator[i]])) {
+
+            mid_a <- as.numeric(levels(as.factor(data_boot[, mediator[i]]))[pred_a])
+
+            mid_astar <- as.numeric(levels(as.factor(data_boot[, mediator[i]]))[pred_astar])
+
+          } else if (is.factor(data_boot[, mediator[i]])) {
+
+            mid_a <- factor(levels(data_boot[, mediator[i]])[pred_a],
+                            levels = levels(data_boot[, mediator[i]]))
+
+            mid_astar <- factor(levels(data_boot[, mediator[i]])[pred_astar],
+                                levels = levels(data_boot[, mediator[i]]))
+
+          } else if (is.character(data_boot[, mediator[i]])) {
+
+            mid_a <- levels(as.factor(data_boot[, mediator[i]]))[pred_a]
+
+            mid_astar <- levels(as.factor(data_boot[, mediator[i]]))[pred_astar]
+
+          }
+
+        } else {
+
+          mid_a <- predict(mediator_regression_pred[[i]], newdata = mdesign_a, type = "response")
+
+          mid_astar <- predict(mediator_regression_pred[[i]], newdata = mdesign_astar, type = "response")
 
         }
-      }
 
+        m_a[, i] <- mid_a
 
-      if (model != "g-formula") {
-
-        ydesign0m <- data.frame(rep(astar, nrow(data_boot)), as.data.frame(mval)[rep(1,nrow(data_boot)),],
-                                data_boot[,prec])
-
-        ydesign1m <- data.frame(rep(a, nrow(data_boot)), as.data.frame(mval)[rep(1,nrow(data_boot)),],
-                                data_boot[,prec])
-
-        ydesign00 <- data.frame(rep(astar, nrow(data_boot)), m_astar, data_boot[,prec])
-
-        ydesign01 <- data.frame(rep(astar, nrow(data_boot)), m_a, data_boot[,prec])
-
-        ydesign10 <- data.frame(rep(a, nrow(data_boot)), m_astar, data_boot[,prec])
-
-        ydesign11 <- data.frame(rep(a, nrow(data_boot)), m_a, data_boot[,prec])
-
-        colnames(ydesign0m) <- colnames(ydesign1m) <- colnames(ydesign00) <-
-          colnames(ydesign01) <- colnames(ydesign10) <- colnames(ydesign11) <-
-          c(exposure, mediator, prec)
-
-      } else {
-
-        ydesign0m <- data.frame(rep(astar, nrow(data_boot)), as.data.frame(mval)[rep(1,nrow(data_boot)),],
-                                data_boot[,prec], postc_astar)
-
-        ydesign1m <- data.frame(rep(a, nrow(data_boot)), as.data.frame(mval)[rep(1,nrow(data_boot)),],
-                                data_boot[,prec], postc_a)
-
-        ydesign00 <- data.frame(rep(astar, nrow(data_boot)), m_astar,
-                                data_boot[,prec], postc_astar)
-
-        ydesign01 <- data.frame(rep(astar, nrow(data_boot)), m_a,
-                                data_boot[,prec], postc_astar)
-
-        ydesign10 <- data.frame(rep(a, nrow(data_boot)), m_astar,
-                                data_boot[,prec], postc_a)
-
-        ydesign11 <- data.frame(rep(a, nrow(data_boot)), m_a,
-                                data_boot[,prec], postc_a)
-
-        colnames(ydesign0m) <- colnames(ydesign1m) <- colnames(ydesign00) <- colnames(ydesign01) <-
-          colnames(ydesign10) <- colnames(ydesign11) <- c(exposure, mediator, prec,
-                                                          postc)
+        m_astar[, i] <- mid_astar
 
       }
 
+      if (model == "g-formula" && !is.null(prec)) {
+
+        m_a <- m_a[sample(1:nrow(data_boot), replace = FALSE), ]
+
+        m_astar <- m_astar[sample(1:nrow(data_boot), replace = FALSE), ]
+
+      }
+
+
+      outcome_regression_pred <- outcome_regression
+
+      if (ME && MEvariable %in% all.vars(formula(outcome_regression))) {
+
+        outcome_regression_pred <- simex_reg(reg = outcome_regression,
+                                             data = data_boot, MEvariable = MEvariable,
+                                             MEvariable.type = MEvariable.type,
+                                             measurement.error = measurement.error,
+                                             lambda = lambda, B = B)
+
+
+      }
+
+      ydesign0m <- data.frame(rep(astar, nrow(data_boot)), as.data.frame(mval)[rep(1,nrow(data_boot)),],
+                              data_boot[,prec], postc_astar)
+
+      ydesign1m <- data.frame(rep(a, nrow(data_boot)), as.data.frame(mval)[rep(1,nrow(data_boot)),],
+                              data_boot[,prec], postc_a)
+
+      ydesign00 <- data.frame(rep(astar, nrow(data_boot)), m_astar,
+                              data_boot[,prec], postc_astar)
+
+      ydesign01 <- data.frame(rep(astar, nrow(data_boot)), m_a,
+                              data_boot[,prec], postc_astar)
+
+      ydesign10 <- data.frame(rep(a, nrow(data_boot)), m_astar,
+                              data_boot[,prec], postc_a)
+
+      ydesign11 <- data.frame(rep(a, nrow(data_boot)), m_a,
+                              data_boot[,prec], postc_a)
+
+      colnames(ydesign0m) <- colnames(ydesign1m) <- colnames(ydesign00) <- colnames(ydesign01) <-
+        colnames(ydesign10) <- colnames(ydesign11) <- c(exposure, mediator, prec,
+                                                        postc)
 
       if (is.factor(data_boot[, exposure])) {
 
@@ -846,43 +956,11 @@ est_step <- function(data, indices, model,
         }
       }
 
-      if (!is.null(reg.simex$outcome_regression)) {
-        outcome_regression_pred <- reg.simex$outcome_regression
-      } else {outcome_regression_pred <- outcome_regression}
-
-      if (identical(class(outcome_regression), "lm") |
-          (identical(class(outcome_regression), c("glm", "lm")) &&
-           family(outcome_regression)$family %in% c("gaussian","Gamma","inverse.gaussian","quasi",
-                                                    "binomial", "quasibinomial","poisson", "quasipoisson"))|
-          (identical(class(outcome_regression), c("gam", "glm", "lm")) &&
-           (family(outcome_regression)$family %in% c("gaussian","Gamma","inverse.gaussian","quasi",
-                                                     "binomial", "quasibinomial","poisson", "quasipoisson") |
-            startsWith(family(outcome_regression)$family,"Negative Binomial")))|
-          identical(class(outcome_regression), "nls")|
-          identical(class(outcome_regression), c("negbin", "glm", "lm"))|
-          identical(class(outcome_regression), "survreg")|
-          identical(class(outcome_regression), "coxph")) {
-
-        type <- ifelse(inherits(outcome_regression, "coxph"), "risk", "response")
-
-        EY0m <- mean(predict(outcome_regression_pred, newdata =  ydesign0m, type = type), na.rm = TRUE)
-
-        EY1m <- mean(predict(outcome_regression_pred, newdata =  ydesign1m, type = type), na.rm = TRUE)
-
-        EY00 <- mean(predict(outcome_regression_pred, newdata =  ydesign00, type = type), na.rm = TRUE)
-
-        EY01 <- mean(predict(outcome_regression_pred, newdata =  ydesign01, type = type), na.rm = TRUE)
-
-        EY10 <- mean(predict(outcome_regression_pred, newdata =  ydesign10, type = type), na.rm = TRUE)
-
-        EY11 <- mean(predict(outcome_regression_pred, newdata =  ydesign11, type = type), na.rm = TRUE)
-
-
-      } else if ((identical(class(outcome_regression), c("gam", "glm", "lm")) &&
-                  (family(outcome_regression)$family %in% c("multinom") |
-                   startsWith(family(outcome_regression)$family,"Ordered Categorical")))|
-                 identical(class(outcome_regression), c("multinom", "nnet"))|
-                 identical(class(outcome_regression), "polr")) {
+      if ((inherits(outcome_regression, "gam") &&
+           (family(outcome_regression)$family == "multinom" |
+            startsWith(family(outcome_regression)$family, "Ordered Categorical")))|
+          (inherits(outcome_regression, "multinom") && length(outcome_regression$lev) > 2)|
+          inherits(outcome_regression, "polr")) {
 
         type = ifelse(inherits(outcome_regression, "gam"), "response", "probs")
 
@@ -898,84 +976,99 @@ est_step <- function(data, indices, model,
 
         EY11 <- mean(predict(outcome_regression_pred, newdata =  ydesign11, type = type)[, yref], na.rm = TRUE)
 
+      } else {
+
+        type <- ifelse(inherits(outcome_regression, "coxph"), "risk",
+                       ifelse(inherits(outcome_regression, "multinom"), "probs", "response"))
+
+        EY0m <- mean(predict(outcome_regression_pred, newdata =  ydesign0m, type = type), na.rm = TRUE)
+
+        EY1m <- mean(predict(outcome_regression_pred, newdata =  ydesign1m, type = type), na.rm = TRUE)
+
+        EY00 <- mean(predict(outcome_regression_pred, newdata =  ydesign00, type = type), na.rm = TRUE)
+
+        EY01 <- mean(predict(outcome_regression_pred, newdata =  ydesign01, type = type), na.rm = TRUE)
+
+        EY10 <- mean(predict(outcome_regression_pred, newdata =  ydesign10, type = type), na.rm = TRUE)
+
+        EY11 <- mean(predict(outcome_regression_pred, newdata =  ydesign11, type = type), na.rm = TRUE)
+
       }
 
     } else if (model == "wb") {
 
-      exposure_regression <- regressions$exposure_regression
+      exposure_regression <- update(regressions$exposure_regression, data = data_boot)
 
-      if (!is.null(reg.simex$exposure_regression)) {
-        exposure_regression_pred <- reg.simex$exposure_regression
-      } else {exposure_regression_pred <- exposure_regression}
+      exposure_regression_pred <- exposure_regression
 
-      outcome_regression <- regressions$outcome_regression
+      if (ME && MEvariable %in% all.vars(formula(exposure_regression))) {
 
-      if (!(identical(class(outcome_regression), "lm") |
-            (identical(class(outcome_regression), c("glm", "lm")) &&
-             family(outcome_regression)$family %in% c("gaussian","Gamma","inverse.gaussian","quasi",
-                                                      "binomial", "quasibinomial","poisson", "quasipoisson"))|
-            (identical(class(outcome_regression), c("gam", "glm", "lm")) &&
-             (family(outcome_regression)$family %in% c("gaussian","Gamma","inverse.gaussian","quasi",
-                                                       "binomial", "quasibinomial","poisson", "quasipoisson") |
-              startsWith(family(outcome_regression)$family,"Negative Binomial")))|
-            identical(class(outcome_regression), "nls")|
-            identical(class(outcome_regression), c("negbin", "glm", "lm")))) {
-
-        stop("The selected model doesn't support this outcome regression")
-
-      } else if ((identical(class(outcome_regression), c("glm", "lm")) &&
-                  family(outcome_regression)$family %in% c("binomial", "quasibinomial"))|
-                 (identical(class(outcome_regression), c("gam", "glm", "lm")) &&
-                  (family(outcome_regression)$family %in% c("binomial", "quasibinomial")))){
-
-        data_boot[, outcome] <- as.factor(data_boot[, outcome])
-
-        levels(data_boot[, outcome]) <- 0:1
-
-        data_boot[, outcome] <- as.numeric(data_boot[, outcome]) - 1
-
-        outcome_regression <- update(outcome_regression, formula. = formula(outcome_regression),
-                                     data = data_boot)
+        exposure_regression_pred <- simex_reg(reg = exposure_regression_pred,
+                                              data = data_boot, MEvariable = MEvariable,
+                                              MEvariable.type = MEvariable.type,
+                                              measurement.error = measurement.error,
+                                              lambda = lambda, B = B)
 
       }
+
+      outcome_regression_pred <- outcome_regression
+
+      if (ME && MEvariable %in% all.vars(formula(outcome_regression))) {
+
+        outcome_regression_pred <- simex_reg(reg = outcome_regression_pred,
+                                             data = data_boot, MEvariable = MEvariable,
+                                             MEvariable.type = MEvariable.type,
+                                             measurement.error = measurement.error,
+                                             lambda = lambda, B = B)
+
+      }
+
 
       index_astar <- which(data_boot[, exposure] == astar)
 
       index_a <- which(data_boot[, exposure] == a)
 
+      astar_lev <- which(levels(as.factor(data_boot[, exposure])) == astar)
+
+      a_lev <- which(levels(as.factor(data_boot[, exposure])) == a)
+
       wnom <- left_join(select(data_boot, exposure),
                         count(data_boot, !!as.name(exposure)),
                         by = exposure)[, "n"]/nrow(data_boot)
 
+      if ((inherits(exposure_regression, "glm") &&
+           family(exposure_regression)$family %in% c("binomial", "quasibinomial"))|
+          (inherits(exposure_regression, "multinom")&&
+           length(exposure_regression$lev) == 2)) {
 
-      if (inherits(exposure_regression, "glm") &&
-          family(exposure_regression)$family %in% c("binomial", "quasibinomial")) {
+        category <- as.numeric(as.factor(data_boot[, exposure])) - 1
 
-        wdenom.prob <- predict(exposure_regression_pred, newdata = data_boot,
-                               type = "response")
+        wdenom.prob <- predict(exposure_regression, newdata = data_boot,
+                               type = ifelse(inherits(exposure_regression, "multinom"),
+                                             "probs", "response"))
 
-        class <- as.numeric(as.factor(data_boot[, exposure])) - 1
+        wdenom0 <- wdenom.prob^(astar_lev - 1)*(1 - wdenom.prob)^(2 - astar_lev)
 
-        wdenom <-  wdenom.prob ^ class * (1 - wdenom.prob) ^ (1 - class)
+        wdenom1 <- wdenom.prob^(a_lev - 1)*(1 - wdenom.prob)^(2 - a_lev)
 
+      } else {
 
-      } else if ((inherits(exposure_regression, "gam") &&
-                  (family(exposure_regression)$family == "multinom" |
-                   startsWith(family(exposure_regression)$family, "Ordered Categorical")))|
-                 inherits(exposure_regression, "multinom")|inherits(exposure_regression, "polr")) {
+        data_pred <- data_boot[, exposure, drop = FALSE]
 
-        wdenom.prob <- predict(exposure_regression_pred, newdata = data_boot,
+        data_pred[, exposure] <- as.factor(data_pred[, exposure])
+
+        category <- model.matrix(as.formula(paste("~0+", exposure, sep = "")), data = data_pred)
+
+        wdenom.prob <- predict(exposure_regression, newdata = data_boot,
                                type = ifelse(inherits(exposure_regression, "multinom")|
                                                inherits(exposure_regression, "polr"),
-                                             "probs","response"))
+                                             "probs", "response"))
 
-        class <- as.numeric(as.factor(data_boot[, exposure]))
+        wdenom0 <- wdenom.prob[, astar_lev]
 
-        wdenom <- sapply(1:nrow(data_boot),FUN = function(i) wdenom.prob[i, class[i]])
+        wdenom1 <- wdenom.prob[, a_lev]
 
       }
-
-      w <- wnom/wdenom
 
       ydesign0m <- data.frame(rep(astar, length(index_astar)), as.data.frame(mval)[rep(1,length(index_astar)),],
                               data_boot[index_astar,prec])
@@ -1014,33 +1107,37 @@ est_step <- function(data, indices, model,
 
       EY0m <- weighted.mean(predict(outcome_regression, newdata = ydesign0m,
                                     type = ifelse(inherits(outcome_regression, "coxph"), "risk", "response")),
-                            w = w[index_astar],
+                            w = (wnom/wdenom0)[index_astar],
                             na.rm = TRUE)
 
       EY1m <- weighted.mean(predict(outcome_regression, newdata = ydesign1m,
                                     type = ifelse(inherits(outcome_regression, "coxph"), "risk", "response")),
-                            w = w[index_a], na.rm = TRUE)
+                            w = (wnom/wdenom1)[index_a], na.rm = TRUE)
 
-      EY00 <- weighted.mean(data_boot[index_astar, outcome], w = w[index_astar], na.rm = TRUE)
+      EY00 <- weighted.mean(data_boot[index_astar, outcome], w = (wnom/wdenom0)[index_astar], na.rm = TRUE)
 
-      EY11 <- weighted.mean(data_boot[index_a, outcome], w = w[index_a], na.rm = TRUE)
+      EY11 <- weighted.mean(data_boot[index_a, outcome], w = (wnom/wdenom1)[index_a], na.rm = TRUE)
 
       EY01 <- weighted.mean(predict(outcome_regression, newdata = ydesign01,
                                     type = ifelse(inherits(outcome_regression, "coxph"), "risk", "response")),
-                            w = w[index_a], na.rm = TRUE)
+                            w = (wnom/wdenom1)[index_a], na.rm = TRUE)
 
       EY10 <- weighted.mean(predict(outcome_regression, newdata = ydesign10,
                                     type = ifelse(inherits(outcome_regression, "coxph"), "risk", "response")),
-                            w = w[index_astar], na.rm = TRUE)
+                            w = (wnom/wdenom0)[index_astar], na.rm = TRUE)
 
     }
 
 
     if (identical(class(outcome_regression), "lm") |
         (identical(class(outcome_regression), c("glm", "lm")) &&
-         family(outcome_regression)$family %in% c("gaussian","Gamma","inverse.gaussian","quasi"))|
-        (identical(class(outcome_regression), c("gam", "glm", "lm")) &&
          (family(outcome_regression)$family %in% c("gaussian","Gamma","inverse.gaussian","quasi")))|
+        (identical(class(outcome_regression), c("gam", "glm", "lm")) &&
+         (family(outcome_regression)$family %in% c("gaussian","Gamma","inverse.gaussian","quasi",
+                                                   "gaulss", "gevlss")|
+          startsWith(family(outcome_regression)$family, "Tweedie")|
+          startsWith(family(outcome_regression)$family, "Beta regression")|
+          startsWith(family(outcome_regression)$family, "Scaled t")))|
         identical(class(outcome_regression), "nls")) {
 
       cde <- EY1m - EY0m
@@ -1156,4 +1253,4 @@ est_step <- function(data, indices, model,
 
   return(out)
 
-  }
+}
