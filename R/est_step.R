@@ -629,7 +629,7 @@ est_step <- function(data, indices, model,
 
         postc_regression <- postc_regression_pred <- list()
 
-        for (i in 1:length(postc_regression)) {
+        for (i in 1:length(postc)) {
 
           postc_regression[[i]] <- regressions$postc_regression[[i]]
 
