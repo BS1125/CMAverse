@@ -241,6 +241,8 @@ cmest <- function(data = NULL, model = "rb",
                      exposure = exposure, mediator = mediator,
                      prec = prec, postc = postc)
 
+  out$reg <- list(yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg, wmreg = wmreg)
+
   out$ref <- list(astar = astar, a = a, mval = mval, yref = yref, vecc = vecc)
 
   out$method <- c(estimation = estimation, inference = inference)

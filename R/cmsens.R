@@ -18,6 +18,16 @@ cmsens <- function(cmest_out = NULL, sens = "uc",
 
   postc <- cmest_out$variables$postc
 
+  yreg <- cmest_out$reg$yreg
+
+  mreg <- cmest_out$reg$mreg
+
+  ereg <- cmest_out$reg$ereg
+
+  postcreg <- cmest_out$reg$postcreg
+
+  wmreg <- cmest_out$reg$wmreg
+
   astar <- cmest_out$ref$astar
 
   a <- cmest_out$ref$a
