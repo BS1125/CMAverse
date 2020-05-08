@@ -100,9 +100,9 @@ cmsens <- function(cmest_out = NULL, sens = "uc",
 
       for (i in index_biased) {
 
-        d <- unname(effect_estimate[i] / sd(data[, outcome]))
+        d <- unname(effect_estimate[i] / sd(data[, outcome], na.rm = TRUE))
 
-        sd <- unname(effect_se[i] / sd(data[, outcome]))
+        sd <- unname(effect_se[i] / sd(data[, outcome], na.rm = TRUE))
 
         est <- c(est, exp(0.91 * d))
 
@@ -188,7 +188,7 @@ cmsens <- function(cmest_out = NULL, sens = "uc",
 
     if (MEvariable.type == "continuous") {
 
-      relia_ratio <- 1 - measurement.error/sd(data[, MEvariable])
+      relia_ratio <- 1 - measurement.error/sd(data[, MEvariable], na.rm = TRUE)
 
       names(out) <- paste("Sigma = ", measurement.error, ", Reliability Ratio = ",
                                round(relia_ratio, 4), sep = "")

@@ -96,7 +96,8 @@ plot.cmsens.me <- function(cmsens_out) {
                                     CIlower = cmsens_out$cmsens[[i]][index_out, 3],
                                     CIupper = cmsens_out$cmsens[[i]][index_out, 4],
                                     ReliabilityRatio = round((1 - cmsens_out$ME$measurement.error[i]/
-                                                                sd(cmsens_out$cmest$data[, cmsens_out$ME$MEvariable])), 2)))
+                                                                sd(cmsens_out$cmest$data[, cmsens_out$ME$MEvariable],
+                                                                   na.rm = TRUE)), 2)))
 
     }
 
