@@ -34,9 +34,9 @@ cmsens <- function(cmest_out = NULL, sens = "uc",
 
   if(inference == "bootstrap") nboot <- cmest_out$nboot
 
-  regression <- cmest_out$regressions
+  regressions <- cmest_out$regressions
 
-  outcome_regression <- regression$outcome_regression
+  outcome_regression <- regressions$outcome_regression
 
   effect_estimate <- cmest_out$effect_estimate
 

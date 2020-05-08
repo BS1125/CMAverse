@@ -1,5 +1,5 @@
 simex_reg <- function (reg, data, MEvariable, MEvariable.type, measurement.error,
-                         lambda = c(0.5, 1, 1.5, 2), B = 100) {
+                       lambda = c(0.5, 1, 1.5, 2), B = 100) {
 
   if (!all(lambda>0)) {
     stop("lambda should be positive")
@@ -16,25 +16,21 @@ simex_reg <- function (reg, data, MEvariable, MEvariable.type, measurement.error
     names(SIMcoef) <- colnames(vcov(reg))
   } else {SIMcoef <- coef(reg)}
 
-  if (identical(class(reg), "lm")) SIMsigma <- sigma(reg)
-
   SIMvar <- list(vcov(reg))
 
   ncoef <- length(SIMcoef)
 
-  if (MEvariable.type == "continuous") {
+  for (i in 2:length(lambda)) {
 
-    if (!length(measurement.error) == 1) {
-      stop("measurement.error should be a single value for a continuous variable measured with error")
-    }
+    if (MEvariable.type == "continuous") {
 
-    error <- rep(measurement.error, n)
+      if (!length(measurement.error) == 1) {
+        stop("measurement.error should be a single value for a continuous variable measured with error")
+      }
 
-    for (i in 2:length(lambda)) {
+      error <- rep(measurement.error, n)
 
       SIMcoef_mid <- c()
-
-      if (identical(class(reg), "lm")) SIMsigma_mid <- c()
 
       SIMvar_mid <- matrix(rep(0, ncoef^2), nrow = ncoef)
 
@@ -54,60 +50,29 @@ simex_reg <- function (reg, data, MEvariable, MEvariable.type, measurement.error
           SIMcoef_mid <- rbind(SIMcoef_mid, as.vector(t(coef(SIMreg))))
         } else {SIMcoef_mid <- rbind(SIMcoef_mid, c(coef(SIMreg)))}
 
-        if (identical(class(reg), "lm")) SIMsigma_mid <- c(SIMsigma_mid, sigma(SIMreg))
-
         SIMvar_mid <- SIMvar_mid + vcov(SIMreg)/B
 
       }
 
       SIMcoef <- rbind(SIMcoef, colMeans(SIMcoef_mid))
 
-      if (identical(class(reg), "lm")) SIMsigma <- c(SIMsigma, mean(SIMsigma_mid))
-
       SIMvar[[i]]<- SIMvar_mid - cov(SIMcoef_mid)
 
-    }
+    } else if (MEvariable.type == "categorical") {
 
-    extrap_coef <- lm(SIMcoef ~ lambda + I(lambda^2))
+      if (!is.matrix(measurement.error)) {
+        stop("measurement.error should be a matrix for a categorical variable measured with error")
+      }
 
-    SIMEXcoef <- predict(extrap_coef, newdata = data.frame(lambda = -1))
+      data[, MEvariable] <- as.factor(data[, MEvariable])
 
-    if (identical(class(reg), "lm")) {
+      levels(data[, MEvariable]) <- 0:(length(levels(data[, MEvariable])) - 1)
 
-      extrap_sigma <- lm(SIMsigma ~ lambda + I(lambda^2))
+      category <- levels(data[, MEvariable])
 
-      SIMEXsigma <- predict(extrap_sigma, newdata = data.frame(lambda = -1))
-
-    }
-
-    SIMvar.element <- matrix(unlist(SIMvar), nrow = length(lambda) , byrow = TRUE)
-
-    extrap_var <- lm(SIMvar.element ~ lambda + I(lambda^2))
-
-    SIMEXvar <- matrix(predict(extrap_var, newdata = data.frame(lambda = -1)),
-                       nrow = length(SIMEXcoef))
-
-    dimnames(SIMEXvar) <- list(colnames(SIMEXcoef), colnames(SIMEXcoef))
-
-  } else if (MEvariable.type == "categorical") {
-
-    if (!is.matrix(measurement.error)) {
-      stop("measurement.error should be a matrix for a categorical variable measured with error")
-    }
-
-    data[, MEvariable] <- as.factor(data[, MEvariable])
-
-    levels(data[, MEvariable]) <- 0:(length(levels(data[, MEvariable])) - 1)
-
-    category <- levels(data[, MEvariable])
-
-    mcmdecomp <- eigen(measurement.error)
-
-    for (i in 2:length(lambda)) {
+      mcmdecomp <- eigen(measurement.error)
 
       SIMcoef_mid <- c()
-
-      if (identical(class(reg), "lm")) SIMsigma_mid <- c()
 
       SIMvar_mid <- matrix(rep(0, ncoef^2), nrow = ncoef)
 
@@ -132,43 +97,41 @@ simex_reg <- function (reg, data, MEvariable, MEvariable.type, measurement.error
           SIMcoef_mid <- rbind(SIMcoef_mid, as.vector(t(coef(SIMreg))))
         } else {SIMcoef_mid <- rbind(SIMcoef_mid, c(coef(SIMreg)))}
 
-        if (identical(class(reg), "lm")) SIMsigma_mid <- c(SIMsigma_mid, sigma(SIMreg))
-
         SIMvar_mid <- SIMvar_mid + vcov(SIMreg)/B
 
       }
 
       SIMcoef <- rbind(SIMcoef, colMeans(SIMcoef_mid))
 
-      if (identical(class(reg), "lm")) SIMsigma <- c(SIMsigma, mean(SIMsigma_mid))
-
       SIMvar[[i]]<- SIMvar_mid - cov(SIMcoef_mid)
 
-    }
+    } else {stop("Only support MEvariable.type = 'continuous or 'categorical'")}
 
-    extrap_coef <- lm(SIMcoef ~ lambda + I(lambda^2))
+  }
 
-    SIMEXcoef <- predict(extrap_coef, newdata = data.frame(lambda = -1))
+  extrap_coef <- lm(SIMcoef ~ lambda + I(lambda^2))
 
-    if (identical(class(reg), "lm")) {
+  SIMEXcoef <- predict(extrap_coef, newdata = data.frame(lambda = -1))
 
-      extrap_sigma <- lm(SIMsigma ~ lambda + I(lambda^2))
+  SIMvar.element <- matrix(unlist(SIMvar), nrow = length(lambda) , byrow = TRUE)
 
-      SIMEXsigma <- predict(extrap_sigma, newdata = data.frame(lambda = -1))
+  extrap_var <- lm(SIMvar.element ~ lambda + I(lambda^2))
 
-    }
+  SIMEXvar <- matrix(predict(extrap_var, newdata = data.frame(lambda = -1)),
+                     nrow = length(SIMEXcoef))
 
-    SIMvar.element <- matrix(unlist(SIMvar), nrow = length(lambda) , byrow = TRUE)
+  dimnames(SIMEXvar) <- list(colnames(SIMEXcoef), colnames(SIMEXcoef))
 
-    extrap_var <- lm(SIMvar.element ~ lambda + I(lambda^2))
+  if (identical(class(reg), "lm")) {
 
-    SIMEXvar <- matrix(predict(extrap_var, newdata = data.frame(lambda = -1)),
-                       nrow = length(SIMEXcoef))
+    reg_fit <- reg
 
-    dimnames(SIMEXvar) <- list(colnames(SIMEXcoef), colnames(SIMEXcoef))
+    reg_fit$coefficient <- SIMEXcoef
 
-  } else {stop("Only support MEvariable.type = 'continuous or 'categorical'")}
+    SIMEXsigma <- sqrt(sum((predict(reg_fit, newdata = reg$model) - reg$model[, 1])^2)/
+      (nrow(reg$model) - length(SIMEXcoef)))
 
+  }
 
   if (identical(class(reg), "lm")) out <- list(NAIVEreg = reg, SIMEXcoef = SIMEXcoef,
                                                SIMEXvar = SIMEXvar, SIMEXsigma = SIMEXsigma)
