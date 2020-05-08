@@ -1,13 +1,25 @@
-est_step <- function(data, indices, model, regressions,
+est_step <- function(data, indices, model,
                      outcome, event, exposure, mediator, EMint, prec, postc,
                      astar, a, mval, yref, vecc,
+                     yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg, wmreg = wmreg,
                      estimation,
                      ME = FALSE, MEvariable = NULL, MEvariable.type = NULL,
                      measurement.error = NULL, lambda = c(0.5, 1, 1.5, 2), B = 100) {
 
   data_boot <- data[indices, ]
 
-  outcome_regression <- update(regressions$outcome_regression, data = data_boot)
+  formulas <- create_formulas(model = model,
+                              outcome = outcome, event = event,
+                              exposure = exposure, mediator = mediator, EMint = EMint,
+                              prec = prec, postc = postc,
+                              yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg, wmreg = wmreg)
+
+  regressions <- run_regressions(formulas = formulas, data = data_boot, model = model,
+                                 exposure = exposure, mediator = mediator, postc = postc,
+                                 yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg,
+                                 wmreg = wmreg)
+
+  outcome_regression <- regressions$outcome_regression
 
   if ((inherits(outcome_regression, "gam") &&
        (family(outcome_regression)$family == "multinom" |
@@ -62,7 +74,7 @@ est_step <- function(data, indices, model, regressions,
       mlevel <- ifelse(is.character(data_boot[, mediator])|is.factor(data_boot[, mediator]),
                        length(levels(data_boot[, mediator])), 2)
 
-      mediator_regression <- update(regressions$mediator_regression[[1]], data = data_boot)
+      mediator_regression <- regressions$mediator_regression[[1]]
 
       if (ME && MEvariable %in% all.vars(formula(outcome_regression))) {
 
@@ -312,11 +324,9 @@ est_step <- function(data, indices, model, regressions,
 
     } else if (model == "iorw") {
 
-      tot_regression <- update(outcome_regression, data = data_boot)
+      tot_regression <- dir_regression <- outcome_regression
 
-      dir_regression <- update(outcome_regression, data = data_boot)
-
-      exposure_regression <- update(regressions$exposure_regression, data = data_boot)
+      exposure_regression <- regressions$exposure_regression
 
       exposure_regression_pred <- exposure_regression
 
@@ -444,7 +454,7 @@ est_step <- function(data, indices, model, regressions,
 
         # calculate P(A=ai)/P(A=ai|C=ci)
 
-        exposure_regression <- update(regressions$exposure_regression, data = data_boot)
+        exposure_regression <- regressions$exposure_regression
 
         exposure_regression_pred <- exposure_regression
 
@@ -500,32 +510,32 @@ est_step <- function(data, indices, model, regressions,
         wmnom_regression <- wmnom_regression_pred <- wmdenom_regression <-
           wmdenom_regression_pred <- list()
 
-         for (i in 1:length(mediator)) {
+        for (i in 1:length(mediator)) {
 
-            wmnom_regression[[i]] <- update(regressions$wmnom_regression[[i]], data = data_boot)
+          wmnom_regression[[i]] <- regressions$wmnom_regression[[i]]
 
-            if (ME && MEvariable %in% all.vars(formula(wmnom_regression[[i]]))) {
+          if (ME && MEvariable %in% all.vars(formula(wmnom_regression[[i]]))) {
 
-              wmnom_regression_pred[[i]] <- simex_reg(reg = wmnom_regression[[i]],
+            wmnom_regression_pred[[i]] <- simex_reg(reg = wmnom_regression[[i]],
+                                                    data = data_boot, MEvariable = MEvariable,
+                                                    MEvariable.type = MEvariable.type,
+                                                    measurement.error = measurement.error,
+                                                    lambda = lambda, B = B)
+
+          } else wmnom_regression_pred[[i]] <- wmnom_regression[[i]]
+
+          wmdenom_regression[[i]] <- regressions$wmdenom_regression[[i]]
+
+          if (ME && MEvariable %in% all.vars(formula(wmdenom_regression[[i]]))) {
+
+            wmdenom_regression_pred[[i]] <- simex_reg(reg = wmdenom_regression[[i]],
                                                       data = data_boot, MEvariable = MEvariable,
                                                       MEvariable.type = MEvariable.type,
                                                       measurement.error = measurement.error,
                                                       lambda = lambda, B = B)
 
-            } else wmnom_regression_pred[[i]] <- wmnom_regression[[i]]
-
-            wmdenom_regression[[i]] <- update(regressions$wmdenom_regression[[i]], data = data_boot)
-
-            if (ME && MEvariable %in% all.vars(formula(wmdenom_regression[[i]]))) {
-
-              wmdenom_regression_pred[[i]] <- simex_reg(reg = wmdenom_regression[[i]],
-                                                        data = data_boot, MEvariable = MEvariable,
-                                                        MEvariable.type = MEvariable.type,
-                                                        measurement.error = measurement.error,
-                                                        lambda = lambda, B = B)
-
-            } else wmdenom_regression_pred[[i]] <- wmdenom_regression[[i]]
-          }
+          } else wmdenom_regression_pred[[i]] <- wmdenom_regression[[i]]
+        }
 
 
         wmnom <- rep(1, nrow(data_boot))
@@ -590,8 +600,7 @@ est_step <- function(data, indices, model, regressions,
 
         for (i in 1:length(mediator_regression)) {
 
-          mediator_regression[[i]] <- update(mediator_regression[[i]],
-                                             data = data_boot, weights = wa)
+          mediator_regression[[i]] <- update(mediator_regression[[i]], weights = wa)
 
         }
 
@@ -620,19 +629,19 @@ est_step <- function(data, indices, model, regressions,
 
         for (i in 1:length(postc_regression)) {
 
-          postc_regression[[i]] <- update(regressions$postc_regression[[i]], data = data_boot)
+          postc_regression[[i]] <- regressions$postc_regression[[i]]
 
-            if (ME && MEvariable %in% all.vars(formula(postc_regression[[i]]))) {
+          if (ME && MEvariable %in% all.vars(formula(postc_regression[[i]]))) {
 
-              postc_regression_pred[[i]] <- simex_reg(reg = postc_regression[[i]],
-                                                      data = data_boot, MEvariable = MEvariable,
-                                                      MEvariable.type = MEvariable.type,
-                                                      measurement.error = measurement.error,
-                                                      lambda = lambda, B = B)
+            postc_regression_pred[[i]] <- simex_reg(reg = postc_regression[[i]],
+                                                    data = data_boot, MEvariable = MEvariable,
+                                                    MEvariable.type = MEvariable.type,
+                                                    measurement.error = measurement.error,
+                                                    lambda = lambda, B = B)
 
-            } else postc_regression_pred[[i]] <- postc_regression[[i]]
+          } else postc_regression_pred[[i]] <- postc_regression[[i]]
 
-            }
+        }
 
 
         postc_a <- data.frame(matrix(nrow = nrow(data_boot), ncol = length(postc)))
@@ -769,19 +778,19 @@ est_step <- function(data, indices, model, regressions,
 
       for (i in 1:length(mediator)) {
 
-        mediator_regression[[i]] <- update(regressions$mediator_regression[[i]], data = data_boot)
+        mediator_regression[[i]] <- regressions$mediator_regression[[i]]
 
-          if (ME && MEvariable %in% all.vars(formula(mediator_regression[[i]]))) {
+        if (ME && MEvariable %in% all.vars(formula(mediator_regression[[i]]))) {
 
-            mediator_regression_pred[[i]] <- simex_reg(reg = mediator_regression[[i]],
-                                                       data = data_boot, MEvariable = MEvariable,
-                                                       MEvariable.type = MEvariable.type,
-                                                       measurement.error = measurement.error,
-                                                       lambda = lambda, B = B)
+          mediator_regression_pred[[i]] <- simex_reg(reg = mediator_regression[[i]],
+                                                     data = data_boot, MEvariable = MEvariable,
+                                                     MEvariable.type = MEvariable.type,
+                                                     measurement.error = measurement.error,
+                                                     lambda = lambda, B = B)
 
-          } else mediator_regression_pred[[i]] <- mediator_regression[[i]]
+        } else mediator_regression_pred[[i]] <- mediator_regression[[i]]
 
-          }
+      }
 
 
       m_a <- data.frame(matrix(nrow = nrow(data_boot), ncol = length(mediator)))
@@ -997,7 +1006,7 @@ est_step <- function(data, indices, model, regressions,
 
     } else if (model == "wb") {
 
-      exposure_regression <- update(regressions$exposure_regression, data = data_boot)
+      exposure_regression <- regressions$exposure_regression
 
       exposure_regression_pred <- exposure_regression
 

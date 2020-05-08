@@ -1,12 +1,25 @@
 inf_step <- function(nboot, data, model,
                      outcome, event, exposure, mediator, EMint, prec, postc,
-                     regressions,
+                     yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg, wmreg = wmreg,
                      astar, a, mval, yref, vecc,
                      estimation, inference,
                      ME = FALSE, MEvariable = NULL, MEvariable.type = NULL,
                      measurement.error = NULL, lambda = c(0.5, 1, 1.5, 2), B = 100) {
 
+
+
   if (inference == "delta") {
+
+    formulas <- create_formulas(model = model,
+                                outcome = outcome, event = event,
+                                exposure = exposure, mediator = mediator, EMint = EMint,
+                                prec = prec, postc = postc,
+                                yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg, wmreg = wmreg)
+
+    regressions <- run_regressions(formulas = formulas, data = data_boot, model = model,
+                                   exposure = exposure, mediator = mediator, postc = postc,
+                                   yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg,
+                                   wmreg = wmreg)
 
     if (model != "rb") {
       stop("Delta method inference doesn't support selected model")
@@ -54,7 +67,7 @@ inf_step <- function(nboot, data, model,
 
       vcov_thetas <- vcov(outcome_regression)
 
-      }
+    }
 
     if (ME && MEvariable %in% all.vars(formula(mediator_regression))) {
 
@@ -144,9 +157,9 @@ inf_step <- function(nboot, data, model,
         cde_formula <- paste0("(", paste(theta1, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
                               paste(theta1, paste0("(", astar, ")"), sep = "*", collapse = "+"), ")+(",
                               ifelse(sum(mstar) == 0, 0, paste(theta3[which(mstar == 1),], paste0("(", a, ")"),
-                                                                sep = "*", collapse = "+")), ")-(",
+                                                               sep = "*", collapse = "+")), ")-(",
                               ifelse(sum(mstar) == 0, 0, paste(theta3[which(mstar == 1),], paste0("(", astar, ")"),
-                                                                         sep = "*", collapse = "+")),
+                                                               sep = "*", collapse = "+")),
                               ")")
 
         pnde_formula <- paste0("(", paste(theta1, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
@@ -154,7 +167,7 @@ inf_step <- function(nboot, data, model,
                                paste0("((",sapply(1:(mlevel - 1), FUN = function(x) paste(theta3[x, ], paste0("(", a, ")"),
                                                                                           sep = "*", collapse = "+")),
                                       ")-(", sapply(1:(mlevel - 1), FUN = function(x) paste(theta3[x, ], paste0("(", astar, ")"),
-                                                                                              sep = "*", collapse = "+")),
+                                                                                            sep = "*", collapse = "+")),
                                       "))*exp(", beta0, "+(", sapply(1:(mlevel - 1),
                                                                      FUN = function(x) paste(beta1[x, ], paste0("(", astar, ")"),
                                                                                              sep = "*", collapse = "+")),
@@ -169,7 +182,7 @@ inf_step <- function(nboot, data, model,
                                paste0("((",sapply(1:(mlevel - 1), FUN = function(x) paste(theta3[x, ], paste0("(", a, ")"),
                                                                                           sep = "*", collapse = "+")),
                                       ")-(", sapply(1:(mlevel - 1), FUN = function(x) paste(theta3[x, ], paste0("(", astar, ")"),
-                                                                                              sep = "*", collapse = "+")),
+                                                                                            sep = "*", collapse = "+")),
                                       "))*exp(", beta0, "+(", sapply(1:(mlevel - 1),
                                                                      FUN = function(x) paste(beta1[x, ], paste0("(", a, ")"),
                                                                                              sep = "*", collapse = "+")),
@@ -318,9 +331,9 @@ inf_step <- function(nboot, data, model,
         cde_rr_formula <- paste0("exp((", paste(theta1, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
                                  paste(theta1, paste0("(", astar, ")"), sep = "*", collapse = "+"), ")+(",
                                  ifelse(sum(mstar) == 0, 0, paste(theta3[which(mstar == 1),], paste0("(", a, ")"),
-                                                                   sep = "*", collapse = "+"))
+                                                                  sep = "*", collapse = "+"))
                                  , ")-(", ifelse(sum(mstar) == 0, 0, paste(theta3[which(mstar == 1),], paste0("(", astar, ")"),
-                                                                            sep = "*", collapse = "+")),
+                                                                           sep = "*", collapse = "+")),
                                  "))")
 
         pnde_rr_formula <- paste0("(exp((", paste(theta1, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
@@ -394,9 +407,9 @@ inf_step <- function(nboot, data, model,
                                   paste(theta1, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
                                   paste(theta1, paste0("(", astar, ")"), sep = "*", collapse = "+"), ")+(",
                                   ifelse(sum(mstar) == 0, 0, paste(theta3[which(mstar == 1),], paste0("(", a, ")"),
-                                                                    sep = "*", collapse = "+")), "))-exp((",
+                                                                   sep = "*", collapse = "+")), "))-exp((",
                                   ifelse(sum(mstar) == 0, 0, paste(theta3[which(mstar == 1),], paste0("(", astar, ")"),
-                                                                    sep = "*", collapse = "+")), "))))/(1+",
+                                                                   sep = "*", collapse = "+")), "))))/(1+",
                                   paste0("exp(", theta2, "+(", sapply(1:(mlevel - 1), FUN = function(x) paste(theta3[x, ], paste0("(", astar, ")"),
                                                                                                               sep = "*", collapse = "+")),
                                          ")+", beta0, "+(" , sapply(1:(mlevel - 1), FUN = function(x) paste(beta1[x, ], paste0("(", astar, ")"),
@@ -470,7 +483,7 @@ inf_step <- function(nboot, data, model,
                         outcome = outcome, event = event, exposure = exposure,
                         mediator = mediator, EMint = EMint,
                         prec = prec, postc = postc,
-                        regressions = regressions,
+                        yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg, wmreg = wmreg,
                         astar = astar, a = a, mval = mval, yref = yref, vecc = vecc,
                         estimation = estimation,
                         ME = ME, MEvariable = MEvariable, MEvariable.type = MEvariable.type,

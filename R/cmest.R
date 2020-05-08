@@ -151,7 +151,7 @@ cmest <- function(data = NULL, model = "rb",
                                 outcome = outcome, event = event, exposure = exposure,
                                 mediator = mediator, EMint = EMint,
                                 prec = prec, postc = postc,
-                                regressions = regressions,
+                                yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg, wmreg = wmreg,
                                 astar = astar, a = a, mval = mval, yref = yref, vecc = vecc,
                                 estimation = estimation)
 
@@ -159,7 +159,7 @@ cmest <- function(data = NULL, model = "rb",
                           outcome = outcome, event = event, exposure = exposure,
                           mediator = mediator, EMint = EMint,
                           prec = prec, postc = postc,
-                          regressions = regressions,
+                          yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg, wmreg = wmreg,
                           astar = astar, a = a, mval = mval, yref = yref, vecc = vecc,
                           estimation = estimation, inference = inference)
 
@@ -176,8 +176,7 @@ cmest <- function(data = NULL, model = "rb",
 
     regressions <- run_regressions(formulas = formulas, data = data, model = model,
                                    exposure = exposure, mediator = mediator, postc = postc,
-                                   regressions = regressions,
-                                   wmreg = wmreg)
+                                   yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg, wmreg = wmreg)
 
     outcome_regression <- regressions$outcome_regression
 
