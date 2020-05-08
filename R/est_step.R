@@ -617,6 +617,8 @@ est_step <- function(data, indices, model,
         postcdesign_astar <- data.frame(c(rep(astar,nrow(data_boot))),
                                         data_boot[,prec])
 
+        colnames(postcdesign_a) <- colnames(postcdesign_astar) <- c(exposure, prec)
+
         if (is.factor(data_boot[, exposure])) {
 
           postcdesign_a[, exposure] <- factor(postcdesign_a[, exposure], levels = levels(data_boot[, exposure]))
