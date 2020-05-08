@@ -103,21 +103,22 @@ plot.cmsens.me <- function(cmsens_out) {
 
     ggplot() +
       geom_errorbar(aes(x = Effect, ymin = CIlower, ymax = CIupper,
-                        colour = ReliabilityRatio), width = 0.1,
+                        colour = ReliabilityRatio), width = 0.3,
                     data = effect_df[which(effect_df$ReliabilityRatio!=1),],
                     position = position_dodge2(width=0.5))+
       geom_point(aes(x = Effect, y = Point, colour = ReliabilityRatio),
                  data = effect_df[which(effect_df$ReliabilityRatio!=1),],
-                 position = position_dodge2(width=0.1)) +
-      geom_errorbar(aes(x = Effect, ymin = CIlower, ymax = CIupper), color = "orange", width = 0.1,
+                 position = position_dodge2(width=0.3)) +
+      geom_errorbar(aes(x = Effect, ymin = CIlower, ymax = CIupper), color = "orange", width = 0.3,
                     data = effect_df[which(effect_df$ReliabilityRatio==1),],
                     position = position_dodge2(width=0.5)) +
       geom_point(aes(x = Effect, y = Point), colour = "orange",
                  data = effect_df[which(effect_df$ReliabilityRatio==1),],
-                 position = position_dodge2(width=0.1)) +
+                 position = position_dodge2(width=0.3)) +
       ylab("Point Estimate and 95% CI")+
       scale_colour_gradient(low = "lightblue", high = "darkblue")+
-      geom_hline(yintercept = 0, color = "red")
+      geom_hline(yintercept = 0, color = "red")+
+      theme(legend.position = "bottom")
 
   }
 
