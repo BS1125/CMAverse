@@ -16,7 +16,7 @@ inf_step <- function(nboot, data, model,
                                 prec = prec, postc = postc,
                                 yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg, wmreg = wmreg)
 
-    regressions <- run_regressions(formulas = formulas, data = data_boot, model = model,
+    regressions <- run_regressions(formulas = formulas, data = data, model = model,
                                    exposure = exposure, mediator = mediator, postc = postc,
                                    yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg,
                                    wmreg = wmreg)
