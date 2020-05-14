@@ -1,7 +1,7 @@
 est_step <- function(data, indices, model,
                      outcome, event, exposure, mediator, EMint, prec, postc,
                      astar, a, mval, yref, vecc,
-                     yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg, wmreg = wmreg,
+                     yreg, mreg, ereg, postcreg, wmreg,
                      estimation,
                      ME = FALSE, MEvariable = NULL, MEvariable.type = NULL,
                      measurement.error = NULL, lambda = c(0.5, 1, 1.5, 2), B = 100) {
