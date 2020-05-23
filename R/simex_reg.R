@@ -28,6 +28,10 @@ simex_reg <- function (reg, data, MEvariable, MEvariable.type, measurement.error
         stop("measurement.error should be a single value for a continuous variable measured with error")
       }
 
+      if (measurement.error <= 0) {
+        stop("measurement.error should be greater than 0")
+      }
+
       error <- rep(measurement.error, n)
 
       SIMcoef_mid <- c()
@@ -36,7 +40,7 @@ simex_reg <- function (reg, data, MEvariable, MEvariable.type, measurement.error
 
       for (b in 1:B) {
 
-        Z <- rnorm(n=n)
+        Z <- rnorm(n = n)
 
         SIMdata <- data
 

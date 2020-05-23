@@ -66,6 +66,37 @@ print.cmsens.me <- function(cmsens_out, digits = 4) {
 
 }
 
+plot.cmest <- function(cmest_out) {
+
+  require(ggplot2)
+
+  if (cmest_out$model %in% c("rb", "wb", "msm", "g-formula")) {
+
+    index_out <- 1:6
+
+  } else if (cmest_out$model == "iorw") {
+
+    index_out <- 1:3
+
+  }
+
+  effect_df <- data.frame(Effect = factor(rownames(summary(cmest_out))[index_out]),
+                          Point = summary(cmest_out)[index_out, 1],
+                          CIlower = summary(cmest_out)[index_out, 3],
+                          CIupper = summary(cmest_out)[index_out, 4])
+
+  ggplot() +
+      geom_errorbar(aes(x = Effect, ymin = CIlower, ymax = CIupper), width = 0.3,
+                    data = effect_df)+
+      geom_point(aes(x = Effect, y = Point),
+                 colour = "blue", data = effect_df) +
+      ylab("Point Estimate and 95% CI")+
+      geom_hline(yintercept = 0, color = "red")
+
+}
+
+
+
 plot.cmsens.me <- function(cmsens_out) {
 
   require(ggplot2)
@@ -95,32 +126,54 @@ plot.cmsens.me <- function(cmsens_out) {
                                     Point = cmsens_out$cmsens[[i]][index_out, 1],
                                     CIlower = cmsens_out$cmsens[[i]][index_out, 3],
                                     CIupper = cmsens_out$cmsens[[i]][index_out, 4],
-                                    ReliabilityRatio = round((1 - cmsens_out$ME$measurement.error[i]/
+                                    ReliabilityRatio = factor(round((1 - cmsens_out$ME$measurement.error[i]/
                                                                 sd(cmsens_out$cmest$data[, cmsens_out$ME$MEvariable],
-                                                                   na.rm = TRUE)), 2)))
+                                                                   na.rm = TRUE)), 2))))
 
     }
 
     ggplot() +
       geom_errorbar(aes(x = Effect, ymin = CIlower, ymax = CIupper,
                         colour = ReliabilityRatio), width = 0.3,
-                    data = effect_df[which(effect_df$ReliabilityRatio!=1),],
+                    data = effect_df,
                     position = position_dodge2(width=0.5))+
       geom_point(aes(x = Effect, y = Point, colour = ReliabilityRatio),
-                 data = effect_df[which(effect_df$ReliabilityRatio!=1),],
-                 position = position_dodge2(width=0.3)) +
-      geom_errorbar(aes(x = Effect, ymin = CIlower, ymax = CIupper), color = "orange", width = 0.3,
-                    data = effect_df[which(effect_df$ReliabilityRatio==1),],
-                    position = position_dodge2(width=0.5)) +
-      geom_point(aes(x = Effect, y = Point), colour = "orange",
-                 data = effect_df[which(effect_df$ReliabilityRatio==1),],
+                 data = effect_df,
                  position = position_dodge2(width=0.3)) +
       ylab("Point Estimate and 95% CI")+
-      scale_colour_gradient(low = "lightblue", high = "darkblue")+
+      scale_colour_hue()+
+      geom_hline(yintercept = 0, color = "red")+
+      theme(legend.position = "bottom")
+
+  } else if (cmsens_out$ME$MEvariable.type == "categorical") {
+
+    for (i in 1:length(cmsens_out$cmsens)) {
+
+      effect_df <- rbind(effect_df,
+                         data.frame(Effect = rownames(cmsens_out$cmsens[[i]])[index_out],
+                                    Point = cmsens_out$cmsens[[i]][index_out, 1],
+                                    CIlower = cmsens_out$cmsens[[i]][index_out, 3],
+                                    CIupper = cmsens_out$cmsens[[i]][index_out, 4],
+                                    MisspecificationMAtrix = factor(paste0("Matrix", i))))
+
+    }
+
+    ggplot() +
+      geom_errorbar(aes(x = Effect, ymin = CIlower, ymax = CIupper,
+                        colour = MisspecificationMAtrix), width = 0.3,
+                    data = effect_df,
+                    position = position_dodge2(width=0.5))+
+      geom_point(aes(x = Effect, y = Point, colour = MisspecificationMAtrix),
+                 data = effect_df,
+                 position = position_dodge2(width=0.3)) +
+      ylab("Point Estimate and 95% CI")+
+      scale_colour_hue()+
       geom_hline(yintercept = 0, color = "red")+
       theme(legend.position = "bottom")
 
   }
+
+
 
 }
 
