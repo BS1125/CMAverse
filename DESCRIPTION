@@ -6,10 +6,19 @@ Author: Who wrote it
 Maintainer: The package maintainer <yourself@somewhere.net>
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
+<<<<<<< HEAD
 Imports: 
     ggdag,
     gridExtra,
     grid
+=======
+RoxygenNote: 7.1.0
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat
+VignetteBuilder: knitr
+>>>>>>> 0619c2b6ec00c006201672ed88c02e767985106a
