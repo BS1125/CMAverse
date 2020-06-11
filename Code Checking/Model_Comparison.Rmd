@@ -1,0 +1,2703 @@
+---
+title: "Model Comparison"
+author: "Baoyi Shi"
+output: 
+  pdf_document:
+    number_sections: true
+    toc: true
+    toc_depth: 2
+header-includes:
+- \usepackage{caption}
+---
+
+```{r echo=FALSE,warning=FALSE,message=FALSE}
+rm(list=ls())
+library(CMA)
+df_int <- read.csv("./Data Simulation and Code Checking/int_data_10000.txt", sep = " ")
+df_noint <- read.csv("./Data Simulation and Code Checking/noint_data_10000.txt", sep = " ")
+df_multipleM_noint <- read.csv("./Data Simulation and Code Checking/multipleM_noint_data_10000.txt", sep = " ")
+df_multipleM_EMint <- read.csv("./Data Simulation and Code Checking/multipleM_EMint_data_10000.txt", sep = " ")
+df_multipleM_MMint <- read.csv("./Data Simulation and Code Checking/multipleM_MMint_data_10000.txt", sep = " ")
+df_multipleM_EMMint <- read.csv("./Data Simulation and Code Checking/multipleM_EMMint_data_10000.txt", sep = " ")
+df_multipleM_EMint_postcovar <- read.csv("./Data Simulation and Code Checking/multipleM_EMint_postcovar_data_10000.txt", sep = " ")
+```
+
+# Case 1: Continuous Outcome and Single Continuous Mediator
+
+## Case 1-1: Continuous Outcome, Single Continuous Mediator and Continuous Exposure Without Interaction
+
+### Data simulation
+
+#### Simulation Procedures
+
+1. Simulate the exposure A from $N(5,2^2)$.
+
+2. Simulate the covariate C1 from $N(1,1)$ and simulate the covariate C2 from $Bernoulli(0.6)$.
+
+3. Simulate the mediator M from $N((\beta_0+\beta_1A+\beta_{21}C1+\beta_{22}C2),\sigma_M^2)$.
+
+4. Simulate the outcome Y from $N(\theta_0+\theta_1A+\theta_2M+\theta_{41}C1+\theta_{42}C2,\sigma_Y^2)$.
+
+#### True Parameters
+
+\begin{center}
+\captionof{table}{True Model Parameters for Data Simulation}
+\begin{tabular}{l|l|l|l|l|l|l|l|l|l|l|l}
+\hline
+Sample Size & $\theta_0$ & $\theta_1$ & $\theta_2$ & $\theta_{41}$ & $\theta_{42}$ & $\beta_0$ & $\beta_1$ & $\beta_{21}$ & $\beta_{22}$ & $\sigma_M$ & $\sigma_Y$\\ \hline
+10000&-5&0.8&1.8&0.1&0.3&-0.25&0.5&0.2&0.3&0.1&0.2 \\ \hline
+\end{tabular}
+\end{center}
+
+#### True Models
+
+True model for the mediator:
+$$E[M|a,c]=\beta_0+\beta_1a+\beta_{21}c1+\beta_{22}c2$$
+
+True model for the outcome:
+$$E[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_2m^*+\theta_{41}c1+\theta_{42}c2$$
+
+### Causal Effects and Standard Errors Estimated By the Regression-based Approach
+
+#### Closed-form Parameter Function Estimation and Delta Method Inference
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "contY_contM_contA_noint", exposure = 'A_cont', 
+                 exposure.type = "continuous",
+                 mediator = 'M_cont_contA', covariates.pre = c("C_cont", "C_bin"), 
+                 yreg = "linear", mreg = "linear", mval = list(1),
+                 a_star = 2, a = 3, 
+                 est.method = "paramfunc", inf.method = "delta", model = "rb")
+
+```
+
+#### Direct Imputation Estimation and Bootstrap Inference
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "contY_contM_contA_noint", exposure = 'A_cont', 
+                 exposure.type = "continuous",
+                 mediator = 'M_cont_contA', covariates.pre = c("C_cont", "C_bin"),  
+                 yreg = "linear", mreg = "linear", mval = list(1),
+                 a_star = 2, a = 3, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "rb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the G-formula Approach 
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "contY_contM_contA_noint", exposure = 'A_cont', 
+                 exposure.type = "continuous",
+                 mediator = 'M_cont_contA', covariates.pre = c("C_cont", "C_bin"), 
+                 yreg = "linear", mreg = "linear", mval = list(1),
+                 a_star = 2, a = 3, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "g-formula")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
+
+```{r warning=F,message=F}
+cmest(data = df_noint,  outcome = "contY_contM_contA_noint", exposure = 'A_cont', 
+                 exposure.type = "continuous",
+                 mediator = 'M_cont_contA', covariates.pre = c("C_cont", "C_bin"), 
+                 yreg = "linear", mreg = "linear", mval = list(1),
+                 a_star = 2, a = 3, model = "ne")
+```
+
+## Case 1-2: Continuous Outcome, Single Continuous Mediator and Binary Exposure Without Interaction
+
+### Data simulation
+
+#### Simulation Procedures
+
+1. Simulate the exposure A from $Bernoulli(0.4)$.
+
+2. Simulate the covariate C1 from $N(1,1)$ and simulate the covariate C2 from $Bernoulli(0.6)$.
+
+3. Simulate the mediator M from $N((\beta_0+\beta_1A+\beta_{21}C1+\beta_{22}C2),\sigma_M^2)$.
+
+4. Simulate the outcome Y from $N(\theta_0+\theta_1A+\theta_2M+\theta_{41}C1+\theta_{42}C2,\sigma_Y^2)$.
+
+#### True Parameters
+
+\begin{center}
+\captionof{table}{True Model Parameters for Data Simulation}
+\begin{tabular}{l|l|l|l|l|l|l|l|l|l|l|l}
+\hline
+Sample Size & $\theta_0$ & $\theta_1$ & $\theta_2$ & $\theta_{41}$ & $\theta_{42}$ & $\beta_0$ & $\beta_1$ & $\beta_{21}$ & $\beta_{22}$ & $\sigma_M$ & $\sigma_Y$\\ \hline
+10000&-5&0.8&1.8&0.1&0.3&-0.25&0.5&0.2&0.3 & 0.1&0.2 \\ \hline
+\end{tabular}
+\end{center}
+
+#### True Models
+
+True model for the mediator:
+$$E[M|a,c]=\beta_0+\beta_1a+\beta_{21}c1+\beta_{22}c2$$
+
+True model for the outcome:
+$$E[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_2m^*+\theta_{41}c1+\theta_{42}c2$$
+
+### Causal Effects and Standard Errors Estimated By the Regression-based Approach
+
+#### Closed-form Parameter Function Estimation and Delta Method Inference
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "contY_contM_binA_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cont_binA', covariates.pre = c("C_cont", "C_bin"), 
+                 yreg = "linear", mreg = "linear", mval = list(1),
+                 a_star = 0, a = 1, 
+                 est.method = "paramfunc", inf.method = "delta", model = "rb")
+
+```
+
+#### Direct Imputation Estimation and Bootstrap Inference
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "contY_contM_binA_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cont_binA', covariates.pre = c("C_cont", "C_bin"),  
+                 yreg = "linear", mreg = "linear", mval = list(1),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "rb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Weighting-based Approach
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "contY_contM_binA_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cont_binA', covariates.pre = c("C_cont", "C_bin"),
+                 yreg = "linear", mreg = "linear", mval = list(1),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "wb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the G-formula Approach 
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "contY_contM_binA_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cont_binA', covariates.pre = c("C_cont", "C_bin"), 
+                 yreg = "linear", mreg = "linear", mval = list(1),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "g-formula")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
+
+```{r warning=F,message=F}
+cmest(data = df_noint,  outcome = "contY_contM_binA_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cont_binA', covariates.pre = c("C_cont", "C_bin"), 
+                 yreg = "linear", mreg = "linear", mval = list(1),
+                 a_star = 0, a = 1, model = "ne")
+```
+
+## Case 1-3: Continuous Outcome, Single Continuous Mediator and Categorical Exposure Without Interaction
+
+### Data simulation
+
+#### Simulation Procedures
+
+1. Simulate the exposure A from $Multinom(0.2,0.3,0.5)$.
+
+2. Simulate the covariate C1 from $N(1,1)$ and simulate the covariate C2 from $Bernoulli(0.6)$.
+
+3. Simulate the mediator M from $N((\beta_0+\beta_{11}I\{A==1\}+\beta_{12}I\{A==2\}+\beta_{21}C1+\beta_{22}C2),\sigma_M^2)$.
+
+4. Simulate the outcome Y from $N(\theta_0+\theta_{11}I\{A==1\}+\theta_{12}I\{A==2\}+\theta_2M+\theta_{41}C1+\theta_{42}C2,\sigma_Y^2)$.
+
+#### True Parameters
+
+\begin{center}
+\captionof{table}{True Model Parameters for Data Simulation}
+\begin{tabular}{l|l|l|l|l|l|l|l|l|l|l|l|l|l}
+\hline
+Sample Size & $\theta_0$ & $\theta_{11}$ & $\theta_{12}$ & $\theta_2$ & $\theta_{41}$ & $\theta_{42}$ & $\beta_0$ & $\beta_{11}$& $\beta_{12}$ & $\beta_{21}$ & $\beta_{22}$ & $\sigma_M$ & $\sigma_Y$\\ \hline
+10000&-5&0.8&0.6&1.8&0.1&0.3&-0.25&0.5&0.2&0.3&0.1 & 0.1&0.2 \\ \hline
+\end{tabular}
+\end{center}
+
+#### True Models
+
+True model for the mediator:
+$$E[M|a,c]=\beta_0+\beta_{11}I\{a==1\}+\beta_{12}I\{a==2\}+\beta_{21}c1+\beta_{22}c2$$
+
+True model for the outcome:
+$$E[Y|a,m^*,c]=\theta_0+\theta_{11}I\{a==1\}+\theta_{12}I\{a==2\}+\theta_2m^*+\theta_{41}c1+\theta_{42}c2$$
+
+### Causal Effects and Standard Errors Estimated By the Regression-based Approach
+
+#### Closed-form Parameter Function Estimation and Delta Method Inference
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "contY_contM_catA_noint", exposure = 'A_cat', 
+                 exposure.type = "categorical",
+                 mediator = 'M_cont_catA', covariates.pre = c("C_cont", "C_bin"), 
+                 yreg = "linear", mreg = "linear", mval = list(1),
+                 a_star = 1, a = 2, 
+                 est.method = "paramfunc", inf.method = "delta", model = "rb")
+
+```
+
+#### Direct Imputation Estimation and Bootstrap Inference
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "contY_contM_catA_noint", exposure = 'A_cat', 
+                 exposure.type = "categorical",
+                 mediator = 'M_cont_catA', covariates.pre = c("C_cont", "C_bin"),  
+                 yreg = "linear", mreg = "linear", mval = list(1),
+                 a_star = 1, a = 2, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "rb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Weighting-based Approach
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "contY_contM_catA_noint", exposure = 'A_cat', 
+                 exposure.type = "categorical",
+                 mediator = 'M_cont_catA', covariates.pre = c("C_cont", "C_bin"),
+                 yreg = "linear", mreg = "linear", mval = list(1),
+                 a_star = 1, a = 2, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "wb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the G-formula Approach 
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "contY_contM_catA_noint", exposure = 'A_cat', 
+                 exposure.type = "categorical",
+                 mediator = 'M_cont_catA', covariates.pre = c("C_cont", "C_bin"), 
+                 yreg = "linear", mreg = "linear", mval = list(1),
+                 a_star = 1, a = 2, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "g-formula")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
+
+```{r warning=F,message=F}
+cmest(data = df_noint,  outcome = "contY_contM_catA_noint", exposure = 'A_cat', 
+                 exposure.type = "categorical",
+                 mediator = 'M_cont_catA', covariates.pre = c("C_cont", "C_bin"), 
+                 yreg = "linear", mreg = "linear", mval = list(1),
+                 a_star = 1, a = 2, model = "ne")
+```
+
+## Case 1-4: Continuous Outcome, Single Continuous Mediator and Continuous Exposure With Exposure-mediator Interaction
+
+### Data simulation
+
+#### Simulation Procedures
+
+1. Simulate the exposure A from $N(5,2^2)$.
+
+2. Simulate the covariate C1 from $N(1,1)$ and simulate the covariate C2 from $Bernoulli(0.6)$.
+
+3. Simulate the mediator M from $N((\beta_0+\beta_1A+\beta_{21}C1+\beta_{22}C2),\sigma_M^2)$.
+
+4. Simulate the outcome Y from $N(\theta_0+\theta_1A+\theta_2M+\theta_3AM+\theta_{41}C1+\theta_{42}C2,\sigma_Y^2)$.
+
+#### True Parameters
+
+\begin{center}
+\captionof{table}{True Model Parameters for Data Simulation}
+\begin{tabular}{l|l|l|l|l|l|l|l|l|l|l|l|l}
+\hline
+Sample Size & $\theta_0$ & $\theta_1$ & $\theta_2$ & $\theta_3$ & $\theta_{41}$ & $\theta_{42}$ & $\beta_0$ & $\beta_1$ & $\beta_{21}$ & $\beta_{22}$& $\sigma_M$ & $\sigma_Y$ \\ \hline
+10000&-5&0.8&1.8&0.2&0.1&0.3&-0.25&0.5&0.2&0.3&0.1&0.2\\ \hline
+\end{tabular}
+\end{center}
+
+#### True Models
+
+True model for the mediator:
+$$E[M|a,c]=\beta_0+\beta_1a+\beta_{21}c1+\beta_{22}c2$$
+
+True model for the outcome:
+$$E[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_2m^*+\theta_3am^*+\theta_{41}c1+\theta_{42}c2$$
+
+### Causal Effects and Standard Errors Estimated By the Regression-based Approach
+
+#### Closed-form Parameter Function Estimation and Delta Method Inference
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "contY_contM_contA_int", exposure = 'A_cont', 
+                 exposure.type = "continuous",
+                 mediator = 'M_cont_contA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE,
+                 yreg = "linear", mreg = "linear", mval = list(1),
+                 a_star = 2, a = 3, 
+                 est.method = "paramfunc", inf.method = "delta", model = "rb")
+
+```
+
+#### Direct Imputation Estimation and Bootstrap Inference
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "contY_contM_contA_int", exposure = 'A_cont', 
+                 exposure.type = "continuous",
+                 mediator = 'M_cont_contA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE,
+                 yreg = "linear", mreg = "linear", mval = list(1),
+                 a_star = 2, a = 3, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "rb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the G-formula Approach 
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "contY_contM_contA_int", exposure = 'A_cont', 
+                 exposure.type = "continuous",
+                 mediator = 'M_cont_contA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE,
+                 yreg = "linear", mreg = "linear", mval = list(1),
+                 a_star = 2, a = 3, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "g-formula")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
+
+```{r warning=F,message=F}
+cmest(data = df_int,  outcome = "contY_contM_contA_int", exposure = 'A_cont', 
+                 exposure.type = "continuous",
+                 mediator = 'M_cont_contA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE,  
+                 yreg = "linear", mreg = "linear", 
+                 a_star = 2, a = 3, model = "ne")
+```
+
+## Case 1-5: Continuous Outcome, Single Continuous Mediator and Binary Exposure With Exposure-mediator Interaction
+
+### Data simulation
+
+#### Simulation Procedures
+
+1. Simulate the exposure A from $Bernoulli(P(A=1))$.
+
+2. Simulate the covariate C1 from $N(1,1)$ and simulate the covariate C2 from $Bernoulli(0.6)$.
+
+3. Simulate the mediator M from $N((\beta_0+\beta_1A+\beta_{21}C1+\beta_{22}C2),\sigma_M^2)$.
+
+4. Simulate the outcome Y from $N(\theta_0+\theta_1A+\theta_2M+\theta_3AM+\theta_{41}C1+\theta_{42}C2,\sigma_Y^2)$.
+
+#### True Parameters
+
+\begin{center}
+\captionof{table}{True Model Parameters for Data Simulation}
+\begin{tabular}{l|l|l|l|l|l|l|l|l|l|l|l|l}
+\hline
+Sample Size & $\theta_0$ & $\theta_1$ & $\theta_2$ & $\theta_3$ & $\theta_{41}$ & $\theta_{42}$ & $\beta_0$ & $\beta_1$ & $\beta_{21}$ & $\beta_{22}$& $\sigma_M$ & $\sigma_Y$\\ \hline
+10000&-5&0.8&1.8&0.2&0.1&0.3&-0.25&0.5&0.2 & 0.3&0.1&0.2 \\ \hline
+\end{tabular}
+\end{center}
+
+#### True Models
+
+True model for the mediator:
+$$E[M|a,c]=\beta_0+\beta_1a+\beta_{21}c1+\beta_{22}c2$$
+
+True model for the outcome:
+$$E[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_2m^*+\theta_3am^*+\theta_{41}c1+\theta_{42}c2$$
+
+### Causal Effects and Standard Errors Estimated By the Regression-based Approach
+
+#### Closed-form Parameter Function Estimation and Delta Method Inference
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "contY_contM_binA_int", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cont_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE,
+                 yreg = "linear", mreg = "linear", mval = list(1),
+                 a_star = 0, a = 1, 
+                 est.method = "paramfunc", inf.method = "delta", model = "rb")
+
+```
+
+#### Direct Imputation Estimation and Bootstrap Inference
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "contY_contM_binA_int", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cont_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE,
+                 yreg = "linear", mreg = "linear", mval = list(1),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "rb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Weighting-based Approach
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "contY_contM_binA_int", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cont_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE, 
+                 yreg = "linear", mreg = "linear", mval = list(1),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "wb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the G-formula Approach 
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "contY_contM_binA_int", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cont_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE,
+                 yreg = "linear", mreg = "linear", mval = list(1),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "g-formula")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
+
+```{r warning=F,message=F}
+cmest(data = df_int,  outcome = "contY_contM_binA_int", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cont_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE,  
+                 yreg = "linear", mreg = "linear", 
+                 a_star = 0, a = 1, model = "ne")
+```
+
+## Case 1-6: Continuous Outcome, Single Continuous Mediator and Categorical Exposure With Exposure-mediator Interaction
+
+### Data simulation
+
+#### Simulation Procedures
+
+1. Simulate the exposure A from $Multinom(0.2,0.3,0.5)$.
+
+2. Simulate the covariate C1 from $N(1,1)$ and simulate the covariate C2 from $Bernoulli(0.6)$.
+
+3. Simulate the mediator M from $N((\beta_0+\beta_{11}I\{A==1\}+\beta_{12}I\{A==2\}+\beta_{21}C1+\beta_{22}C2),\sigma_M^2)$.
+
+4. Simulate the outcome Y from $N(\theta_0+\theta_{11}I\{A==1\}+\theta_{12}I\{A==2\}+\theta_2M+\theta_{31}I\{A==1\}M+\theta_{32}I\{A==2\}M+\theta_{41}C1+\theta_{42}C2,\sigma_Y^2)$.
+
+#### True Parameters
+
+\begin{center}
+\captionof{table}{True Model Parameters for Data Simulation}
+\begin{tabular}{l|l|l|l|l|l|l|l|l|l|l|l|l|l|l|l}
+\hline
+Sample Size & $\theta_0$ & $\theta_{11}$ & $\theta_{12}$ & $\theta_2$& $\theta_{31}$ & $\theta_{32}$  & $\theta_{41}$ & $\theta_{42}$ & $\beta_0$ & $\beta_{11}$& $\beta_{12}$ & $\beta_{21}$ & $\beta_{22}$ & $\sigma_M$ & $\sigma_Y$\\ \hline
+10000&-5&0.8&0.6&1.8&0.2&0.4&0.1&0.3&-0.25&0.5&0.2&0.3&0.1 & 0.1&0.2 \\ \hline
+\end{tabular}
+\end{center}
+
+#### True Models
+
+True model for the mediator:
+$$E[M|a,c]=\beta_0+\beta_{11}I\{a==1\}+\beta_{12}I\{a==2\}+\beta_{21}c1+\beta_{22}c2$$
+
+True model for the outcome:
+$$E[Y|a,m^*,c]=\theta_0+\theta_{11}I\{a==1\}+\theta_{12}I\{a==2\}+\theta_2m^*+\theta_{31}I\{a==1\}m^*+\theta_{32}I\{a==2\}m^*+\theta_{41}c1+\theta_{42}c2$$
+
+### Causal Effects and Standard Errors Estimated By the Regression-based Approach
+
+#### Closed-form Parameter Function Estimation and Delta Method Inference
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "contY_contM_catA_int", exposure = 'A_cat', 
+                 exposure.type = "categorical",
+                 mediator = 'M_cont_catA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE,
+                 yreg = "linear", mreg = "linear", mval = list(1),
+                 a_star = 1, a = 2, 
+                 est.method = "paramfunc", inf.method = "delta", model = "rb")
+
+```
+
+#### Direct Imputation Estimation and Bootstrap Inference
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "contY_contM_catA_int", exposure = 'A_cat', 
+                 exposure.type = "categorical",
+                 mediator = 'M_cont_catA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE,
+                 yreg = "linear", mreg = "linear", mval = list(1),
+                 a_star = 1, a = 2, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "rb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Weighting-based Approach
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "contY_contM_catA_int", exposure = 'A_cat', 
+                 exposure.type = "categorical",
+                 mediator = 'M_cont_catA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE, 
+                 yreg = "linear", mreg = "linear", mval = list(1),
+                 a_star = 1, a = 2, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "wb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the G-formula Approach 
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "contY_contM_catA_int", exposure = 'A_cat', 
+                 exposure.type = "categorical",
+                 mediator = 'M_cont_catA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE,
+                 yreg = "linear", mreg = "linear", mval = list(1),
+                 a_star = 1, a = 2, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "g-formula")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
+
+```{r warning=F,message=F}
+cmest(data = df_int,  outcome = "contY_contM_catA_int", exposure = 'A_cat', 
+                 exposure.type = "categorical",
+                 mediator = 'M_cont_catA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE,  
+                 yreg = "linear", mreg = "linear", 
+                 a_star = 1, a = 2, model = "ne")
+```
+
+# Case 2: Continuous Outcome and Single Binary Mediator
+
+## Case 2-1: Continuous Outcome and Single Binary Mediator Without Interaction
+
+### Data simulation
+
+#### Simulation Procedures
+
+1. Simulate the exposure A from $Bernoulli(P(A=1))$.
+
+2. Simulate the covariate C from $N(\mu_C,\sigma_C^2)$.
+
+3. Simulate the mediator M from $Bernoulli(expit(\beta_0+\beta_1*A+\beta_{21}C1+\beta_{22}C2))$.
+
+4. Simulate the outcome Y from $N(\theta_0+\theta_1A+\theta_2M+\theta_{41}C1+\theta_{42}C2,\sigma_Y^2)$.
+
+#### True Parameters
+
+\begin{center}
+\captionof{table}{True Model Parameters for Data Simulation}
+\begin{tabular}{l|l|l|l|l|l|l|l|l|l|l|l}
+\hline
+Sample Size & $\theta_0$ & $\theta_1$ & $\theta_2$ & $\theta_4$ & $\beta_0$ & $\beta_1$ & $\beta_2$ & P(A=1) & $\mu_C$ & $\sigma_C$ &  $\sigma_Y$\\ \hline
+10000&-5&0.8&1.8&0.1&-0.25&0.5&0.2&0.4&1&1&0.2 \\ \hline
+\end{tabular}
+\end{center}
+
+#### True Models
+
+True model for the mediator:
+$$logitE[M|a,c]=\beta_0+\beta_1a+\beta_{21}c1+\beta_{22}c2$$
+
+True model for the outcome:
+$$E[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_2m^*+\theta_{41}C1+\theta_{42}C2$$
+
+### Causal Effects and Standard Errors Estimated By the Regression-based Approach
+
+#### Closed-form Parameter Function Estimation and Delta Method Inference
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "contY_binM_binA_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_bin_binA', covariates.pre = c("C_cont", "C_bin"),
+                 yreg = "linear", mreg = "logistic", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "paramfunc", inf.method = "delta", model = "rb")
+
+```
+
+#### Direct Imputation Estimation and Bootstrap Inference
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "contY_binM_binA_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_bin_binA', covariates.pre = c("C_cont", "C_bin"),  
+                 yreg = "linear", mreg = "logistic", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "rb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Weighting-based Approach
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "contY_binM_binA_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_bin_binA', covariates.pre = c("C_cont", "C_bin"), 
+                 yreg = "linear", mreg = "logistic", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "wb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Marginal Structural Model 
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "contY_binM_binA_noint", exposure = "A_bin", 
+                 exposure.type = "binary",
+                 mediator = 'M_bin_binA', covariates.pre = c("C_cont", "C_bin"), 
+                 yreg = "linear", mreg = "logistic", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "msm")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Inverse Odds-ratio Weighting Approach 
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "contY_binM_binA_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_bin_binA', covariates.pre = c("C_cont", "C_bin"), 
+                 yreg = "linear", mreg = "logistic", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "paramfunc", inf.method = "bootstrap", model = "iorw")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the G-formula Approach 
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "contY_binM_binA_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_bin_binA', covariates.pre = c("C_cont", "C_bin"), 
+                 yreg = "linear", mreg = "logistic", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "g-formula")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
+
+```{r warning=F,message=F}
+cmest(data = df_noint,  outcome = "contY_binM_binA_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_bin_binA', covariates.pre = c("C_cont", "C_bin"),  
+                 yreg = "linear", mreg = "logistic", mval = list(0),
+                 a_star = 0, a = 1, model = "ne")
+```
+
+## Case 2-2: Continuous Outcome and Single Binary Mediator With Exposure-mediator Interaction
+
+### Data simulation
+
+#### Simulation Procedures
+
+1. Simulate the exposure A from $Bernoulli(P(A=1))$.
+
+2. Simulate the covariate C from $N(\mu_C,\sigma_C^2)$.
+
+3. Simulate the mediator M from $Bernoulli(expit(\beta_0+\beta_1*A+\beta_{21}C1+\beta_{22}C2))$.
+
+4. Simulate the outcome Y from $N(\theta_0+\theta_1A+\theta_2M+\theta_3AM+\theta_{41}C1+\theta_{42}C2,\sigma_Y^2)$.
+
+#### True Parameters
+
+\begin{center}
+\captionof{table}{True Model Parameters for Data Simulation}
+\begin{tabular}{l|l|l|l|l|l|l|l|l|l|l|l|l}
+\hline
+Sample Size & $\theta_0$ & $\theta_1$ & $\theta_2$ & $\theta_3$ & $\theta_4$ & $\beta_0$ & $\beta_1$ & $\beta_2$ & P(A=1) & $\mu_C$ & $\sigma_C$  & $\sigma_Y$\\ \hline
+10000&-5&0.8&1.8&0.2&0.1&-0.25&0.5&0.2&0.4&1&1&0.2 \\ \hline
+\end{tabular}
+\end{center}
+
+#### True Models
+
+True model for the mediator:
+$$logitE[M|a,c]=\beta_0+\beta_1a+\beta_{21}c1+\beta_{22}c2$$
+
+True model for the outcome:
+$$E[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_2m^*+\theta_3am^*+\theta_{41}C1+\theta_{42}C2$$
+
+### Causal Effects and Standard Errors Estimated By the Regression-based Approach
+
+#### Closed-form Parameter Function Estimation and Delta Method Inference
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "contY_binM_binA_int", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_bin_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE, 
+                 yreg = "linear", mreg = "logistic", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "paramfunc", inf.method = "delta", model = "rb")
+
+```
+
+#### Direct Imputation Estimation and Bootstrap Inference
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "contY_binM_binA_int", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_bin_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE, 
+                 yreg = "linear", mreg = "logistic", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "rb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Weighting-based Approach
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "contY_binM_binA_int", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_bin_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE, 
+                 yreg = "linear", mreg = "logistic", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "wb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Marginal Structural Model 
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "contY_binM_binA_int", exposure = "A_bin", 
+                 exposure.type = "binary",
+                 mediator = 'M_bin_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE,
+                 yreg = "linear", mreg = "logistic", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "msm")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Inverse Odds-ratio Weighting Approach 
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "contY_binM_binA_int", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_bin_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE, 
+                 yreg = "linear", mreg = "logistic", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "paramfunc", inf.method = "bootstrap", model = "iorw")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the G-formula Approach 
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "contY_binM_binA_int", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_bin_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE,
+                 yreg = "linear", mreg = "logistic", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "g-formula")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
+
+```{r warning=F,message=F}
+cmest(data = df_int,  outcome = "contY_binM_binA_int", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_bin_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE,
+                 yreg = "linear", mreg = "logistic", mval = list(0),
+                 a_star = 0, a = 1, model = "ne")
+```
+
+# Case 3: Continuous Outcome and Single Categorical Mediator
+
+## Case 3-1: Continuous Outcome and Single Categorical Mediator Without Interaction
+
+### Data simulation
+
+#### Simulation Procedures
+
+1. Simulate the exposure A from $Bernoulli(P(A=1))$.
+
+2. Simulate the covariate C from $N(\mu_C,\sigma_C^2)$.
+
+3. Simulate the mediator M from $Multinom(\frac{1}{1+expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)}$,
+
+$\frac{expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)}{1+expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)}, \frac{expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)}{1+expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)})$.
+
+4. Simulate the outcome Y from $N(\theta_0+\theta_1A+\theta_{21}I\{M==1\}+\theta_{22}I\{M==2\}+\theta_{41}C1+\theta_{42}C2,\sigma_Y^2)$.
+
+#### True Parameters
+
+\begin{center}
+\captionof{table}{True Model Parameters for Data Simulation}
+\begin{tabular}{l|l|l|l|l|l|l|l}
+\hline
+Sample Size & $\theta_0$ & $\theta_1$ & $\theta_{21}$ & $\theta_{22}$ & $\theta_4$ & $\beta_{01}$ & $\beta_{11}$  \\ \hline
+10000&-5&0.8&1.8&1.2&0.1&-0.25&0.5 \\ \hline
+$\beta_{21}$ & $\beta_{02}$ & $\beta_{12}$ & $\beta_{22}$ & P(A=1) & $\mu_C$ & $\sigma_C$  & $\sigma_Y$\\ \hline
+0.2&-0.3&0.4&0.3&0.4&1&1&0.2 \\ \hline
+\end{tabular}
+\end{center}
+
+#### True Models
+
+True model for the mediator:
+$$ln\frac{P(M==1)}{P(M==0)}=\beta_{01}+\beta_{11}a+\beta_{21}c$$
+$$ln\frac{P(M==2)}{P(M==0)}=\beta_{02}+\beta_{12}a+\beta_{22}c$$
+
+True model for the outcome:
+$$E[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_{21}I\{m^*==1\}+\theta_{22}I\{m^*==2\}+\theta_{41}C1+\theta_{42}C2$$
+
+### Causal Effects and Standard Errors Estimated By the Regression-based Approach
+
+#### Closed-form Parameter Function Estimation and Delta Method Inference
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "contY_catM_binA_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cat_binA', covariates.pre = c("C_cont", "C_bin"), 
+                 yreg = "linear", mreg = "multinomial", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "paramfunc", inf.method = "delta", model = "rb")
+
+```
+
+#### Direct Imputation Estimation and Bootstrap Inference
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "contY_catM_binA_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cat_binA', covariates.pre = c("C_cont", "C_bin"), 
+                 yreg = "linear", mreg = "multinomial", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "rb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Weighting-based Approach
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "contY_catM_binA_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cat_binA', covariates.pre = c("C_cont", "C_bin"), 
+                 yreg = "linear", mreg = "multinomial", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "wb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Marginal Structural Model 
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "contY_catM_binA_noint", exposure = "A_bin", 
+                 exposure.type = "binary",
+                 mediator = 'M_cat_binA', covariates.pre = c("C_cont", "C_bin"), 
+                 yreg = "linear", mreg = "multinomial", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "msm")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Inverse Odds-ratio Weighting Approach 
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "contY_catM_binA_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cat_binA', covariates.pre = c("C_cont", "C_bin"),  
+                 yreg = "linear", mreg = "multinomial", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "paramfunc", inf.method = "bootstrap", model = "iorw")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the G-formula Approach 
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "contY_catM_binA_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cat_binA', covariates.pre = c("C_cont", "C_bin"),  
+                 yreg = "linear", mreg = "multinomial", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "g-formula")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
+
+```{r warning=F,message=F}
+cmest(data = df_noint,  outcome = "contY_catM_binA_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cat_binA', covariates.pre = c("C_cont", "C_bin"), 
+                 yreg = "linear", mreg = "multinomial", mval = list(0),
+                 a_star = 0, a = 1, model = "ne")
+```
+
+## Case 3-2: Continuous Outcome and Single Categorical Mediator With Exposure-mediator Interaction
+
+### Data simulation
+
+#### Simulation Procedures
+
+1. Simulate the exposure A from $Bernoulli(P(A=1))$.
+
+2. Simulate the covariate C from $N(\mu_C,\sigma_C^2)$.
+
+3. Simulate the mediator M from $Multinom(\frac{1}{1+expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)}$,
+
+$\frac{expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)}{1+expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)}, \frac{expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)}{1+expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)})$.
+
+4. Simulate the outcome Y from $N(\theta_0+\theta_1A+\theta_{21}I\{M==1\}+\theta_{22}I\{M==2\}+\theta_{31}A*I\{M==1\}+\theta_{32}A*I\{M==2\}+\theta_{41}C1+\theta_{42}C2,\sigma_Y^2)$.
+
+#### True Parameters
+
+\begin{center}
+\captionof{table}{True Model Parameters for Data Simulation}
+\begin{tabular}{l|l|l|l|l|l|l|l|l}
+\hline
+Sample Size & $\theta_0$ & $\theta_1$ & $\theta_{21}$ & $\theta_{22}$ & $\theta_{31}$ & $\theta_{32}$ & $\theta_4$ & $\beta_{01}$   \\ \hline
+10000&-5&0.8&1.8&1.2&0.2&0.40.1&-0.25 \\ \hline
+$\beta_{11}$&$\beta_{21}$ & $\beta_{02}$ & $\beta_{12}$ & $\beta_{22}$ & P(A=1) & $\mu_C$ & $\sigma_C$  & $\sigma_Y$\\ \hline
+0.5&0.2&-0.3&0.4&0.3&0.4&1&1&0.2 \\ \hline
+\end{tabular}
+\end{center}
+
+#### True Models
+
+True model for the mediator:
+$$ln\frac{P(M==1)}{P(M==0)}=\beta_{01}+\beta_{11}a+\beta_{21}c$$
+$$ln\frac{P(M==2)}{P(M==0)}=\beta_{02}+\beta_{12}a+\beta_{22}c$$
+
+True model for the outcome:
+$$E[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_{21}I\{m^*==1\}+\theta_{22}I\{m^*==2\}+\theta_{31}a*I\{m^*==1\}+\theta_{32}a*I\{m^*==2\}+\theta_{41}C1+\theta_{42}C2$$
+
+### Causal Effects and Standard Errors Estimated By the Regression-based Approach
+
+#### Closed-form Parameter Function Estimation and Delta Method Inference
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "contY_catM_binA_int", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cat_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE,
+                 yreg = "linear", mreg = "multinomial", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "paramfunc", inf.method = "delta", model = "rb")
+
+```
+
+#### Direct Imputation Estimation and Bootstrap Inference
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "contY_catM_binA_int", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cat_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE,
+                 yreg = "linear", mreg = "multinomial", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "rb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Weighting-based Approach
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "contY_catM_binA_int", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cat_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE, 
+                 yreg = "linear", mreg = "multinomial", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "wb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Marginal Structural Model 
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "contY_catM_binA_int", exposure = "A_bin", 
+                 exposure.type = "binary",
+                 mediator = 'M_cat_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE,
+                 yreg = "linear", mreg = "multinomial", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "msm")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Inverse Odds-ratio Weighting Approach 
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "contY_catM_binA_int", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cat_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE, 
+                 yreg = "linear", mreg = "multinomial", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "paramfunc", inf.method = "bootstrap", model = "iorw")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the G-formula Approach 
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "contY_catM_binA_int", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cat_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE, 
+                 yreg = "linear", mreg = "multinomial", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "g-formula")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
+
+```{r warning=F,message=F}
+cmest(data = df_int,  outcome = "contY_catM_binA_int", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cat_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE,
+                 yreg = "linear", mreg = "multinomial", mval = list(0),
+                 a_star = 0, a = 1, model = "ne")
+```
+
+# Case 4: Continuous Outcome and Multiple Mediators 
+
+## Case 4-1: Continuous Outcome and Multiple Mediators Without Interaction
+
+### Data simulation
+
+#### Simulation Procedures
+
+1. Simulate the exposure A from $Bernoulli(P(A=1))$.
+
+2. Simulate the covariate C from $N(\mu_C,\sigma_C^2)$.
+
+3. Simulate the first mediator M1 from  $Multinom(\frac{1}{1+expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)},$
+
+$\frac{expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)}{1+expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)},\frac{expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)}{1+expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)})$,
+
+the second mediator M2 from $Bernoulli(expit(\beta_{03}+\beta_{13}*A+\beta_{23}*C))$.
+
+4. Simulate the outcome Y from $N(\theta_0+\theta_1A+\theta_{21}I\{M1==1\}+\theta_{22}I\{M1==2\}+\theta_{23}M2+\theta_{41}C1+\theta_{42}C2,\sigma_Y^2)$.
+
+#### True Parameters
+
+\begin{center}
+\captionof{table}{True Model Parameters for Data Simulation}
+\begin{tabular}{l|l|l|l|l|l|l|l|l|l}
+\hline
+Sample Size & $\theta_0$ & $\theta_1$ & $\theta_{21}$ & $\theta_{22}$& $\theta_{23}$  & $\theta_4$ & $\beta_{01}$ & $\beta_{11}$&$\beta_{21}$ \\ \hline
+10000&-5&0.8&1.8&1.2&1.5&0.1&-0.25&0.5&0.2 \\ \hline
+$\beta_{02}$ & $\beta_{12}$ & $\beta_{22}$ &$\beta_{03}$ & $\beta_{13}$ & $\beta_{23}$ & P(A=1) & $\mu_C$ & $\sigma_C$  & $\sigma_Y$\\ \hline
+-0.3&0.4&0.3&-0.25&0.5&0.2&0.4&1&1&0.2 \\ \hline
+\end{tabular}
+\end{center}
+
+#### True Models
+
+True model for the first mediator:
+$$ln\frac{P(M1==1)}{P(M1==0)}=\beta_{01}+\beta_{11}a+\beta_{21}c$$
+$$ln\frac{P(M1==2)}{P(M1==0)}=\beta_{02}+\beta_{12}a+\beta_{22}c$$
+
+True model for the second mediator:
+$$logitE[M2|a,c]=\beta_{03}+\beta_{13}a+\beta_{23}c$$
+
+True model for the outcome:
+$$E[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_{21}I\{m1^*==1\}+\theta_{22}I\{m1^*==2\}+\theta_{23}m2^*+\theta_{41}C1+\theta_{42}C2$$
+
+### Causal Effects and Standard Errors Estimated By the Regression-based Approach
+
+```{r warning=F,message=F}
+
+cmest(data = df_multipleM_noint,  outcome = "contY_catMbinM_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = c('M_cat',"M_bin"), covariates.pre = c("C_cont", "C_bin"), 
+                 yreg = "linear", mreg = c("multinomial", "logistic"), mval = list(0,0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "rb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Weighting-based Approach
+
+```{r warning=F,message=F}
+
+cmest(data = df_multipleM_noint,  outcome = "contY_catMbinM_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = c('M_cat',"M_bin"), covariates.pre = c("C_cont", "C_bin"),  
+                 yreg = "linear", mreg = c("multinomial", "logistic"), mval = list(0,0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "wb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Marginal Structural Model 
+
+```{r warning=F,message=F}
+
+cmest(data = df_multipleM_noint,  outcome = "contY_catMbinM_noint", exposure = "A_bin", 
+                 exposure.type = "binary",
+                 mediator = c('M_cat',"M_bin"), covariates.pre = c("C_cont", "C_bin"),  
+                 yreg = "linear", mreg = c("multinomial", "logistic"), mval = list(0,0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "msm")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Inverse Odds-ratio Weighting Approach 
+
+```{r warning=F,message=F}
+
+cmest(data = df_multipleM_noint,  outcome = "contY_catMbinM_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = c('M_cat',"M_bin"), covariates.pre = c("C_cont", "C_bin"), 
+                 yreg = "linear", mreg = c("multinomial", "logistic"), mval = list(0,0),
+                 a_star = 0, a = 1, 
+                 est.method = "paramfunc", inf.method = "bootstrap", model = "iorw")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the G-formula Approach 
+
+```{r warning=F,message=F}
+
+cmest(data = df_multipleM_noint,  outcome = "contY_catMbinM_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = c('M_cat',"M_bin"), covariates.pre = c("C_cont", "C_bin"), 
+                 yreg = "linear", mreg = c("multinomial", "logistic"), mval = list(0,0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "g-formula")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
+
+```{r warning=F,message=F}
+cmest(data = df_multipleM_noint,  outcome = "contY_catMbinM_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = c('M_cat',"M_bin"), covariates.pre = c("C_cont", "C_bin"),  
+                 yreg = "linear", mreg = c("multinomial", "logistic"), mval = list(0,0),
+                 a_star = 0, a = 1, model = "ne")
+```
+
+## Case 4-2: Continuous Outcome and Multiple Mediators With Exposure-mediator Interaction
+
+### Data simulation
+
+#### Simulation Procedures
+
+1. Simulate the exposure A from $Bernoulli(P(A=1))$.
+
+2. Simulate the covariate C from $N(\mu_C,\sigma_C^2)$.
+
+3. Simulate the first mediator M1 from  $Multinom(\frac{1}{1+expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)},$
+
+$\frac{expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)}{1+expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)},\frac{expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)}{1+expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)})$,
+
+the second mediator M2 from $Bernoulli(expit(\beta_{03}+\beta_{13}*A+\beta_{23}*C))$.
+
+4. Simulate the outcome Y from $N(\theta_0+\theta_1A+\theta_{21}I\{M1==1\}+\theta_{22}I\{M1==2\}+\theta_{23}M2+\theta_{31}AM2+\theta_{41}C1+\theta_{42}C2,\sigma_Y^2)$.
+
+#### True Parameters
+
+\begin{center}
+\captionof{table}{True Model Parameters for Data Simulation}
+\begin{tabular}{l|l|l|l|l|l|l|l|l|l|l}
+\hline
+Sample Size & $\theta_0$ & $\theta_1$ & $\theta_{21}$ & $\theta_{22}$& $\theta_{23}$ &$\theta_{31}$ & $\theta_4$ & $\beta_{01}$ & $\beta_{11}$&$\beta_{21}$ \\ \hline
+10000&-5&0.8&1.8&1.2&1.5&0.2&0.1&-0.25&0.5&0.2 \\ \hline
+$\beta_{02}$ & $\beta_{12}$ & $\beta_{22}$ &$\beta_{03}$ & $\beta_{13}$ & $\beta_{23}$ & P(A=1) & $\mu_C$ & $\sigma_C$  & $\sigma_Y$\\ \hline
+-0.3&0.4&0.3&-0.25&0.5&0.2&0.4&1&1&0.2 \\ \hline
+\end{tabular}
+\end{center}
+
+#### True Models
+
+True model for the first mediator:
+$$ln\frac{P(M1==1)}{P(M1==0)}=\beta_{01}+\beta_{11}a+\beta_{21}c$$
+$$ln\frac{P(M1==2)}{P(M1==0)}=\beta_{02}+\beta_{12}a+\beta_{22}c$$
+
+True model for the second mediator:
+$$logitE[M2|a,c]=\beta_{03}+\beta_{13}a+\beta_{23}c$$
+
+True model for the outcome:
+$$E[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_{21}I\{m1^*==1\}+\theta_{22}I\{m1^*==2\}+\theta_{23}m2^*+\theta_{31}am2^*+\theta_{41}C1+\theta_{42}C2$$
+
+### Causal Effects and Standard Errors Estimated By the Regression-based Approach
+
+```{r warning=F,message=F}
+
+cmest(data = df_multipleM_EMint, outcome = "contY_catMbinM_EMint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = c('M_cat',"M_bin"), covariates.pre = c("C_cont", "C_bin"), 
+                 EMint = TRUE, EMint.terms = c("A*M_bin"),
+                 yreg = "linear", mreg = c("multinomial", "logistic"), mval = list(0,0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "rb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Weighting-based Approach
+
+```{r warning=F,message=F}
+
+cmest(data = df_multipleM_EMint,  outcome = "contY_catMbinM_EMint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = c('M_cat',"M_bin"), covariates.pre = c("C_cont", "C_bin"), 
+                 EMint = TRUE, EMint.terms = c("A*M_bin"),
+                 yreg = "linear", mreg = c("multinomial", "logistic"), mval = list(0,0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "wb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Marginal Structural Model 
+
+```{r warning=F,message=F}
+
+cmest(data = df_multipleM_EMint,  outcome = "contY_catMbinM_EMint", exposure = "A_bin", 
+                 exposure.type = "binary",
+                 mediator = c('M_cat',"M_bin"), covariates.pre = c("C_cont", "C_bin"),
+                 EMint = TRUE, EMint.terms = c("A*M_bin"),
+                 yreg = "linear", mreg = c("multinomial", "logistic"), mval = list(0,0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "msm")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Inverse Odds-ratio Weighting Approach 
+
+```{r warning=F,message=F}
+
+cmest(data = df_multipleM_EMint,  outcome = "contY_catMbinM_EMint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = c('M_cat',"M_bin"), covariates.pre = c("C_cont", "C_bin"), 
+                 EMint = TRUE, EMint.terms = c("A*M_bin"),
+                 yreg = "linear", mreg = c("multinomial", "logistic"), mval = list(0,0),
+                 a_star = 0, a = 1, 
+                 est.method = "paramfunc", inf.method = "bootstrap", model = "iorw")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the G-formula Approach 
+
+```{r warning=F,message=F}
+
+cmest(data = df_multipleM_EMint,  outcome = "contY_catMbinM_EMint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = c('M_cat',"M_bin"), covariates.pre = c("C_cont", "C_bin"), 
+                 EMint = TRUE, EMint.terms = c("A*M_bin"),
+                 yreg = "linear", mreg = c("multinomial", "logistic"), mval = list(0,0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "g-formula")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
+
+```{r warning=F,message=F}
+cmest(data = df_multipleM_EMint,  outcome = "contY_catMbinM_EMint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = c('M_cat',"M_bin"), covariates.pre = c("C_cont", "C_bin"), 
+                 EMint = TRUE, EMint.terms = c("A*M_bin"),
+                 yreg = "linear", mreg = c("multinomial", "logistic"), mval = list(0,0),
+                 a_star = 0, a = 1, model = "ne")
+```
+
+## Case 4-3: Continuous Outcome and Multiple Mediators With Mediator-mediator Interaction
+
+### Data simulation
+
+#### Simulation Procedures
+
+1. Simulate the exposure A from $Bernoulli(P(A=1))$.
+
+2. Simulate the covariate C from $N(\mu_C,\sigma_C^2)$.
+
+3. Simulate the first mediator M1 from  $Multinom(\frac{1}{1+expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)},$
+
+$\frac{expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)}{1+expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)},\frac{expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)}{1+expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)})$,
+
+the second mediator M2 from $Bernoulli(expit(\beta_{03}+\beta_{13}*A+\beta_{23}*C))$.
+
+4. Simulate the outcome Y from $N(\theta_0+\theta_1A+\theta_{21}I\{M1==1\}+\theta_{22}I\{M1==2\}+\theta_{23}M2+\theta_{31}I\{M1==1\}M2+\theta_{32}I\{M1==2\}M2+\theta_{41}C1+\theta_{42}C2,\sigma_Y^2)$.
+
+#### True Parameters
+
+\begin{center}
+\captionof{table}{True Model Parameters for Data Simulation}
+\begin{tabular}{l|l|l|l|l|l|l|l|l|l|l}
+\hline
+Sample Size & $\theta_0$ & $\theta_1$ & $\theta_{21}$ & $\theta_{22}$& $\theta_{23}$ &$\theta_{31}$ &$\theta_{32}$ & $\theta_4$ & $\beta_{01}$ & $\beta_{11}$ \\ \hline
+10000&-5&0.8&1.8&1.2&1.5&0.2&0.4&0.1&-0.25&0.5 \\ \hline
+$\beta_{21}$&$\beta_{02}$ & $\beta_{12}$ & $\beta_{22}$ &$\beta_{03}$ & $\beta_{13}$ & $\beta_{23}$ & P(A=1) & $\mu_C$ & $\sigma_C$  & $\sigma_Y$\\ \hline
+0.2&-0.3&0.4&0.3&-0.25&0.5&0.2&0.4&1&1&0.2 \\ \hline
+\end{tabular}
+\end{center}
+
+#### True Models
+
+True model for the first mediator:
+$$ln\frac{P(M1==1)}{P(M1==0)}=\beta_{01}+\beta_{11}a+\beta_{21}c$$
+$$ln\frac{P(M1==2)}{P(M1==0)}=\beta_{02}+\beta_{12}a+\beta_{22}c$$
+
+True model for the second mediator:
+$$logitE[M2|a,c]=\beta_{03}+\beta_{13}a+\beta_{23}c$$
+
+True model for the outcome:
+$$E[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_{21}I\{m1^*==1\}+\theta_{22}I\{m1^*==2\}+\theta_{23}m2^*+$$
+$$\theta_{31}I\{m1^*==1\}m2^*+\theta_{32}I\{m1^*==2\}m2^*+\theta_{41}C1+\theta_{42}C2$$
+
+### Causal Effects and Standard Errors Estimated By the Weighting-based Approach
+
+```{r warning=F,message=F}
+
+cmest(data = df_multipleM_MMint,  outcome = "contY_catMbinM_MMint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = c('M_cat',"M_bin"), covariates.pre = c("C_cont", "C_bin"), MMint = TRUE, 
+                 yreg = "linear", mreg = c("multinomial", "logistic"), mval = list(0,0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "wb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Inverse Odds-ratio Weighting Approach 
+
+```{r warning=F,message=F}
+
+cmest(data = df_multipleM_MMint,  outcome = "contY_catMbinM_MMint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = c('M_cat',"M_bin"), covariates.pre = c("C_cont", "C_bin"), MMint = TRUE, 
+                 yreg = "linear", mreg = c("multinomial", "logistic"), mval = list(0,0),
+                 a_star = 0, a = 1, 
+                 est.method = "paramfunc", inf.method = "bootstrap", model = "iorw")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
+
+```{r warning=F,message=F}
+cmest(data = df_multipleM_MMint,  outcome = "contY_catMbinM_MMint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = c('M_cat',"M_bin"), covariates.pre = c("C_cont", "C_bin"), MMint = TRUE, 
+                 yreg = "linear", mreg = c("multinomial", "logistic"), mval = list(0,0),
+                 a_star = 0, a = 1, model = "ne")
+```
+
+## Case 4-4: Continuous Outcome and Multiple Mediators With Exposure-mediator-mediator Interaction
+
+### Data simulation
+
+#### Simulation Procedures
+
+1. Simulate the exposure A from $Bernoulli(P(A=1))$.
+
+2. Simulate the covariate C from $N(\mu_C,\sigma_C^2)$.
+
+3. Simulate the first mediator M1 from  $Multinom(\frac{1}{1+expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)},$
+
+$\frac{expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)}{1+expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)},\frac{expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)}{1+expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)})$,
+
+the second mediator M2 from $Bernoulli(expit(\beta_{03}+\beta_{13}*A+\beta_{23}*C))$.
+
+4. Simulate the outcome Y from $N(\theta_0+\theta_1A+\theta_{21}I\{M1==1\}+\theta_{22}I\{M1==2\}+\theta_{23}M2+\theta_{31}AI\{M1==1\}M2+\theta_{32}AI\{M1==2\}M2+\theta_{41}C1+\theta_{42}C2,\sigma_Y^2)$.
+
+#### True Parameters
+
+\begin{center}
+\captionof{table}{True Model Parameters for Data Simulation}
+\begin{tabular}{l|l|l|l|l|l|l|l|l|l|l}
+\hline
+Sample Size & $\theta_0$ & $\theta_1$ & $\theta_{21}$ & $\theta_{22}$& $\theta_{23}$ &$\theta_{31}$ &$\theta_{32}$ & $\theta_4$ & $\beta_{01}$ & $\beta_{11}$ \\ \hline
+10000&-5&0.8&1.8&1.2&1.5&0.2&0.4&0.1&-0.25&0.5 \\ \hline
+$\beta_{21}$&$\beta_{02}$ & $\beta_{12}$ & $\beta_{22}$ &$\beta_{03}$ & $\beta_{13}$ & $\beta_{23}$ & P(A=1) & $\mu_C$ & $\sigma_C$  & $\sigma_Y$\\ \hline
+0.2&-0.3&0.4&0.3&-0.25&0.5&0.2&0.4&1&1&0.2 \\ \hline
+\end{tabular}
+\end{center}
+
+#### True Models
+
+True model for the first mediator:
+$$ln\frac{P(M1==1)}{P(M1==0)}=\beta_{01}+\beta_{11}a+\beta_{21}c$$
+$$ln\frac{P(M1==2)}{P(M1==0)}=\beta_{02}+\beta_{12}a+\beta_{22}c$$
+
+True model for the second mediator:
+$$logitE[M2|a,c]=\beta_{03}+\beta_{13}a+\beta_{23}c$$
+
+True model for the outcome:
+$$E[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_{21}I\{m1^*==1\}+\theta_{22}I\{m1^*==2\}+\theta_{23}m2^*+$$
+$$\theta_{31}aI\{m1^*==1\}m2^*+\theta_{32}aI\{m1^*==2\}m2^*+\theta_{41}C1+\theta_{42}C2$$
+
+### Causal Effects and Standard Errors Estimated By the Weighting-based Approach
+
+```{r warning=F,message=F}
+
+cmest(data = df_multipleM_EMMint,  outcome = "contY_catMbinM_EMMint", exposure = 'A_bin',
+                 exposure.type = "binary",
+                 mediator = c('M_cat',"M_bin"), covariates.pre = c("C_cont", "C_bin"), EMMint = TRUE, 
+                 yreg = "linear", mreg = c("multinomial", "logistic"), mval = list(0,0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "wb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Inverse Odds-ratio Weighting Approach 
+
+```{r warning=F,message=F}
+
+cmest(data = df_multipleM_EMMint,  outcome = "contY_catMbinM_EMMint", exposure = 'A_bin',
+                 exposure.type = "binary",
+                 mediator = c('M_cat',"M_bin"), covariates.pre = c("C_cont", "C_bin"), EMMint = TRUE, 
+                 yreg = "linear", mreg = c("multinomial", "logistic"), mval = list(0,0),
+                 a_star = 0, a = 1, 
+                 est.method = "paramfunc", inf.method = "bootstrap", model = "iorw")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
+
+```{r warning=F,message=F}
+cmest(data = df_multipleM_EMMint,  outcome = "contY_catMbinM_EMMint", exposure = 'A_bin',
+                 exposure.type = "binary",
+                 mediator = c('M_cat',"M_bin"), covariates.pre = c("C_cont", "C_bin"), EMMint = TRUE, 
+                 yreg = "linear", mreg = c("multinomial", "logistic"), mval = list(0,0),
+                 a_star = 0, a = 1, 
+                 est.method = NULL, inf.method = NULL, model = "ne")
+```
+
+# Case 5: Binary Outcome and Single Continuous Mediator
+
+## Case 5-1: Binary Outcome and Single Continuous Mediator Without Interaction
+
+### Data simulation
+
+#### Simulation Procedures
+
+1. Simulate the exposure A from $Bernoulli(P(A=1))$.
+
+2. Simulate the covariate C from $N(\mu_C,\sigma_C^2)$.
+
+3. Simulate the mediator M from $N((\beta_0+\beta_1*A+\beta_{21}C1+\beta_{22}C2),\sigma_M^2)$.
+
+4. Simulate the outcome Y from $Bernoulli(expit(\theta_0+\theta_1A+\theta_2M+\theta_{41}C1+\theta_{42}C2))$.
+
+#### True Parameters
+
+\begin{center}
+\captionof{table}{True Model Parameters for Data Simulation}
+\begin{tabular}{l|l|l|l|l|l|l|l|l|l|l|l}
+\hline
+Sample Size & $\theta_0$ & $\theta_1$ & $\theta_2$ & $\theta_4$ & $\beta_0$ & $\beta_1$ & $\beta_2$ & P(A=1) & $\mu_C$ & $\sigma_C$ & $\sigma_M$ \\ \hline
+10000&-5&0.8&1.8&0.1&-0.25&0.5&0.2&0.4&1&1&0.1 \\ \hline
+\end{tabular}
+\end{center}
+
+#### True Models
+
+True model for the mediator:
+$$E[M|a,c]=\beta_0+\beta_1a+\beta_{21}c1+\beta_{22}c2$$
+
+True model for the outcome:
+$$logitE[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_2m^*+\theta_{41}C1+\theta_{42}C2$$
+
+### Causal Effects and Standard Errors Estimated By the Regression-based Approach
+
+#### Closed-form Parameter Function Estimation and Delta Method Inference
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "binY_contM_binA_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cont_binA', covariates.pre = c("C_cont", "C_bin"), 
+                 yreg = "logistic", mreg = "linear", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "paramfunc", inf.method = "delta", model = "rb")
+
+```
+
+#### Direct Imputation Estimation and Bootstrap Inference
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "binY_contM_binA_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cont_binA', covariates.pre = c("C_cont", "C_bin"), 
+                 yreg = "logistic", mreg = "linear", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "rb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Weighting-based Approach
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "binY_contM_binA_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cont_binA', covariates.pre = c("C_cont", "C_bin"), 
+                 yreg = "logistic", mreg = "linear", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "wb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the G-formula Approach 
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "binY_contM_binA_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cont_binA', covariates.pre = c("C_cont", "C_bin"),  
+                 yreg = "logistic", mreg = "linear", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "g-formula")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
+
+```{r warning=F,message=F}
+cmest(data = df_noint,  outcome = "binY_contM_binA_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cont_binA', covariates.pre = c("C_cont", "C_bin"),
+                 yreg = "logistic", mreg = "linear", mval = list(0),
+                 a_star = 0, a = 1, model = "ne")
+```
+
+
+## Case 5-2: Binary Outcome and Single Continuous Mediator With Exposure-mediator Interaction
+
+### Data simulation
+
+#### Simulation Procedures
+
+1. Simulate the exposure A from $Bernoulli(P(A=1))$.
+
+2. Simulate the covariate C from $N(\mu_C,\sigma_C^2)$.
+
+3. Simulate the mediator M from $N((\beta_0+\beta_1*A+\beta_{21}C1+\beta_{22}C2),\sigma_M^2)$.
+
+4. Simulate the outcome Y from $Bernoulli(expit(\theta_0+\theta_1A+\theta_2M+\theta_3AM+\theta_{41}C1+\theta_{42}C2))$.
+
+#### True Parameters
+
+\begin{center}
+\captionof{table}{True Model Parameters for Data Simulation}
+\begin{tabular}{l|l|l|l|l|l|l|l|l|l|l|l|l}
+\hline
+Sample Size & $\theta_0$ & $\theta_1$ & $\theta_2$ & $\theta_3$ & $\theta_4$ & $\beta_0$ & $\beta_1$ & $\beta_2$ & P(A=1) & $\mu_C$ & $\sigma_C$ & $\sigma_M$ \\ \hline
+10000&-5&0.8&1.8&0.2&0.1&-0.25&0.5&0.2&0.4&1&1&0.1 \\ \hline
+\end{tabular}
+\end{center}
+
+#### True Models
+
+True model for the mediator:
+$$E[M|a,c]=\beta_0+\beta_1a+\beta_{21}c1+\beta_{22}c2$$
+
+True model for the outcome:
+$$logitE[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_2m^*+\theta_3am^*+\theta_{41}C1+\theta_{42}C2$$
+
+### Causal Effects and Standard Errors Estimated By the Regression-based Approach
+
+#### Closed-form Parameter Function Estimation and Delta Method Inference
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "binY_contM_binA_int", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cont_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE, 
+                 yreg = "logistic", mreg = "linear", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "paramfunc", inf.method = "delta", model = "rb")
+
+```
+
+#### Direct Imputation Estimation and Bootstrap Inference
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "binY_contM_binA_int", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cont_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE,
+                 yreg = "logistic", mreg = "linear", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "rb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Weighting-based Approach
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "binY_contM_binA_int", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cont_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE, 
+                 yreg = "logistic", mreg = "linear", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "wb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the G-formula Approach 
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "binY_contM_binA_int", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cont_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE,
+                 yreg = "logistic", mreg = "linear", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "g-formula")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
+
+```{r warning=F,message=F}
+cmest(data = df_int,  outcome = "binY_contM_binA_int", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cont_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE, 
+                 yreg = "logistic", mreg = "linear", mval = list(0),
+                 a_star = 0, a = 1, model = "ne")
+```
+
+# Case 6: Binary Outcome and Single Binary Mediator
+
+## Case 6-1: Binary Outcome and Single Binary Mediator Without Interaction
+
+### Data simulation
+
+#### Simulation Procedures
+
+1. Simulate the exposure A from $Bernoulli(P(A=1))$.
+
+2. Simulate the covariate C from $N(\mu_C,\sigma_C^2)$.
+
+3. Simulate the mediator M from $Bernoulli(expit(\beta_0+\beta_1*A+\beta_{21}C1+\beta_{22}C2))$.
+
+4. Simulate the outcome Y from $Bernoulli(expit(\theta_0+\theta_1A+\theta_2M+\theta_{41}C1+\theta_{42}C2))$.
+
+#### True Parameters
+
+\begin{center}
+\captionof{table}{True Model Parameters for Data Simulation}
+\begin{tabular}{l|l|l|l|l|l|l|l|l|l|l}
+\hline
+Sample Size & $\theta_0$ & $\theta_1$ & $\theta_2$ & $\theta_4$ & $\beta_0$ & $\beta_1$ & $\beta_2$ & P(A=1) & $\mu_C$ & $\sigma_C$ \\ \hline
+10000&-5&0.8&1.8&0.1&-0.25&0.5&0.2&0.4&1&1 \\ \hline
+\end{tabular}
+\end{center}
+
+#### True Models
+
+True model for the mediator:
+$$logitE[M|a,c]=\beta_0+\beta_1a+\beta_{21}c1+\beta_{22}c2$$
+
+True model for the outcome:
+$$logitE[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_2m^*+\theta_{41}C1+\theta_{42}C2$$
+
+### Causal Effects and Standard Errors Estimated By the Regression-based Approach
+
+#### Closed-form Parameter Function Estimation and Delta Method Inference
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "binY_binM_binA_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_bin_binA', covariates.pre = c("C_cont", "C_bin"),  
+                 yreg = "logistic", mreg = "logistic", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "paramfunc", inf.method = "delta", model = "rb")
+
+```
+
+#### Direct Imputation Estimation and Bootstrap Inference
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "binY_binM_binA_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_bin_binA', covariates.pre = c("C_cont", "C_bin"), 
+                 yreg = "logistic", mreg = "logistic", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "rb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Weighting-based Approach
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "binY_binM_binA_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_bin_binA', covariates.pre = c("C_cont", "C_bin"),  
+                 yreg = "logistic", mreg = "logistic", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "wb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Marginal Structural Model 
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "binY_binM_binA_noint", exposure = "A_bin", 
+                 exposure.type = "binary",
+                 mediator = 'M_bin_binA', covariates.pre = c("C_cont", "C_bin"),  
+                 yreg = "logistic", mreg = "logistic", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "msm")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Inverse Odds-ratio Weighting Approach 
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "binY_binM_binA_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_bin_binA', covariates.pre = c("C_cont", "C_bin"),  
+                 yreg = "logistic", mreg = "logistic", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "paramfunc", inf.method = "bootstrap", model = "iorw")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the G-formula Approach 
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "binY_binM_binA_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_bin_binA', covariates.pre = c("C_cont", "C_bin"), 
+                 yreg = "logistic", mreg = "logistic", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "g-formula")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
+
+```{r warning=F,message=F}
+cmest(data = df_noint,  outcome = "binY_binM_binA_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_bin_binA', covariates.pre = c("C_cont", "C_bin"),  
+                 yreg = "logistic", mreg = "logistic", mval = list(0),
+                 a_star = 0, a = 1, model = "ne")
+```
+
+## Case 6-2: Binary Outcome and Single Binary Mediator With Exposure-mediator Interaction
+
+### Data simulation
+
+#### Simulation Procedures
+
+1. Simulate the exposure A from $Bernoulli(P(A=1))$.
+
+2. Simulate the covariate C from $N(\mu_C,\sigma_C^2)$.
+
+3. Simulate the mediator M from $Bernoulli(expit(\beta_0+\beta_1*A+\beta_{21}C1+\beta_{22}C2))$.
+
+4. Simulate the outcome Y from $Bernoulli(expit(\theta_0+\theta_1A+\theta_2M+\theta_3AM+\theta_{41}C1+\theta_{42}C2))$.
+
+#### True Parameters
+
+\begin{center}
+\captionof{table}{True Model Parameters for Data Simulation}
+\begin{tabular}{l|l|l|l|l|l|l|l|l|l|l|l}
+\hline
+Sample Size & $\theta_0$ & $\theta_1$ & $\theta_2$ & $\theta_3$ & $\theta_4$ & $\beta_0$ & $\beta_1$ & $\beta_2$ & P(A=1) & $\mu_C$ & $\sigma_C$  \\ \hline
+10000&-5&0.8&1.8&0.2&0.1&-0.25&0.5&0.2&0.4&1&1 \\ \hline
+\end{tabular}
+\end{center}
+
+#### True Models
+
+True model for the mediator:
+$$logitE[M|a,c]=\beta_0+\beta_1a+\beta_{21}c1+\beta_{22}c2$$
+
+True model for the outcome:
+$$logitE[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_2m^*+\theta_3am^*+\theta_{41}C1+\theta_{42}C2$$
+
+### Causal Effects and Standard Errors Estimated By the Regression-based Approach
+
+#### Closed-form Parameter Function Estimation and Delta Method Inference
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "binY_binM_binA_int", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_bin_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE,
+                 yreg = "logistic", mreg = "logistic", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "paramfunc", inf.method = "delta", model = "rb")
+
+```
+
+#### Direct Imputation Estimation and Bootstrap Inference
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "binY_binM_binA_int", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_bin_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE, 
+                 yreg = "logistic", mreg = "logistic", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "rb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Weighting-based Approach
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "binY_binM_binA_int", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_bin_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE, 
+                 yreg = "logistic", mreg = "logistic", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "wb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Marginal Structural Model 
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "binY_binM_binA_int", exposure = "A_bin", 
+                 exposure.type = "binary",
+                 mediator = 'M_bin_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE, 
+                 yreg = "logistic", mreg = "logistic", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "msm")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Inverse Odds-ratio Weighting Approach 
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "binY_binM_binA_int", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_bin_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE, 
+                 yreg = "logistic", mreg = "logistic", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "paramfunc", inf.method = "bootstrap", model = "iorw")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the G-formula Approach 
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "binY_binM_binA_int", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_bin_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE, 
+                 yreg = "logistic", mreg = "logistic", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "g-formula")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
+
+```{r warning=F,message=F}
+cmest(data = df_int,  outcome = "binY_binM_binA_int", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_bin_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE, 
+                 yreg = "logistic", mreg = "logistic", mval = list(0),
+                 a_star = 0, a = 1, model = "ne")
+```
+
+# Case 7: Continuous Outcome and Single Categorical Mediator
+
+## Case 7-1: Continuous Outcome and Single Categorical Mediator Without Interaction
+
+### Data simulation
+
+#### Simulation Procedures
+
+1. Simulate the exposure A from $Bernoulli(P(A=1))$.
+
+2. Simulate the covariate C from $N(\mu_C,\sigma_C^2)$.
+
+3. Simulate the mediator M from $Multinom(\frac{1}{1+expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)}$,
+
+$\frac{expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)}{1+expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)}, \frac{expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)}{1+expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)})$.
+
+4. Simulate the outcome Y from $Bernoulli(expit(\theta_0+\theta_1A+\theta_{21}I\{M==1\}+\theta_{22}I\{M==2\}+\theta_{41}C1+\theta_{42}C2))$.
+
+#### True Parameters
+
+\begin{center}
+\captionof{table}{True Model Parameters for Data Simulation}
+\begin{tabular}{l|l|l|l|l|l|l|l}
+\hline
+Sample Size & $\theta_0$ & $\theta_1$ & $\theta_{21}$ & $\theta_{22}$ & $\theta_4$ & $\beta_{01}$ & $\beta_{11}$  \\ \hline
+10000&-5&0.8&1.8&1.2&0.1&-0.25&0.5 \\ \hline
+$\beta_{21}$ & $\beta_{02}$ & $\beta_{12}$ & $\beta_{22}$ & P(A=1) & $\mu_C$ & $\sigma_C$  \\ \hline
+0.2&-0.3&0.4&0.3&0.4&1&1 \\ \hline
+\end{tabular}
+\end{center}
+
+#### True Models
+
+True model for the mediator:
+$$ln\frac{P(M==1)}{P(M==0)}=\beta_{01}+\beta_{11}a+\beta_{21}c$$
+$$ln\frac{P(M==2)}{P(M==0)}=\beta_{02}+\beta_{12}a+\beta_{22}c$$
+
+True model for the outcome:
+$$logitE[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_{21}I\{m^*==1\}+\theta_{22}I\{m^*==2\}+\theta_{41}C1+\theta_{42}C2$$
+
+### Causal Effects and Standard Errors Estimated By the Regression-based Approach
+
+#### Closed-form Parameter Function Estimation and Delta Method Inference
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "binY_catM_binA_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cat_binA', covariates.pre = c("C_cont", "C_bin"), 
+                 yreg = "logistic", mreg = "multinomial", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "paramfunc", inf.method = "delta", model = "rb")
+
+```
+
+#### Direct Imputation Estimation and Bootstrap Inference
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "binY_catM_binA_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cat_binA', covariates.pre = c("C_cont", "C_bin"), 
+                 yreg = "logistic", mreg = "multinomial", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "rb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Weighting-based Approach
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "binY_catM_binA_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cat_binA', covariates.pre = c("C_cont", "C_bin"), 
+                 yreg = "logistic", mreg = "multinomial", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "wb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Marginal Structural Model 
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "binY_catM_binA_noint", exposure = "A_bin", 
+                 exposure.type = "binary",
+                 mediator = 'M_cat_binA', covariates.pre = c("C_cont", "C_bin"), 
+                 yreg = "logistic", mreg = "multinomial", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "msm")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Inverse Odds-ratio Weighting Approach 
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "binY_catM_binA_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cat_binA', covariates.pre = c("C_cont", "C_bin"),  
+                 yreg = "logistic", mreg = "multinomial", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "paramfunc", inf.method = "bootstrap", model = "iorw")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the G-formula Approach 
+
+```{r warning=F,message=F}
+
+cmest(data = df_noint,  outcome = "binY_catM_binA_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cat_binA', covariates.pre = c("C_cont", "C_bin"),
+                 yreg = "logistic", mreg = "multinomial", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "g-formula")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
+
+```{r warning=F,message=F}
+cmest(data = df_noint,  outcome = "binY_catM_binA_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cat_binA', covariates.pre = c("C_cont", "C_bin"),  
+                 yreg = "logistic", mreg = "multinomial", mval = list(0),
+                 a_star = 0, a = 1, model = "ne")
+```
+
+## Case 7-2: Binary Outcome and Single Categorical Mediator With Exposure-mediator Interaction
+
+### Data simulation
+
+#### Simulation Procedures
+
+1. Simulate the exposure A from $Bernoulli(P(A=1))$.
+
+2. Simulate the covariate C from $N(\mu_C,\sigma_C^2)$.
+
+3. Simulate the mediator M from $Multinom(\frac{1}{1+expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)}$,
+
+$\frac{expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)}{1+expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)}, \frac{expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)}{1+expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)})$.
+
+4. Simulate the outcome Y from $Bernoulli(expit(\theta_0+\theta_1A+\theta_{21}I\{M==1\}+\theta_{22}I\{M==2\}+\theta_{31}A*I\{M==1\}+\theta_{32}A*I\{M==2\}+\theta_{41}C1+\theta_{42}C2))$.
+
+#### True Parameters
+
+\begin{center}
+\captionof{table}{True Model Parameters for Data Simulation}
+\begin{tabular}{l|l|l|l|l|l|l|l|l}
+\hline
+Sample Size & $\theta_0$ & $\theta_1$ & $\theta_{21}$ & $\theta_{22}$ & $\theta_{31}$ & $\theta_{32}$ & $\theta_4$ & $\beta_{01}$   \\ \hline
+10000&-5&0.8&1.8&1.2&0.2&0.40.1&-0.25 \\ \hline
+$\beta_{11}$&$\beta_{21}$ & $\beta_{02}$ & $\beta_{12}$ & $\beta_{22}$ & P(A=1) & $\mu_C$ & $\sigma_C$  \\ \hline
+0.5&0.2&-0.3&0.4&0.3&0.4&1&1 \\ \hline
+\end{tabular}
+\end{center}
+
+#### True Models
+
+True model for the mediator:
+$$ln\frac{P(M==1)}{P(M==0)}=\beta_{01}+\beta_{11}a+\beta_{21}c$$
+$$ln\frac{P(M==2)}{P(M==0)}=\beta_{02}+\beta_{12}a+\beta_{22}c$$
+
+True model for the outcome:
+$$logitE[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_{21}I\{m^*==1\}+\theta_{22}I\{m^*==2\}+\theta_{31}a*I\{m^*==1\}+\theta_{32}a*I\{m^*==2\}+\theta_{41}C1+\theta_{42}C2$$
+
+### Causal Effects and Standard Errors Estimated By the Regression-based Approach
+
+#### Closed-form Parameter Function Estimation and Delta Method Inference
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "binY_catM_binA_int", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cat_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE, 
+                 yreg = "logistic", mreg = "multinomial", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "paramfunc", inf.method = "delta", model = "rb")
+
+```
+
+#### Direct Imputation Estimation and Bootstrap Inference
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "binY_catM_binA_int", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cat_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE,
+                 yreg = "logistic", mreg = "multinomial", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "rb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Weighting-based Approach
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "binY_catM_binA_int", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cat_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE, 
+                 yreg = "logistic", mreg = "multinomial", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "wb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Marginal Structural Model 
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "binY_catM_binA_int", exposure = "A_bin", 
+                 exposure.type = "binary",
+                 mediator = 'M_cat_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE, 
+                 yreg = "logistic", mreg = "multinomial", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "msm")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Inverse Odds-ratio Weighting Approach 
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "binY_catM_binA_int", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cat_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE, 
+                 yreg = "logistic", mreg = "multinomial", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "paramfunc", inf.method = "bootstrap", model = "iorw")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the G-formula Approach 
+
+```{r warning=F,message=F}
+
+cmest(data = df_int,  outcome = "binY_catM_binA_int", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cat_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE,
+                 yreg = "logistic", mreg = "multinomial", mval = list(0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "g-formula")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
+
+```{r warning=F,message=F}
+cmest(data = df_int,  outcome = "binY_catM_binA_int", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = 'M_cat_binA', covariates.pre = c("C_cont", "C_bin"), EMint = TRUE, 
+                 yreg = "logistic", mreg = "multinomial", mval = list(0),
+                 a_star = 0, a = 1, model = "ne")
+```
+
+# Case 8: Binary Outcome and Multiple Mediators 
+
+## Case 8-1: Binary Outcome and Multiple Mediators Without Interaction
+
+### Data simulation
+
+#### Simulation Procedures
+
+1. Simulate the exposure A from $Bernoulli(P(A=1))$.
+
+2. Simulate the covariate C from $N(\mu_C,\sigma_C^2)$.
+
+3. Simulate the first mediator M1 from  $Multinom(\frac{1}{1+expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)},$
+
+$\frac{expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)}{1+expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)},\frac{expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)}{1+expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)})$,
+
+the second mediator M2 from $Bernoulli(expit(\beta_{03}+\beta_{13}*A+\beta_{23}*C))$.
+
+4. Simulate the outcome Y from $Bernoulli(expit(\theta_0+\theta_1A+\theta_{21}I\{M1==1\}+\theta_{22}I\{M1==2\}+\theta_{23}M2+\theta_{41}C1+\theta_{42}C2))$.
+
+#### True Parameters
+
+\begin{center}
+\captionof{table}{True Model Parameters for Data Simulation}
+\begin{tabular}{l|l|l|l|l|l|l|l|l|l}
+\hline
+Sample Size & $\theta_0$ & $\theta_1$ & $\theta_{21}$ & $\theta_{22}$& $\theta_{23}$  & $\theta_4$ & $\beta_{01}$ & $\beta_{11}$&$\beta_{21}$ \\ \hline
+10000&-5&0.8&1.8&1.2&1.5&0.1&-0.25&0.5&0.2 \\ \hline
+$\beta_{02}$ & $\beta_{12}$ & $\beta_{22}$ &$\beta_{03}$ & $\beta_{13}$ & $\beta_{23}$ & P(A=1) & $\mu_C$ & $\sigma_C$  \\ \hline
+-0.3&0.4&0.3&-0.25&0.5&0.2&0.4&1&1 \\ \hline
+\end{tabular}
+\end{center}
+
+#### True Models
+
+True model for the first mediator:
+$$ln\frac{P(M1==1)}{P(M1==0)}=\beta_{01}+\beta_{11}a+\beta_{21}c$$
+$$ln\frac{P(M1==2)}{P(M1==0)}=\beta_{02}+\beta_{12}a+\beta_{22}c$$
+
+True model for the second mediator:
+$$logitE[M2|a,c]=\beta_{03}+\beta_{13}a+\beta_{23}c$$
+
+True model for the outcome:
+$$logitE[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_{21}I\{m1^*==1\}+\theta_{22}I\{m1^*==2\}+\theta_{23}m2^*+\theta_{41}C1+\theta_{42}C2$$
+
+### Causal Effects and Standard Errors Estimated By the Regression-based Approach
+
+```{r warning=F,message=F}
+
+cmest(data = df_multipleM_noint,  outcome = "binY_catMbinM_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = c('M_cat',"M_bin"), covariates.pre = c("C_cont", "C_bin"), 
+                 yreg = "logistic", mreg = c("multinomial", "logistic"), mval = list(0,0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "rb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Weighting-based Approach
+
+```{r warning=F,message=F}
+
+cmest(data = df_multipleM_noint,  outcome = "binY_catMbinM_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = c('M_cat',"M_bin"), covariates.pre = c("C_cont", "C_bin"), 
+                 yreg = "logistic", mreg = c("multinomial", "logistic"), mval = list(0,0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "wb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Marginal Structural Model 
+
+```{r warning=F,message=F}
+
+cmest(data = df_multipleM_noint,  outcome = "binY_catMbinM_noint", exposure = "A_bin", 
+                 exposure.type = "binary",
+                 mediator = c('M_cat',"M_bin"), covariates.pre = c("C_cont", "C_bin"),
+                 yreg = "logistic", mreg = c("multinomial", "logistic"), mval = list(0,0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "msm")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Inverse Odds-ratio Weighting Approach 
+
+```{r warning=F,message=F}
+
+cmest(data = df_multipleM_noint,  outcome = "binY_catMbinM_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = c('M_cat',"M_bin"), covariates.pre = c("C_cont", "C_bin"), 
+                 yreg = "logistic", mreg = c("multinomial", "logistic"), mval = list(0,0),
+                 a_star = 0, a = 1, 
+                 est.method = "paramfunc", inf.method = "bootstrap", model = "iorw")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the G-formula Approach 
+
+```{r warning=F,message=F}
+
+cmest(data = df_multipleM_noint,  outcome = "binY_catMbinM_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = c('M_cat',"M_bin"), covariates.pre = c("C_cont", "C_bin"), 
+                 yreg = "logistic", mreg = c("multinomial", "logistic"), mval = list(0,0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "g-formula")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
+
+```{r warning=F,message=F}
+cmest(data = df_multipleM_noint,  outcome = "binY_catMbinM_noint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = c('M_cat',"M_bin"), covariates.pre = c("C_cont", "C_bin"), 
+                 yreg = "logistic", mreg = c("multinomial", "logistic"), mval = list(0,0),
+                 a_star = 0, a = 1, model = "ne")
+```
+
+## Case 8-2: Binary Outcome and Multiple Mediators With Exposure-mediator Interaction
+
+### Data simulation
+
+#### Simulation Procedures
+
+1. Simulate the exposure A from $Bernoulli(P(A=1))$.
+
+2. Simulate the covariate C from $N(\mu_C,\sigma_C^2)$.
+
+3. Simulate the first mediator M1 from  $Multinom(\frac{1}{1+expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)},$
+
+$\frac{expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)}{1+expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)},\frac{expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)}{1+expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)})$,
+
+the second mediator M2 from $Bernoulli(expit(\beta_{03}+\beta_{13}*A+\beta_{23}*C))$.
+
+4. Simulate the outcome Y from $Bernoulli(expit(\theta_0+\theta_1A+\theta_{21}I\{M1==1\}+\theta_{22}I\{M1==2\}+\theta_{23}M2+\theta_{31}AM2+\theta_{41}C1+\theta_{42}C2))$.
+
+#### True Parameters
+
+\begin{center}
+\captionof{table}{True Model Parameters for Data Simulation}
+\begin{tabular}{l|l|l|l|l|l|l|l|l|l}
+\hline
+Sample Size & $\theta_0$ & $\theta_1$ & $\theta_{21}$ & $\theta_{22}$& $\theta_{23}$ &$\theta_{31}$ & $\theta_4$ & $\beta_{01}$ & $\beta_{11}$\\ \hline
+10000&-5&0.8&1.8&1.2&1.5&0.2&0.1&-0.25&0.5 \\ \hline
+$\beta_{21}$ & $\beta_{02}$ & $\beta_{12}$ & $\beta_{22}$ &$\beta_{03}$ & $\beta_{13}$ & $\beta_{23}$ & P(A=1) & $\mu_C$ & $\sigma_C$  \\ \hline
+0.2&-0.3&0.4&0.3&-0.25&0.5&0.2&0.4&1&1 \\ \hline
+\end{tabular}
+\end{center}
+
+#### True Models
+
+True model for the first mediator:
+$$ln\frac{P(M1==1)}{P(M1==0)}=\beta_{01}+\beta_{11}a+\beta_{21}c$$
+$$ln\frac{P(M1==2)}{P(M1==0)}=\beta_{02}+\beta_{12}a+\beta_{22}c$$
+
+True model for the second mediator:
+$$logitE[M2|a,c]=\beta_{03}+\beta_{13}a+\beta_{23}c$$
+
+True model for the outcome:
+$$logitE[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_{21}I\{m1^*==1\}+\theta_{22}I\{m1^*==2\}+\theta_{23}m2^*+\theta_{31}am2^*+\theta_{41}C1+\theta_{42}C2$$
+
+### Causal Effects and Standard Errors Estimated By the Regression-based Approach
+
+```{r warning=F,message=F}
+
+cmest(data = df_multipleM_EMint, outcome = "binY_catMbinM_EMint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = c('M_cat',"M_bin"), covariates.pre = c("C_cont", "C_bin"), 
+                 EMint = TRUE, EMint.terms = c("A*M_bin"),
+                 yreg = "logistic", mreg = c("multinomial", "logistic"), mval = list(0,0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "rb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Weighting-based Approach
+
+```{r warning=F,message=F}
+
+cmest(data = df_multipleM_EMint,  outcome = "binY_catMbinM_EMint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = c('M_cat',"M_bin"), covariates.pre = c("C_cont", "C_bin"),
+                 EMint = TRUE, EMint.terms = c("A*M_bin"),
+                 yreg = "logistic", mreg = c("multinomial", "logistic"), mval = list(0,0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "wb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Marginal Structural Model 
+
+```{r warning=F,message=F}
+
+cmest(data = df_multipleM_EMint,  outcome = "binY_catMbinM_EMint", exposure = "A_bin", 
+                 exposure.type = "binary",
+                 mediator = c('M_cat',"M_bin"), covariates.pre = c("C_cont", "C_bin"), 
+                 EMint = TRUE, EMint.terms = c("A*M_bin"),
+                 yreg = "logistic", mreg = c("multinomial", "logistic"), mval = list(0,0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "msm")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Inverse Odds-ratio Weighting Approach 
+
+```{r warning=F,message=F}
+
+cmest(data = df_multipleM_EMint,  outcome = "binY_catMbinM_EMint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = c('M_cat',"M_bin"), covariates.pre = c("C_cont", "C_bin"), 
+                 EMint = TRUE, EMint.terms = c("A*M_bin"),
+                 yreg = "logistic", mreg = c("multinomial", "logistic"), mval = list(0,0),
+                 a_star = 0, a = 1, 
+                 est.method = "paramfunc", inf.method = "bootstrap", model = "iorw")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the G-formula Approach 
+
+```{r warning=F,message=F}
+
+cmest(data = df_multipleM_EMint,  outcome = "binY_catMbinM_EMint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = c('M_cat',"M_bin"), covariates.pre = c("C_cont", "C_bin"), 
+                 EMint = TRUE, EMint.terms = c("A*M_bin"),
+                 yreg = "logistic", mreg = c("multinomial", "logistic"), mval = list(0,0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "g-formula")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
+
+```{r warning=F,message=F}
+cmest(data = df_multipleM_EMint,  outcome = "binY_catMbinM_EMint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = c('M_cat',"M_bin"), covariates.pre = c("C_cont", "C_bin"),  
+                 EMint = TRUE, EMint.terms = c("A*M_bin"),
+                 yreg = "logistic", mreg = c("multinomial", "logistic"), mval = list(0,0),
+                 a_star = 0, a = 1, 
+                 est.method = NULL, inf.method = NULL, model = "ne")
+```
+
+## Case 8-3: Binary Outcome and Multiple Mediators With Mediator-mediator Interaction
+
+### Data simulation
+
+#### Simulation Procedures
+
+1. Simulate the exposure A from $Bernoulli(P(A=1))$.
+
+2. Simulate the covariate C from $N(\mu_C,\sigma_C^2)$.
+
+3. Simulate the first mediator M1 from  $Multinom(\frac{1}{1+expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)},$
+
+$\frac{expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)}{1+expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)},\frac{expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)}{1+expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)})$,
+
+the second mediator M2 from $Bernoulli(expit(\beta_{03}+\beta_{13}*A+\beta_{23}*C))$.
+
+4. Simulate the outcome Y from $Bernoulli(expit(\theta_0+\theta_1A+\theta_{21}I\{M1==1\}+\theta_{22}I\{M1==2\}+\theta_{23}M2+\theta_{31}I\{M1==1\}M2+\theta_{32}I\{M1==2\}M2+\theta_{41}C1+\theta_{42}C2))$.
+
+#### True Parameters
+
+\begin{center}
+\captionof{table}{True Model Parameters for Data Simulation}
+\begin{tabular}{l|l|l|l|l|l|l|l|l|l|l}
+\hline
+Sample Size & $\theta_0$ & $\theta_1$ & $\theta_{21}$ & $\theta_{22}$& $\theta_{23}$ &$\theta_{31}$ &$\theta_{32}$ & $\theta_4$ & $\beta_{01}$ & $\beta_{11}$ \\ \hline
+10000&-5&0.8&1.8&1.2&1.5&0.2&0.4&0.1&-0.25&0.5 \\ \hline
+$\beta_{21}$&$\beta_{02}$ & $\beta_{12}$ & $\beta_{22}$ &$\beta_{03}$ & $\beta_{13}$ & $\beta_{23}$ & P(A=1) & $\mu_C$ & $\sigma_C$  \\ \hline
+0.2&-0.3&0.4&0.3&-0.25&0.5&0.2&0.4&1&1 \\ \hline
+\end{tabular}
+\end{center}
+
+#### True Models
+
+True model for the first mediator:
+$$ln\frac{P(M1==1)}{P(M1==0)}=\beta_{01}+\beta_{11}a+\beta_{21}c$$
+$$ln\frac{P(M1==2)}{P(M1==0)}=\beta_{02}+\beta_{12}a+\beta_{22}c$$
+
+True model for the second mediator:
+$$logitE[M2|a,c]=\beta_{03}+\beta_{13}a+\beta_{23}c$$
+
+True model for the outcome:
+$$logitE[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_{21}I\{m1^*==1\}+\theta_{22}I\{m1^*==2\}+\theta_{23}m2^*+$$
+$$\theta_{31}I\{m1^*==1\}m2^*+\theta_{32}I\{m1^*==2\}m2^*+\theta_{41}C1+\theta_{42}C2$$
+
+### Causal Effects and Standard Errors Estimated By the Weighting-based Approach
+
+```{r warning=F,message=F}
+
+cmest(data = df_multipleM_MMint,  outcome = "binY_catMbinM_MMint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = c('M_cat',"M_bin"), covariates.pre = c("C_cont", "C_bin"), MMint = TRUE, 
+                 yreg = "logistic", mreg = c("multinomial", "logistic"), mval = list(0,0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "wb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Inverse Odds-ratio Weighting Approach 
+
+```{r warning=F,message=F}
+
+cmest(data = df_multipleM_MMint,  outcome = "binY_catMbinM_MMint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = c('M_cat',"M_bin"), covariates.pre = c("C_cont", "C_bin"), MMint = TRUE, 
+                 yreg = "logistic", mreg = c("multinomial", "logistic"), mval = list(0,0),
+                 a_star = 0, a = 1, 
+                 est.method = "paramfunc", inf.method = "bootstrap", model = "iorw",)
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
+
+```{r warning=F,message=F}
+cmest(data = df_multipleM_MMint,  outcome = "binY_catMbinM_MMint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = c('M_cat',"M_bin"), covariates.pre = c("C_cont", "C_bin"), MMint = TRUE, 
+                 yreg = "logistic", mreg = c("multinomial", "logistic"), mval = list(0,0),
+                 a_star = 0, a = 1, 
+                 est.method = NULL, inf.method = NULL, model = "ne")
+```
+
+## Case 8-4: Binary Outcome and Multiple Mediators With Exposure-mediator-mediator Interaction
+
+### Data simulation
+
+#### Simulation Procedures
+
+1. Simulate the exposure A from $Bernoulli(P(A=1))$.
+
+2. Simulate the covariate C from $N(\mu_C,\sigma_C^2)$.
+
+3. Simulate the first mediator M1 from  $Multinom(\frac{1}{1+expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)},$
+
+$\frac{expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)}{1+expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)},\frac{expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)}{1+expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C)+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)})$,
+
+the second mediator M2 from $Bernoulli(expit(\beta_{03}+\beta_{13}*A+\beta_{23}*C))$.
+
+4. Simulate the outcome Y from $Bernoulli(expit(\theta_0+\theta_1A+\theta_{21}I\{M1==1\}+\theta_{22}I\{M1==2\}+\theta_{23}M2+\theta_{31}AI\{M1==1\}M2+\theta_{32}AI\{M1==2\}M2+\theta_{41}C1+\theta_{42}C2))$.
+
+#### True Parameters
+
+\begin{center}
+\captionof{table}{True Model Parameters for Data Simulation}
+\begin{tabular}{l|l|l|l|l|l|l|l|l|l|l}
+\hline
+Sample Size & $\theta_0$ & $\theta_1$ & $\theta_{21}$ & $\theta_{22}$& $\theta_{23}$ &$\theta_{31}$ &$\theta_{32}$ & $\theta_4$ & $\beta_{01}$ & $\beta_{11}$ \\ \hline
+10000&-5&0.8&1.8&1.2&1.5&0.2&0.4&0.1&-0.25&0.5 \\ \hline
+$\beta_{21}$&$\beta_{02}$ & $\beta_{12}$ & $\beta_{22}$ &$\beta_{03}$ & $\beta_{13}$ & $\beta_{23}$ & P(A=1) & $\mu_C$ & $\sigma_C$  \\ \hline
+0.2&-0.3&0.4&0.3&-0.25&0.5&0.2&0.4&1&1 \\ \hline
+\end{tabular}
+\end{center}
+
+#### True Models
+
+True model for the first mediator:
+$$ln\frac{P(M1==1)}{P(M1==0)}=\beta_{01}+\beta_{11}a+\beta_{21}c$$
+$$ln\frac{P(M1==2)}{P(M1==0)}=\beta_{02}+\beta_{12}a+\beta_{22}c$$
+
+True model for the second mediator:
+$$logitE[M2|a,c]=\beta_{03}+\beta_{13}a+\beta_{23}c$$
+
+True model for the outcome:
+$$logitE[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_{21}I\{m1^*==1\}+\theta_{22}I\{m1^*==2\}+\theta_{23}m2^*+$$
+$$\theta_{31}aI\{m1^*==1\}m2^*+\theta_{32}aI\{m1^*==2\}m2^*+\theta_{41}C1+\theta_{42}C2$$
+
+### Causal Effects and Standard Errors Estimated By the Weighting-based Approach
+
+```{r warning=F,message=F}
+
+cmest(data = df_multipleM_EMMint,  outcome = "binY_catMbinM_EMMint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = c('M_cat',"M_bin"), covariates.pre = c("C_cont", "C_bin"), EMMint = TRUE, 
+                 yreg = "logistic", mreg = c("multinomial", "logistic"), mval = list(0,0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "wb")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Inverse Odds-ratio Weighting Approach 
+
+```{r warning=F,message=F}
+
+cmest(data = df_multipleM_EMMint,  outcome = "binY_catMbinM_EMMint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = c('M_cat',"M_bin"), covariates.pre = c("C_cont", "C_bin"), EMMint = TRUE, 
+                 yreg = "logistic", mreg = c("multinomial", "logistic"), mval = list(0,0),
+                 a_star = 0, a = 1, 
+                 est.method = "paramfunc", inf.method = "bootstrap", model = "iorw")
+
+```
+
+### Causal Effects and Standard Errors Estimated By the Natural Effect Model 
+
+```{r warning=F,message=F}
+cmest(data = df_multipleM_EMMint,  outcome = "binY_catMbinM_EMMint", exposure = 'A_bin', 
+                 exposure.type = "binary",
+                 mediator = c('M_cat',"M_bin"), covariates.pre = c("C_cont", "C_bin"), EMMint = TRUE, 
+                 yreg = "logistic", mreg = c("multinomial", "logistic"), mval = list(0,0),
+                 a_star = 0, a = 1, 
+                 est.method = NULL, inf.method = NULL, model = "ne")
+```
+
+# Case 9: Post-exposure Confounding
+
+## Data simulation
+
+### Simulation Procedures
+
+1. Simulate the exposure A from $Bernoulli(P(A=1))$.
+
+2. Simulate the covariate C from $N(\mu_C,\sigma_C^2)$.
+
+3. Simulate the first post-exposure confounder L1 from $Bernoulli(expit(\beta_{01}+\beta_{11}*A+\beta_{21}*C))$ 
+the second post-exposure confounder L2 from
+$Multinom(\frac{1}{1+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)+expit(\beta_{03}+\beta_{13}*A+\beta_{23}*C)},$
+
+$\frac{expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)}{1+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)+expit(\beta_{03}+\beta_{13}*A+\beta_{23}*C)},\frac{expit(\beta_{03}+\beta_{13}*A+\beta_{23}*C)}{1+expit(\beta_{02}+\beta_{12}*A+\beta_{22}*C)+expit(\beta_{03}+\beta_{13}*A+\beta_{23}*C)})$
+.
+
+4. Simulate the first mediator M1 from $Multinom$ 
+
+$(\frac{1}{1+expit(\beta_{04}+\beta_{14}*A+\beta_{24}*C+\beta_{34}*L1+\beta_{44}*I\{L2==1\}+\beta_{54}*I\{L2==2\})+expit(\beta_{05}+\beta_{15}*A+\beta_{25}*C+\beta_{35}*L1+\beta_{45}*I\{L2==1\}+\beta_{55}*I\{L2==2\})},$
+
+$\frac{expit(\beta_{04}+\beta_{14}*A+\beta_{24}*C+\beta_{34}*L1+\beta_{44}*I\{L2==1\}+\beta_{54}*I\{L2==2\})}{1+expit(\beta_{04}+\beta_{14}*A+\beta_{24}*C+\beta_{34}*L1+\beta_{44}*I\{L2==1\}+\beta_{54}*I\{L2==2\})+expit(\beta_{05}+\beta_{15}*A+\beta_{25}*C+\beta_{35}*L1+\beta_{45}*I\{L2==1\}+\beta_{55}*I\{L2==2\})}$,
+
+$\frac{expit(\beta_{05}+\beta_{15}*A+\beta_{25}*C+\beta_{35}*L1+\beta_{45}*I\{L2==1\}+\beta_{55}*I\{L2==2\})}{1+expit(\beta_{04}+\beta_{14}*A+\beta_{24}*C+\beta_{34}*L1+\beta_{44}*I\{L2==1\}+\beta_{54}*I\{L2==2\})+expit(\beta_{05}+\beta_{15}*A+\beta_{25}*C+\beta_{35}*L1+\beta_{45}*I\{L2==1\}+\beta_{55}*I\{L2==2\})})$,
+
+the second mediator M2 from $Bernoulli(expit(\beta_{06}+\beta_{16}*A+\beta_{26}*C+\beta_{36}*L1+\beta_{46}*I\{L2==1\}+\beta_{56}*I\{L2==2\}))$.
+
+5. Simulate the outcome Y from $Bernoulli(expit(\theta_0+\theta_1A+\theta_{21}I\{M1==1\}+\theta_{22}I\{M1==2\}+\theta_{23}M2+\theta_{31}AI\{M1==1\}M2+\theta_{32}AI\{M1==2\}M2+\theta_{41}C1+\theta_{42}C2+\theta_5*L1+\theta_6*I\{L2==1\}+\theta_7*I\{L2==2\}))$.
+
+### True Parameters
+
+\begin{center}
+\captionof{table}{True Model Parameters for Data Simulation}
+\begin{tabular}{l|l|l|l|l|l|l|l|l|l|l}
+\hline
+Sample Size & $\theta_0$ & $\theta_1$ & $\theta_{21}$ & $\theta_{22}$& $\theta_{23}$&
+$\theta_{31}$ & $\theta_4$ &$\theta_5$&$\theta_6$&$\theta_7$ \\ \hline
+10000&-5&0.8&1.8&1.2&1.5&0.2&0.1&0.3&0.4&0.2\\ \hline
+$\beta_{01}$ & $\beta_{11}$&
+$\beta_{21}$&$\beta_{02}$ & $\beta_{12}$ & $\beta_{22}$ &$\beta_{03}$ & $\beta_{13}$ & $\beta_{23}$ &$\beta_{04}$ & $\beta_{14}$  \\ \hline
+-0.25&0.5&0.2&-0.25&0.5&0.2&-0.3&0.4&0.3&-0.25&0.5 \\ \hline
+$\beta_{24}$ & $\beta_{34}$ & $\beta_{44}$& $\beta_{54}$ &$\beta_{05}$ & $\beta_{15}$ & $\beta_{25}$ & $\beta_{35}$ & $\beta_{45}$& $\beta_{55}$&$\beta_{06}$ \\ \hline
+0.2&0.1&0.3&0.25&-0.3&0.4&0.3&0.5&0.1&0.2&-0.25\\ \hline
+$\beta_{16}$ & $\beta_{26}$ & $\beta_{36}$ & $\beta_{46}$& $\beta_{56}$& P(A=1) & $\mu_C$ & $\sigma_C$ \\ \hline
+0.5&0.2&0.1&0.3&0.25&0.4&1&1 \\ \hline
+\end{tabular}
+\end{center}
+
+### True Models
+
+True model for the first post-exposure confounder:
+$$logitE[L1|a,c]=\beta_{01}+\beta_{11}a+\beta_{21}c$$
+
+True model for the second post-exposure confounder:
+$$ln\frac{P(L2==1)}{P(L2==0)}=\beta_{02}+\beta_{12}a+\beta_{22}c$$
+$$ln\frac{P(L2==2)}{P(L2==0)}=\beta_{03}+\beta_{13}a+\beta_{23}c$$
+
+True model for the first mediator:
+$$ln\frac{P(M1==1)}{P(M1==0)}=\beta_{04}+\beta_{14}a+\beta_{24}c+\beta_{34}l1+\beta_{44}I\{l2==1\}+\beta_{54}I\{l2==2\}$$
+$$ln\frac{P(M1==2)}{P(M1==0)}=\beta_{05}+\beta_{15}a+\beta_{25}c+\beta_{35}l1+\beta_{45}I\{l2==1\}+\beta_{55}I\{l2==2\}$$
+
+True model for the second mediator:
+$$logitE[M2|a,c]=\beta_{06}+\beta_{16}a+\beta_{26}c+\beta_{36}l1+\beta_{46}I\{l2==1\}+\beta_{56}I\{l2==2\}$$
+
+True model for the outcome:
+$$logitE[Y|a,m^*,c]=\theta_0+\theta_1a+\theta_{21}I\{m1^*==1\}+\theta_{22}I\{m1^*==2\}+\theta_{23}m2^*+$$
+$$\theta_{31}aI\{m1^*==1\}m2^*+\theta_{32}aI\{m1^*==2\}m2^*+\theta_{41}C1+\theta_{42}C2+\theta_5l1+\theta_6I\{l2==1\}+\theta_7I\{l2==2\}$$
+
+## Causal Effects and Standard Errors Estimated By the Marginal Structural Model 
+
+```{r warning=F,message=F}
+
+cmest(data = df_multipleM_EMint_postcovar,  outcome = "binY_catMbinM_EMint", 
+                 exposure = "A_bin", exposure.type = "binary",
+                 mediator = c('M_bin',"M_cat"), covariates.pre = c("C_cont", "C_bin"), 
+                 covariates.post = c("L_bin", "L_cat"),
+                 covariates.post.type = c("binary", "categorical"), 
+                 EMint = TRUE, EMint.terms = c("A*M_bin"),
+                 yreg = "logistic", mreg = c("logistic", "multinomial"), mval = list(0,0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "msm")
+
+```
+
+## Causal Effects and Standard Errors Estimated By the G-formula Approach 
+
+```{r warning=F,message=F}
+
+cmest(data = df_multipleM_EMint_postcovar,  outcome = "binY_catMbinM_EMint", 
+                 exposure = "A_bin", exposure.type = "binary",
+                 mediator = c('M_bin',"M_cat"), covariates.pre = c("C_cont", "C_bin"),  
+                 covariates.post = c("L_bin", "L_cat"),
+                 covariates.post.type = c("binary", "categorical"), 
+                 EMint = TRUE, EMint.terms = c("A*M_bin"),
+                 yreg = "logistic", mreg = c("logistic", "multinomial"), mval = list(0,0),
+                 a_star = 0, a = 1, 
+                 est.method = "imputation", inf.method = "bootstrap", model = "g-formula")
+
+```
+

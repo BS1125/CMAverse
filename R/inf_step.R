@@ -241,7 +241,7 @@ inf_step <- function(nboot, data, model,
 
       te_formula <- paste0("(", tnie_formula, ")+(", pnde_formula, ")")
 
-      pm_formula <- paste0("(", tnie_formula, ")/((", pnde_formula, ")+(", te_formula, "))")
+      pm_formula <- paste0("(", tnie_formula, ")/(", te_formula, ")")
 
       intref_formula <- paste0("(", pnde_formula, ")-(", cde_formula, ")")
 
@@ -491,7 +491,15 @@ inf_step <- function(nboot, data, model,
 
     effect_se <- apply(boots$t, 2, sd)
 
-  }
+  } else if (inference == "none") {
+
+    effect_se <- NULL
+
+  } else {
+
+    stop("Unsupported inference method")
+
+    }
 
   return(effect_se)
 

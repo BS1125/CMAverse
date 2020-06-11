@@ -1,13 +1,15 @@
-cmest <- function(data = NULL, model = "rb",
+cmest <- function(model = "rb", data = NULL,
                   outcome = NULL, event = NULL,
                   exposure = NULL, mediator = NULL, EMint = FALSE,
                   prec = NULL, postc = NULL,
                   yreg = "linear", mreg = "linear", ereg = NULL, postcreg = NULL, wmreg = NULL,
                   astar = 0, a = 1, mval = NULL, yref = NULL, precval = NULL,
                   estimation = "paramfunc", inference = "delta",
-                  nboot = 200, nrep = 5) {
+                  nboot = 200, nRep = 5, ...) {
 
   require(dplyr)
+
+  cl <- match.call()
 
   ##########################################Argument Restrictions####################################
 
@@ -233,22 +235,11 @@ cmest <- function(data = NULL, model = "rb",
 
   }
 
+  out$call <- cl
+
+  out$refs <- list(astar = astar, a = a, mval = mval, yref = yref, vecc = vecc)
+
   out$data <- data
-
-  out$model <- model
-
-  out$variables <- list(outcome = outcome, event = event,
-                     exposure = exposure, mediator = mediator,
-                     prec = prec, postc = postc)
-
-  out$reg <- list(yreg = yreg, mreg = mreg, ereg = ereg, postcreg = postcreg, wmreg = wmreg,
-                  EMint = EMint)
-
-  out$ref <- list(astar = astar, a = a, mval = mval, yref = yref, vecc = vecc)
-
-  out$method <- c(estimation = estimation, inference = inference)
-
-  if(inference == "bootstrap") out$nboot <- nboot
 
   out$regressions <- regressions
 

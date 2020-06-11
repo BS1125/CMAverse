@@ -1,0 +1,111 @@
+---
+title: 'CMA: A Suite of Functions For Causal Mediation Analysis'
+output: 
+  pdf_document:
+    fig_caption: yes
+header-includes:
+ \usepackage{float}
+ \usepackage{mdsymbol}
+ \floatplacement{figure}{H}
+ 
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.pos = 'h')
+```
+
+# Abstract
+
+In many research fields including epidemiology, social sciences and pharmaceutical research, mediation analysis is a statistical analysis approach that can help researchers in identifying the underlying causal mechanism between the exposure of interest and the outcome within a counterfactual framework. Other than a direct causal relationship between the exposure and outcome, mediation models put forward other causal pathways in which the exposure causes the outcome through a mediator and decompose the total causal effect into direct effect and indirect effect. In this paper, we firstly describe the fundamental assumptions and effect decomposition in the counterfactual framework, and then we develop an R package with visualization by DAGs, user-friendly model fitting functions, and easy-to-read output to implement the most commonly accepted mediation models such as the regression-based approach accomodating single or multiple mediators and interactions, the natural effect model and the weighting-based approach and perform a 2-way or 4 way effect decomposition. Finally, we showcase our package by several real data applications.  
+
+**Keywords:** _Causal Inference; Mediation Analysis; Effect Decomposition; Software Development; R_
+
+# Introduction
+
+# Methods
+
+## Effect Decomposition
+
+The total causal effect of an exposure on an outcome can be decomposed by a two-way decomposition or a four-way decompostion. In either decomposition, the controlled direct effect (CDE) is defined as the expected change in the outcome when the exposure was changed from $a^*$ to a and the mediator was controlled at a certain value m:
+$$CDE(m^*)=E[Y_{am^*}-Y_{a^*m^*}]$$
+
+Two-way decomposition proposes to decompose the total effect(TE) into two separate effects: a pure natrual direct effect and a total natural indirect effect. The pure natural direct effect(PNDE) is defined as the expected change in the outcome when the exposure was changed from $a^*$ to a and the mediator was controlled at a natural value it would have taken given the exposure A=$a^*$. The total natural indirect effect(TNIE) is defined as the expected change in the outcome when the exposure was controlled at a and the mediator changed from the value it would have taken at A=$a^*$ to the value it would take at A=a. We can also consider the total natural direct effect(TNDE), which is the expected change in the outcome when the exposure was changed from $a^*$ to a and the mediator was controlled at a natural value it would have taken given the exposure A=$a$, and the pure natural indirect effect(PNIE), which is the expected change in the outcome when the exposure was controlled at $a^*$ and the mediator changed from the value it would have taken at A=$a^*$ to the value it would take at A=a. These effects are given by:
+
+$$PNDE=E[Y_{aM_{a^*}}-Y_{a^*M_{a^*}}]$$
+$$TNDE=E[Y_{aM_{a}}-Y_{a^*M_{a}}]$$
+$$TNIE=E[Y_{aM_{a}}-Y_{aM_{a^*}}]$$
+$$PNIE=E[Y_{a^*M_{a}}-Y_{a^*M_{a^*}}]$$
+
+$$TE=E[Y_{a}-Y_{a^*}]=PNDE+TNIE$$
+
+Four-way decomposition decomposes the total effect into 4 parts: a controlled direct effect(CDE), a reference interaction($INT_{ref}$), a mediated interaction($INT_{med}$) and a pure indirect effect(PIE). The CDE is the same as before and the PIE here is the same as the PNIE in two-way decomposition. $INT_{ref}$ and $INT_{med}$ are defined as:
+
+$$INT_{ref}(m^*)=\sum_mE[Y_{am}-Y_{a^*m}-Y_{am^*}+Y_{a^*m^*}]I(M_{a^*}=m)$$
+
+$$INT_{med}=\sum_mE[Y_{am}-Y_{a^*m}]\{I(M_{a}=m)-I(M_{a^*}=m)\}$$
+Then, the total effect is given by:
+$$TE=CDE+INF_{ref}+INT_{med}+PIE$$
+
+It can be shown that the $INT_{ref}$ in four-way decomposition is equivalent to the difference between PNDE and CDE in two-way decomposition, i.e, $INT_{ref}$ = PNDE - CDE. $INT_{med}$ in four-way decomposition is equivalent to the difference between TNIE and PNIE in two-way decomposition, i.e, $INT_{med}$ = TNIE - PNIE.
+
+## The Counterfactual Framework and Identifiability Assumptions
+
+Let A denote the exposure of interest, Y denote the outcome of interest, M denote a single mediator that lies on a causal pathway from the exposure to the outcome and C denote a set of exposure-outcome confounders and mediator-outcome confounders, then we have the causal relationship in figure 1. $M_a$ denote the potential value of M if the exposure is set to be a, $Y_{am}$ denote the potential value of Y if the exposure is set to be a and the mediator is set to be m 
+
+```{r echo=F,warning=F,message=F,fig.width=6,fig.height=3,fig.cap="DAG with Causal Mediation. A = exposure; M = mediator; Y = outcome; C = confounders."}
+g1 <- dagitty::dagitty( "dag {
+    A -> Y
+    A -> M -> Y
+    C -> A
+    C -> M
+    C -> Y
+}")
+
+dagitty::coordinates(g1) <- list(x=c(A=0,Y=4,M=2,C=0.2),y=c(A=0,Y=0,M=-1,C=-1.5))
+
+plot(g1)
+```
+
+For these quantities to have causal interpretation, the following 4 assumptions need to be made:
+(i) no unmeasured confounding between the potential outcomes and the exposure, i.e, $Y_{am}\upvDash A|C$; (ii) no unmearsured confounding between the potential outcomes and the mediator, i.e, $Y_{am}\upvDash M|\{A,C\}$; (iii) no unmeasured confounding between the potential mediators and the exposure, i.e, $M_a\upvDash A|C$; (iv) no mediator-outcome confounders are affected by the exposure, i.e, $Y_{am}\upvDash M_{a^*}|C$. The first assumption establishes the causality between A and Y and can be assured by randomization of the exposure.
+The assumption (iv) is nonintuitive because it is a cross-world assumption and we can only observe one of the $Y_{am}$ and $M_{a^*}$
+
+## Regression-based approach
+
+exposure: continuous or binary
+
+mediator: continuous or binary
+
+outcome: continuous, binary, count, or failure time.
+
+single mediator: two-way and four-way decomposition using delta method, bootstrap and simulation-based approach.; estimate conditional NDE and NIE
+  
+multiple joint independent mediators: "Mediation Analysis with Multiple Mediators"; two-way decomposition using delta method, bootstrap and simulation-based approach; if binary or count outcome, only apply if all mediators are continuous; estimate conditional NDE and NIE
+
+## Weighting-based approach
+
+"Mediation Analysis with Multiple Mediators"
+
+single M or multiple M: two-way decomposition using bootstrap; only apply when binary exposure or discrete with only a few levels; estimate marginal NDE and NIE
+
+Any type of mediators?
+
+## natural effect model
+
+single M or multiple M; only te, nde, nie
+
+exposure: binary, categorical, continuous
+mediator: continuous, binary, count, ordinal, nominal
+outcome: continuous, binary or count(models that can be fitted with the glm function)
+
+se = "robust"
+
+## MSM
+
+For CDE: any type of outcome; A and M binary, continuous, categorical ordinal...
+
+# Software Illustration
+
+# Data Analysis
+
+# Discussions and Conclusions 

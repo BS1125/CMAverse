@@ -1,24 +1,49 @@
+t_p <- function(cmest_out) {
 
-z_p <- function(cmest_out) {
+  outcome_regression <- cmest_out$regressions$outcome_regression
 
   n <- nrow(cmest_out$data)
 
-  z <- cmest_out$effect_estimate / cmest_out$effect_se
+  if (identical(class(outcome_regression), "lm") |
+      (identical(class(outcome_regression), c("glm", "lm")) &&
+       (family(outcome_regression)$family %in% c("gaussian","Gamma","inverse.gaussian","quasi")))|
+      (identical(class(outcome_regression), c("gam", "glm", "lm")) &&
+       (family(outcome_regression)$family %in% c("gaussian","Gamma","inverse.gaussian","quasi",
+                                                 "gaulss", "gevlss")|
+        startsWith(family(outcome_regression)$family, "Tweedie")|
+        startsWith(family(outcome_regression)$family, "Beta regression")|
+        startsWith(family(outcome_regression)$family, "Scaled t")))|
+      identical(class(outcome_regression), "nls")) {
 
-  pval <- 2 * pt(-abs(z), n - 1)
+     t <- cmest_out$effect_estimate / cmest_out$effect_se
 
-  return(data.frame(z = z, pval = pval))
+  } else {
+
+    # z <- log(cmest_out$effect_estimate) / sqrt(cmest_out$effect_se ^ 2 /
+    #                                              cmest_out$effect_estimate ^ 2)
+    t <- cmest_out$effect_estimate / cmest_out$effect_se
+  }
+
+  pval <- 2 * pt(-abs(t), n - 1)
+
+  out <- data.frame(t = t, pval = pval)
+
+  colnames(out) <- c("t", "Pr(>|t|)")
+
+  return(out)
 
 }
 
 
 format_df <- function(cmest_out, conf = 0.95) {
 
+  n <- nrow(cmest_out$data)
+
   d_all <- data.frame(matrix(NA, length(cmest_out$effect_estimate), 4))
 
   alpha <- (1 - conf) / 2
 
-  z <- qnorm(1 - alpha)
+  t <- qt(1 - alpha, n - 1)
 
   label_CI <- paste0(round(conf * 100, 2), c("% CIL", "% CIU"))
 
@@ -29,14 +54,15 @@ format_df <- function(cmest_out, conf = 0.95) {
   for (name in rownames(d_all)) {
 
     d_all[name, ] <- c(unname(cmest_out$effect_estimate[name]), unname(cmest_out$effect_se[which(rownames(d_all)==name)]),
-                       unname(cmest_out$effect_estimate[name]-z*cmest_out$effect_se[which(rownames(d_all)==name)]),
-                       unname(cmest_out$effect_estimate[name]+z*cmest_out$effect_se[which(rownames(d_all)==name)]))
+                       unname(cmest_out$effect_estimate[name]-t*cmest_out$effect_se[which(rownames(d_all)==name)]),
+                       unname(cmest_out$effect_estimate[name]+t*cmest_out$effect_se[which(rownames(d_all)==name)]))
 
   }
 
-  return(cbind(d_all, z_p(cmest_out)))
+  return(cbind(d_all, t_p(cmest_out)))
 
 }
+
 
 summary.cmest <- function(cmest_out, digits = 4) {
 
@@ -48,11 +74,13 @@ summary.cmest <- function(cmest_out, digits = 4) {
 
 }
 
+
 print.summary.cmest <- function(summary.cmest, digits = 4) {
 
   printCoefmat(summary.cmest, digits = digits, has.Pvalue = TRUE)
 
 }
+
 
 print.cmsens.me <- function(cmsens_out, digits = 4) {
 
