@@ -8,11 +8,11 @@ The R package `CMAverse` provides a suite of functions conducting causal mediati
 
 ## Statistical Modeling
 
-`cmest` implements six causal mediation analysis approaches including the regression-based approach by [Valeri et al. (2013)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3659198/) and [Vanderweele et al. (2014)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/), 
-the weighting-based approach by [Vanderweele et al. (2014)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/), the inverse odd-ratio weighting 
-approach by [Tchetgen Tchetgen et al. (2013)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3954805/), the natural effect model by
-[Vansteelandt et al. (2012)](https://www.degruyter.com/view/journals/em/1/1/article-p131.xml?language=en), the marginal structural model by [VanderWeele 
-et al. (2009)](https://pubmed.ncbi.nlm.nih.gov/19234398), and the g-formula approach by [Lin et al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5285457/). 
+`cmest` implements six causal mediation analysis approaches including *the regression-based approach* by [Valeri et al. (2013)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3659198/) and [Vanderweele et al. (2014)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/), 
+*the weighting-based approach* by [Vanderweele et al. (2014)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/), *the inverse odd-ratio weighting 
+approach* by [Tchetgen Tchetgen et al. (2013)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3954805/), *the natural effect model* by
+[Vansteelandt et al. (2012)](https://www.degruyter.com/view/journals/em/1/1/article-p131.xml?language=en), *the marginal structural model* by [VanderWeele 
+et al. (2009)](https://pubmed.ncbi.nlm.nih.gov/19234398), and *the g-formula approach* by [Lin et al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5285457/). 
 
 ## Multiple Imputation
 
@@ -20,7 +20,7 @@ et al. (2009)](https://pubmed.ncbi.nlm.nih.gov/19234398), and the g-formula appr
 
 ## Sensitivity Analysis
 
-`cmsens` conducts sensitivity analysis for unmeasured confounding via the E-value approach by [Vanderweele et al. (2017)](https://pubmed.ncbi.nlm.nih.gov/28693043/) and sensitivity analysis for measurement error via the regression calibration correction by [Carroll et al. (1995)](https://www.taylorfrancis.com/books/9780429139635), the SIMEX correction by [Cook et al. (1994)](https://www.jstor.org/stable/2290994?seq=1#metadata_info_tab_contents) and the MCSIMEX correction by [Küchenhoff et al. (2006)](https://pubmed.ncbi.nlm.nih.gov/16542233/). The sensitivity analysis for measurement error is currently available for the regression-based approach and the g-formulaa approach.
+`cmsens` conducts sensitivity analysis for unmeasured confounding via *the E-value approach* by [Vanderweele et al. (2017)](https://pubmed.ncbi.nlm.nih.gov/28693043/) and sensitivity analysis for measurement error via *the regression calibration correction* by [Carroll et al. (1995)](https://www.taylorfrancis.com/books/9780429139635), *the SIMEX correction* by [Cook et al. (1994)](https://www.jstor.org/stable/2290994?seq=1#metadata_info_tab_contents) and *the MCSIMEX correction* by [Küchenhoff et al. (2006)](https://pubmed.ncbi.nlm.nih.gov/16542233/). The sensitivity analysis for measurement error is currently available for *the regression-based approach* and *the g-formulaa approach*.
 
 
 # Installation
@@ -57,9 +57,9 @@ Vansteelandt S, Bekaert M, Lange T. (2012). Imputation Strategies for the Estima
 
 Steen J, Loeys T, Moerkerke B, Vansteelandt S (2017). Medflex: an R package for flexible mediation analysis using natural effect models. Journal of Statistical Software. 76(11).
 
-Imai K, Keele L, Tingley D. A general approach to causal mediation analysis (2010). Psychological Methods. 15(4): 309 - 334.
-
 VanderWeele TJ. A unification of mediation and interaction: a 4-way decomposition (2014). Epidemiology. 25(5): 749 - 61.
+
+Imai K, Keele L, Tingley D. A general approach to causal mediation analysis (2010). Psychological Methods. 15(4): 309 - 334.
 
 Schomaker M, Heumann C. Bootstrap inference when using multiple imputation (2018). Statistics in Medicine. 37(14): 2252 - 2266.
 

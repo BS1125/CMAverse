@@ -2,187 +2,444 @@
 % Please edit documentation in R/cmest.R
 \name{cmest}
 \alias{cmest}
+\alias{print.cmest}
+\alias{summary.cmest}
+\alias{print.summary.cmest}
+\alias{plot.cmest}
 \title{Causal Mediation Analysis}
-
 \usage{
-cmest(model, data, outcome, event, exposure,
-mediator, EMint = FALSE, prec, postc,
-yreg, mreg, ereg, postcreg, wmnomreg, wmdenomreg,
-astar = 0, a = 1, mval, yref = 1, precval,
-estimation = "imputation", inference = "bootstrap",
-nboot = 200, nRep = 5, ...)
-}
+cmest(
+  data = NULL,
+  model = NULL,
+  full = TRUE,
+  casecontrol = FALSE,
+  yrare = NULL,
+  yprevalence = NULL,
+  estimation = "imputation",
+  inference = "bootstrap",
+  outcome = NULL,
+  event = NULL,
+  exposure = NULL,
+  mediator = NULL,
+  EMint = NULL,
+  prec = NULL,
+  postc = NULL,
+  yreg = NULL,
+  mreg = NULL,
+  wmreg = NULL,
+  ereg = NULL,
+  postcreg = NULL,
+  astar = 0,
+  a = 1,
+  mval = NULL,
+  yref = NULL,
+  precval = NULL,
+  nboot = 200,
+  multimp = FALSE,
+  ...
+)
 
+\method{print}{cmest}(cmest)
+
+\method{summary}{cmest}(cmest)
+
+\method{print}{summary.cmest}(summary.cmest, digits = 4)
+
+\method{plot}{cmest}(cmest)
+}
 \arguments{
+\item{data}{data set for causal mediation analysis.}
 
-\item{model}{the causal mediation analysis approach. \code{rb}, \code{wb}, \code{iorw}, \code{msm}, \code{gformula}, \code{ne} are implemented:
-\itemize{
-\item{"\code{rb}": }{the regression-based approach by Valeri et al. (2013) and VanderWeele et al. (2014)}
-\item{"\code{wb}": }{the weighting-based approach by VanderWeele et al. (2014)}
-\item{"\code{iorw}": }{the inverse odd-ratio weighting approach by Tchetgen Tchetgen et al. (2013)}
-\item{"\code{msm}": }{the marginal structural models by VanderWeele et al. (2009)}
-\item{"\code{gformula}": }{the g-formula approach by Lin et al. (2017)}
-\item{"\code{ne}": }{the natural effect model implemented by \link[medflex]{neModel}, Steen et al. (2017)}
+\item{model}{causal mediation analysis approach. "\code{rb}", "\code{wb}", "\code{iorw}", 
+"\code{ne}", "\code{msm}", "\code{gformula}" are implemented. See \code{Details-Causal 
+Mediation Analysis Approaches}.}
+
+\item{full}{a logical value (used when model is not \code{iorw}). If \code{TRUE}, output a 
+full list of causal effects; if \code{FALSE}, output a reduced list of causal effects. Default 
+is \code{TRUE}. See \code{Details-Estimated Causal Effects}.}
+
+\item{casecontrol}{a logical value. \code{TRUE} indicates a case control study. When \code{TRUE},
+either set \code{yrare} to be \code{TRUE} or provide \code{yprevalence}. Default is \code{FALSE}.}
+
+\item{yrare}{a logical value (used when casecontrol is \code{TRUE}). \code{TRUE} 
+indicates the outcome is rare.}
+
+\item{yprevalence}{the prevalence of the outcome (used when casecontrol is \code{TRUE})}
+
+\item{estimation}{estimation method for causal effects. \code{paramfunc} and 
+\code{imputation} are implemented (the first 4 letters are enough). Default is \code{imputation}. 
+See \code{Details-Estimation Methods}.}
+
+\item{inference}{inference method for causal effects. \code{delta} and \code{bootstrap} are 
+implemented (the first 4 letters are enough). Default is \code{bootstrap}. See 
+\code{Details-Inference Methods}.}
+
+\item{outcome}{the variable name of the outcome.}
+
+\item{event}{the variable name of the event (used when \code{yreg} is \code{coxph}, \code{aft_exp},
+or \code{aft_weibull}).}
+
+\item{exposure}{the variable name of the exposure.}
+
+\item{mediator}{a vector of variable name(s) of the mediator(s).}
+
+\item{EMint}{a logical value (used and required when \code{yreg} is character). If \code{TRUE}, the 
+outcome regression formula includes the interaction(s) between the exposure and each of the 
+mediator(s). Default is \code{FALSE}.}
+
+\item{prec}{a vector of variable name(s) of the pre-exposure confounder(s)}
+
+\item{postc}{a vector of variable name(s) of the post-exposure confounder(s). If not \code{NULL}, 
+\code{model} can only be \code{msm} or \code{gformula}.}
+
+\item{yreg}{outcome regression. See \code{Details-Regressions}.}
+
+\item{mreg}{a list of regression(s) specifying a regression model for each of the 
+mediator(s) and following the same variable order as in \code{mediator} (used and required when 
+\code{model} is \code{rb}, \code{msm} or \code{gformula}). See \code{Details-Regressions}.}
+
+\item{wmreg}{a list of regression(s) specifying a regression model for weights with 
+respect to each of the mediator(s) and following the same variable order as in \code{mediator} 
+(used and required when \code{model} is \code{msm}). See \code{Details-Regressions}.}
+
+\item{ereg}{exposure regression for weights with respect to the exposure (used and required 
+when \code{model} is \code{wb} or \code{msm} with \code{length(prec)} != 0 or when \code{model} 
+is \code{iorw}). See \code{Details-Regressions}.}
+
+\item{postcreg}{a list of regression(s) specifying a regression model for each of the 
+post-expossure confounder(s) and following the same variable order in \code{postc} (used and 
+required when \code{model} is \code{gformula} and \code{length(postc)} != 0). See 
+\code{Details-Regressions}.}
+
+\item{astar}{the first reference value for the exposure. Default is \code{0}.}
+
+\item{a}{the second reference value for the exposure. Default is \code{1}.}
+
+\item{mval}{a list of reference value(s) for the mediator(s) (used and required when \code{model} 
+is \code{rb}, \code{wb}, \code{ne}, \code{msm} or \code{gformula}).}
+
+\item{yref}{reference value for the outcome (used when the outcome is categorical).}
+
+\item{precval}{a list of values specifying a value for each of the pre-exposure confounders 
+conditional on which conditional causal effects are estimated and following the same variable 
+order as in \code{prec} (used when \code{model} is \code{rb} and \code{estimation} is 
+\code{paramfunc}). If \code{NULL}, mean values of the pre-exposure confounders are used.}
+
+\item{nboot}{the number of boots applied (used and required when \code{inference} is 
+\code{bootstrap}). Default is 200.}
+
+\item{multimp}{a logical value (used when \code{data} contains missing values). If \code{TRUE},
+conduct multiple imputation using the \code{mice} package. Default is \code{FALSE}.}
+
+\item{...}{Additional arguments passed to the \link[mice]{mice} function. See \link[mice]{mice}
+for details.}
 }
-}
-
-\item{data}{data for causal mediation analysis}
-
-\item{outcome}{the variable name of the outcome}
-
-\item{event}{applicable and required when \code{yreg} is \code{coxph}, \code{aft_exp}, or \code{aft_weibull}. The variable name of the event}
-
-\item{exposure}{the variable name of the exposure}
-
-\item{mediator}{a character or vector of variable name(s) of the mediator(s)}
-
-\item{EMint}{a logical value applicable and required when \code{yreg} is character. If \code{TRUE}, the outcome regression formula includes the interaction(s) between the exposure and each of the mediator(s). Default is \code{FALSE}.}
-
-\item{prec}{a character or vector of variable name(s) of the pre-exposure confounder(s)}
-
-\item{postc}{a character or vector of variable name(s) of the post-exposure confounder(s). If not \code{NULL}, \code{model} can only be \code{msm} or \code{gformula}}
-
-\item{yreg}{outcome regression. Can be a user-defined regression object or a character specifying the regression name. See \code{details} for more information about supported values.}
-
-\item{mreg}{applicable and required when \code{model} is \code{rb}, \code{msm} or \code{gformula}. A list of mediator regression(s) with a length of \code{length(mediator)} and following the same mediator order in \code{mediator}. Each element can be a user-defined regression object or a character specifying the regression name. See \code{details} for more information about supported values.}
-
-\item{ereg}{applicable when \code{model} is \code{wb}, \code{iorw} or \code{msm}. Exposure regression for calculating weights which is set to be \code{NULL} when exposure weighting is not applied and set to be a user-defined regression object or a character specifying the regression name when exposure weighting is applied. See \code{details} for more information about supported values.}
-
-\item{postreg}{applicable and required when \code{model} is \code{gformula} and \code{postc} is not empty. A list of post-exposure confounder regression(s) with a length of \code{length(postc)} and following the same mediator order in \code{postc}. Can be a user-defined regression object or a character specifying the regression name. See \code{details} for more information about supported values.}
-
-\item{wmnomreg}{applicable when \code{model} is \code{msm}. A list of mediator regressions for calculating nominators of weights for each mediator with a length of \code{length(mediator)} and following the same mediator order in \code{mediator}. Each element can be \code{NULL}, a user-defined regression object or a character specifying the regression name. See \code{details} for more information about supported values.}
-
-\item{wmdenomreg}{applicable when \code{model} is \code{msm}. A list of mediator regressions for calculating denominators of weights for each mediator with a length of \code{length(mediator)} and following the same mediator order in \code{mediator}. Each element can be \code{NULL}, a user-defined regression object or a character specifying the regression name. See \code{details} for more information about supported values.}
-
-\item{astar, a}{reference values for the exposure. Default for \code{astar} is \code{0} and default for \code{a} is \code{1}.}
-
-\item{mval}{applicable and required when \code{model} is \code{rb}, \code{wb}, \code{msm} or \code{gformula}. A list of reference value(s) for the mediator(s)}
-
-\item{yref}{applicable and required when the outcome is categorical with more than three levels. Default is 1.}
-
-\item{precval}{applicable when \code{model} is \code{rb} and \code{estimation} is \code{paramfunc}. When \code{NULL}, set to be sample means of \code{prec}.}
-
-\item{estimation}{applicable and required when \code{model} is not \code{ne}. Estimation method for causal effects. \code{paramfunc} and \code{imputation} are implemented. See \code{details} for more information. Default is \code{imputation}.
-\itemize{
-\item{"\code{paramfunc}": }{closed-form parameter function estimation}
-\item{"\code{imputation}": }{direct counterfactual imputation estimation}
-}}
-
-\item{inference}{applicable and required when \code{model} is not \code{ne}. Inference method for causal effects. \code{delta} and \code{bootstrap} are implemented. See \code{details} for more information. Default is \code{bootstrap}.
-\itemize{
-\item{"\code{delta}": }{delta method}
-\item{"\code{bootstrap}": }{bootstrapping}
-}}
-
-\item{nboot}{applicable and required when \code{inference} is \code{bootstrap}. The number of boots applied. Default is 200.}
-
-\item{nRep}{applicable when \code{model} is \code{ne}. Number of replications or hypothetical values of the exposure to sample for each observation unit. See \link[meflex]{neImpute.default} for details. Default is \code{5}.}
-
-\item{...}{applicable when \code{model} is \code{ne}. Additional arguments passed to \code{neModel()}. See \link[meflex]{neModel} for details.}
-}
-
 \value{
-
-\code{cmest} returns an object of class "cmest" which contains:
-
-\item{effect_estimate}{the point estimates of causal effects,}
-\item{effect_se}{the standard errors of causal effects,}
+An object of class 'cmest' is returned:
 \item{call}{the function call,}
-\item{refs}{a list of the reference values applied containing:
-\itemize{
-\item{"\code{astar and a}": }{reference values for the exposure}
-\item{"\code{mval}": }{a list of reference value(s) for the mediator(s)}
-\item{"\code{yref}": }{reference value for the categorical outcome}
-\item{"\code{vecc}": }{a vector of pre-exposure confounder values used for
-closed-form parameter function estimation for \code{rb}}
-}}
-\item{data}{the data set,}
-\item{regressions}{the regressions used,}
-...}
-
+\item{data}{the dataset,}
+\item{methods}{a list of methods used which may include \code{model}, \code{full}, 
+\code{casecontrol}, \code{yprevalence}, \code{yrare}, \code{estimation}, \code{inference}, 
+\code{nboot},}
+\item{variables}{a list of variables used which may include \code{outcome}, \code{event}, 
+\code{exposure}, \code{mediator}, \code{EMint}, \code{prec}, \code{postc},}
+\item{reg.input}{a list of regressions input,}
+\item{multimp}{a list of arguments used for multiple imputation,}
+\item{ref}{reference values used,}
+\item{reg.output}{a list of regressions used,}
+\item{effect.pe}{point estimates of causal effects,}
+\item{effect.se}{standard errors of causal effects,}
+\item{effect.ci.low}{the lower limits of confidence intervals of causal effects,}
+\item{effect.ci.high}{the higher limits of confidence intervals of causal effects,}
+\item{effect.pe}{point estimates of causal effects,}
+\item{effect.pval}{p-values of causal effects,}
+...
+}
 \description{
-Implementation of 6 causal mediation analysis approaches including the regression-based approach by Valeri et al. (2013) and VanderWeele et al. (2014), the weighting-based approach by VanderWeele et al. (2014), the inverse odd-ratio weighting approach by Tchetgen Tchetgen et al. (2013), the marginal structural models by VanderWeele et al. (2009), the g-formula approach by Lin et al. (2017) and the natural effect model implemented by \link[medflex]{neModel}, Steen et al. (2017).
+\code{cmest} is used to conduct causal mediation analysis via six statistical approaches 
+including \emph{the regression-based approach} by Valeri et al. (2013) and VanderWeele 
+et al. (2014), \emph{the weighting-based approach} by VanderWeele et al. (2014), 
+\emph{the inverse odd-ratio weighting approach} by Tchetgen Tchetgen et al. (2013), 
+\emph{the natural effect model} by Vansteelandt et al. (2012), \emph{the marginal structural 
+model} by VanderWeele et al. (2009), and \emph{the g-formula approach} by Lin et al. (2017).
 }
-
 \details{
+\strong{Causal Mediation Analysis Approaches}
 
-\title{\strong{Supported Values For Regs}}
+  \itemize{
+    \item{\code{rb}: }{\emph{the regression-based approach} by Valeri et al. (2013) and
+      VanderWeele et al. (2014). }
+    \item{\code{wb}: }{\emph{the weighting-based approach} by VanderWeele et al. (2014)}
+    \item{\code{iorw}: }{\emph{the inverse odd-ratio weighting approach} by
+      Tchetgen Tchetgen et al. (2013)}
+    \item{\code{ne}: }{\emph{the natural effect model} by Vansteelandt et al. (2012). }  
+    \item{\code{msm}: }{\emph{the marginal structural model} by VanderWeele et al. (2009)}
+    \item{\code{gformula}: }{\emph{the g-formula approach} by Lin et al. (2017)}
+  }
+  
+  When there exist post-exposure confounders, i.e. \code{postc} is not empty, \code{msm} 
+  and \code{gformula} can be used but \code{rb}, \code{wb}, \code{iorw} and \code{ne} can't be 
+  used.
+  
+  To use \code{wb} and \code{msm} when \code{prec} is not empty, the exposure must be 
+  categorical; to use \code{iorw}, the exposure must be categorical; to use \code{msm}, the 
+  mediator(s) must be categorical.
 
-\code{cmest} supports the following user-defined regression objects and characters specifying the regression name:
+\strong{Regressions}
+
+Each regression model in \code{yreg}, \code{mreg}, \code{wmreg}, \code{ereg} and \code{postcreg} 
+can be specified by a user-defined regression object or the character name of a regression. 
+
+\emph{The Supported Character Name of A Regression}
+
 \itemize{
-\item{"\code{linear}": }{simple linear regression fitted by \link{lm}}
-\item{"\code{logistic}": }{logistic regression fitted by \link{glm} with \code{family=binomial()}}
-\item{"\code{loglinear}": }{log-linear regression fitted by \link{glm} with \code{family=binomial("log")}}
-\item{"\code{poisson}": }{poisson regression fitted by \link{glm} with \code{family=poisson()}}
-\item{"\code{quasipoisson}": }{quasi-poisson regression fitted by \link{glm} with \code{family=quasipoisson()}}
-\item{"\code{negbin}": }{negative binomial regression fitted by \link{glm.nb}}
-\item{"\code{multinomial}": }{multinomial regression fitted by \link[nnet]{multinom}}
-\item{"\code{ordinal}": }{proportional odds logistic regression fitted by \link[MASS]{polr}}
-\item{"\code{coxph}": }{proportional hazards regression fitted by \link[survival]{coxph}}
-\item{"\code{aft_exp}": }{parametric survival regression fitted by \link[survival]{survreg} with \code{dist="exponential"}}
-\item{"\code{aft_weibull}": }{parametric survival regression fitted by \link[survival]{survreg} with \code{dist="weibull"}}
-\item{\code{user-defined regression objects}: }{regression objects fitted by \link{lm}, \link{glm}, \link{glm.nb}, \link[mgcv]{gam}, \link[nnet]{multinom}, \link[MASS]{polr}, \link[survival]{survreg}, \link[survival]{coxph}}
+\item{"\code{linear}": }{linear regression fitted by \link{glm()} with \code{family = gaussian()}}
+\item{"\code{logistic}": }{logistic regression fitted by \link{glm()} with \code{family = logit()}}
+\item{"\code{loglinear}": }{log linear regression fitted by \link{glm()} with 
+\code{family = poisson()} for a binary response}
+\item{"\code{poisson}": }{poisson regression fitted by \link{glm()} with 
+\code{family = poisson()} for a count response}
+\item{"\code{quasipoisson}": }{quasipoisson regression fitted by \link{glm()} with 
+\code{family = quasipoisson()}}
+\item{"\code{negbin}": }{negative binomial regression fitted by \link[MASS]{glm.nb()}}
+\item{"\code{multinomial}": }{multinomial regression fitted by \link[nnet]{multinom()}}
+\item{"\code{ordinal}": }{ordered logistic regression fitted by \link[MASS]{polr()}}
+\item{"\code{coxph}": }{cox proportional hazard regression fitted by \link[survival]{coxph()}}
+\item{"\code{aft_exp}": }{accelerated failure time model fitted by \link[survival]{survreg()}
+with \code{dist = "exponential"}}
+\item{"\code{aft_weibull}": }{accelerated failure time model fitted by \link[survival]{polr()}
+with \code{dist = "weibull"}}
+}
+\code{coxph}, \code{aft_exp} and \code{aft_weibull} are currently not implemented for 
+\code{mreg}, \code{wmreg}, \code{ereg} and \code{postcreg}.
+
+\emph{The User-defined Regression Object} 
+
+A user-defined regression object can be fitted by \link{lm}, \link{glm}, \link{glm.nb}, 
+\link[mgcv]{gam}, \link[nnet]{multinom}, \link[MASS]{polr}, \link[survival]{coxph} and
+\link[survival]{survreg}. Objects fitted by \link[survival]{coxph} and \link[survival]{survreg} 
+are currently not supported for \code{mreg}, \code{wmreg}, \code{ereg} and \code{postcreg}.
+
+Let \code{Y} denote the outcome, \code{A} denote the exposure, \code{M} denote the mediator(s),
+\code{C} denote the pre-exposure confounder(s), \code{L} denote the post-exposure confounder(s).
+
+If \code{model = "rb" or "wb"}, \code{yreg} should regress \code{Y} on \code{A},
+\code{M} and \code{C}. If \code{model = "ne"}, \code{yreg} should also regress \code{Y} on 
+\code{A}, \code{M} and \code{C} but the variables in the formula of \code{yreg} should follow 
+the order of \code{A}, \code{M} and \code{C}, i.e., the first 
+variable needs to point to the exposure, the variable(s) right after the exposure need to 
+point to the mediator(s), e.g. \eqn{Y ~ A + M[1] + M[2] + A*M[1] + A*M[2] + C}. If 
+\code{model = "iorw"}, \code{yreg} should regress \code{Y} on \code{A} and \code{C}. If 
+\code{model = "msm"}, \code{yreg} should regress \code{Y} on \code{A} and \code{M}. If 
+\code{model = "gformula"}, \code{yreg} should regress \code{Y} on \code{A}, \code{M}, \code{C}, 
+\code{L}.  
+
+When \code{model = "rb"}, \code{mreg[[p]]} should regress \code{M[p]} on \code{A}, \code{M[1]}, 
+..., \code{M[p - 1]} and \code{C}. When \code{model = "gformula"}, \code{mreg[[p]]} should 
+regress \code{M[p]} on \code{A}, \code{M[1]}, ..., \code{M[p - 1]}, \code{C} and \code{L}. 
+When \code{model = "msm"}, \code{mreg[[p]]} should regress \code{M[p]} on \code{A}, 
+\code{M[1]}, ..., and \code{M[p - 1]}. Otherwise, \code{mreg} is ignored.
+
+\code{wmreg} is ignored when \code{model != "msm"}. When \code{model = "msm"}, \code{wmreg[[p]]} 
+should regress \code{M[p]} on \code{A}, \code{M[1]}, ..., \code{M[p - 1]}, \code{C} and \code{L}.
+
+When \code{model = "msm" or "wb"} with \code{length(prec) != 0}, \code{ereg} should regress
+\code{A} on \code{C}. When \code{model = "iorw"}, \code{ereg} should regress \code{A} on 
+\code{M} and \code{C}. Otherwise, \code{ereg} is ignored.
+
+When \code{model = "gformula"} with \code{length(postc) != 0}, \code{postcreg[[p]]} should 
+regress \code{L[p]} on \code{A}, \code{L[1]}, ..., \code{L[p - 1]} and \code{C}. Otherwise, 
+\code{postcreg} is ignored. 
+
+\strong{Estimation Methods} 
+  
+\itemize{
+\item{"\code{paramfunc}": }{closed-form parameter function estimation (only available when 
+\code{model = "rb"} with \code{length(mediator) = 1} and \code{yreg} and \code{mreg} are 
+specified by the character name of the regression). The point estimate of each causal 
+effect is obtained by its closed-form formula of regression coefficients.}
+\item{"\code{imputation}": }{direct counterfactual imputation estimation. The point estimate 
+of each causal effect is calculated by imputed counterfactuals.}
 }
 
-All values above are supported for \code{yreg}. For \code{mreg} and \code{postcreg}, \code{coxph}, \code{aft_exp}, \code{aft_weibull}, regression objects fitted by \code{survreg()} and \code{coxph()} are not supported.
+\strong{Inference Methods}
 
-Let \code{Y} denote \code{otucome}, \code{A} denote \code{exposure}, \code{M} denote \code{mediator}, \code{C} denote \code{prec}, \code{L} denote \code{postc}.
+\itemize{
+\item{"\code{delta}": }{delta method (only available when \code{estimation = "paramfunc"}). 
+The standard errors of causal effects are obtained by the delta method. The confidence 
+intervals of causal effects are obtained by normal distribution approximation.}
+\item{"\code{bootstrap}": }{bootstrapping. The standard errors of causal effects are 
+obtained by the standard deviations of bootstrapped results. The confidence intervals of 
+causal effects are obtained by percentiles of bootstrapped results.}
+}  
 
-\code{model="wb"} applies only when the exposure is categorical; when \code{prec} is empty, \code{ereg} is \code{NULL}, otherwise a non-null \code{ereg} is required for calculating weights and the weights are calculated by \code{P(A=a)/P(A=a|C=C_i)}. Thus, \code{ereg} for \code{model="wb"} can be \code{NULL}, \code{logistic}, \code{loglinear}, \code{multinomial}, \code{ordinal} or a user-defined regression object for categorical responses.
+\strong{Estimated Causal Effects}
 
-\code{model="iorw"} applies only when the exposure is categorical and \code{ereg} is required for calculating weights, in which the weights are calculated by \code{P(A=0|M=M_i,C=C_i)/P(A=A_i|M=M_i,C=C_i)}. Thus, \code{ereg} for \code{model="iorw"} can be \code{logistic}, \code{loglinear}, \code{multinomial}, \code{ordinal} or a user-defined regression object for categorical responses.
+When there are multiple mediators, the joint effect of them is studied.
 
-For \code{model="msm"}, when \code{prec} is empty, \code{ereg} is \code{NULL}, otherwise \code{ereg} is required for calculating weights in which the weight for subject \code{i} for \code{A} is calculated by \code{P(A=A_i)/P(A=A_i|C=C_i)} and only categorical exposure is supported; for \code{p=1,...,length(mediator)}, weight for subject \code{i} for \code{mediator[p]} is calculated by \code{P(M_p=M_{p,i}|A=A_i)/P(M_p=M_{p,i}|A=A_i,
-C=C_i,L=L_i,M_1=M_{1,i},...,M_{p-1}=M_{p-1,i})}; when the nominator is the same as the denominator in the weight for subject \code{i} for \code{mediator[p]}, \code{wmnomreg[p]} and \code{wmdenomreg[p]} can be \code{NULL}, otherwise non-null \code{wmnomreg[p]} and \code{wmdenomreg[p]} are required and only categorical \code{mediator[p]} is supported. Thus, \code{ereg}, \code{wmnomreg[p]} and \code{wmdenomreg[p]} for \code{model="msm"} can be \code{NULL}, \code{logistic}, \code{loglinear}, \code{multinomial}, \code{ordinal} or a user-defined regression object for categorical responses.
+For a continuous outcome, the causal effects on the difference scale are estimated. For a 
+categorical, count or survival outcome, the causal effects on the ratio scale are estimated.
 
-\title{\strong{Supported \code{estimation} and \code{inference} for each \code{model}}}
+\emph{Continuous Outcome}
 
-\code{paramfunc} is supported only when \code{model} is \code{rb} or \code{iorw}.
+When \code{model = "rb", "wb", "ne", "msm" or "gformula"} with \code{length(postc) = 0} and 
+\code{full = TRUE}, \code{cde} (controlled direct effect), \code{pnde} (pure natural direct 
+effect), \code{tnde} (total natural direct effect), \code{pnie} (pure natural indirect effect), 
+\code{tnie} (total natural indirect effect), \code{te} (total effect), \code{pm} (proportion 
+mediated), \code{intref} (reference interaction), \code{intmed} (mediated interaction), 
+\code{pie} (pure indirect effect), \code{cde(prop)} (proportion \code{cde}), \code{intref(prop)} 
+(proportion \code{intref}), \code{intmed(prop)} (proportion \code{intmed}), \code{pie(prop)} 
+(proportion \code{pie}), \code{pm(overall)} (overall proportion mediated), \code{int(overall)} 
+(overall proportion attributable to interaction) and \code{pe(overall)} (overall proportion 
+eliminated) are estimated. 
 
-\code{delta} is supported only when \code{model} is \code{rb} and \code{estimation} is \code{paramfunc}.
+When \code{model = "rb", "wb", "ne", "msm" or "gformula"} with \code{length(postc) = 0} and
+\code{full = FALSE}, \code{cde}, \code{pnde}, \code{tnde}, \code{pnie}, \code{tnie} and 
+\code{te} are estimated.
 
-\code{bootstrap} and \code{imputation} are supported by all of \code{rb}, \code{wb}, \code{iorw}, \code{msm}, \code{gformula}.
+When \code{model = "msm" or "gformula"} with \code{length(postc) != 0} and \code{full = TRUE}, 
+\code{pnde}, \code{tnde}, \code{pnie}, \code{tnie},  \code{pm}, \code{intref}, \code{intmed}, 
+\code{pie}, \code{intref(prop)}, \code{intmed(prop)}, \code{pie(prop)}, \code{pm(overall)}, 
+\code{int(overall)} and \code{pe(overall)} are replaced by their randomized analogues
+\code{rpnde}, \code{rtnde}, \code{rpnie}, \code{rtnie}, \code{rpm}, \code{rintref}, 
+\code{rintmed}, \code{rpie}, \code{rintref(prop)}, \code{rintmed(prop)}, 
+\code{rpie(prop)}, \code{rpm(overall)}, \code{rint(overall)} and \code{rpe(overall)}.
 
+When \code{model = "msm" or "gformula"} with \code{length(postc) != 0} and
+\code{full = FALSE}, \code{cde}, \code{rpnde}, \code{rtnde}, \code{rpnie}, \code{rtnie} and 
+\code{te} are estimated.
 
+When \code{model = "iorw"}, \code{tot} (total effect), \code{dir} (direct effect) and \code{ind} 
+(indirect effect) are estimated.  
+
+\emph{Categorical, Count or Survival Outcome}
+
+When \code{model = "rb", "wb", "ne", "msm" or "gformula"} with \code{length(postc) = 0} and 
+\code{full = TRUE}, \code{RRcde} (\code{cde} risk rario or rate ratio), \code{RRpnde} 
+(\code{pnde} risk rario or rate ratio), \code{RRtnde} (\code{tnde} risk rario or rate ratio), 
+\code{RRpnie} (\code{pnie} risk rario or rate ratio), \code{RRtnie} (\code{tnie} risk rario 
+or rate ratio), \code{RRte} (\code{te} risk rario or rate ratio), \code{pm}, \code{ERRcde} 
+(excess risk rario or rate ratio due to \code{cde}), \code{ERRintref} (excess risk rario or 
+rate ratio due to \code{intref}), \code{ERRintmed} (excess risk rario or rate ratio due to 
+\code{intmed}), \code{ERRpie} (excess risk rario or rate ratio due to \code{pie}), 
+\code{ERRcde(prop)} (proportion \code{ERRcde}), \code{ERRintref(prop)} (proportion 
+\code{ERRintref}), \code{ERRintmed(prop)} (proportion \code{ERRintmed}), \code{ERRpie(prop)} 
+(proportion \code{ERRpie}), \code{pm(overall)} (overall proportion mediated), 
+\code{int(overall)} (overall proportion attributable to interaction) and \code{pe(overall)} 
+(overall proportion eliminated) are estimated. 
+
+When \code{model = "rb", "wb", "ne", "msm" or "gformula"} with \code{length(postc) = 0} and
+\code{full = FALSE}, \code{RRcde}, \code{RRpnde}, \code{RRtnde}, \code{RRpnie}, \code{RRtnie} 
+and \code{RRte} are estimated.
+
+When \code{model = "msm" or "gformula"} with \code{length(postc) != 0} and \code{full = TRUE}, 
+\code{RRpnde}, \code{RRtnde}, \code{RRpnie}, \code{RRtnie},  \code{pm}, \code{ERRintref}, 
+\code{ERRintmed}, \code{ERRpie}, \code{ERRintref(prop)}, \code{ERRintmed(prop)}, 
+\code{ERRpie(prop)}, \code{pm(overall)}, \code{int(overall)} and \code{pe(overall)} are 
+replaced by their randomized analogues \code{rRRpnde}, \code{rRRtnde}, \code{rRRpnie}, 
+\code{rRRtnie}, \code{rpm}, \code{rERRintref}, \code{rERRintmed}, \code{rERRpie}, 
+\code{rERRintref(prop)}, \code{rERRintmed(prop)}, \code{rERRpie(prop)}, \code{rpm(overall)}, 
+\code{rint(overall)} and \code{rpe(overall)}.
+
+When \code{model = "msm" or "gformula"} with \code{length(postc) != 0} and
+\code{full = FALSE}, \code{RRcde}, \code{rRRpnde}, \code{rRRtnde}, \code{rRRpnie}, 
+\code{rRRtnie} and \code{RRte} are estimated.
+
+When \code{model = "iorw"}, \code{RRtot} (total effect risk ratio or rate ratio), \code{RRdir} 
+(direct effect risk ratio or rate ratio) and \code{RRind} (indirect effect risk ratio or rate 
+ratio) are estimated.
 }
-
 \section{Methods (by generic)}{
 \itemize{
-\item \code{summary}: Summary of causal effects
+\item \code{print}: Print the results of cmest nicely
 
-\item \code{print}: Print causal effects
+\item \code{summary}: Summarize the results of cmest nicely
+
+\item \code{print}: Print the summary of cmest nicely
+
+\item \code{plot}: Plot the results of cmest with \link[ggplot2]{ggplot}
 }}
 
-
-
 \examples{
+# single-mediator case with rb
+exp1 <- cmest(data = cma2020, model = "rb", outcome = "contY", 
+exposure = "A", mediator = "M2", prec = c("C1", "C2"), 
+EMint = TRUE, mreg = list("multinomial"), yreg = "linear", 
+astar = 0, a = 1, mval = list("M2_0"), estimation = "paramfunc", 
+inference = "delta")
+summary(exp1)
+plot(exp1) +
+theme(axis.text.x = element_text(angle = 45))
+
+# multiple-mediator case with rb
+exp2 <- cmest(data = cma2020, model = "rb", outcome = "contY", 
+exposure = "A", mediator = c("M1", "M2"), prec = c("C1", "C2"), 
+EMint = TRUE, mreg = list("logistic", "multinomial"), 
+yreg = "linear", astar = 0, a = 1, mval = list(0, "M2_0"), 
+estimation = "imputation", inference = "bootstrap", nboot = 100)
+
+# multiple-mediator case with ne
+exp3 <- cmest(data = cma2020, model = "ne", outcome = "contY", 
+exposure = "A", mediator = c("M1", "M2"), prec = c("C1", "C2"), 
+yreg = lm(Y ~ A + M1 + M2 + A*M1 + A*M2 + C1 + C2, data = cma2020), 
+astar = 0, a = 1, mval = list(0, "M2_0"), estimation = "imputation", 
+inference = "bootstrap", nboot = 100)
+
+# case control study with msm
+exp4 <- cmest(data = cma2020, model = "msm", casecontrol = TRUE, 
+yrare = TRUE, outcome = "binY", exposure = "A", 
+mediator = c("M1", "M2"), prec = c("C1", "C2"), yreg = "logistic", 
+ereg = "logistic", mreg = list(glm(M1 ~ A, family = binomial, 
+data = cma2020), multinom(M2 ~ A + M1, data = cma2020)), 
+wmreg = list(glm(M1 ~ A + C1 + C2, family = binomial, data = cma2020), 
+multinom(M2 ~ A + M1 + C1 + C2, data = cma2020)), astar = 0, a = 1, 
+mval = list(0, "M2_0"), estimation = "imputation", 
+inference = "bootstrap", nboot = 100)
+
 
 }
-
 \references{
+Valeri L, Vanderweele TJ (2013). Mediation analysis allowing for
+exposure-mediator interactions and causal interpretation: theoretical assumptions and
+implementation with SAS and SPSS macros. Psychological Methods. 18(2): 137 - 150.
 
-Valeri L, Vanderweele TJ (2013). Mediation analysis allowing for exposure-mediator interactions and causal interpretation: theoretical assumptions and implementation with SAS and SPSS macros. Psychological Methods. 18(2): 137 - 150.
+VanderWeele TJ, Vansteelandt S (2014). Mediation analysis with multiple mediators.
+Epidemiologic Methods. 2(1): 95 - 115.
 
-VanderWeele TJ, Vansteelandt S (2014). Mediation analysis with multiple mediators. Epidemiologic Methods. 2(1): 95 - 115.
+Tchetgen Tchetgen EJ (2013). Inverse odds ratio-weighted estimation for causal
+mediation analysis. Statistics in medicine. 32: 4567 - 4580.
 
-Tchetgen Tchetgen EJ (2013). Inverse odds ratio-weighted estimation for causal mediation analysis. Statistics in medicine. 32: 4567 - 4580.
+Nguyen QC, Osypuk TL, Schmidt NM, Glymour MM, Tchetgen Tchetgen EJ. Practical guidance
+for conducting mediation analysis with multiple mediators using inverse odds ratio
+weighting (2015). American Journal of Epidemiology. 181(5): 349 - 356.
 
-Nguyen QC, Osypuk TL, Schmidt NM, Glymour MM, Tchetgen Tchetgen EJ. Practical guidance for conducting mediation analysis with multiple mediators using inverse odds ratio weighting (2015). American Journal of Epidemiology. 181(5): 349 - 356.
+VanderWeele TJ. Marginal structural models for the estimation of direct and indirect
+effects (2009). Epidemiology. 20(1): 18 - 26.
 
-VanderWeele TJ. Marginal structural models for the estimation of direct and indirect effects (2009). Epidemiology. 20(1): 18 - 26.
+VanderWeele TJ, Tchetgen Tchetgen EJ (2017). Mediation analysis with time varying
+exposures and mediators. Journal of the Royal Statistical Society: Series B (Statistical
+Methodology). 79(3): 917 - 938.
 
-VanderWeele TJ, Tchetgen Tchetgen EJ (2017). Mediation analysis with time varying exposures and mediators. Journal of the Royal Statistical Society: Series B (Statistical Methodology). 79(3): 917 - 938.
+Lin SH, Young J, Logan R, Tchetgen Tchetgen EJ, VanderWeele TJ (2017). Parametric
+mediational g-formula approach to mediation analysis with time-varying exposures,
+mediators, and confounders. Epidemiology. 28: 266 - 274.
 
-Lin SH, Young J, Logan R, Tchetgen Tchetgen EJ, VanderWeele TJ (2017). Parametric mediational g-formula approach to mediation analysis with time-varying exposures, mediators, and confounders. Epidemiology. 28: 266 - 274.
+Vansteelandt S, Bekaert M, Lange T. (2012). Imputation Strategies for the Estimation 
+of Natural Direct and Indirect Effects. Epidemiologic Methods. 1(1): 131 - 158.
 
-Steen J, Loeys T, Moerkerke B, Vansteelandt S (2017). Medflex: an R package for flexible mediation analysis using natural effect models. Journal of Statistical Software. 76(11).
+Steen J, Loeys T, Moerkerke B, Vansteelandt S (2017). Medflex: an R package for
+flexible mediation analysis using natural effect models. Journal of Statistical
+Software. 76(11).
 
-Imai K, Keele L, Tingley D. A general approach to causal mediation analysis (2010). Psychological Methods. 15(4): 309 - 334.
+VanderWeele TJ. A unification of mediation and interaction: a 4-way decomposition (2014). 
+Epidemiology. 25(5): 749 - 61.
 
+Imai K, Keele L, Tingley D. A general approach to causal mediation analysis (2010).
+Psychological Methods. 15(4): 309 - 334.
+
+Schomaker M, Heumann C. Bootstrap inference when using multiple 
+imputation (2018). Statistics in Medicine. 37(14): 2252 - 2266.
 }
-
-
-
-\author{
-
+\seealso{
+\code{\link{cmdag}}, \code{\link{cmsens}}
 }

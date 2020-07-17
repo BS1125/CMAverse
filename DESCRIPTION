@@ -1,4 +1,4 @@
-Package: CMA
+Package: CMAverse
 Type: Package
 Title: What the Package Does (Title Case)
 Version: 0.1.0
@@ -9,16 +9,15 @@ Description: More about what it does (maybe more than one line)
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-<<<<<<< HEAD
 Imports: 
     ggdag,
     gridExtra,
     grid
-=======
 RoxygenNote: 7.1.0
 Suggests: 
     knitr,
     rmarkdown,
     testthat
 VignetteBuilder: knitr
->>>>>>> 0619c2b6ec00c006201672ed88c02e767985106a
+Depends: 
+    R (>= 2.10)

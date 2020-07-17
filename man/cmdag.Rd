@@ -3,15 +3,26 @@
 \name{cmdag}
 \alias{cmdag}
 \title{DAG For Causal Mediation Analysis}
-
 \usage{
-cmdag(outcome, exposure, mediator, prec, postc,
-x.outcome = 4, x.exposure = 0, x.mediator = 2,
-x.prec = 2, x.postc = 2, y.outcome = 0, y.exposure = 0,
-y.mediator = 1, y.prec = 2, y.postc = -0.5,
-...)
+cmdag(
+  outcome = NULL,
+  exposure = NULL,
+  mediator = NULL,
+  prec = NULL,
+  postc = NULL,
+  x.outcome = 4,
+  x.exposure = 0,
+  x.mediator = 2,
+  x.prec = 2,
+  x.postc = 2,
+  y.outcome = 0,
+  y.exposure = 0,
+  y.mediator = 1,
+  y.prec = 2,
+  y.postc = -0.5,
+  ...
+)
 }
-
 \arguments{
 \item{outcome}{the variable name of the outcome}
 
@@ -19,9 +30,9 @@ y.mediator = 1, y.prec = 2, y.postc = -0.5,
 
 \item{mediator}{a character or vector of variable name(s) of the mediator(s)}
 
-\item{prec}{a character or vector of variable name(s) of the pre-exposure confounder(s)}
+\item{prec}{(optional) a character or vector of variable name(s) of the pre-exposure confounder(s)}
 
-\item{postc}{a character or vector of variable name(s) of the post-exposure confounder(s)}
+\item{postc}{(optional) a character or vector of variable name(s) of the post-exposure confounder(s)}
 
 \item{x.outcome}{x coordinate of the outcome. Default is \code{4}.}
 
@@ -45,33 +56,19 @@ y.mediator = 1, y.prec = 2, y.postc = -0.5,
 
 \item{...}{additional arguments passed to \code{ggdag()}. See \link[ggdag]{ggdag} for details.}
 }
-
 \description{
-Create the directed acyclic graph(DAG) for causal mediation analysis
+Create the directed acyclic graph(DAG) for causal mediation analysis.
 }
-\details{
-\code{outcome}, \code{exposure}, \code{mediator} are required and \code{prec}, \code{postc} are optional for creating the DAG.
-
-For details about setting the coordinates, see \link[ggdag]{dagify}.
-}
-
 \examples{
-
 ## prec and postc are empty
 cmdag(outcome = "Y", exposure = "A", mediator = c("M1", "M2"),
-      prec = NULL, postc = NULL, node = TRUE, text_col = "white")
+     prec = NULL, postc = NULL, node = TRUE, text_col = "white")
 
 ## postc is empty
 cmdag(outcome = "Y", exposure = "A", mediator = c("M1", "M2"),
-      prec = c("C1", "c2", "c3"), postc = NULL, node = FALSE, text_col = "black")
+     prec = c("C1", "c2", "c3"), postc = NULL, node = FALSE, text_col = "black")
 
 ## prec and postc aren't empty
 cmdag(outcome = "Y", exposure = "A", mediator = c("M1", "M2"),
-      prec = c("C1", "c2", "c3"), postc = c("L1", "L2"), node = FALSE, text_col = "black")
-
+     prec = c("C1", "c2", "c3"), postc = c("L1", "L2"), node = FALSE, text_col = "black")
 }
-
-\author{
-
-}
-
