@@ -12,7 +12,20 @@ LazyData: true
 Imports: 
     ggdag,
     gridExtra,
-    grid
+    grid,
+    simex,
+    dplyr,
+    mice,
+    nnet,
+    MASS,
+    survey,
+    survival,
+    SuppDists,
+    boot,
+    msm,
+    Matrix,
+    EValue,
+    ggplot2
 RoxygenNote: 7.1.0
 Suggests: 
     knitr,
