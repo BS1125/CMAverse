@@ -179,11 +179,10 @@ deltamethod <- function(data = NULL, yreg = NULL, mreg = NULL) {
       pm_formula <- paste0("(", tnie_formula, ")/(", te_formula, ")")
       intref_formula <- paste0("(", pnde_formula, ")-(", cde_formula, ")")
       intmed_formula <- paste0("(", tnie_formula, ")-(", pnie_formula, ")")
-      pie_formula <- pnie_formula
       cde_prop_formula <- paste0("(", cde_formula, ")/(", te_formula, ")")
       intref_prop_formula <- paste0("(", intref_formula, ")/(", te_formula, ")")
       intmed_prop_formula <- paste0("(", intmed_formula, ")/(", te_formula, ")")
-      pie_prop_formula <- paste0("(", pie_formula, ")/(", te_formula, ")")
+      pnie_prop_formula <- paste0("(", pnie_formula, ")/(", te_formula, ")")
       overall_pm_formula <- paste0("((", pnie_formula, ")+(", intmed_formula, "))/(", te_formula, ")")
       overall_int_formula <- paste0("((", intref_formula, ")+(", intmed_formula, "))/(", te_formula, ")")
       overall_pe_formula <- paste0("((", intref_formula, ")+(", intmed_formula, ")+(", pnie_formula,
@@ -191,9 +190,9 @@ deltamethod <- function(data = NULL, yreg = NULL, mreg = NULL) {
       delta_formula <- list(cde_formula = cde_formula, pnde_formula = pnde_formula,
                             tnde_formula = tnde_formula, pnie_formula = pnie_formula,
                             tnie_formula = tnie_formula, te_formula = te_formula, pm_formula = pm_formula,
-                            intref_formula = intref_formula, intmed_formula = intmed_formula, pie_formula = pie_formula,
+                            intref_formula = intref_formula, intmed_formula = intmed_formula, 
                             cde_prop_formula = cde_prop_formula, intref_prop_formula = intref_prop_formula,
-                            intmed_prop_formula = intmed_prop_formula, pie_prop_formula = pie_prop_formula,
+                            intmed_prop_formula = intmed_prop_formula, pnie_prop_formula = pnie_prop_formula,
                             overall_pm_formula = overall_pm_formula, overall_int_formula = overall_int_formula,
                             overall_pe_formula = overall_pe_formula)
     } else delta_formula <- list(cde_formula = cde_formula, pnde_formula = pnde_formula,
@@ -349,28 +348,28 @@ deltamethod <- function(data = NULL, yreg = NULL, mreg = NULL) {
       intref_err_formula <- paste0("exp(", pnde_logrr_formula, ")-1-(", cde_err_formula," )")
       intmed_err_formula <- paste0("exp(", tnie_logrr_formula, ")*exp(", pnde_logrr_formula, ")-exp(",
                                    pnde_logrr_formula, ")-exp(", pnie_logrr_formula, ")+1")
-      pie_err_formula <- paste0("exp(", pnie_logrr_formula, ")-1")
+      pnie_err_formula <- paste0("exp(", pnie_logrr_formula, ")-1")
       te_err_formula <- paste0("exp(", te_logrr_formula, ")-1")
       cde_err_prop_formula <- paste0("(", cde_err_formula, ")/(", te_err_formula, ")")
       intmed_err_prop_formula <- paste0("(", intmed_err_formula, ")/(", te_err_formula, ")")
       intref_err_prop_formula <-paste0("(", intref_err_formula, ")/(", te_err_formula, ")")
-      pie_err_prop_formula <- paste0("(", pie_err_formula, ")/(", te_err_formula, ")")
-      overall_pm_formula <- paste0("((", pie_err_formula, ")+(", intmed_err_formula, "))/(",
+      pnie_err_prop_formula <- paste0("(", pnie_err_formula, ")/(", te_err_formula, ")")
+      overall_pm_formula <- paste0("((", pnie_err_formula, ")+(", intmed_err_formula, "))/(",
                                    te_err_formula, ")")
       overall_int_formula <- paste0("((", intref_err_formula, ")+(", intmed_err_formula, "))/(",
                                     te_err_formula, ")")
       overall_pe_formula <- paste0("((", intref_err_formula, ")+(", intmed_err_formula, ")+(",
-                                   pie_err_formula,
+                                   pnie_err_formula,
                                    "))/(", te_err_formula, ")")
       delta_formula <- list(cde_logrr_formula = cde_logrr_formula, pnde_logrr_formula = pnde_logrr_formula,
                             tnde_logrr_formula = tnde_logrr_formula, pnie_logrr_formula = pnie_logrr_formula,
                             tnie_logrr_formula = tnie_logrr_formula, te_logrr_formula = te_logrr_formula,
                             pm_formula = pm_formula, cde_err_formula = cde_err_formula,
                             intref_err_formula = intref_err_formula, intmed_err_formula = intmed_err_formula,
-                            pie_err_formula = pie_err_formula,
+                            pnie_err_formula = pnie_err_formula,
                             cde_err_prop_formula = cde_err_prop_formula,
                             intref_err_prop_formula = intref_err_prop_formula,
-                            intmed_err_prop_formula = intmed_err_prop_formula, pie_err_prop_formula = pie_err_prop_formula,
+                            intmed_err_prop_formula = intmed_err_prop_formula, pnie_err_prop_formula = pnie_err_prop_formula,
                             overall_pm_formula = overall_pm_formula, overall_int_formula = overall_int_formula,
                             overall_pe_formula = overall_pe_formula)
     } else delta_formula <- list(cde_logrr_formula = cde_logrr_formula, pnde_logrr_formula = pnde_logrr_formula,

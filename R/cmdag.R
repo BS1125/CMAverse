@@ -65,7 +65,7 @@ cmdag <- function(outcome = NULL, exposure = NULL, mediator = NULL,
     dag <- dagify(Y ~ A + M + C, M ~ A + C, A ~ C,
                   coords = list(x = c(A = x.exposure, Y = x.outcome, M = x.mediator, C = x.prec),
                                 y = c(A = y.exposure, Y = y.outcome, M = y.mediator, C = y.prec)))
-
+ 
     grid.arrange(ggdag(dag, ...) + theme_dag_blank(),
                  bottom = textGrob(paste0("A(Exposure):", exposure, "\n M(Mediator):", paste(mediator, collapse = ", "),
                                           "\n Y(Outcome):", outcome, "\n C(Pre-exposure confounders): prec"), x = 1,
@@ -80,8 +80,7 @@ cmdag <- function(outcome = NULL, exposure = NULL, mediator = NULL,
     grid.arrange(ggdag(dag, ...) + theme_dag_blank(),
                  bottom = textGrob(paste0("A(Exposure):", exposure, "\n M(Mediator):",
                                           paste(mediator, collapse = ", "), "\n Y(Outcome):",
-                                          outcome, "\n L(Post-exposure confounders):",
-                                          paste(postc, collapse = ", ")),
+                                          outcome, "\n L(Post-exposure confounders): postc"),
                                    x = 1,
                                    hjust = 1, gp = gpar(fontface = 3L, fontsize = 8)))
 
@@ -94,8 +93,7 @@ cmdag <- function(outcome = NULL, exposure = NULL, mediator = NULL,
     grid.arrange(ggdag(dag, ...) + theme_dag_blank(),
                  bottom = textGrob(paste0("A(Exposure):", exposure, "\n M(Mediator):",
                                           paste(mediator, collapse = ", "), "\n Y(Outcome):",
-                                          outcome, "\n C(Pre-exposure confounders): prec \n L(Post-exposure confounders):",
-                                          paste(postc, collapse = ", ")), x = 1,
+                                          outcome, "\n C(Pre-exposure confounders): prec \n L(Post-exposure confounders): postc"), x = 1,
                                    hjust = 1, gp = gpar(fontface = 3L, fontsize = 8)))
 
   }

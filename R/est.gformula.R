@@ -445,16 +445,15 @@ est.gformula <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRU
       pm <- tnie / te
       intref <- pnde - cde
       intmed <- tnie - pnie
-      pie <- pnie
       cde_prop <- cde/te
       intref_prop <- intref/te
       intmed_prop <- intmed/te
-      pie_prop <- pie/te
-      overall_pm <- (pie + intmed)/te
+      pnie_prop <- pnie/te
+      overall_pm <- (pnie + intmed)/te
       overall_int <- (intref + intmed)/te
-      overall_pe <- (intref + intmed + pie)/te
-      est <- c(cde, pnde, tnde, pnie, tnie, te, pm, intref, intmed, pie,
-               cde_prop, intref_prop, intmed_prop, pie_prop, overall_pm, overall_int, overall_pe)
+      overall_pe <- (intref + intmed + pnie)/te
+      est <- c(cde, pnde, tnde, pnie, tnie, te, pm, intref, intmed, 
+               cde_prop, intref_prop, intmed_prop, pnie_prop, overall_pm, overall_int, overall_pe)
 
     } else est <- c(cde, pnde, tnde, pnie, tnie, te)
 
@@ -478,18 +477,18 @@ est.gformula <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRU
       ERRcde <- (EY1m-EY0m)/EY00
       ERRintref <- exp(logRRpnde) - 1 - ERRcde
       ERRintmed <- exp(logRRtnie) * exp(logRRpnde) - exp(logRRpnde) - exp(logRRpnie) + 1
-      ERRpie <- exp(logRRpnie) - 1
+      ERRpnie <- exp(logRRpnie) - 1
       ERRte <- exp(logRRte) - 1
       ERRcde_prop <- ERRcde/ERRte
       ERRintmed_prop <- ERRintmed/ERRte
       ERRintref_prop <- ERRintref/ERRte
-      ERRpie_prop <- ERRpie/ERRte
-      overall_pm <- (ERRpie + ERRintmed)/ERRte
+      ERRpnie_prop <- ERRpnie/ERRte
+      overall_pm <- (ERRpnie + ERRintmed)/ERRte
       overall_int <- (ERRintref + ERRintmed)/ERRte
-      overall_pe <- (ERRintref + ERRintmed + ERRpie)/ERRte
+      overall_pe <- (ERRintref + ERRintmed + ERRpnie)/ERRte
       est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte, pm,
-               ERRcde, ERRintref, ERRintmed, ERRpie,
-               ERRcde_prop, ERRintref_prop, ERRintmed_prop, ERRpie_prop,
+               ERRcde, ERRintref, ERRintmed, ERRpnie,
+               ERRcde_prop, ERRintref_prop, ERRintmed_prop, ERRpnie_prop,
                overall_pm, overall_int, overall_pe)
     } else est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte)
 

@@ -166,6 +166,9 @@
 #' of each causal effect is calculated by imputed counterfactuals.}
 #' }
 #' 
+#' To use \code{yreg = "logistic"} in closed-form parameter function estimation, the binary outcome 
+#' is required to be rare. For common binary outcomes, use \code{yreg = "loglinear"}.
+#' 
 #' \strong{Inference Methods}
 #' 
 #' \itemize{
@@ -366,6 +369,7 @@ cmest <- function(data = NULL, model = NULL,
                   astar = 0, a = 1, mval = NULL, yref = NULL, precval = NULL,
                   nboot = 200, multimp = FALSE, ...) {
 
+  usethis::use_package("ggplot2")
   usethis::use_package("dplyr")
   usethis::use_package("mice")
   usethis::use_package("nnet")
@@ -440,6 +444,7 @@ cmest <- function(data = NULL, model = NULL,
     if (!is.logical(EMint)) stop("EMint should be TRUE or FALSE")
     out$variables$EMint <- EMint
   } else if (!is.null(EMint)) warning("EMint is ignored")
+  if (!is.null(prec)) out$variables$prec <- prec
   # postc
   if (length(postc) != 0) {
     if (!model %in% c("msm", "gformula")) stop("When postc is not empty, select model from 'msm' and 'gformula'")
@@ -536,7 +541,7 @@ cmest <- function(data = NULL, model = NULL,
         wmreg_formula <- paste0(mediator[p], "~", paste(c(exposure, mediator[0:(p-1)], prec, postc), collapse = "+"))
         # regression for the denominator of w_{m_p,i}
         switch(wmreg[[p]],
-               logistic = wmreg[[p]] <- eval(bquote(glm(.(as.formula(wmregformula)), family = binomial(), data = data))),
+               logistic = wmreg[[p]] <- eval(bquote(glm(.(as.formula(wmreg_formula)), family = binomial(), data = data))),
                loglinear = wmreg[[p]] <- eval(bquote(glm(.(as.formula(wmreg_formula)), family = poisson(), data = data))),
                multinomial = wmreg[[p]] <- eval(bquote(nnet::multinom(.(as.formula(wmreg_formula)), data = data, trace = FALSE))),
                ordinal = wmreg[[p]] <- eval(bquote(MASS::polr(.(as.formula(wmreg_formula)), data = data))))
@@ -729,7 +734,7 @@ print.cmest <- function(cmest) {
   if (cmest$methods$estimation == "imputation") est_str <- "Direct counterfactual imputation estimation"
   if (cmest$methods$inference == "delta") inf_str <- "delta method standard errors, confidence intervals and p-values"
   if (cmest$methods$inference == "bootstrap") inf_str <- "bootstrap standard errors, percentile confidence intervals and p-values"
-  if (cmest$methods$model != "ne" && (cmest$methods$casecontrol)) cat("\n Causal Mediation Analysis For A Case Control Study Via the ")
+  if (cmest$methods$model != "ne" && (cmest$methods$casecontrol)) cat("Causal Mediation Analysis For A Case Control Study Via the ")
   if (!(cmest$methods$model != "ne" && (cmest$methods$casecontrol))) cat("\n Causal Mediation Analysis Via the ")
   cat(model_str)
   cat("\n \n")
@@ -777,7 +782,6 @@ print.summary.cmest <- function(summary.cmest, digits = 4) {
 #' @export
 plot.cmest <- function(cmest) {
   require(ggplot2)
-
   effect_df <- data.frame(Effect = factor(names(cmest$effect.pe), levels = names(cmest$effect.pe)),
                           PE = cmest$effect.pe,
                           CIlower = cmest$effect.ci.low,
@@ -787,7 +791,6 @@ plot.cmest <- function(cmest) {
       (family(cmest$regressions$outcome)$family %in% c("gaussian","Gamma","inverse.gaussian","quasi"))) {
     refline <- 0
   } else refline <- 1
-
   ggplot() +
     geom_errorbar(aes(x = Effect, ymin = CIlower, ymax = CIupper), width = 0.3,
                   data = effect_df)+
@@ -795,5 +798,4 @@ plot.cmest <- function(cmest) {
                colour = "blue", data = effect_df) +
     ylab("Point Estimate and 95% CI")+
     geom_hline(yintercept = refline, color = "red")
-  
 }

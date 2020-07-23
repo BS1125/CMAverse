@@ -1,0 +1,423 @@
+#' Sensitivity Analysis For Unmeasured Confounding and Measurement Error
+#'
+#' \code{cmsens} is used to conduct sensitivity analysis for unmeasured confounding via 
+#' the \emph{E-value} approach by Vanderweele et al. (2017) and sensitivity analysis for 
+#' measurement error via \emph{regression calibration} by Carroll et al. (1995), 
+#' \emph{SIMEX} by Cook et al. (1994) or \emph{MCSIMEX} by Küchenhoff et al. (2006).
+#'
+#' @param object an object of class \code{cmest}.
+#' @param sens sensitivity analysis for unmeasured confounding or measurement error. 
+#' \code{uc} represents unmeasured confounding and \code{me} represents measurement error.
+#' See \code{Details}.
+#' @param MEmethod method for measurement error correction. \code{rc} represents regression
+#' calibration and \code{simex} represents SIMEX or MCSIMEX. See \code{Details}.
+#' @param MEvariable variable measured with error.
+#' @param MEvartype type of the variable measured with error.
+#' Can be \code{continuous} or \code{categorical} (first 3 letters are enough).
+#' @param MEerror a vector of standard deviations of the measurement error (when \code{MEvartype}
+#' is \code{continuous}) or a list of misclassification matrices (when \code{MEvartype}
+#' is \code{categorical}). 
+#' @param lambda a vector of lambdas for SIMEX or MCSIMEX. Default is \code{c(0.5, 1, 1.5, 2)}. 
+#' @param B number of simulations for SIMEX or MCSIMEX. Default is \code{200}.
+#' @param nboot.rc number of boots for variance estimation with regression calibration. Default 
+#' is \code{400}.
+#'
+#' @details
+#' 
+#' For unmeasured confounding, all E-values are on the (risk or rate) ratio scale. If the causal 
+#' effects are estimated on the difference scale, the point estimates are transformed into ratios.
+#' 
+#' Sensitivity analysis for measurement error only supports a single variable measured with error.
+#' Regression calibration only supports an independent continuous variable in a regression formula.
+#' SIMEX supports both continuous variables and categorical variables.
+#' 
+#' @return
+#' If \code{sens} is \code{uc}, an object of class 'cmest.uc' is returned:
+#' \item{call}{the function call,}
+#' \item{evalues}{the data frame in which the first three columns are the point estimates, 
+#' lower limits of confidence intervals, upper limits of confidence intervals of causal effects on 
+#' the ratio scale and the last three columns are the E-values on the ratio scale for point estimates, 
+#' lower limits of confidence intervals, upper limits of confidence intervals of causal effects,}
+#' If \code{sens} is \code{me}, an object of class 'cmest.me' is returned:
+#' \item{call}{the function call,}
+#' \item{ME}{a list which might contain MEvariable, MEvartype, MEerror, reliability ratio, lambda and B,}
+#' \item{naive}{naive causal mediation analysis results}
+#' \item{sens}{a list of causal mediation analysis results after measurement error correction,}
+#' 
+#' ...
+#'
+#' @seealso \code{\link{cmdag}}, \code{\link{cmest}}
+#'
+#' @references
+#' VanderWeele TJ, Ding P. Sensitivity analysis in observational research: introducing the 
+#' E-Value (2017). Annals of Internal Medicine. 167(4): 268 - 274.
+#' 
+#' Smith LH, VanderWeele TJ. Mediational E-values: Approximate sensitivity analysis for 
+#' unmeasured mediator-outcome confounding (2019). Epidemiology. 30(6): 835 - 837.
+#' 
+#' Carrol RJ, Ruppert D, Stefanski LA, Crainiceanu C. Measurement Error in Nonlinear Models: 
+#' A Modern Perspective, Second Edition (2006). London: Chapman & Hall.
+#' 
+#' Cook JR, Stefanski LA. Simulation-extrapolation estimation in parametric measurement error 
+#' models (1994). Journal of the American Statistical Association, 89(428): 1314 - 1328.
+#' 
+#' Küchenhoff H, Mwalili SM, Lesaffre E. A general method for dealing with misclassification 
+#' in regression: the misclassification SIMEX (2006). Biometrics. 62(1): 85 - 96.
+#' 
+#' Stefanski LA, Cook JR. Simulation-extrapolation: the measurement error jackknife (1995). 
+#' Journal of the American Statistical Association. 90(432): 1247 - 56.
+#'
+#' @examples
+#' naive <- cmest(data = cma2020, model = "rb", outcome = "Y", 
+#' exposure = "A", mediator = c("M1", "M2"), 
+#' prec = c("C1", "C2"), EMint = TRUE,
+#' mreg = list("logistic", "multinomial"), yreg = "linear",
+#' astar = 0, a = 1, mval = list(0, "M2_0"),
+#' estimation = "imputation", inference = "bootstrap")
+#' 
+#' exp1 <- cmsens(object = naive, sens = "uc")
+#' exp1
+#' 
+#' exp2 <- cmsens(object = naive, sens = "me", MEmethod = "rc", 
+#' MEvariable = "C1", MEvartype = "con",
+#' MEerror = c(0.1, 0.2))
+#' summary(exp2)
+#' plot(exp2)
+#' 
+#' exp3 <- cmsens(object = naive, sens = "me", MEmethod = "simex", 
+#' MEvariable = "M1", MEvartype = "cat",
+#' MEerror = list(matrix(c(0.95,0.05,0.05,0.95), nrow = 2), 
+#' matrix(c(0.9,0.1,0.1,0.9), nrow = 2)))
+#' summary(exp3)
+#' 
+#' @export
+
+cmsens <- function(object = NULL, sens = "uc", MEmethod = "simex",
+                   MEvariable = NULL, MEvartype = NULL, MEerror = NULL,
+                   lambda = c(0.5, 1, 1.5, 2), B = 200, nboot.rc = 400) {
+  
+  usethis::use_package("simex")
+  usethis::use_package("EValue")
+  
+  if (is.null(object)) stop("Unspecified object")
+  
+  cl <- match.call()
+  out <- list(call = cl)
+  
+  data <- object$data
+  model <- object$methods$model
+  reg.output <- object$reg.output
+  effect.pe <- object$effect.pe
+  effect.se <- object$effect.se
+  outcome <- object$variables$outcome
+  
+  #################################################################################################
+  ############################Sensitivity Analysis for Unmeasured Confounding#######################
+  #################################################################################################
+  
+  if (sens == "uc") {
+    if (model %in% c("rb", "wb", "msm", "g-formula", "ne")) {
+      out.index <- 1:6
+    } else if (model == "iorw") {
+      out.index <- 1:3
+    } 
+    
+    effect.pe <- effect.pe[out.index]
+    effect.se <- effect.se[out.index]
+    
+    yreg <- switch((model == "iorw") + 1, "1" = reg.output$yreg,
+                   "2" = reg.output$yregTot)
+    yreg4class <- switch(("rcreg" %in% class(yreg) | "simexreg" %in% class(yreg)) + 1,
+                         "1" = yreg, "2" = yreg$NAIVEreg)
+    if (inherits(yreg4class, "lm")) yreg_family <- family(yreg)$family
+    
+    evalues <- c()
+    if (inherits(yreg4class, "lm") && 
+        (yreg_family %in% c("gaussian","Gamma","inverse.gaussian","quasi", "gaulss", "gevlss") |
+         startsWith(yreg_family, "Tweedie") | startsWith(yreg_family, "Beta regression") |
+         startsWith(yreg_family, "Scaled t"))) {
+      
+      # transform effect on the difference scale to RR scale
+      outcome.se <- sd(data[, outcome], na.rm = TRUE)
+      d <- unname(effect.pe / outcome.se)
+      sd <- unname(effect.se / outcome.se)
+      for (i in out.index) {
+        evalues_mid <- EValue::evalues.RR(est = exp(0.91 * d[i]), lo = exp(0.91 * d[i] - 1.78 * sd[i]),
+                                          hi = exp(0.91 * d[i] + 1.78 * sd[i]))
+        evalues_mid <- c(evalues_mid[1, ], evalues_mid[2, ])
+        names(evalues_mid) <- c("estRR", "lowerRR", "upperRR", "Evalue.estRR", "Evalue.lowerRR", "Evalue.upperRR")
+        evalues <- rbind(evalues, evalues_mid)
+      }
+    } else {
+      summ <- summary(object)
+      ci_lo <- summ[, "95% CIL"]
+      ci_up <-summ[, "95% CIU"]
+      for (i in out.index) {
+        evalues_mid <- EValue::evalues.RR(est = effect.pe[i], lo = ci_lo[i], hi = ci_up[i])
+        evalues_mid <- c(evalues_mid[1, ], evalues_mid[2, ])
+        names(evalues_mid) <- c("estRR", "lowerRR", "upperRR", "Evalue.estRR", "Evalue.lowerRR", "Evalue.upperRR")
+        evalues <- rbind(evalues, evalues_mid)
+      }
+    }
+    rownames(evalues) <- names(effect.pe)
+    out$evalues <- evalues
+    class(out) <- "cmsens.uc"
+    
+    #################################################################################################
+    ############################Sensitiviti Analysis for Measurement Error###########################
+    #################################################################################################
+    
+  } else if (sens == "me") {
+    
+    if(!model %in% c("rb", "gformula")) stop("Measurement error correction currently only supports model = 'rb' or 'gformula'")
+    if (length(MEvariable) == 0) stop("Unspecified MEvariable")
+    if (length(MEvariable) != 1) stop("Currently only supports one variable measured with error")
+    if (length(MEvartype) != length(MEvariable)) stop("length(MEvartype) != length(MEvariable)")
+    
+    if (MEvartype == "con") MEvartype <- "continuous"
+    if (MEvartype == "cat") MEvartype <- "categorical"
+    if (MEvartype == "continuous") {
+      if (!is.vector(MEerror)) stop("MEerror should be a vector for a continuous variable measured with error")
+    } else if (MEvartype == "categorical") {
+      if (!is.list(MEerror)) stop("MEerror should be a list for a categorical variable measured with error")
+    }
+    
+    if (MEmethod == "rc") out$ME <- list(MEvariable = MEvariable, MEvartype = MEvartype, MEerror = MEerror)
+    if (MEmethod == "simex") out$ME <- list(MEvariable = MEvariable, MEvartype = MEvartype, MEerror = MEerror,
+                                            lambda = lambda, B = B)
+    if (MEvartype == "continuous") out$ME$reliabilityRatio <- 
+        1 - MEerror/sd(data[, MEvariable], na.rm = TRUE)
+    out$naive <- object[c("effect.pe", "effect.se", "effect.ci.low", 
+                          "effect.ci.high", "effect.pval")]
+    
+    estimation <- object$methods$estimation
+    inference <- object$methods$inference
+    casecontrol <- object$methods$casecontrol
+    yrare <- object$methods$yrare
+    yprevalence <- object$methods$yprevalence
+    full <- object$methods$full
+    outcome <- object$variables$outcome
+    event <- object$variables$event
+    exposure <- object$variables$exposure
+    mediator <- object$variables$mediator
+    EMint <- object$variables$EMint
+    prec <- object$variables$prec
+    postc <- object$variables$postc
+    multimp <- object$multimp$multimp
+    a <- object$ref$a
+    astar <- object$ref$asta
+    mval <- object$ref$mval
+    yref <- object$ref$yref
+    precval <- object$ref$precval
+    nboot <- object$methods$nboot
+    args_mice <- object$multimp$args_mice
+    
+    if (inference == "delta") variance <- TRUE
+    if (inference == "bootstrap") variance <- FALSE
+    sens <- list()
+    
+    for (i in 1:length(MEerror)) {
+      
+      yreg <- reg.output$yreg
+      mreg <- reg.output$mreg
+      wmreg <- reg.output$wmreg
+      postcreg <- reg.output$postcreg
+      ereg <- reg.output$ereg
+      
+      if (MEmethod == "rc") {
+        if (MEvartype != "continuous") stop("Regression calibration only supports a continuous variable measured with error")
+        for (reg_name in c("yreg", "mreg", "postcreg")) {
+          reg <- get(reg_name)
+          if (!is.null(reg)) {
+            switch(as.character(reg_name %in% c("mreg", "postcreg")),
+                   "TRUE" = assign(reg_name, lapply(1:length(reg), function(x)
+                     eval(bquote(rcreg(reg = .(reg[[x]]), data = data, MEvariable = .(MEvariable), 
+                                       MEerror = .(MEerror[[i]]), variance = .(variance), nboot = .(nboot.rc)))))),
+                   "FALSE" = assign(reg_name, eval(bquote(rcreg(reg = .(reg), data = data, MEvariable = .(MEvariable), 
+                                                                MEerror = .(MEerror[[i]]), variance = .(variance), nboot = .(nboot.rc))))))
+          }
+        }
+      } else if (MEmethod == "simex") {
+        for (reg_name in c("yreg", "mreg", "postcreg")) {
+          reg <- get(reg_name)
+          if (!is.null(reg)) {
+            switch(as.character(reg_name %in% c("mreg", "postcreg")),
+                   "TRUE" = assign(reg_name, lapply(1:length(reg), function(x)
+                     eval(bquote(simexreg(reg = .(reg[[x]]), data = data, MEvariable = .(MEvariable), MEvartype = .(MEvartype), 
+                                          MEerror = .(MEerror[[i]]), variance = .(variance), lambda = .(lambda), B = .(B)))))),
+                   "FALSE" = assign(reg_name, eval(bquote(simexreg(reg = .(reg), data = data, MEvariable = .(MEvariable), 
+                                                                   MEvartype = .(MEvartype), MEerror = .(MEerror[[i]]), 
+                                                                   variance = .(variance), lambda = .(lambda), B = .(B))))))
+          }
+        }
+      } else stop("Unsupported MEmethod; use 'rc' or 'simex'")
+      
+      # add a progress bar for bootstrap inference
+      if (inference == "bootstrap") {
+        env <- environment()
+        counter <- 0
+        progbar <- txtProgressBar(min = 0, max = nboot, style = 3)
+      }
+      environment(estinf) <- environment()
+      sens[[i]] <- estinf()[c("effect.pe", "effect.se", "effect.ci.low", 
+                              "effect.ci.high", "effect.pval")]
+      
+    }
+    
+    out$sens <- sens
+    class(out) <- "cmsens.me"
+    
+  } else stop("Unsupported sens; use 'uc' or 'me'")
+  
+  return(out)
+  
+}
+
+#' @describeIn cmest Print the results of cmsens.uc nicely
+#' @export
+print.cmsens.uc <- function(cmsens.uc) {
+  cat("Sensitivity Analysis For Unmeasured Confounding \n")
+  cat("\nEvalues on the ratio scale: \n")
+  print(cmsens.uc$evalues)
+}
+
+#' @describeIn cmest Print the results of cmsens.me nicely
+#' @export
+print.cmsens.me <- function(cmsens.me) {
+  cat("Sensitivity Analysis For Measurement Error \n \n")
+  cat("The variable measured with error: ")
+  cat(cmsens.me$ME$MEvariable)
+  cat("\nType of the variable measured with error: ")
+  cat(cmsens.me$ME$MEvartype)
+  cat("\n")
+  for (i in 1:length(cmsens.me$sens)) {
+    cat(paste0("\nMeasurement error ", i, ": \n"))
+    if (cmsens.me$ME$MEvartype == "continuous") cat(cmsens.me$ME$MEerror[i])
+    if (cmsens.me$ME$MEvartype == "categorical") print(cmsens.me$ME$MEerror[[i]])
+    cat(paste0("\nMeasurement error correction for measurement error ", i, ": \n"))
+    out <- data.frame(cmsens.me$sens[[i]]$effect.pe, cmsens.me$sens[[i]]$effect.se, 
+                      cmsens.me$sens[[i]]$effect.ci.low, cmsens.me$sens[[i]]$effect.ci.high, 
+                      cmsens.me$sens[[i]]$effect.pval)
+    colnames(out) <- c("Estimate", "Std.error", "95% CIL", "95% CIU", "P.val")
+    print(out)
+    cat("----------------------------------------------------------------\n")
+  }
+}
+
+#' @describeIn cmsens Summarize the results of cmsens.me nicely
+#' @export
+summary.cmsens.me <- function(cmsens.me) {
+  summary.df <- list()
+  for (i in 1:length(cmsens.me$sens)) {
+    summary.df[[i]] <- data.frame(cmsens.me$sens[[i]]$effect.pe, cmsens.me$sens[[i]]$effect.se, 
+                                  cmsens.me$sens[[i]]$effect.ci.low, cmsens.me$sens[[i]]$effect.ci.high, 
+                                  cmsens.me$sens[[i]]$effect.pval)
+    colnames(summary.df[[i]]) <- c("Estimate", "Std.error", "95% CIL", "95% CIU", "P.val")
+  }
+  out <- c(cmsens.me, list(summary.df = summary.df))
+  class(out) <- c("summary.cmsens.me")
+  return(out)
+}
+
+#' @describeIn cmsens Print the summary of cmsens.me nicely
+#' @export
+print.summary.cmsens.me <- function(summary.cmsens.me, digits = 4) {
+  cat("Sensitivity Analysis For Measurement Error \n \n")
+  cat("The variable measured with error: ")
+  cat(summary.cmsens.me$ME$MEvariable)
+  cat("\nType of the variable measured with error: ")
+  cat(summary.cmsens.me$ME$MEvartype)
+  cat("\n")
+  for (i in 1:length(summary.cmsens.me$sens)) {
+    cat(paste0("\nMeasurement error ", i, ": \n"))
+    if (summary.cmsens.me$ME$MEvartype == "continuous") cat(summary.cmsens.me$ME$MEerror[i])
+    if (summary.cmsens.me$ME$MEvartype == "categorical") print(summary.cmsens.me$ME$MEerror[[i]])
+    cat(paste0("\nMeasurement error correction for measurement error ", i, ": \n"))
+    printCoefmat(summary.cmsens.me$summary.df[[i]], digits = digits, has.Pvalue = TRUE)
+    cat("----------------------------------------------------------------\n")
+  }
+}
+
+#' @describeIn cmsens Plot the results of cmsens.me with \link[ggplot2]{ggplot}
+#' @export
+plot.cmsens.me <- function(cmsens.me) {
+  require(ggplot2)
+  naive.pe <- cmsens.me$naive$effect.pe
+  naive.ci.low <- cmsens.me$naive$effect.ci.low
+  naive.ci.high <- cmsens.me$naive$effect.ci.high
+  if (cmsens.me$ME$MEvartype == "continuous") {
+    effect_df <- data.frame(Effect = factor(names(naive.pe), levels = names(naive.pe)),
+                            Point = naive.pe,
+                            CIlower = naive.ci.low,
+                            CIupper = naive.ci.high,
+                            ReliabilityRatio = rep(1, length(naive.pe)))
+    for (i in 1:length(cmsens.me$sens)) {
+      pe.mid <- cmsens.me$sens[[i]]$effect.pe
+      ci.low.mid <- cmsens.me$sens[[i]]$effect.ci.low
+      ci.high.mid <- cmsens.me$sens[[i]]$effect.ci.high
+      effect_df <- rbind(effect_df,
+                         data.frame(Effect = factor(names(pe.mid), levels = names(pe.mid)),
+                                    Point = pe.mid,
+                                    CIlower = ci.low.mid,
+                                    CIupper = ci.high.mid,
+                                    ReliabilityRatio = rep(factor(round(cmsens.me$ME$reliabilityRatio[i], 2)), 
+                                                           length(pe.mid))))
+      
+    }
+    ggplot() +
+      geom_errorbar(aes(x = Effect, ymin = CIlower, ymax = CIupper,
+                        colour = ReliabilityRatio), width = 0.3,
+                    data = effect_df,
+                    position = position_dodge2(width=0.5))+
+      geom_point(aes(x = Effect, y = Point, colour = ReliabilityRatio),
+                 data = effect_df,
+                 position = position_dodge2(width=0.3)) +
+      ylab("Point Estimate and 95% CI")+
+      scale_colour_hue()+
+      geom_hline(yintercept = 0, color = "red")+
+      theme(legend.position = "bottom")
+  } else if (cmsens.me$ME$MEvartype == "categorical") {
+    pe.mid <- cmsens.me$sens[[1]]$effect.pe
+    ci.low.mid <- cmsens.me$sens[[1]]$effect.ci.low
+    ci.high.mid <- cmsens.me$sens[[1]]$effect.ci.high
+    effect_df <- data.frame(Effect = rep(factor(names(pe.mid), levels = names(pe.mid)), 2),
+                            Point = c(pe.mid, naive.pe),
+                            CIlower = c(ci.low.mid, naive.ci.low),
+                            CIupper = c(ci.high.mid, naive.ci.high),
+                            MC = factor(c(rep("MC", length(pe.mid)), 
+                                          rep("Naive", length(naive.pe)))),
+                            MisclassificationMAtrix = factor(rep("Matrix 1", 
+                                                                 length(pe.mid)+length(naive.pe))))
+    if (length(cmsens.me$sens) > 1) {
+      for (i in 2:length(cmsens.me$sens)) {
+        pe.mid <- cmsens.me$sens[[i]]$effect.pe
+        ci.low.mid <- cmsens.me$sens[[i]]$effect.ci.low
+        ci.high.mid <- cmsens.me$sens[[i]]$effect.ci.high
+        effect_df <- rbind(effect_df,
+                           data.frame(Effect = rep(factor(names(pe.mid), levels = names(pe.mid)), 2),
+                                      Point = c(pe.mid, naive.pe),
+                                      CIlower = c(ci.low.mid, naive.ci.low),
+                                      CIupper = c(ci.high.mid, naive.ci.high),
+                                      MC = factor(c(rep("MC", length(pe.mid)), 
+                                                    rep("Naive", length(naive.pe)))),
+                                      MisclassificationMAtrix = factor(rep(paste0("Matrix ", i), 
+                                                                           length(pe.mid)+length(naive.pe)))))
+        
+      }
+    }
+    ggplot() +
+      geom_errorbar(aes(x = Effect, ymin = CIlower, ymax = CIupper,
+                        colour = MC), width = 0.3,
+                    data = effect_df,
+                    position = position_dodge2(width=0.5))+
+      geom_point(aes(x = Effect, y = Point, colour = MC),
+                 data = effect_df,
+                 position = position_dodge2(width=0.3)) +
+      facet_grid(MisclassificationMAtrix~.) +
+      ylab("Point Estimate and 95% CI")+
+      scale_colour_hue()+
+      geom_hline(yintercept = 0, color = "red")+
+      theme(legend.position = "bottom", legend.title = element_blank())
+  }
+}
+
