@@ -316,8 +316,6 @@ al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5285457/).
 </ol>
 </section>
 
-------------------------------------------------------------------------
-
 Multiple Imputation
 -------------------
 
