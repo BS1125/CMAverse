@@ -57,6 +57,7 @@ Table: Supported Data Types and Functionalities of `cmest`
 |Inference: Bootstrapping|√|√|√|√|√|√|
 |Marginal Effects|√[^4]|√|√|√|√|√|
 |Effects Conditional On C|√[^5]|×|×|×|×|×|
+|Effects Conditional On C|√[^5]|×|×|×|×|×|
 ***
 [^1]: rb: the regression-based approach; wb: the weighting-based approach; iorw: the inverse odds ratio weighting approach; ne: the natural effect model; msm: the marginal structural model; gformula: the g-formula approach.
 [^2]: closed-form parameter function estimation only supports the regression-based approach and a single mediator.
