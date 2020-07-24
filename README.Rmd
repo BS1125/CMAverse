@@ -26,7 +26,7 @@ approach* by [Tchetgen Tchetgen et al. (2013)](https://www.ncbi.nlm.nih.gov/pmc/
 [Vansteelandt et al. (2012)](https://www.degruyter.com/view/journals/em/1/1/article-p131.xml?language=en), *the marginal structural model* by [VanderWeele 
 et al. (2009)](https://pubmed.ncbi.nlm.nih.gov/19234398), and *the g-formula approach* by [Lin et al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5285457/). 
 
-Table: Supported Data Types and Functionalities of `cmest`
+Table: Table: Supported Data Types and Functionalities of `cmest`
 
 |     |rb|wb|iorw|ne|msm|gformula[^1]
 |-----|:-----:|:------:|:------:|:------:|:------:|:------:|
@@ -57,8 +57,6 @@ Table: Supported Data Types and Functionalities of `cmest`
 |Inference: Bootstrapping|√|√|√|√|√|√|
 |Marginal Effects|√[^4]|√|√|√|√|√|
 |Effects Conditional On C|√[^5]|×|×|×|×|×|
-|Effects Conditional On C|√[^5]|×|×|×|×|×|
-***
 [^1]: rb: the regression-based approach; wb: the weighting-based approach; iorw: the inverse odds ratio weighting approach; ne: the natural effect model; msm: the marginal structural model; gformula: the g-formula approach.
 [^2]: closed-form parameter function estimation only supports the regression-based approach and a single mediator.
 [^3]: delta method inference is available only when closed-form parameter function estimation is used.
@@ -95,7 +93,7 @@ library(CMAverse)
 We illustrate the general workflow of the `CMAverse` package by a quick example. Firstly, let's simulate some data and plot the DAG of the scientific setting. The simulated dataset contains a binary exposure, a binary mediator, a continuous mediator, a continuous outcome and two pre-exposure confounders.
 
 ```{r message=F,warning=F}
-n <- 100
+n <- 1000
 C1 <- rnorm(n, mean = 1, sd = 1)
 C2 <- rbinom(n, 1, 0.6)
 C2[which(C2 == 0)] <- "C2_0"
@@ -128,7 +126,7 @@ est <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
                 mediator = c("M1", "M2"), prec = c("C1", "C2"), EMint = TRUE,
                 mreg = list("logistic", "linear"), yreg = "linear",
                 astar = 0, a = 1, mval = list(0, 0),
-                estimation = "imputation", inference = "bootstrap", nboot = 5)
+                estimation = "imputation", inference = "bootstrap", nboot = 200)
 ```
 
 Summarizing and plotting the results:
@@ -170,7 +168,7 @@ Then, assume that the exposure was measured with error. Sensitivity analysis usi
 
 ```{r message=F,warning=F,results='hide'}
 me2 <- cmsens(object = est, sens = "me", MEmethod = "simex", MEvariable = "A", 
-              MEvartype = "cat", B = 5,
+              MEvartype = "cat", B = 200,
               MEerror = list(matrix(c(0.95, 0.05, 0.05, 0.95), nrow = 2), 
                              matrix(c(0.9, 0.1, 0.1, 0.9), nrow = 2)))
 ```
