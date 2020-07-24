@@ -57,6 +57,7 @@ Table: Supported Data Types and Functionalities of `cmest`
 |Inference: Bootstrapping|√|√|√|√|√|√|
 |Marginal Effects|√[^4]|√|√|√|√|√|
 |Effects Conditional On C|√[^5]|×|×|×|×|×|
+
 [^1]: rb: the regression-based approach; wb: the weighting-based approach; iorw: the inverse odds ratio weighting approach; ne: the natural effect model; msm: the marginal structural model; gformula: the g-formula approach.
 [^2]: closed-form parameter function estimation only supports the regression-based approach and a single mediator.
 [^3]: delta method inference is available only when closed-form parameter function estimation is used.
@@ -93,7 +94,7 @@ library(CMAverse)
 We illustrate the general workflow of the `CMAverse` package by a quick example. Firstly, let's simulate some data and plot the DAG of the scientific setting. The simulated dataset contains a binary exposure, a binary mediator, a continuous mediator, a continuous outcome and two pre-exposure confounders.
 
 ```{r message=F,warning=F}
-n <- 1000
+n <- 100
 C1 <- rnorm(n, mean = 1, sd = 1)
 C2 <- rbinom(n, 1, 0.6)
 C2[which(C2 == 0)] <- "C2_0"
@@ -126,7 +127,7 @@ est <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
                 mediator = c("M1", "M2"), prec = c("C1", "C2"), EMint = TRUE,
                 mreg = list("logistic", "linear"), yreg = "linear",
                 astar = 0, a = 1, mval = list(0, 0),
-                estimation = "imputation", inference = "bootstrap", nboot = 200)
+                estimation = "imputation", inference = "bootstrap", nboot = 5)
 ```
 
 Summarizing and plotting the results:
@@ -168,7 +169,7 @@ Then, assume that the exposure was measured with error. Sensitivity analysis usi
 
 ```{r message=F,warning=F,results='hide'}
 me2 <- cmsens(object = est, sens = "me", MEmethod = "simex", MEvariable = "A", 
-              MEvartype = "cat", B = 200,
+              MEvartype = "cat", B = 5,
               MEerror = list(matrix(c(0.95, 0.05, 0.05, 0.95), nrow = 2), 
                              matrix(c(0.9, 0.1, 0.1, 0.9), nrow = 2)))
 ```
@@ -210,7 +211,8 @@ Imai K, Keele L, Tingley D. A general approach to causal mediation analysis (201
 
 Schomaker M, Heumann C. Bootstrap inference when using multiple imputation (2018). Statistics in Medicine. 37(14): 2252 - 2266.
 
-VanderWeele TJ, Ding P. Sensitivity analysis in observational research: introducing the E-Value (2017). Annals of Internal Medicine. 167(4): 268 - 274.
+VanderWeele TJ, Ding P. Sensitivity analysis in observational research: introducing the 
+E-Value (2017). Annals of Internal Medicine. 167(4): 268 - 274.
 
 Smith LH, VanderWeele TJ. Mediational E-values: Approximate sensitivity analysis for unmeasured mediator-outcome confounding (2019). Epidemiology. 30(6): 835 - 837.
 
