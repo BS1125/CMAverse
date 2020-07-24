@@ -1,3 +1,5 @@
+<img src="man/figures/logo.png" width="50%" style="display: block; margin: auto 0 auto auto;" />
+
 About the Package
 =================
 
@@ -29,6 +31,281 @@ al. (2009)](https://pubmed.ncbi.nlm.nih.gov/19234398), and *the
 g-formula approach* by [Lin et
 al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5285457/).
 
+<table>
+<caption>Supported Data Types and Functionalities of <code>cmest</code></caption>
+<thead>
+<tr class="header">
+<th></th>
+<th style="text-align: center;">rb</th>
+<th style="text-align: center;">wb</th>
+<th style="text-align: center;">iorw</th>
+<th style="text-align: center;">ne</th>
+<th style="text-align: center;">msm</th>
+<th style="text-align: center;">gformula<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Continuous Y<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+</tr>
+<tr class="even">
+<td>Binary Y</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+</tr>
+<tr class="odd">
+<td>Count Y</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+</tr>
+<tr class="even">
+<td>Nominal Y</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">×</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+</tr>
+<tr class="odd">
+<td>Ordinal Y</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">×</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+</tr>
+<tr class="even">
+<td>Survival Y</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">×</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+</tr>
+<tr class="odd">
+<td>Continuous M</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">×</td>
+<td style="text-align: center;">√</td>
+</tr>
+<tr class="even">
+<td>Binary M</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+</tr>
+<tr class="odd">
+<td>Nominal M</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+</tr>
+<tr class="even">
+<td>Ordinal M</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+</tr>
+<tr class="odd">
+<td>Count M</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">×</td>
+<td style="text-align: center;">√</td>
+</tr>
+<tr class="even">
+<td>M of Any Type</td>
+<td style="text-align: center;">×</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">×</td>
+<td style="text-align: center;">×</td>
+</tr>
+<tr class="odd">
+<td>Continuous A</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">×<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a></td>
+<td style="text-align: center;">×</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">×<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a></td>
+<td style="text-align: center;">√</td>
+</tr>
+<tr class="even">
+<td>Binary A</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+</tr>
+<tr class="odd">
+<td>Nominal A</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+</tr>
+<tr class="even">
+<td>Ordinal A</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+</tr>
+<tr class="odd">
+<td>Count A</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">×<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a></td>
+<td style="text-align: center;">×</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">×<a href="#fn6" class="footnote-ref" id="fnref6" role="doc-noteref"><sup>6</sup></a></td>
+<td style="text-align: center;">√</td>
+</tr>
+<tr class="even">
+<td>Multiple Mediators</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+</tr>
+<tr class="odd">
+<td>Post-exposure Confounding</td>
+<td style="text-align: center;">×</td>
+<td style="text-align: center;">×</td>
+<td style="text-align: center;">×</td>
+<td style="text-align: center;">×</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+</tr>
+<tr class="even">
+<td>2-way Decomposition</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+</tr>
+<tr class="odd">
+<td>4-way Decomposition</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">×</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+</tr>
+<tr class="even">
+<td>Estimation: Closed-form Parameter Function</td>
+<td style="text-align: center;">√<a href="#fn7" class="footnote-ref" id="fnref7" role="doc-noteref"><sup>7</sup></a></td>
+<td style="text-align: center;">×</td>
+<td style="text-align: center;">×</td>
+<td style="text-align: center;">×</td>
+<td style="text-align: center;">×</td>
+<td style="text-align: center;">×</td>
+</tr>
+<tr class="odd">
+<td>Estimation: Direct Counterfactual Imputation</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+</tr>
+<tr class="even">
+<td>Inference: Delta Method</td>
+<td style="text-align: center;">√<a href="#fn8" class="footnote-ref" id="fnref8" role="doc-noteref"><sup>8</sup></a></td>
+<td style="text-align: center;">×</td>
+<td style="text-align: center;">×</td>
+<td style="text-align: center;">×</td>
+<td style="text-align: center;">×</td>
+<td style="text-align: center;">×</td>
+</tr>
+<tr class="odd">
+<td>Inference: Bootstrapping</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+</tr>
+<tr class="even">
+<td>Marginal Effects</td>
+<td style="text-align: center;">√<a href="#fn9" class="footnote-ref" id="fnref9" role="doc-noteref"><sup>9</sup></a></td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+<td style="text-align: center;">√</td>
+</tr>
+<tr class="odd">
+<td>Effects Conditional On C</td>
+<td style="text-align: center;">√<a href="#fn10" class="footnote-ref" id="fnref10" role="doc-noteref"><sup>10</sup></a></td>
+<td style="text-align: center;">×</td>
+<td style="text-align: center;">×</td>
+<td style="text-align: center;">×</td>
+<td style="text-align: center;">×</td>
+<td style="text-align: center;">×</td>
+</tr>
+</tbody>
+</table>
+<section class="footnotes" role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1" role="doc-endnote"><p>rb: the regression-based approach; wb: the weighting-based approach; iorw: the inverse odds ratio weighting approach; ne: the natural effect model; msm: the marginal structural model; gformula: the g-formula approach.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2" role="doc-endnote"><p>Y denotes the outcome, A denotes the exposure, M denotes the mediator(s) and C denotes the pre-exposure confounder(s).<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3" role="doc-endnote"><p>continuous A is not supported when C is not empty; otherwise, it is supported.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4" role="doc-endnote"><p>continuous A is not supported when C is not empty; otherwise, it is supported.<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn5" role="doc-endnote"><p>count A is not supported when C is not empty; otherwise, it is supported.<a href="#fnref5" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn6" role="doc-endnote"><p>count A is not supported when C is not empty; otherwise, it is supported.<a href="#fnref6" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn7" role="doc-endnote"><p>closed-form parameter function estimation only supports the regression-based approach and a single mediator.<a href="#fnref7" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn8" role="doc-endnote"><p>delta method inference is available only when closed-form parameter function estimation is used.<a href="#fnref8" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn9" role="doc-endnote"><p>marginal effects are estimated when direct counterfactual imputation estimation is used.<a href="#fnref9" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn10" role="doc-endnote"><p>conditional effects are estimated when closed-form parameter function estimation is used.<a href="#fnref10" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
+
 Multiple Imputation
 -------------------
 
@@ -49,7 +326,7 @@ al. (1994)](https://www.jstor.org/stable/2290994?seq=1#metadata_info_tab_conten
 or *MCSIMEX* by [Küchenhoff et
 al. (2006)](https://pubmed.ncbi.nlm.nih.gov/16542233/). The sensitivity
 analysis for measurement error is currently available for *the
-regression-based approach* and *the g-formulaa approach*.
+regression-based approach* and *the g-formula approach*.
 
 Installation
 ============
@@ -58,7 +335,7 @@ The latest version can be installed via:
 
     devtools::install_github("LindaValeri/CMAverse")
 
-Load CMAverse:
+Load `CMAverse`:
 
     library(CMAverse)
 
@@ -67,11 +344,11 @@ Quickstart Guide
 
 We illustrate the general workflow of the `CMAverse` package by a quick
 example. Firstly, let’s simulate some data and plot the DAG of the
-scientific setting. The simulated data contains a binary exposure, a
+scientific setting. The simulated dataset contains a binary exposure, a
 binary mediator, a continuous mediator, a continuous outcome and two
 pre-exposure confounders.
 
-    n <- 500
+    n <- 1000
     C1 <- rnorm(n, mean = 1, sd = 1)
     C2 <- rbinom(n, 1, 0.6)
     C2[which(C2 == 0)] <- "C2_0"
@@ -94,7 +371,7 @@ The DAG can be plotted using the `cmdag` function.
           prec = c("C1", "C2"), postc = NULL,
           node = FALSE, text_col = "black")
 
-![](README_files/figure-markdown_strict/unnamed-chunk-4-1.png)
+![](man/figures/plot_dag-1.png)
 
 Then, we estimate the causal effects using the `cmest` function. We use
 the regression-based approach for illustration. The reference values for
@@ -117,30 +394,30 @@ Summarizing and plotting the results:
     ## Direct counterfactual imputation estimation with 
     ##  bootstrap standard errors, percentile confidence intervals and p-values 
     ##  
-    ##               Estimate Std.error   95% CIL 95% CIU  P.val    
-    ## cde           0.521487  0.268116 -0.013986   1.042   0.07 .  
-    ## pnde          1.197079  0.102549  0.966198   1.390 <2e-16 ***
-    ## tnde          1.338773  0.102742  1.134994   1.545 <2e-16 ***
-    ## pnie          0.423595  0.070399  0.306427   0.571 <2e-16 ***
-    ## tnie          0.565289  0.075643  0.416000   0.718 <2e-16 ***
-    ## te            1.762368  0.106978  1.545383   1.955 <2e-16 ***
-    ## pm            0.320755  0.039574  0.242353   0.397 <2e-16 ***
-    ## intref        0.675592  0.228491  0.230643   1.093 <2e-16 ***
-    ## intmed        0.141694  0.051340  0.044126   0.230 <2e-16 ***
-    ## cde(prop)     0.295901  0.147598 -0.008183   0.564   0.07 .  
-    ## intref(prop)  0.383343  0.136178  0.119061   0.633 <2e-16 ***
-    ## intmed(prop)  0.080400  0.029396  0.023272   0.135 <2e-16 ***
-    ## pnie(prop)    0.240356  0.036970  0.171181   0.317 <2e-16 ***
-    ## pm(overall)   0.320755  0.039574  0.242353   0.397 <2e-16 ***
-    ## int(overall)  0.463743  0.162601  0.154421   0.761 <2e-16 ***
-    ## pe(overall)   0.704099  0.147598  0.435990   1.008 <2e-16 ***
+    ##              Estimate Std.error 95% CIL 95% CIU  P.val    
+    ## cde           0.50192   0.21744 0.07152   0.911   0.03 *  
+    ## pnde          1.23082   0.07086 1.10602   1.376 <2e-16 ***
+    ## tnde          1.37577   0.07457 1.24440   1.522 <2e-16 ***
+    ## pnie          0.49086   0.05204 0.38308   0.583 <2e-16 ***
+    ## tnie          0.63581   0.05862 0.52685   0.748 <2e-16 ***
+    ## te            1.86663   0.07704 1.70766   2.014 <2e-16 ***
+    ## pm            0.34062   0.02734 0.28965   0.390 <2e-16 ***
+    ## intref        0.72890   0.19583 0.36740   1.110 <2e-16 ***
+    ## intmed        0.14495   0.04033 0.07272   0.230 <2e-16 ***
+    ## cde(prop)     0.26889   0.11424 0.03848   0.497   0.03 *  
+    ## intref(prop)  0.39049   0.10565 0.19740   0.612 <2e-16 ***
+    ## intmed(prop)  0.07765   0.02106 0.03812   0.119 <2e-16 ***
+    ## pnie(prop)    0.26296   0.02568 0.20630   0.308 <2e-16 ***
+    ## pm(overall)   0.34062   0.02734 0.28965   0.390 <2e-16 ***
+    ## int(overall)  0.46815   0.12493 0.23719   0.725 <2e-16 ***
+    ## pe(overall)   0.73111   0.11424 0.50267   0.962 <2e-16 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
     plot(est) +
       theme(axis.text.x = element_text(angle = 30, vjust = 0.8))
 
-![](README_files/figure-markdown_strict/unnamed-chunk-7-1.png)
+![](man/figures/plot_cmest-1.png)
 
 Lastly, let’s conduct sensitivity analysis for the results. Sensitivity
 analysis for unmeasured confounding:
@@ -151,12 +428,12 @@ analysis for unmeasured confounding:
     ## 
     ## Evalues on the ratio scale: 
     ##         estRR  lowerRR  upperRR Evalue.estRR Evalue.lowerRR Evalue.upperRR
-    ## cde  1.223388 0.998856 1.498393     1.746160       1.000000             NA
-    ## pnde 1.588564 1.470019 1.716669     2.555503       2.301245             NA
-    ## tnde 1.678019 1.552573 1.813601     2.744662       2.478806             NA
-    ## pnie 1.177950 1.116875 1.242365     1.635789       1.478172             NA
-    ## tnie 1.244283 1.175099 1.317540     1.795606       1.628706             NA
-    ## te   1.976623 1.823003 2.143188     3.366016       3.047885             NA
+    ## cde  1.217625 1.030504 1.438722     1.732392       1.207803             NA
+    ## pnde 1.620686 1.534912 1.711254     2.623650       2.441026             NA
+    ## tnde 1.715515 1.620100 1.816549     2.823430       2.622409             NA
+    ## pnie 1.212352 1.164894 1.261743     1.719743       1.603169             NA
+    ## tnie 1.283289 1.226843 1.342331     1.886233       1.754386             NA
+    ## te   2.079808 1.960424 2.206463     3.578405       3.332589             NA
 
 Assume that the continuous pre-exposure confounder was measured with
 error. Sensitivity analysis using regression calibration with a set of
@@ -177,23 +454,23 @@ Summarizing and plotting the results:
     ## Measurement error 1: 
     ## 0.1
     ## Measurement error correction for measurement error 1: 
-    ##              Estimate Std.error  95% CIL 95% CIU  P.val    
-    ## cde           0.51964   0.26855 -0.03334   1.058   0.06 .  
-    ## pnde          1.18710   0.09957  1.00923   1.397 <2e-16 ***
-    ## tnde          1.33236   0.10642  1.14380   1.536 <2e-16 ***
-    ## pnie          0.42287   0.07443  0.27507   0.560 <2e-16 ***
-    ## tnie          0.56813   0.07559  0.43909   0.715 <2e-16 ***
-    ## te            1.75523   0.10374  1.58755   1.938 <2e-16 ***
-    ## pm            0.32368   0.03891  0.24456   0.396 <2e-16 ***
-    ## intref        0.66746   0.24402  0.20852   1.175 <2e-16 ***
-    ## intmed        0.14526   0.05419  0.04309   0.246   0.02 *  
-    ## cde(prop)     0.29605   0.14848 -0.02002   0.579   0.06 .  
-    ## intref(prop)  0.38027   0.14270  0.11083   0.692 <2e-16 ***
-    ## intmed(prop)  0.08276   0.03030  0.02382   0.137   0.02 *  
-    ## pnie(prop)    0.24092   0.04019  0.16061   0.315 <2e-16 ***
-    ## pm(overall)   0.32368   0.03891  0.24456   0.396 <2e-16 ***
-    ## int(overall)  0.46303   0.16970  0.13510   0.813 <2e-16 ***
-    ## pe(overall)   0.70395   0.14848  0.42066   1.020 <2e-16 ***
+    ##              Estimate Std.error 95% CIL 95% CIU  P.val    
+    ## cde           0.49960   0.21135 0.07527   0.967   0.04 *  
+    ## pnde          1.23013   0.07929 1.09667   1.397 <2e-16 ***
+    ## tnde          1.37450   0.07663 1.23527   1.541 <2e-16 ***
+    ## pnie          0.49434   0.05377 0.40500   0.595 <2e-16 ***
+    ## tnie          0.63872   0.06288 0.52792   0.758 <2e-16 ***
+    ## te            1.86884   0.08220 1.72517   2.048 <2e-16 ***
+    ## pm            0.34177   0.03034 0.28742   0.412 <2e-16 ***
+    ## intref        0.73052   0.17646 0.39263   1.119 <2e-16 ***
+    ## intmed        0.14437   0.03780 0.07347   0.228 <2e-16 ***
+    ## cde(prop)     0.26733   0.10963 0.04101   0.499   0.04 *  
+    ## intref(prop)  0.39090   0.09625 0.19737   0.603 <2e-16 ***
+    ## intmed(prop)  0.07725   0.02004 0.03716   0.122 <2e-16 ***
+    ## pnie(prop)    0.26452   0.02588 0.21814   0.316 <2e-16 ***
+    ## pm(overall)   0.34177   0.03034 0.28742   0.412 <2e-16 ***
+    ## int(overall)  0.46815   0.11494 0.23475   0.725 <2e-16 ***
+    ## pe(overall)   0.73267   0.10963 0.50129   0.959 <2e-16 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## ----------------------------------------------------------------
@@ -202,22 +479,22 @@ Summarizing and plotting the results:
     ## 0.2
     ## Measurement error correction for measurement error 2: 
     ##              Estimate Std.error 95% CIL 95% CIU  P.val    
-    ## cde           0.51370   0.24178 0.04764   0.987   0.02 *  
-    ## pnde          1.20586   0.09923 0.99641   1.370 <2e-16 ***
-    ## tnde          1.33409   0.10586 1.13356   1.532 <2e-16 ***
-    ## pnie          0.44440   0.06725 0.29954   0.549 <2e-16 ***
-    ## tnie          0.57264   0.08255 0.41022   0.717 <2e-16 ***
-    ## te            1.77850   0.10696 1.54511   1.958 <2e-16 ***
-    ## pm            0.32198   0.04198 0.24938   0.407 <2e-16 ***
-    ## intref        0.69216   0.21433 0.22117   1.067 <2e-16 ***
-    ## intmed        0.12823   0.05112 0.05458   0.248 <2e-16 ***
-    ## cde(prop)     0.28884   0.13703 0.02623   0.569   0.02 *  
-    ## intref(prop)  0.38918   0.12273 0.12503   0.626 <2e-16 ***
-    ## intmed(prop)  0.07210   0.02793 0.03132   0.135 <2e-16 ***
-    ## pnie(prop)    0.24988   0.03640 0.17128   0.309 <2e-16 ***
-    ## pm(overall)   0.32198   0.04198 0.24938   0.407 <2e-16 ***
-    ## int(overall)  0.46129   0.14745 0.16730   0.737 <2e-16 ***
-    ## pe(overall)   0.71116   0.13703 0.43099   0.974 <2e-16 ***
+    ## cde           0.49219   0.19219 0.11754   0.853   0.01 ** 
+    ## pnde          1.21853   0.07155 1.09341   1.360 <2e-16 ***
+    ## tnde          1.36615   0.07560 1.23568   1.518 <2e-16 ***
+    ## pnie          0.49865   0.05854 0.40067   0.618 <2e-16 ***
+    ## tnie          0.64627   0.06866 0.52092   0.786 <2e-16 ***
+    ## te            1.86480   0.08819 1.70322   2.050 <2e-16 ***
+    ## pm            0.34656   0.02975 0.28861   0.403 <2e-16 ***
+    ## intref        0.72634   0.16973 0.42906   1.045 <2e-16 ***
+    ## intmed        0.14762   0.03615 0.07958   0.222 <2e-16 ***
+    ## cde(prop)     0.26394   0.10150 0.06426   0.450   0.01 ** 
+    ## intref(prop)  0.38950   0.09215 0.22538   0.569 <2e-16 ***
+    ## intmed(prop)  0.07916   0.01854 0.04289   0.113 <2e-16 ***
+    ## pnie(prop)    0.26740   0.02672 0.22060   0.328 <2e-16 ***
+    ## pm(overall)   0.34656   0.02975 0.28861   0.403 <2e-16 ***
+    ## int(overall)  0.46866   0.10863 0.26379   0.668 <2e-16 ***
+    ## pe(overall)   0.73606   0.10150 0.54965   0.936 <2e-16 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## ----------------------------------------------------------------
@@ -225,23 +502,23 @@ Summarizing and plotting the results:
     ## Measurement error 3: 
     ## 0.3
     ## Measurement error correction for measurement error 3: 
-    ##               Estimate Std.error   95% CIL 95% CIU  P.val    
-    ## cde           0.502278  0.286518 -0.014643   1.088   0.06 .  
-    ## pnde          1.174673  0.101812  0.983094   1.349 <2e-16 ***
-    ## tnde          1.319282  0.104802  1.119086   1.505 <2e-16 ***
-    ## pnie          0.444247  0.074372  0.327600   0.604 <2e-16 ***
-    ## tnie          0.588857  0.078207  0.446115   0.743 <2e-16 ***
-    ## te            1.763530  0.101974  1.574002   1.939 <2e-16 ***
-    ## pm            0.333908  0.041084  0.262401   0.413 <2e-16 ***
-    ## intref        0.672395  0.253474  0.152410   1.080   0.01 ** 
-    ## intmed        0.144610  0.054859  0.032333   0.247   0.01 ** 
-    ## cde(prop)     0.284814  0.159225 -0.008935   0.620   0.06 .  
-    ## intref(prop)  0.381278  0.148396  0.092493   0.645   0.01 ** 
-    ## intmed(prop)  0.082000  0.030976  0.016967   0.137   0.01 ** 
-    ## pnie(prop)    0.251908  0.040025  0.191593   0.346 <2e-16 ***
-    ## pm(overall)   0.333908  0.041084  0.262401   0.413 <2e-16 ***
-    ## int(overall)  0.463278  0.176766  0.109666   0.768   0.01 ** 
-    ## pe(overall)   0.715186  0.159225  0.379946   1.009 <2e-16 ***
+    ##              Estimate Std.error 95% CIL 95% CIU  P.val    
+    ## cde           0.47807   0.18633 0.09341   0.830   0.02 *  
+    ## pnde          1.20710   0.07228 1.06028   1.343 <2e-16 ***
+    ## tnde          1.35412   0.07359 1.20259   1.489 <2e-16 ***
+    ## pnie          0.51579   0.05598 0.41954   0.628 <2e-16 ***
+    ## tnie          0.66281   0.06486 0.55487   0.780 <2e-16 ***
+    ## te            1.86991   0.08485 1.69052   2.027 <2e-16 ***
+    ## pm            0.35446   0.02911 0.30183   0.409 <2e-16 ***
+    ## intref        0.72903   0.15875 0.43605   1.058 <2e-16 ***
+    ## intmed        0.14702   0.03629 0.06704   0.225 <2e-16 ***
+    ## cde(prop)     0.25566   0.09751 0.04960   0.429   0.02 *  
+    ## intref(prop)  0.38988   0.08653 0.23359   0.559 <2e-16 ***
+    ## intmed(prop)  0.07862   0.01895 0.03674   0.115 <2e-16 ***
+    ## pnie(prop)    0.27584   0.02599 0.23033   0.327 <2e-16 ***
+    ## pm(overall)   0.35446   0.02911 0.30183   0.409 <2e-16 ***
+    ## int(overall)  0.46850   0.10381 0.26742   0.686 <2e-16 ***
+    ## pe(overall)   0.74434   0.09751 0.57051   0.950 <2e-16 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## ----------------------------------------------------------------
@@ -249,12 +526,13 @@ Summarizing and plotting the results:
     plot(me1) +
       theme(axis.text.x = element_text(angle = 30, vjust = 0.8))
 
-![](README_files/figure-markdown_strict/unnamed-chunk-11-1.png)
+![](man/figures/plot_cmsens_me_con-1.png)
 
 Then, assume that the exposure was measured with error. Sensitivity
 analysis using MCSIMEX with two assumed misclassification matrices:
 
-    me2 <- cmsens(object = est, sens = "me", MEmethod = "simex", MEvariable = "A", MEvartype = "cat", 
+    me2 <- cmsens(object = est, sens = "me", MEmethod = "simex", MEvariable = "A", 
+                  MEvartype = "cat", B = 200,
                   MEerror = list(matrix(c(0.95, 0.05, 0.05, 0.95), nrow = 2), 
                                  matrix(c(0.9, 0.1, 0.1, 0.9), nrow = 2)))
 
@@ -274,22 +552,22 @@ Summarizing and plotting the results:
     ## 
     ## Measurement error correction for measurement error 1: 
     ##              Estimate Std.error 95% CIL 95% CIU  P.val    
-    ## cde           0.62807   0.28731 0.10604   1.255   0.02 *  
-    ## pnde          1.37069   0.12126 1.10864   1.585 <2e-16 ***
-    ## tnde          1.55006   0.13849 1.26308   1.786 <2e-16 ***
-    ## pnie          0.41672   0.08066 0.27627   0.566 <2e-16 ***
-    ## tnie          0.59609   0.08902 0.41907   0.771 <2e-16 ***
-    ## te            1.96678   0.12625 1.69858   2.184 <2e-16 ***
-    ## pm            0.30308   0.04189 0.22502   0.388 <2e-16 ***
-    ## intref        0.74262   0.25963 0.25009   1.178   0.01 ** 
-    ## intmed        0.17937   0.06935 0.04687   0.320   0.02 *  
-    ## cde(prop)     0.31934   0.14362 0.05134   0.626   0.02 *  
-    ## intref(prop)  0.37758   0.13206 0.12435   0.605   0.01 ** 
-    ## intmed(prop)  0.09120   0.03368 0.02392   0.151   0.02 *  
-    ## pnie(prop)    0.21188   0.04167 0.14156   0.284 <2e-16 ***
-    ## pm(overall)   0.30308   0.04189 0.22502   0.388 <2e-16 ***
-    ## int(overall)  0.46878   0.16201 0.16029   0.746   0.01 ** 
-    ## pe(overall)   0.68066   0.14362 0.37429   0.949 <2e-16 ***
+    ## cde           0.67069   0.24454 0.21348   1.121   0.01 ** 
+    ## pnde          1.44012   0.09013 1.26336   1.613 <2e-16 ***
+    ## tnde          1.61731   0.08573 1.46060   1.765 <2e-16 ***
+    ## pnie          0.49755   0.05453 0.38354   0.600 <2e-16 ***
+    ## tnie          0.67473   0.06564 0.55013   0.797 <2e-16 ***
+    ## te            2.11485   0.09240 1.91705   2.296 <2e-16 ***
+    ## pm            0.31905   0.02892 0.27102   0.375 <2e-16 ***
+    ## intref        0.76943   0.19887 0.39908   1.164 <2e-16 ***
+    ## intmed        0.17719   0.04684 0.08191   0.272 <2e-16 ***
+    ## cde(prop)     0.31713   0.11199 0.10436   0.519   0.01 ** 
+    ## intref(prop)  0.36382   0.09796 0.18080   0.575 <2e-16 ***
+    ## intmed(prop)  0.08378   0.02226 0.03916   0.127 <2e-16 ***
+    ## pnie(prop)    0.23526   0.02383 0.18933   0.281 <2e-16 ***
+    ## pm(overall)   0.31905   0.02892 0.27102   0.375 <2e-16 ***
+    ## int(overall)  0.44761   0.11849 0.22828   0.690 <2e-16 ***
+    ## pe(overall)   0.68287   0.11199 0.48118   0.896 <2e-16 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## ----------------------------------------------------------------
@@ -301,22 +579,22 @@ Summarizing and plotting the results:
     ## 
     ## Measurement error correction for measurement error 2: 
     ##              Estimate Std.error 95% CIL 95% CIU  P.val    
-    ## cde           0.79094   0.37141 0.16541   1.549   0.03 *  
-    ## pnde          1.57150   0.14836 1.26901   1.867 <2e-16 ***
-    ## tnde          1.77735   0.15300 1.48966   2.065 <2e-16 ***
-    ## pnie          0.38910   0.07948 0.24675   0.565 <2e-16 ***
-    ## tnie          0.59495   0.08720 0.43769   0.754 <2e-16 ***
-    ## te            2.16645   0.13708 1.89950   2.419 <2e-16 ***
-    ## pm            0.27462   0.04094 0.20024   0.356 <2e-16 ***
-    ## intref        0.78056   0.29852 0.15330   1.283   0.02 *  
-    ## intmed        0.20585   0.08664 0.02830   0.358   0.03 *  
-    ## cde(prop)     0.36508   0.16400 0.08034   0.691   0.03 *  
-    ## intref(prop)  0.36030   0.14421 0.06418   0.599   0.02 *  
-    ## intmed(prop)  0.09502   0.03974 0.01265   0.164   0.03 *  
-    ## pnie(prop)    0.17960   0.03736 0.11354   0.259 <2e-16 ***
-    ## pm(overall)   0.27462   0.04094 0.20024   0.356 <2e-16 ***
-    ## int(overall)  0.45531   0.17933 0.08554   0.757   0.01 ** 
-    ## pe(overall)   0.63492   0.16400 0.30928   0.920 <2e-16 ***
+    ## cde           0.83047   0.28236 0.29720   1.375 <2e-16 ***
+    ## pnde          1.65142   0.09630 1.47902   1.836 <2e-16 ***
+    ## tnde          1.86738   0.09925 1.68033   2.066 <2e-16 ***
+    ## pnie          0.49659   0.05870 0.37617   0.623 <2e-16 ***
+    ## tnie          0.71255   0.07099 0.57810   0.861 <2e-16 ***
+    ## te            2.36397   0.10177 2.19258   2.577 <2e-16 ***
+    ## pm            0.30142   0.02709 0.24741   0.345 <2e-16 ***
+    ## intref        0.82095   0.23563 0.34472   1.287 <2e-16 ***
+    ## intmed        0.21596   0.06292 0.08951   0.330 <2e-16 ***
+    ## cde(prop)     0.35130   0.11686 0.12748   0.589 <2e-16 ***
+    ## intref(prop)  0.34727   0.10228 0.14611   0.550 <2e-16 ***
+    ## intmed(prop)  0.09135   0.02628 0.03898   0.144 <2e-16 ***
+    ## pnie(prop)    0.21007   0.02353 0.16158   0.253 <2e-16 ***
+    ## pm(overall)   0.30142   0.02709 0.24741   0.345 <2e-16 ***
+    ## int(overall)  0.43863   0.12687 0.18057   0.678 <2e-16 ***
+    ## pe(overall)   0.64870   0.11686 0.41101   0.873 <2e-16 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## ----------------------------------------------------------------
@@ -324,7 +602,7 @@ Summarizing and plotting the results:
     plot(me2) +
       theme(axis.text.x = element_text(angle = 30, vjust = 0.8))
 
-![](README_files/figure-markdown_strict/unnamed-chunk-14-1.png)
+![](man/figures/plot_cmsens_me_cat-1.png)
 
 References
 ==========
