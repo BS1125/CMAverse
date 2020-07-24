@@ -1,19 +1,221 @@
 ---
-title: "quickstart"
+title: "CMAverse Quickstart Guide"
 output: rmarkdown::html_vignette
+date: "`r Sys.Date()`"
 vignette: >
-  %\VignetteIndexEntry{quicksart}
+  %\VignetteIndexEntry{CMAverse Quickstart Guide}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
+# About the Package
+
+The R package `CMAverse` provides a suite of functions conducting causal mediation analysis including `cmdag` for DAG visualization, `cmest` for statistical modeling and `cmsens` for sensitivity analysis.
+
+## DAG Visualization
+
+`cmdag` visualizes the scientific setting via a DAG.
+
+## Statistical Modeling
+
+`cmest` implements six causal mediation analysis approaches including *the regression-based approach* by [Valeri et al. (2013)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3659198/) and [Vanderweele et al. (2014)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/), 
+*the weighting-based approach* by [Vanderweele et al. (2014)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/), *the inverse odd-ratio weighting 
+approach* by [Tchetgen Tchetgen et al. (2013)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3954805/), *the natural effect model* by
+[Vansteelandt et al. (2012)](https://www.degruyter.com/view/journals/em/1/1/article-p131.xml?language=en), *the marginal structural model* by [VanderWeele 
+et al. (2009)](https://pubmed.ncbi.nlm.nih.gov/19234398), and *the g-formula approach* by [Lin et al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5285457/). 
+
+Table: Supported Data Types and Functionalities of `cmest`
+
+|     |rb|wb|iorw|ne|msm|gformula[^1]
+|-----|:-----:|:------:|:------:|:------:|:------:|:------:|
+|Continuous Y[^6]|√|√|√|√|√|√|
+|Binary Y|√|√|√|√|√|√|
+|Count Y|√|√|√|√|√|√|
+|Nominal Y|√|√|√|×|√|√|
+|Ordinal Y|√|√|√|×|√|√|
+|Survival Y|√|√|√|×|√|√|
+|Continuous M|√|√|√|√|×|√|
+|Binary M|√|√|√|√|√|√|
+|Nominal M|√|√|√|√|√|√|
+|Ordinal M|√|√|√|√|√|√|
+|Count M|√|√|√|√|×|√|
+|M of Any Type|×|√|√|√|×|×|
+|Continuous A|√|×[^7]|×|√|×[^7]|√|
+|Binary A|√|√|√|√|√|√|
+|Nominal A|√|√|√|√|√|√|
+|Ordinal A|√|√|√|√|√|√|
+|Count A|√|×[^8]|×|√|×[^8]|√|
+|Multiple Mediators|√|√|√|√|√|√|
+|Post-exposure Confounding|×|×|×|×|√|√|
+|2-way Decomposition|√|√|√|√|√|√|
+|4-way Decomposition|√|√|×|√|√|√|
+|Estimation: Closed-form Parameter Function|√[^2]|×|×|×|×|×|
+|Estimation: Direct Counterfactual Imputation|√|√|√|√|√|√|
+|Inference: Delta Method|√[^3]|×|×|×|×|×|
+|Inference: Bootstrapping|√|√|√|√|√|√|
+|Marginal Effects|√[^4]|√|√|√|√|√|
+|Effects Conditional On C|√[^5]|×|×|×|×|×|
+[^1]: rb: the regression-based approach; wb: the weighting-based approach; iorw: the inverse odds ratio weighting approach; ne: the natural effect model; msm: the marginal structural model; gformula: the g-formula approach.
+[^2]: closed-form parameter function estimation only supports the regression-based approach and a single mediator.
+[^3]: delta method inference is available only when closed-form parameter function estimation is used.
+[^4]: marginal effects are estimated when direct counterfactual imputation estimation is used.
+[^5]: conditional effects are estimated when closed-form parameter function estimation is used.
+[^6]: Y denotes the outcome, A denotes the exposure, M denotes the mediator(s) and C denotes the pre-exposure confounder(s).
+[^7]: continuous A is not supported when C is not empty; otherwise, it is supported.
+[^8]: count A is not supported when C is not empty; otherwise, it is supported.
+
+## Multiple Imputation
+
+`cmest` provides options to perform multiple imputation for a dataset with missing values via the `mice` package, estimate the causal effects with each of the imputed datasets and pool the results together.
+
+## Sensitivity Analysis
+
+`cmsens` conducts sensitivity analysis for unmeasured confounding via the *E-value* approach by [Vanderweele et al. (2017)](https://pubmed.ncbi.nlm.nih.gov/28693043/) and sensitivity analysis for measurement error via *regression calibration* by [Carroll et al. (1995)](https://www.taylorfrancis.com/books/9780429139635), *SIMEX* by [Cook et al. (1994)](https://www.jstor.org/stable/2290994?seq=1#metadata_info_tab_contents) or *MCSIMEX* by [Küchenhoff et al. (2006)](https://pubmed.ncbi.nlm.nih.gov/16542233/). The sensitivity analysis for measurement error is currently available for *the regression-based approach* and *the g-formula approach*.
+
+# Installation
+
+The latest version can be installed via:
+
+```{r eval=F}
+devtools::install_github("LindaValeri/CMAverse")
 ```
 
-```{r setup}
-library(CMA)
+Load `CMAverse`:
+
+```{r message=F,warning=F}
+library(CMAverse)
 ```
+
+# Quickstart Guide
+
+We illustrate the general workflow of the `CMAverse` package by a quick example. Firstly, let's simulate some data and plot the DAG of the scientific setting. The simulated dataset contains a binary exposure, a binary mediator, a continuous mediator, a continuous outcome and two pre-exposure confounders.
+
+```{r message=F,warning=F}
+n <- 1000
+C1 <- rnorm(n, mean = 1, sd = 1)
+C2 <- rbinom(n, 1, 0.6)
+C2[which(C2 == 0)] <- "C2_0"
+C2[which(C2 == 1)] <- "C2_1"
+pa <- exp(0.2 - 0.5*C1 + 0.1*(C2 == "C2_1"))/(1 + exp(0.2 - 0.5*C1 + 0.1*(C2 == "C2_1")))
+A <- rbinom(n, 1, pa)
+A[which(A == 0)] <- "control"
+A[which(A == 1)] <- "treat"
+pm <- exp(1 + 0.5*(A == "treat") - 1.5*C1 + 0.5*(C2 == "C2_1"))/
+  (1 + exp(1 + 0.5*(A == "treat") - 1.5*C1 + 0.5*(C2 == "C2_1")))
+M1 <- rbinom(n, 1, pm)
+M2 <- rnorm(n, 2 + 0.8*(A == "treat") - M1 + 0.5*C1 + 2*(C2 == "C2_1"), 1)
+Y <- rnorm(n, mean = 0.5 + 0.4*(A == "treat") + 0.5*M1 + 0.6*M2 + 0.3*(A == "treat")*M1 +
+             0.2*(A == "treat")*M2 - 0.3*C1 + 2*(C2=="C2_1"), sd = 1)
+data <- data.frame(A, M1, M2, Y, C1, C2)
+```
+
+The DAG can be plotted using the `cmdag` function.
+
+```{r plot_dag,message=F,warning=F}
+cmdag(outcome = "Y", exposure = "A", mediator = c("M1", "M2"), 
+      prec = c("C1", "C2"), postc = NULL,
+      node = FALSE, text_col = "black")
+```
+
+Then, we estimate the causal effects using the `cmest` function. We use the regression-based approach for illustration. The reference values for the exposure are set to be 0 and 1. The reference values for the two mediators are set to be 0. 
+
+```{r message=F,warning=F,results='hide'}
+est <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
+                mediator = c("M1", "M2"), prec = c("C1", "C2"), EMint = TRUE,
+                mreg = list("logistic", "linear"), yreg = "linear",
+                astar = 0, a = 1, mval = list(0, 0),
+                estimation = "imputation", inference = "bootstrap", nboot = 200)
+```
+
+Summarizing and plotting the results:
+
+```{r message=F,warning=F}
+summary(est)
+```
+
+```{r plot_cmest,message=F,warning=F,fig.width=8,fig.height=5}
+plot(est) +
+  theme(axis.text.x = element_text(angle = 30, vjust = 0.8))
+```
+
+Lastly, let's conduct sensitivity analysis for the results. Sensitivity analysis for unmeasured confounding:
+
+```{r message=F,warning=F}
+cmsens(object = est, sens = "uc")
+```
+
+Assume that the continuous pre-exposure confounder was measured with error. Sensitivity analysis using regression calibration with a set of assumed standard deviations of the measurement error 0.1, 0.2 and 0.3:
+
+```{r message=F,warning=F,results='hide'}
+me1 <- cmsens(object = est, sens = "me", MEmethod = "rc", 
+              MEvariable = "C1", MEvartype = "con", MEerror = c(0.1, 0.2, 0.3))
+```
+
+Summarizing and plotting the results:
+
+```{r message=F,warning=F}
+summary(me1)
+```
+
+```{r plot_cmsens_me_con,message=F,warning=F,fig.width=8,fig.height=5}
+plot(me1) +
+  theme(axis.text.x = element_text(angle = 30, vjust = 0.8))
+```
+
+Then, assume that the exposure was measured with error. Sensitivity analysis using MCSIMEX with two assumed misclassification matrices:
+
+```{r message=F,warning=F,results='hide'}
+me2 <- cmsens(object = est, sens = "me", MEmethod = "simex", MEvariable = "A", 
+              MEvartype = "cat", B = 200,
+              MEerror = list(matrix(c(0.95, 0.05, 0.05, 0.95), nrow = 2), 
+                             matrix(c(0.9, 0.1, 0.1, 0.9), nrow = 2)))
+```
+
+Summarizing and plotting the results:
+
+```{r message=F,warning=F}
+summary(me2)
+```
+
+```{r plot_cmsens_me_cat,message=F,warning=F,fig.width=8,fig.height=6}
+plot(me2) +
+  theme(axis.text.x = element_text(angle = 30, vjust = 0.8))
+```
+
+# References
+
+Valeri L, Vanderweele TJ (2013). Mediation analysis allowing for exposure-mediator interactions and causal interpretation: theoretical assumptions and implementation with SAS and SPSS macros. Psychological Methods. 18(2): 137 - 150.
+ 
+VanderWeele TJ, Vansteelandt S (2014). Mediation analysis with multiple mediators. Epidemiologic Methods. 2(1): 95 - 115.
+
+Tchetgen Tchetgen EJ (2013). Inverse odds ratio-weighted estimation for causal mediation analysis. Statistics in medicine. 32: 4567 - 4580.
+
+Nguyen QC, Osypuk TL, Schmidt NM, Glymour MM, Tchetgen Tchetgen EJ. Practical guidance for conducting mediation analysis with multiple mediators using inverse odds ratio weighting (2015). American Journal of Epidemiology. 181(5): 349 - 356.
+
+VanderWeele TJ. Marginal structural models for the estimation of direct and indirect effects (2009). Epidemiology. 20(1): 18 - 26.
+
+VanderWeele TJ, Tchetgen Tchetgen EJ (2017). Mediation analysis with time varying exposures and mediators. Journal of the Royal Statistical Society: Series B (Statistical Methodology). 79(3): 917 - 938.
+
+Lin SH, Young J, Logan R, Tchetgen Tchetgen EJ, VanderWeele TJ (2017). Parametric mediational g-formula approach to mediation analysis with time-varying exposures, mediators, and confounders. Epidemiology. 28: 266 - 274.
+
+Vansteelandt S, Bekaert M, Lange T. (2012). Imputation Strategies for the Estimation of Natural Direct and Indirect Effects. Epidemiologic Methods. 1(1): 131 - 158.
+
+Steen J, Loeys T, Moerkerke B, Vansteelandt S (2017). Medflex: an R package for flexible mediation analysis using natural effect models. Journal of Statistical Software. 76(11).
+
+VanderWeele TJ. A unification of mediation and interaction: a 4-way decomposition (2014). Epidemiology. 25(5): 749 - 61.
+
+Imai K, Keele L, Tingley D. A general approach to causal mediation analysis (2010). Psychological Methods. 15(4): 309 - 334.
+
+Schomaker M, Heumann C. Bootstrap inference when using multiple imputation (2018). Statistics in Medicine. 37(14): 2252 - 2266.
+
+VanderWeele TJ, Ding P. Sensitivity analysis in observational research: introducing the E-Value (2017). Annals of Internal Medicine. 167(4): 268 - 274.
+
+Smith LH, VanderWeele TJ. Mediational E-values: Approximate sensitivity analysis for unmeasured mediator-outcome confounding (2019). Epidemiology. 30(6): 835 - 837.
+
+Carrol RJ, Ruppert D, Stefanski LA, Crainiceanu C. Measurement Error in Nonlinear Models: A Modern Perspective, Second Edition (2006). London: Chapman & Hall.
+
+Cook JR, Stefanski LA. Simulation-extrapolation estimation in parametric measurement error models (1994). Journal of the American Statistical Association, 89(428): 1314 - 1328.
+
+Küchenhoff H, Mwalili SM, Lesaffre E. A general method for dealing with misclassification in regression: the misclassification SIMEX (2006). Biometrics. 62(1): 85 - 96.
+
+Stefanski LA, Cook JR. Simulation-extrapolation: the measurement error jackknife (1995). Journal of the American Statistical Association. 90(432): 1247 - 56.
