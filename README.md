@@ -300,7 +300,7 @@ al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5285457/).
 </tbody>
 </table>
 <section class="footnotes" role="doc-endnotes">
-<hr />
+
 <ol>
 <li id="fn1" role="doc-endnote"><p>rb: the regression-based approach; wb: the weighting-based approach; iorw: the inverse odds ratio weighting approach; ne: the natural effect model; msm: the marginal structural model; gformula: the g-formula approach.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn2" role="doc-endnote"><p>Y denotes the outcome, A denotes the exposure, M denotes the mediator(s) and C denotes the pre-exposure confounder(s).<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
