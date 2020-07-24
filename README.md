@@ -653,8 +653,8 @@ Schomaker M, Heumann C. Bootstrap inference when using multiple
 imputation (2018). Statistics in Medicine. 37(14): 2252 - 2266.
 
 VanderWeele TJ, Ding P. Sensitivity analysis in observational research:
-introducing the E-Value (2017). Annals of Internal Medicine. 167(4): 268
-- 274.
+introducing the E-Value (2017). Annals of Internal Medicine. 
+167(4): 268 - 274.
 
 Smith LH, VanderWeele TJ. Mediational E-values: Approximate sensitivity
 analysis for unmeasured mediator-outcome confounding (2019).
