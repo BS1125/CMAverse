@@ -14,6 +14,8 @@ knitr::opts_chunk$set(
 
 # CMAverse <img src="man/figures/logo.png" align="right" width="200" />
 
+[![Project Status: Active](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
+
 ## About the Package 
 
 The R package `CMAverse` provides a suite of functions conducting causal mediation analysis including `cmdag` for DAG visualization, `cmest` for statistical modeling and `cmsens` for sensitivity analysis.
