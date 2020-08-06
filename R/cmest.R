@@ -787,8 +787,8 @@ plot.cmest <- function(cmest) {
                           CIlower = cmest$effect.ci.low,
                           CIupper = cmest$effect.ci.high)
 
-  if ((inherits(cmest$regressions$outcome, "lm") | inherits(cmest$regressions$outcome, "glm")) &&
-      (family(cmest$regressions$outcome)$family %in% c("gaussian","Gamma","inverse.gaussian","quasi"))) {
+  if ((inherits(cmest$reg.output$yreg, "lm") | inherits(cmest$reg.output$yreg, "glm")) &&
+      (family(cmest$reg.output$yreg)$family %in% c("gaussian","Gamma","inverse.gaussian","quasi"))) {
     refline <- 0
   } else refline <- 1
   ggplot() +
