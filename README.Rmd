@@ -2,15 +2,17 @@
 output: md_document
 ---
 
-# About the Package <img src="man/figures/logo.png" align="right" width="300" />
+# CMAverse <img src="man/figures/logo.png" align="right" width="300" />
+
+## About the Package 
 
 The R package `CMAverse` provides a suite of functions conducting causal mediation analysis including `cmdag` for DAG visualization, `cmest` for statistical modeling and `cmsens` for sensitivity analysis.
 
-## DAG Visualization
+### DAG Visualization
 
 `cmdag` visualizes the scientific setting via a DAG.
 
-## Statistical Modeling
+### Statistical Modeling
 
 `cmest` implements six causal mediation analysis approaches including *the regression-based approach* by [Valeri et al. (2013)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3659198/) and [Vanderweele et al. (2014)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/), 
 *the weighting-based approach* by [Vanderweele et al. (2014)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/), *the inverse odd-ratio weighting 
@@ -58,15 +60,15 @@ Table: Table: Supported Data Types and Functionalities of `cmest`
 [^7]: continuous A is not supported when C is not empty; otherwise, it is supported.
 [^8]: count A is not supported when C is not empty; otherwise, it is supported.
 
-## Multiple Imputation
+### Multiple Imputation
 
 `cmest` provides options to perform multiple imputation for a dataset with missing values via the `mice` package, estimate the causal effects with each of the imputed datasets and pool the results together.
 
-## Sensitivity Analysis
+### Sensitivity Analysis
 
 `cmsens` conducts sensitivity analysis for unmeasured confounding via the *E-value* approach by [Vanderweele et al. (2017)](https://pubmed.ncbi.nlm.nih.gov/28693043/) and sensitivity analysis for measurement error via *regression calibration* by [Carroll et al. (1995)](https://www.taylorfrancis.com/books/9780429139635), *SIMEX* by [Cook et al. (1994)](https://www.jstor.org/stable/2290994?seq=1#metadata_info_tab_contents) or *MCSIMEX* by [Küchenhoff et al. (2006)](https://pubmed.ncbi.nlm.nih.gov/16542233/). The sensitivity analysis for measurement error is currently available for *the regression-based approach* and *the g-formula approach*.
 
-# Installation
+## Installation
 
 The latest version can be installed via:
 
@@ -80,7 +82,7 @@ Load `CMAverse`:
 library(CMAverse)
 ```
 
-# Quickstart Guide
+## Quickstart Guide
 
 We illustrate the general workflow of the `CMAverse` package by a quick example. Firstly, let's simulate some data and plot the DAG of the scientific setting. The simulated dataset contains a binary exposure, a binary mediator, a continuous mediator, a continuous outcome and two pre-exposure confounders.
 
@@ -176,7 +178,7 @@ plot(me2) +
   theme(axis.text.x = element_text(angle = 30, vjust = 0.8))
 ```
 
-# References
+## References
 
 Valeri L, Vanderweele TJ (2013). Mediation analysis allowing for exposure-mediator interactions and causal interpretation: theoretical assumptions and implementation with SAS and SPSS macros. Psychological Methods. 18(2): 137 - 150.
  
