@@ -12,7 +12,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# CMAverse <img src="man/figures/logo.png" align="right" width="200" />
+# CMAverse <img src="man/figures/logo.png" align="right" width="250" />
 
 [![Project Status: Active](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
 
