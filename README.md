@@ -1,8 +1,9 @@
-CMAverse <img src="man/figures/logo.png" align="right" width="300" />
-=====================================================================
 
-About the Package
------------------
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+# CMAverse <img src="man/figures/logo.png" align="right" width="300" />
+
+## About the Package
 
 The R package `CMAverse` provides a suite of functions conducting causal
 mediation analysis including `cmdag` for DAG visualization, `cmest` for
@@ -18,292 +19,49 @@ statistical modeling and `cmsens` for sensitivity analysis.
 *the regression-based approach* by [Valeri et
 al. (2013)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3659198/) and
 [Vanderweele et
-al. (2014)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/), *the
-weighting-based approach* by [Vanderweele et
-al. (2014)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/), *the
-inverse odd-ratio weighting approach* by [Tchetgen Tchetgen et
-al. (2013)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3954805/), *the
-natural effect model* by [Vansteelandt et
+al. (2014)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/),
+*the weighting-based approach* by [Vanderweele et
+al. (2014)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/),
+*the inverse odd-ratio weighting approach* by [Tchetgen Tchetgen et
+al. (2013)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3954805/),
+*the natural effect model* by [Vansteelandt et
 al. (2012)](https://www.degruyter.com/view/journals/em/1/1/article-p131.xml?language=en),
 *the marginal structural model* by [VanderWeele et
 al. (2009)](https://pubmed.ncbi.nlm.nih.gov/19234398), and *the
 g-formula approach* by [Lin et
 al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5285457/).
 
-<table>
-<caption>Table: Supported Data Types and Functionalities of <code>cmest</code></caption>
-<thead>
-<tr class="header">
-<th></th>
-<th style="text-align: center;">rb</th>
-<th style="text-align: center;">wb</th>
-<th style="text-align: center;">iorw</th>
-<th style="text-align: center;">ne</th>
-<th style="text-align: center;">msm</th>
-<th style="text-align: center;">gformula<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Continuous Y<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-</tr>
-<tr class="even">
-<td>Binary Y</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-</tr>
-<tr class="odd">
-<td>Count Y</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-</tr>
-<tr class="even">
-<td>Nominal Y</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">×</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-</tr>
-<tr class="odd">
-<td>Ordinal Y</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">×</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-</tr>
-<tr class="even">
-<td>Survival Y</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">×</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-</tr>
-<tr class="odd">
-<td>Continuous M</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">×</td>
-<td style="text-align: center;">√</td>
-</tr>
-<tr class="even">
-<td>Binary M</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-</tr>
-<tr class="odd">
-<td>Nominal M</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-</tr>
-<tr class="even">
-<td>Ordinal M</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-</tr>
-<tr class="odd">
-<td>Count M</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">×</td>
-<td style="text-align: center;">√</td>
-</tr>
-<tr class="even">
-<td>M of Any Type</td>
-<td style="text-align: center;">×</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">×</td>
-<td style="text-align: center;">×</td>
-</tr>
-<tr class="odd">
-<td>Continuous A</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">×<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a></td>
-<td style="text-align: center;">×</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">×<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a></td>
-<td style="text-align: center;">√</td>
-</tr>
-<tr class="even">
-<td>Binary A</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-</tr>
-<tr class="odd">
-<td>Nominal A</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-</tr>
-<tr class="even">
-<td>Ordinal A</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-</tr>
-<tr class="odd">
-<td>Count A</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">×<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a></td>
-<td style="text-align: center;">×</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">×<a href="#fn6" class="footnote-ref" id="fnref6" role="doc-noteref"><sup>6</sup></a></td>
-<td style="text-align: center;">√</td>
-</tr>
-<tr class="even">
-<td>Multiple Mediators</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-</tr>
-<tr class="odd">
-<td>Post-exposure Confounding</td>
-<td style="text-align: center;">×</td>
-<td style="text-align: center;">×</td>
-<td style="text-align: center;">×</td>
-<td style="text-align: center;">×</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-</tr>
-<tr class="even">
-<td>2-way Decomposition</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-</tr>
-<tr class="odd">
-<td>4-way Decomposition</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">×</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-</tr>
-<tr class="even">
-<td>Estimation: Closed-form Parameter Function</td>
-<td style="text-align: center;">√<a href="#fn7" class="footnote-ref" id="fnref7" role="doc-noteref"><sup>7</sup></a></td>
-<td style="text-align: center;">×</td>
-<td style="text-align: center;">×</td>
-<td style="text-align: center;">×</td>
-<td style="text-align: center;">×</td>
-<td style="text-align: center;">×</td>
-</tr>
-<tr class="odd">
-<td>Estimation: Direct Counterfactual Imputation</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-</tr>
-<tr class="even">
-<td>Inference: Delta Method</td>
-<td style="text-align: center;">√<a href="#fn8" class="footnote-ref" id="fnref8" role="doc-noteref"><sup>8</sup></a></td>
-<td style="text-align: center;">×</td>
-<td style="text-align: center;">×</td>
-<td style="text-align: center;">×</td>
-<td style="text-align: center;">×</td>
-<td style="text-align: center;">×</td>
-</tr>
-<tr class="odd">
-<td>Inference: Bootstrapping</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-</tr>
-<tr class="even">
-<td>Marginal Effects</td>
-<td style="text-align: center;">√<a href="#fn9" class="footnote-ref" id="fnref9" role="doc-noteref"><sup>9</sup></a></td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-</tr>
-<tr class="odd">
-<td>Effects Conditional On C</td>
-<td style="text-align: center;">√<a href="#fn10" class="footnote-ref" id="fnref10" role="doc-noteref"><sup>10</sup></a></td>
-<td style="text-align: center;">×</td>
-<td style="text-align: center;">×</td>
-<td style="text-align: center;">×</td>
-<td style="text-align: center;">×</td>
-<td style="text-align: center;">×</td>
-</tr>
-</tbody>
-</table>
-<section class="footnotes" role="doc-endnotes">
-<hr />
-<ol>
-<li id="fn1" role="doc-endnote"><p>rb: the regression-based approach; wb: the weighting-based approach; iorw: the inverse odds ratio weighting approach; ne: the natural effect model; msm: the marginal structural model; gformula: the g-formula approach.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2" role="doc-endnote"><p>Y denotes the outcome, A denotes the exposure, M denotes the mediator(s) and C denotes the pre-exposure confounder(s).<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn3" role="doc-endnote"><p>continuous A is not supported when C is not empty; otherwise, it is supported.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn4" role="doc-endnote"><p>continuous A is not supported when C is not empty; otherwise, it is supported.<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn5" role="doc-endnote"><p>count A is not supported when C is not empty; otherwise, it is supported.<a href="#fnref5" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn6" role="doc-endnote"><p>count A is not supported when C is not empty; otherwise, it is supported.<a href="#fnref6" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn7" role="doc-endnote"><p>closed-form parameter function estimation only supports the regression-based approach and a single mediator.<a href="#fnref7" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn8" role="doc-endnote"><p>delta method inference is available only when closed-form parameter function estimation is used.<a href="#fnref8" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn9" role="doc-endnote"><p>marginal effects are estimated when direct counterfactual imputation estimation is used.<a href="#fnref9" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn10" role="doc-endnote"><p>conditional effects are estimated when closed-form parameter function estimation is used.<a href="#fnref10" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-</ol>
-</section>
+|                                              |   rb    |   wb   | iorw | ne |  msm   | gformula\[1\] |
+| -------------------------------------------- | :-----: | :----: | :--: | :-: | :----: | :-----------: |
+| Continuous Y\[2\]                            |    √    |   √    |  √   | √  |   √    |       √       |
+| Binary Y                                     |    √    |   √    |  √   | √  |   √    |       √       |
+| Count Y                                      |    √    |   √    |  √   | √  |   √    |       √       |
+| Nominal Y                                    |    √    |   √    |  √   | ×  |   √    |       √       |
+| Ordinal Y                                    |    √    |   √    |  √   | ×  |   √    |       √       |
+| Survival Y                                   |    √    |   √    |  √   | ×  |   √    |       √       |
+| Continuous M                                 |    √    |   √    |  √   | √  |   ×    |       √       |
+| Binary M                                     |    √    |   √    |  √   | √  |   √    |       √       |
+| Nominal M                                    |    √    |   √    |  √   | √  |   √    |       √       |
+| Ordinal M                                    |    √    |   √    |  √   | √  |   √    |       √       |
+| Count M                                      |    √    |   √    |  √   | √  |   ×    |       √       |
+| M of Any Type                                |    ×    |   √    |  √   | √  |   ×    |       ×       |
+| Continuous A                                 |    √    | ×\[3\] |  ×   | √  | ×\[4\] |       √       |
+| Binary A                                     |    √    |   √    |  √   | √  |   √    |       √       |
+| Nominal A                                    |    √    |   √    |  √   | √  |   √    |       √       |
+| Ordinal A                                    |    √    |   √    |  √   | √  |   √    |       √       |
+| Count A                                      |    √    | ×\[5\] |  ×   | √  | ×\[6\] |       √       |
+| Multiple Mediators                           |    √    |   √    |  √   | √  |   √    |       √       |
+| Post-exposure Confounding                    |    ×    |   ×    |  ×   | ×  |   √    |       √       |
+| 2-way Decomposition                          |    √    |   √    |  √   | √  |   √    |       √       |
+| 4-way Decomposition                          |    √    |   √    |  ×   | √  |   √    |       √       |
+| Estimation: Closed-form Parameter Function   | √\[7\]  |   ×    |  ×   | ×  |   ×    |       ×       |
+| Estimation: Direct Counterfactual Imputation |    √    |   √    |  √   | √  |   √    |       √       |
+| Inference: Delta Method                      | √\[8\]  |   ×    |  ×   | ×  |   ×    |       ×       |
+| Inference: Bootstrapping                     |    √    |   √    |  √   | √  |   √    |       √       |
+| Marginal Effects                             | √\[9\]  |   √    |  √   | √  |   √    |       √       |
+| Effects Conditional On C                     | √\[10\] |   ×    |  ×   | ×  |   ×    |       ×       |
+
+Table: Supported Data Types and Functionalities of `cmest`
 
 ### Multiple Imputation
 
@@ -325,19 +83,21 @@ al. (2006)](https://pubmed.ncbi.nlm.nih.gov/16542233/). The sensitivity
 analysis for measurement error is currently available for *the
 regression-based approach* and *the g-formula approach*.
 
-Installation
-------------
+## Installation
 
 The latest version can be installed via:
 
-    devtools::install_github("LindaValeri/CMAverse")
+``` r
+devtools::install_github("LindaValeri/CMAverse")
+```
 
 Load `CMAverse`:
 
-    library(CMAverse)
+``` r
+library(CMAverse)
+```
 
-Quickstart Guide
-----------------
+## Quickstart Guide
 
 We illustrate the general workflow of the `CMAverse` package by a quick
 example. Firstly, let’s simulate some data and plot the DAG of the
@@ -345,264 +105,283 @@ scientific setting. The simulated dataset contains a binary exposure, a
 binary mediator, a continuous mediator, a continuous outcome and two
 pre-exposure confounders.
 
-    n <- 30
-    C1 <- rnorm(n, mean = 1, sd = 1)
-    C2 <- rbinom(n, 1, 0.6)
-    C2[which(C2 == 0)] <- "C2_0"
-    C2[which(C2 == 1)] <- "C2_1"
-    pa <- exp(0.2 - 0.5*C1 + 0.1*(C2 == "C2_1"))/(1 + exp(0.2 - 0.5*C1 + 0.1*(C2 == "C2_1")))
-    A <- rbinom(n, 1, pa)
-    A[which(A == 0)] <- "control"
-    A[which(A == 1)] <- "treat"
-    pm <- exp(1 + 0.5*(A == "treat") - 1.5*C1 + 0.5*(C2 == "C2_1"))/
-      (1 + exp(1 + 0.5*(A == "treat") - 1.5*C1 + 0.5*(C2 == "C2_1")))
-    M1 <- rbinom(n, 1, pm)
-    M2 <- rnorm(n, 2 + 0.8*(A == "treat") - M1 + 0.5*C1 + 2*(C2 == "C2_1"), 1)
-    Y <- rnorm(n, mean = 0.5 + 0.4*(A == "treat") + 0.5*M1 + 0.6*M2 + 0.3*(A == "treat")*M1 +
-                 0.2*(A == "treat")*M2 - 0.3*C1 + 2*(C2=="C2_1"), sd = 1)
-    data <- data.frame(A, M1, M2, Y, C1, C2)
+``` r
+n <- 30
+C1 <- rnorm(n, mean = 1, sd = 1)
+C2 <- rbinom(n, 1, 0.6)
+C2[which(C2 == 0)] <- "C2_0"
+C2[which(C2 == 1)] <- "C2_1"
+pa <- exp(0.2 - 0.5*C1 + 0.1*(C2 == "C2_1"))/(1 + exp(0.2 - 0.5*C1 + 0.1*(C2 == "C2_1")))
+A <- rbinom(n, 1, pa)
+A[which(A == 0)] <- "control"
+A[which(A == 1)] <- "treat"
+pm <- exp(1 + 0.5*(A == "treat") - 1.5*C1 + 0.5*(C2 == "C2_1"))/
+  (1 + exp(1 + 0.5*(A == "treat") - 1.5*C1 + 0.5*(C2 == "C2_1")))
+M1 <- rbinom(n, 1, pm)
+M2 <- rnorm(n, 2 + 0.8*(A == "treat") - M1 + 0.5*C1 + 2*(C2 == "C2_1"), 1)
+Y <- rnorm(n, mean = 0.5 + 0.4*(A == "treat") + 0.5*M1 + 0.6*M2 + 0.3*(A == "treat")*M1 +
+             0.2*(A == "treat")*M2 - 0.3*C1 + 2*(C2=="C2_1"), sd = 1)
+data <- data.frame(A, M1, M2, Y, C1, C2)
+```
 
 The DAG can be plotted using the `cmdag` function.
 
-    cmdag(outcome = "Y", exposure = "A", mediator = c("M1", "M2"), 
-          prec = c("C1", "C2"), postc = NULL,
-          node = FALSE, text_col = "black")
+``` r
+cmdag(outcome = "Y", exposure = "A", mediator = c("M1", "M2"), 
+      prec = c("C1", "C2"), postc = NULL,
+      node = FALSE, text_col = "black")
+```
 
-![](README_files/figure-markdown_strict/plot_dag-1.png)
+![](man/figuresplot_dag-1.png)<!-- -->
 
 Then, we estimate the causal effects using the `cmest` function. We use
 the regression-based approach for illustration. The reference values for
 the exposure are set to be 0 and 1. The reference values for the two
 mediators are set to be 0.
 
-    est <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
-                    mediator = c("M1", "M2"), prec = c("C1", "C2"), EMint = TRUE,
-                    mreg = list("logistic", "linear"), yreg = "linear",
-                    astar = 0, a = 1, mval = list(0, 0),
-                    estimation = "imputation", inference = "bootstrap", nboot = 5)
+``` r
+est <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
+                mediator = c("M1", "M2"), prec = c("C1", "C2"), EMint = TRUE,
+                mreg = list("logistic", "linear"), yreg = "linear",
+                astar = 0, a = 1, mval = list(0, 0),
+                estimation = "imputation", inference = "bootstrap", nboot = 5)
+```
 
 Summarizing and plotting the results:
 
-    summary(est)
+``` r
+summary(est)
+#> 
+#> Causal Mediation Analysis Via the Regression-based Approach
+#>  
+#> Direct counterfactual imputation estimation with 
+#>  bootstrap standard errors, percentile confidence intervals and p-values 
+#>  
+#>              Estimate Std.error  95% CIL 95% CIU  P.val    
+#> cde           1.79585   1.61455 -1.53279   2.100    0.4    
+#> pnde          1.67472   0.42547  1.00895   2.059 <2e-16 ***
+#> tnde          1.64392   0.49248  1.10432   2.248 <2e-16 ***
+#> pnie          0.54145   0.31529  0.35501   1.013 <2e-16 ***
+#> tnie          0.51065   0.48752  0.49978   1.560 <2e-16 ***
+#> te            2.18537   0.28037  2.01052   2.614 <2e-16 ***
+#> pm            0.23367   0.17623  0.19991   0.601 <2e-16 ***
+#> intref       -0.12113   1.22188 -0.04504   2.542    0.8    
+#> intmed       -0.03080   0.63256 -0.37638   1.134    0.8    
+#> cde(prop)     0.82176   0.63819 -0.57693   0.816    0.4    
+#> intref(prop) -0.05543   0.46847 -0.01730   0.983    0.8    
+#> intmed(prop) -0.01410   0.25527 -0.18832   0.437    0.8    
+#> pnie(prop)    0.24776   0.14997  0.13637   0.462 <2e-16 ***
+#> pm(overall)   0.23367   0.17623  0.19991   0.601 <2e-16 ***
+#> int(overall) -0.06952   0.69954 -0.05447   1.402    0.8    
+#> pe(overall)   0.17824   0.63819  0.18425   1.577 <2e-16 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
 
-    ## 
-    ## Causal Mediation Analysis Via the Regression-based Approach
-    ##  
-    ## Direct counterfactual imputation estimation with 
-    ##  bootstrap standard errors, percentile confidence intervals and p-values 
-    ##  
-    ##               Estimate Std.error   95% CIL 95% CIU  P.val    
-    ## cde          -0.658963  0.753200 -2.155124  -0.347 <2e-16 ***
-    ## pnde          1.260381  0.341023  0.703075   1.437 <2e-16 ***
-    ## tnde          1.566422  0.481788  0.860943   1.920 <2e-16 ***
-    ## pnie          0.484661  0.260754  0.134236   0.784 <2e-16 ***
-    ## tnie          0.790702  0.448194  0.334669   1.434 <2e-16 ***
-    ## te            2.051083  0.664573  1.067875   2.683 <2e-16 ***
-    ## pm            0.385505  0.118009  0.276553   0.540 <2e-16 ***
-    ## intref        1.919344  0.534888  1.740029   2.926 <2e-16 ***
-    ## intmed        0.306041  0.280879  0.012723   0.671    0.4    
-    ## cde(prop)    -0.321276  0.841134 -2.061961  -0.165 <2e-16 ***
-    ## intref(prop)  0.935771  0.892701  0.685890   2.742 <2e-16 ***
-    ## intmed(prop)  0.149209  0.105678  0.009747   0.250    0.4    
-    ## pnie(prop)    0.236295  0.109643  0.113553   0.375 <2e-16 ***
-    ## pm(overall)   0.385505  0.118009  0.276553   0.540 <2e-16 ***
-    ## int(overall)  1.084980  0.912099  0.888015   2.926 <2e-16 ***
-    ## pe(overall)   1.321276  0.841134  1.165199   3.062 <2e-16 ***
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+``` r
+plot(est) +
+  theme(axis.text.x = element_text(angle = 30, vjust = 0.8))
+```
 
-    plot(est) +
-      theme(axis.text.x = element_text(angle = 30, vjust = 0.8))
-
-![](README_files/figure-markdown_strict/plot_cmest-1.png)
+![](man/figuresplot_cmest-1.png)<!-- -->
 
 Lastly, let’s conduct sensitivity analysis for the results. Sensitivity
 analysis for unmeasured confounding:
 
-    cmsens(object = est, sens = "uc")
-
-    ## Sensitivity Analysis For Unmeasured Confounding 
-    ## 
-    ## Evalues on the ratio scale: 
-    ##          estRR   lowerRR  upperRR Evalue.estRR Evalue.lowerRR Evalue.upperRR
-    ## cde  0.7851671 0.4572158 1.348351     1.863935             NA              1
-    ## pnde 1.5881930 1.2432983 2.028763     2.554715       1.793291             NA
-    ## tnde 1.7769932 1.2573858 2.511325     2.952030       1.826274             NA
-    ## pnie 1.1946879 0.9907263 1.440639     1.676965       1.000000             NA
-    ## tnie 1.3367092 0.9689338 1.844080     2.007591       1.000000             NA
-    ## te   2.1229522 1.3174447 3.420960     3.666964       1.964141             NA
+``` r
+cmsens(object = est, sens = "uc")
+#> Sensitivity Analysis For Unmeasured Confounding 
+#> 
+#> Evalues on the ratio scale: 
+#>         estRR   lowerRR  upperRR Evalue.estRR Evalue.lowerRR Evalue.upperRR
+#> cde  2.249041 0.5407336 9.354305     3.925092       1.000000             NA
+#> pnde 2.129394 1.4626200 3.100134     3.680175       2.285200             NA
+#> tnde 2.099994 1.3595681 3.243658     3.619856       2.058751             NA
+#> pnie 1.276815 0.9665999 1.686589     1.871325       1.000000             NA
+#> tnie 1.259187 0.8187949 1.936445     1.830470       1.000000             NA
+#> te   2.681304 2.0934113 3.434295     4.804530       3.606342             NA
+```
 
 Assume that the continuous pre-exposure confounder was measured with
 error. Sensitivity analysis using regression calibration with a set of
 assumed standard deviations of the measurement error 0.1, 0.2 and 0.3:
 
-    me1 <- cmsens(object = est, sens = "me", MEmethod = "rc", 
-                  MEvariable = "C1", MEvartype = "con", MEerror = c(0.1, 0.2, 0.3))
+``` r
+me1 <- cmsens(object = est, sens = "me", MEmethod = "rc", 
+              MEvariable = "C1", MEvartype = "con", MEerror = c(0.1, 0.2, 0.3))
+```
 
 Summarizing and plotting the results:
 
-    summary(me1)
+``` r
+summary(me1)
+#> Sensitivity Analysis For Measurement Error 
+#>  
+#> The variable measured with error: C1
+#> Type of the variable measured with error: continuous
+#> 
+#> Measurement error 1: 
+#> 0.1
+#> Measurement error correction for measurement error 1: 
+#>              Estimate Std.error  95% CIL 95% CIU  P.val    
+#> cde           1.80927   2.34837 -0.97823   5.011    0.4    
+#> pnde          1.71727   0.53662  1.17056   2.329 <2e-16 ***
+#> tnde          1.68646   0.69584  0.87117   2.494 <2e-16 ***
+#> pnie          0.53380   0.41713  0.05375   1.003 <2e-16 ***
+#> tnie          0.50299   0.61884  0.03566   1.432 <2e-16 ***
+#> te            2.22026   0.36509  1.86147   2.715 <2e-16 ***
+#> pm            0.22655   0.24556  0.01681   0.549 <2e-16 ***
+#> intref       -0.09200   2.20948 -3.28280   2.272    0.8    
+#> intmed       -0.03081   0.71733 -0.87866   0.954    0.8    
+#> cde(prop)     0.81489   1.22351 -0.36883   2.737    0.4    
+#> intref(prop) -0.04144   1.06365 -1.79622   0.862    0.8    
+#> intmed(prop) -0.01388   0.33629 -0.48456   0.362    0.8    
+#> pnie(prop)    0.24042   0.21482  0.02055   0.535 <2e-16 ***
+#> pm(overall)   0.22655   0.24556  0.01681   0.549 <2e-16 ***
+#> int(overall) -0.05531   1.38729 -2.27170   1.224    0.8    
+#> pe(overall)   0.18511   1.22351 -1.73676   1.369    0.8    
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> ----------------------------------------------------------------
+#> 
+#> Measurement error 2: 
+#> 0.2
+#> Measurement error correction for measurement error 2: 
+#>              Estimate Std.error  95% CIL 95% CIU  P.val    
+#> cde           1.85567   2.56296 -0.92920   5.628    0.4    
+#> pnde          1.73427   0.65656  1.02717   2.595 <2e-16 ***
+#> tnde          1.69365   0.43897  0.96058   1.887 <2e-16 ***
+#> pnie          0.53945   0.61087  0.22719   1.724 <2e-16 ***
+#> tnie          0.49883   0.43985  0.09402   1.075 <2e-16 ***
+#> te            2.23310   0.35178  1.93156   2.762 <2e-16 ***
+#> pm            0.22338   0.20873  0.04250   0.507 <2e-16 ***
+#> intref       -0.12139   1.98068 -3.06329   2.001    0.4    
+#> intmed       -0.04063   0.92740 -1.54648   0.815    0.4    
+#> cde(prop)     0.83098   0.99070 -0.45356   2.046    0.4    
+#> intref(prop) -0.05436   0.81552 -1.11261   0.949    0.4    
+#> intmed(prop) -0.01819   0.37079 -0.55848   0.387    0.4    
+#> pnie(prop)    0.24157   0.21929  0.10746   0.634 <2e-16 ***
+#> pm(overall)   0.22338   0.20873  0.04250   0.507 <2e-16 ***
+#> int(overall) -0.07255   1.18358 -1.66760   1.336    0.4    
+#> pe(overall)   0.16902   0.99070 -1.04562   1.454    0.8    
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> ----------------------------------------------------------------
+#> 
+#> Measurement error 3: 
+#> 0.3
+#> Measurement error correction for measurement error 3: 
+#>              Estimate Std.error  95% CIL 95% CIU  P.val    
+#> cde           1.96205   2.54447  1.31162   7.215 <2e-16 ***
+#> pnde          1.85066   1.38063  1.26316   4.534 <2e-16 ***
+#> tnde          1.77078   0.72456  1.25796   3.044 <2e-16 ***
+#> pnie          0.62185   0.10614  0.19210   0.427 <2e-16 ***
+#> tnie          0.54197   0.76464 -1.27433   0.408    0.8    
+#> te            2.39263   0.67340  1.65641   3.293 <2e-16 ***
+#> pm            0.22652   0.26426 -0.37945   0.242    0.8    
+#> intref       -0.11139   1.17818 -2.68128  -0.037 <2e-16 ***
+#> intmed       -0.07988   0.69668 -1.49867   0.000    0.4    
+#> cde(prop)     0.82004   0.60535  0.77631   2.187 <2e-16 ***
+#> intref(prop) -0.04656   0.34143 -0.80764  -0.018 <2e-16 ***
+#> intmed(prop) -0.03339   0.20352 -0.44878   0.000    0.4    
+#> pnie(prop)    0.25990   0.07376  0.06933   0.242 <2e-16 ***
+#> pm(overall)   0.22652   0.26426 -0.37945   0.242    0.8    
+#> int(overall) -0.07994   0.54330 -1.25642  -0.018 <2e-16 ***
+#> pe(overall)   0.17996   0.60535 -1.18709   0.224    0.8    
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> ----------------------------------------------------------------
+```
 
-    ## Sensitivity Analysis For Measurement Error 
-    ##  
-    ## The variable measured with error: C1
-    ## Type of the variable measured with error: continuous
-    ## 
-    ## Measurement error 1: 
-    ## 0.1
-    ## Measurement error correction for measurement error 1: 
-    ##              Estimate Std.error  95% CIL 95% CIU  P.val    
-    ## cde          -0.65674   1.15974 -2.54844   0.047    0.4    
-    ## pnde          1.19921   0.29399  1.08291   1.777 <2e-16 ***
-    ## tnde          1.51534   0.44059  1.00878   2.093 <2e-16 ***
-    ## pnie          0.50405   0.07742  0.14731   0.326 <2e-16 ***
-    ## tnie          0.82018   0.21541  0.09792   0.635 <2e-16 ***
-    ## te            2.01939   0.39193  1.33069   2.251 <2e-16 ***
-    ## pm            0.40615   0.10805  0.07154   0.341 <2e-16 ***
-    ## intref        1.85595   1.17693  1.03627   3.789 <2e-16 ***
-    ## intmed        0.31613   0.25010 -0.21801   0.383    0.4    
-    ## cde(prop)    -0.32522   0.87462 -1.91334   0.038    0.4    
-    ## intref(prop)  0.91906   0.96821  0.68638   2.842 <2e-16 ***
-    ## intmed(prop)  0.15655   0.15395 -0.16667   0.201    0.4    
-    ## pnie(prop)    0.24961   0.07084  0.06766   0.243 <2e-16 ***
-    ## pm(overall)   0.40615   0.10805  0.07154   0.341 <2e-16 ***
-    ## int(overall)  1.07561   0.83390  0.81258   2.675 <2e-16 ***
-    ## pe(overall)   1.32522   0.87462  0.96153   2.913 <2e-16 ***
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## ----------------------------------------------------------------
-    ## 
-    ## Measurement error 2: 
-    ## 0.2
-    ## Measurement error correction for measurement error 2: 
-    ##              Estimate Std.error  95% CIL 95% CIU  P.val    
-    ## cde          -0.64918   1.68791 -4.21245  -0.470 <2e-16 ***
-    ## pnde          1.14238   0.31107  0.71326   1.407 <2e-16 ***
-    ## tnde          1.44868   0.51621  0.65003   1.770 <2e-16 ***
-    ## pnie          0.48309   0.51446  0.02835   1.161    0.4    
-    ## tnie          0.78939   0.56448 -0.08118   1.166    0.4    
-    ## te            1.93177   0.50443  1.06403   2.279 <2e-16 ***
-    ## pm            0.40864   0.32604 -0.11970   0.612    0.4    
-    ## intref        1.79156   1.71757  1.53814   5.317 <2e-16 ***
-    ## intmed        0.30631   0.26512 -0.15208   0.412    0.8    
-    ## cde(prop)    -0.33606   1.86465 -4.20911  -0.220 <2e-16 ***
-    ## intref(prop)  0.92742   2.15885  0.74632   5.300 <2e-16 ***
-    ## intmed(prop)  0.15856   0.14745 -0.15172   0.181    0.8    
-    ## pnie(prop)    0.25007   0.28615  0.01136   0.640    0.4    
-    ## pm(overall)   0.40864   0.32604 -0.11970   0.612    0.4    
-    ## int(overall)  1.08598   2.04926  0.81904   5.150 <2e-16 ***
-    ## pe(overall)   1.33606   1.86465  1.21986   5.209 <2e-16 ***
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## ----------------------------------------------------------------
-    ## 
-    ## Measurement error 3: 
-    ## 0.3
-    ## Measurement error correction for measurement error 3: 
-    ##              Estimate Std.error  95% CIL 95% CIU  P.val    
-    ## cde          -0.63264   1.18666 -0.76658   1.974    0.8    
-    ## pnde          1.14597   0.23318  1.53113   2.055 <2e-16 ***
-    ## tnde          1.39469   0.30994  1.48052   2.254 <2e-16 ***
-    ## pnie          0.36014   0.28039  0.23721   0.937 <2e-16 ***
-    ## tnie          0.60885   0.51436  0.02607   1.168 <2e-16 ***
-    ## te            1.75482   0.51208  1.97122   3.178 <2e-16 ***
-    ## pm            0.34696   0.17514  0.01311   0.380 <2e-16 ***
-    ## intref        1.77861   1.07266  0.03970   2.664    0.4    
-    ## intmed        0.24871   0.33770 -0.46463   0.356    0.8    
-    ## cde(prop)    -0.36051   0.50942 -0.38418   0.804    0.8    
-    ## intref(prop)  1.01355   0.52337  0.02168   1.337    0.4    
-    ## intmed(prop)  0.14173   0.15566 -0.23645   0.146    0.8    
-    ## pnie(prop)    0.20523   0.07787  0.11231   0.298 <2e-16 ***
-    ## pm(overall)   0.34696   0.17514  0.01311   0.380 <2e-16 ***
-    ## int(overall)  1.15528   0.46607  0.03569   1.123    0.4    
-    ## pe(overall)   1.36051   0.50942  0.19632   1.384 <2e-16 ***
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## ----------------------------------------------------------------
+``` r
+plot(me1) +
+  theme(axis.text.x = element_text(angle = 30, vjust = 0.8))
+```
 
-    plot(me1) +
-      theme(axis.text.x = element_text(angle = 30, vjust = 0.8))
-
-![](README_files/figure-markdown_strict/plot_cmsens_me_con-1.png)
+![](man/figuresplot_cmsens_me_con-1.png)<!-- -->
 
 Then, assume that the exposure was measured with error. Sensitivity
 analysis using MCSIMEX with two assumed misclassification matrices:
 
-    me2 <- cmsens(object = est, sens = "me", MEmethod = "simex", MEvariable = "A", 
-                  MEvartype = "cat", B = 5,
-                  MEerror = list(matrix(c(0.95, 0.05, 0.05, 0.95), nrow = 2), 
-                                 matrix(c(0.9, 0.1, 0.1, 0.9), nrow = 2)))
+``` r
+me2 <- cmsens(object = est, sens = "me", MEmethod = "simex", MEvariable = "A", 
+              MEvartype = "cat", B = 5,
+              MEerror = list(matrix(c(0.95, 0.05, 0.05, 0.95), nrow = 2), 
+                             matrix(c(0.9, 0.1, 0.1, 0.9), nrow = 2)))
+```
 
 Summarizing and plotting the results:
 
-    summary(me2)
+``` r
+summary(me2)
+#> Sensitivity Analysis For Measurement Error 
+#>  
+#> The variable measured with error: A
+#> Type of the variable measured with error: categorical
+#> 
+#> Measurement error 1: 
+#>      [,1] [,2]
+#> [1,] 0.95 0.05
+#> [2,] 0.05 0.95
+#> 
+#> Measurement error correction for measurement error 1: 
+#>              Estimate Std.error  95% CIL 95% CIU  P.val    
+#> cde           1.07926   3.23894 -0.22949   7.928    0.4    
+#> pnde          2.06299   1.01671  1.63218   4.129 <2e-16 ***
+#> tnde          2.52009   0.62224  1.93876   3.470 <2e-16 ***
+#> pnie          0.25112   0.50955 -0.88360   0.341    0.8    
+#> tnie          0.70822   0.86597 -1.73235   0.430    0.4    
+#> te            2.77121   0.43913  1.99121   3.064 <2e-16 ***
+#> pm            0.25557   0.37790 -0.72618   0.223    0.4    
+#> intref        0.98373   2.35650 -3.82223   1.885    0.8    
+#> intmed        0.45711   0.74052 -1.31114   0.386    0.8    
+#> cde(prop)     0.38945   1.36094 -0.14853   3.303    0.4    
+#> intref(prop)  0.35498   1.02916 -1.59513   0.955    0.8    
+#> intmed(prop)  0.16495   0.31141 -0.54516   0.197    0.8    
+#> pnie(prop)    0.09062   0.19737 -0.34397   0.121    0.8    
+#> pm(overall)   0.25557   0.37790 -0.72618   0.223    0.4    
+#> int(overall)  0.51993   1.32466 -2.13546   1.152    0.8    
+#> pe(overall)   0.61055   1.36094 -2.30344   1.149    0.8    
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> ----------------------------------------------------------------
+#> 
+#> Measurement error 2: 
+#>      [,1] [,2]
+#> [1,]  0.9  0.1
+#> [2,]  0.1  0.9
+#> 
+#> Measurement error correction for measurement error 2: 
+#>              Estimate Std.error  95% CIL 95% CIU  P.val    
+#> cde           2.21042   1.92113  0.78428   5.078 <2e-16 ***
+#> pnde          1.68468   0.68298  1.46855   3.034 <2e-16 ***
+#> tnde          1.27483   0.71259  1.68595   3.451 <2e-16 ***
+#> pnie          1.14790   0.44120 -0.55081   0.498    0.4    
+#> tnie          0.73805   0.40885 -0.45716   0.563    0.8    
+#> te            2.42273   0.43257  1.99550   2.973 <2e-16 ***
+#> pm            0.30464   0.18473 -0.18031   0.282    0.8    
+#> intref       -0.52574   1.40320 -2.04317   0.933    0.8    
+#> intmed       -0.40985   0.65335 -0.69858   0.820    0.8    
+#> cde(prop)     0.91237   0.71146  0.37023   1.969 <2e-16 ***
+#> intref(prop) -0.21700   0.54362 -0.79305   0.347    0.8    
+#> intmed(prop) -0.16917   0.24188 -0.27161   0.285    0.8    
+#> pnie(prop)    0.47380   0.15896 -0.18628   0.173    0.4    
+#> pm(overall)   0.30464   0.18473 -0.18031   0.282    0.8    
+#> int(overall) -0.38617   0.78017 -1.06466   0.615    0.8    
+#> pe(overall)   0.08763   0.71146 -0.96896   0.630    0.8    
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> ----------------------------------------------------------------
+```
 
-    ## Sensitivity Analysis For Measurement Error 
-    ##  
-    ## The variable measured with error: A
-    ## Type of the variable measured with error: categorical
-    ## 
-    ## Measurement error 1: 
-    ##      [,1] [,2]
-    ## [1,] 0.95 0.05
-    ## [2,] 0.05 0.95
-    ## 
-    ## Measurement error correction for measurement error 1: 
-    ##               Estimate Std.error   95% CIL 95% CIU  P.val    
-    ## cde          -1.852395  0.859350 -1.956986   0.069    0.4    
-    ## pnde          1.056125  1.129122  0.693214   3.273 <2e-16 ***
-    ## tnde          1.534459  1.006836  1.124244   3.300 <2e-16 ***
-    ## pnie          0.610474  0.769398 -0.652758   1.040    0.8    
-    ## tnie          1.088808  1.060440 -0.655003   1.878    0.4    
-    ## te            2.144934  0.948680  1.301169   3.674 <2e-16 ***
-    ## pm            0.507619  0.384139 -0.240492   0.715    0.4    
-    ## intref        2.908520  1.342883  1.051971   4.386 <2e-16 ***
-    ## intmed        0.478334  0.374663 -0.023435   0.838    0.4    
-    ## cde(prop)    -0.863614  0.580875 -1.390478   0.056    0.4    
-    ## intref(prop)  1.355995  0.718771  0.506159   2.243 <2e-16 ***
-    ## intmed(prop)  0.223007  0.142012 -0.008447   0.324    0.4    
-    ## pnie(prop)    0.284612  0.303861 -0.250209   0.424    0.8    
-    ## pm(overall)   0.507619  0.384139 -0.240492   0.715    0.4    
-    ## int(overall)  1.579002  0.748416  0.535665   2.421 <2e-16 ***
-    ## pe(overall)   1.863614  0.580875  0.944318   2.390 <2e-16 ***
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## ----------------------------------------------------------------
-    ## 
-    ## Measurement error 2: 
-    ##      [,1] [,2]
-    ## [1,]  0.9  0.1
-    ## [2,]  0.1  0.9
-    ## 
-    ## Measurement error correction for measurement error 2: 
-    ##               Estimate Std.error   95% CIL 95% CIU  P.val    
-    ## cde           0.659033  1.005064 -1.866819   0.469    0.4    
-    ## pnde          1.532504  0.835565  0.750680   2.646 <2e-16 ***
-    ## tnde          1.528524  0.666597  0.892012   2.324 <2e-16 ***
-    ## pnie          0.890843  0.374359 -0.052686   0.871    0.4    
-    ## tnie          0.886863  0.598130 -0.349485   1.064    0.4    
-    ## te            2.419367  0.495657  1.678021   2.797 <2e-16 ***
-    ## pm            0.366568  0.303014 -0.156683   0.592    0.4    
-    ## intref        0.873471  0.913881  1.990596   3.910 <2e-16 ***
-    ## intmed       -0.003980  0.403118 -0.472854   0.434    0.8    
-    ## cde(prop)     0.272399  0.446358 -0.922287   0.154    0.4    
-    ## intref(prop)  0.361033  0.376626  0.770847   1.727 <2e-16 ***
-    ## intmed(prop) -0.001645  0.177041 -0.199868   0.175    0.8    
-    ## pnie(prop)    0.368213  0.202856 -0.025589   0.488    0.4    
-    ## pm(overall)   0.366568  0.303014 -0.156683   0.592    0.4    
-    ## int(overall)  0.359388  0.459747  0.595279   1.623 <2e-16 ***
-    ## pe(overall)   0.727601  0.446358  0.845966   1.922 <2e-16 ***
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## ----------------------------------------------------------------
+``` r
+plot(me2) +
+  theme(axis.text.x = element_text(angle = 30, vjust = 0.8))
+```
 
-    plot(me2) +
-      theme(axis.text.x = element_text(angle = 30, vjust = 0.8))
+![](man/figuresplot_cmsens_me_cat-1.png)<!-- -->
 
-![](README_files/figure-markdown_strict/plot_cmsens_me_cat-1.png)
-
-References
-----------
+## References
 
 Valeri L, Vanderweele TJ (2013). Mediation analysis allowing for
 exposure-mediator interactions and causal interpretation: theoretical
@@ -676,3 +455,35 @@ jackknife (1995). Journal of the American Statistical Association.
 Valeri L, Lin X, VanderWeele TJ. Mediation analysis when a continuous
 mediator is measured with error and the outcome follows a generalized
 linear model (2014). Statistics in medicine, 33(28): 4875–4890.
+
+1.  rb: the regression-based approach; wb: the weighting-based approach;
+    iorw: the inverse odds ratio weighting approach; ne: the natural
+    effect model; msm: the marginal structural model; gformula: the
+    g-formula approach.
+
+2.  Y denotes the outcome, A denotes the exposure, M denotes the
+    mediator(s) and C denotes the pre-exposure confounder(s).
+
+3.  continuous A is not supported when C is not empty; otherwise, it is
+    supported.
+
+4.  continuous A is not supported when C is not empty; otherwise, it is
+    supported.
+
+5.  count A is not supported when C is not empty; otherwise, it is
+    supported.
+
+6.  count A is not supported when C is not empty; otherwise, it is
+    supported.
+
+7.  closed-form parameter function estimation only supports the
+    regression-based approach and a single mediator.
+
+8.  delta method inference is available only when closed-form parameter
+    function estimation is used.
+
+9.  marginal effects are estimated when direct counterfactual imputation
+    estimation is used.
+
+10. conditional effects are estimated when closed-form parameter
+    function estimation is used.
