@@ -384,9 +384,9 @@ plot.cmsens.me <- function(cmsens.me) {
                             Point = c(pe.mid, naive.pe),
                             CIlower = c(ci.low.mid, naive.ci.low),
                             CIupper = c(ci.high.mid, naive.ci.high),
-                            MC = factor(c(rep("MC", length(pe.mid)), 
+                            MC = factor(c(rep("SIMEX", length(pe.mid)), 
                                           rep("Naive", length(naive.pe)))),
-                            MisclassificationMAtrix = factor(rep("Matrix 1", 
+                            MisclassificationMAtrix = factor(rep("MEerror[1]", 
                                                                  length(pe.mid)+length(naive.pe))))
     if (length(cmsens.me$sens) > 1) {
       for (i in 2:length(cmsens.me$sens)) {
@@ -398,9 +398,9 @@ plot.cmsens.me <- function(cmsens.me) {
                                       Point = c(pe.mid, naive.pe),
                                       CIlower = c(ci.low.mid, naive.ci.low),
                                       CIupper = c(ci.high.mid, naive.ci.high),
-                                      MC = factor(c(rep("MC", length(pe.mid)), 
+                                      MC = factor(c(rep("SIMEX", length(pe.mid)), 
                                                     rep("Naive", length(naive.pe)))),
-                                      MisclassificationMAtrix = factor(rep(paste0("Matrix ", i), 
+                                      MisclassificationMAtrix = factor(rep(paste0("MEerror[", i, "]"), 
                                                                            length(pe.mid)+length(naive.pe)))))
         
       }
