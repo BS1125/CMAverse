@@ -95,7 +95,7 @@ library(CMAverse)
 We illustrate the general workflow of the `CMAverse` package by a quick example. Firstly, let's simulate some data and plot the DAG of the scientific setting. The simulated dataset contains a binary exposure, a binary mediator, a continuous mediator, a continuous outcome and two pre-exposure confounders.
 
 ```{r message=F,warning=F}
-n <- 500
+n <- 40
 C1 <- rnorm(n, mean = 1, sd = 1)
 C2 <- rbinom(n, 1, 0.6)
 C2[which(C2 == 0)] <- "C2_0"
@@ -128,7 +128,7 @@ est <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
                 mediator = c("M1", "M2"), prec = c("C1", "C2"), EMint = TRUE,
                 mreg = list("logistic", "linear"), yreg = "linear",
                 astar = 0, a = 1, mval = list(0, 0),
-                estimation = "imputation", inference = "bootstrap", nboot = 200)
+                estimation = "imputation", inference = "bootstrap", nboot = 20)
 ```
 
 Summarizing and plotting the results:
@@ -148,7 +148,7 @@ Lastly, let's conduct sensitivity analysis for the results. Sensitivity analysis
 cmsens(object = est, sens = "uc")
 ```
 
-Assume that the continuous pre-exposure confounder was measured with error. Sensitivity analysis using regression calibration with a set of assumed standard deviations of the measurement error 0.1, 0.2 and 0.3:
+Assume that the continuous pre-exposure confounder was measured with error. Sensitivity analysis for measurement error using regression calibration with a set of assumed standard deviations of the measurement error 0.1, 0.2 and 0.3:
 
 ```{r message=F,warning=F,results='hide'}
 me1 <- cmsens(object = est, sens = "me", MEmethod = "rc", 
@@ -166,11 +166,11 @@ plot(me1) +
   theme(axis.text.x = element_text(angle = 30, vjust = 0.8))
 ```
 
-Then, assume that the exposure was measured with error. Sensitivity analysis using MCSIMEX with two assumed misclassification matrices:
+Then, assume that the exposure was measured with error. Sensitivity analysis for measurement error using MCSIMEX with two assumed misclassification matrices:
 
 ```{r message=F,warning=F,results='hide'}
 me2 <- cmsens(object = est, sens = "me", MEmethod = "simex", MEvariable = "A", 
-              MEvartype = "cat", B = 200,
+              MEvartype = "cat", B = 5,
               MEerror = list(matrix(c(0.95, 0.05, 0.05, 0.95), nrow = 2), 
                              matrix(c(0.9, 0.1, 0.1, 0.9), nrow = 2)))
 ```
