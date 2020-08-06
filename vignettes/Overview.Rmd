@@ -1,16 +1,8 @@
 ---
-title: "Overview of Causal Mediation Analysis Approaches and Sensitivity Analysis Approaches"
+title: "Overview of Statistical Approaches for Causal Mediation Analysis"
 author: "Baoyi Shi"
-date: "2020/07/20"
-output: 
-  html_document:
-    theme: cosmo
-    number_sections: true
-    toc: true
-    toc_depth: 3
-    toc_float: true
-header-includes:
-- \usepackage{mdsymbol}
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Overview of Causal Mediation Analysis Approaches and Sensitivity Analysis Approaches}
   %\VignetteEngine{knitr::rmarkdown}
@@ -25,10 +17,9 @@ knitr::opts_chunk$set(
 ```
 
 This document describes how the six causal mediation analysis approaches including *the regression-based approach* by [Valeri et al. (2013)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3659198/) and [Vanderweele et al. (2014)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/), 
-*the weighting-based approach* by [Vanderweele et al. (2014)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/), *the inverse odd-ratio weighting 
-approach* by [Tchetgen Tchetgen et al. (2013)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3954805/), *the natural effect model* by
+*the weighting-based approach* by [Vanderweele et al. (2014)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/), *the inverse odd-ratio weighting approach* by [Tchetgen Tchetgen et al. (2013)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3954805/), *the natural effect model* by
 [Vansteelandt et al. (2012)](https://www.degruyter.com/view/journals/em/1/1/article-p131.xml?language=en), *the marginal structural model* by [VanderWeele 
-et al. (2009)](https://pubmed.ncbi.nlm.nih.gov/19234398), and *the g-formula approach* by [Lin et al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5285457/) are implemented by the `cmest` function in the `CMAverse` package. See the original publications for assumptions and methodological details of these approaches.
+et al. (2009)](https://pubmed.ncbi.nlm.nih.gov/19234398), and *the g-formula approach* by [Lin et al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5285457/) are implemented by the `cmest` function in the `CMAverse` package. See the publications for methodological details of these approaches.
 
 We categorize the approaches according to whether the approach deals with post-exposure confounding. The outcome, the exposure and the pre-exposure confounder(s) are denoted as $Y$, $A$ and $C$ respectively. The set of mediator(s) $\{M_p\}_{p=1,...,k}$ is denoted as $M$ and $M=(M_1,...,M_k)$ follows the temporal order of the mediators. The set of post-exposure confounder(s) $\{L_q\}_{q=1,...,s}$ is denoted as $L$ and $L=(L_1,...,L_s)$ follows the temporal order of the post-exposure confounder(s). 
 
