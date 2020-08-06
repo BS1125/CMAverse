@@ -373,7 +373,7 @@ The DAG can be plotted using the `cmdag` function.
           prec = c("C1", "C2"), postc = NULL,
           node = FALSE, text_col = "black")
 
-![](man/figuresplot_dag-1.png)
+![](man/figures/plot_dag-1.png)
 
 Then, we estimate the causal effects using the `cmest` function. We use
 the regression-based approach for illustration. The reference values for
@@ -389,56 +389,53 @@ mediators are set to be 0.
 Summarizing and plotting the results:
 
     summary(est)
-    #> 
-    #> Causal Mediation Analysis Via the Regression-based Approach
-    #>  
-    #> Direct counterfactual imputation estimation with 
-    #>  bootstrap standard errors, percentile confidence intervals and p-values 
-    #>  
-    #>               Estimate Std.error   95% CIL 95% CIU P.val
-    #> cde           -0.74954  31.26003  -2.69855  63.512   0.8
-    #> pnde           0.69782   5.69243 -10.77027   1.118   0.8
-    #> tnde           0.81557  21.42268 -42.45167   1.494   0.8
-    #> pnie           0.42889  16.10370  -0.14838  32.948   0.4
-    #> tnie           0.54664   0.55096  -0.10711   1.267   0.4
-    #> te             1.24446   5.32598  -9.50408   1.673   0.4
-    #> pm             0.43926   0.48642  -0.17628   0.951   0.8
-    #> intref         1.44736  36.94434 -74.28200   3.584   0.8
-    #> intmed         0.11775  15.73744 -31.68140   0.621   0.8
-    #> cde(prop)     -0.60230   4.16165  -6.09392   4.399   0.8
-    #> intref(prop)   1.16304   4.55613  -4.33725   7.158   0.8
-    #> intmed(prop)   0.09462   1.56398  -0.68669   3.008   0.4
-    #> pnie(prop)     0.34464   1.90408  -3.09782   1.616   0.8
-    #> pm(overall)    0.43926   0.48642  -0.17628   0.951   0.8
-    #> int(overall)   1.25766   6.00771  -5.01528  10.163   0.8
-    #> pe(overall)    1.60230   4.16165  -3.39922   7.094   0.8
+
+    ## 
+    ## Causal Mediation Analysis Via the Regression-based Approach
+    ##  
+    ## Direct counterfactual imputation estimation with 
+    ##  bootstrap standard errors, percentile confidence intervals and p-values 
+    ##  
+    ##               Estimate Std.error   95% CIL 95% CIU  P.val    
+    ## cde          -0.892591  1.607350 -1.945221   1.697    0.4    
+    ## pnde          0.551437  0.495887  0.142822   1.395 <2e-16 ***
+    ## tnde          1.620366  0.263352  1.386278   1.958 <2e-16 ***
+    ## pnie          0.150942  0.279030  0.084918   0.748 <2e-16 ***
+    ## tnie          1.219870  0.528054  0.313292   1.567 <2e-16 ***
+    ## te            1.771307  0.240348  1.669482   2.174 <2e-16 ***
+    ## pm            0.688683  0.294830  0.174001   0.916 <2e-16 ***
+    ## intref        1.444028  1.193608 -0.311642   2.453    0.4    
+    ## intmed        1.068928  0.543794  0.005043   1.287    0.4    
+    ## cde(prop)    -0.503916  0.940940 -1.120675   1.020    0.4    
+    ## intref(prop)  0.815233  0.681272 -0.200281   1.399    0.4    
+    ## intmed(prop)  0.603469  0.314785 -0.005313   0.756    0.4    
+    ## pnie(prop)    0.085215  0.122840  0.042617   0.346 <2e-16 ***
+    ## pm(overall)   0.688683  0.294830  0.174001   0.916 <2e-16 ***
+    ## int(overall)  1.418702  0.983347 -0.205595   2.002    0.4    
+    ## pe(overall)   1.503916  0.940940 -0.019546   2.121    0.4    
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
     plot(est) +
       theme(axis.text.x = element_text(angle = 30, vjust = 0.8))
 
-![](man/figuresplot_cmest-1.png)
+![](man/figures/plot_cmest-1.png)
 
 Lastly, let’s conduct sensitivity analysis for the results. Sensitivity
 analysis for unmeasured confounding:
 
     cmsens(object = est, sens = "uc")
-    #> Sensitivity Analysis For Unmeasured Confounding 
-    #> 
-    #> Evalues on the ratio scale: 
-    #>          estRR      lowerRR      upperRR Evalue.estRR Evalue.lowerRR
-    #> cde  0.7748469 7.106482e-10 8.448453e+08     1.902960             NA
-    #> pnde 1.2680597 2.866857e-02 5.608844e+01     1.851083              1
-    #> tnde 1.3199069 8.453793e-07 2.060796e+06     1.969712              1
-    #> pnie 1.1571549 2.556614e-05 5.237425e+04     1.583597              1
-    #> tnie 1.2044675 8.346551e-01 1.738134e+00     1.700728              1
-    #> te   1.5273368 4.407035e-02 5.293258e+01     2.424789              1
-    #>      Evalue.upperRR
-    #> cde               1
-    #> pnde             NA
-    #> tnde             NA
-    #> pnie             NA
-    #> tnie             NA
-    #> te               NA
+
+    ## Sensitivity Analysis For Unmeasured Confounding 
+    ## 
+    ## Evalues on the ratio scale: 
+    ##          estRR   lowerRR  upperRR Evalue.estRR Evalue.lowerRR Evalue.upperRR
+    ## cde  0.6938471 0.1914846 2.514164     2.238693             NA              1
+    ## pnde 1.2533325 0.8424961 1.864510     1.816813       1.000000             NA
+    ## tnde 1.9416096 1.5723628 2.397569     3.293733       2.521026             NA
+    ## pnie 1.0637586 0.8507071 1.330167     1.324188       1.000000             NA
+    ## tnie 1.6479298 1.0795697 2.515514     2.681246       1.372659             NA
+    ## te   2.0654039 1.7037187 2.503872     3.548809       2.798679             NA
 
 Assume that the continuous pre-exposure confounder was measured with
 error. Sensitivity analysis using regression calibration with a set of
@@ -450,87 +447,88 @@ assumed standard deviations of the measurement error 0.1, 0.2 and 0.3:
 Summarizing and plotting the results:
 
     summary(me1)
-    #> Sensitivity Analysis For Measurement Error 
-    #>  
-    #> The variable measured with error: C1
-    #> Type of the variable measured with error: continuous
-    #> 
-    #> Measurement error 1: 
-    #> 0.1
-    #> Measurement error correction for measurement error 1: 
-    #>                Estimate  Std.error    95% CIL 95% CIU  P.val    
-    #> cde           -0.750607   2.717236  -4.874211   0.935    0.8    
-    #> pnde           0.600007   0.407310  -0.183471   0.712    0.4    
-    #> tnde           0.772065   0.552929  -0.145503   1.035    0.8    
-    #> pnie           0.491369   0.446456   0.148428   1.191 <2e-16 ***
-    #> tnie           0.663426   0.637768   0.192393   1.568 <2e-16 ***
-    #> te             1.263434   0.961663   0.008923   2.143    0.4    
-    #> pm             0.525098   1.943008  -3.284767   0.761    0.4    
-    #> intref         1.350614   2.635971  -0.627730   5.356    0.8    
-    #> intmed         0.172058   0.220462  -0.116376   0.378    0.8    
-    #> cde(prop)     -0.594100  37.182657  -2.120807  74.868    0.8    
-    #> intref(prop)   1.069003  35.245261 -70.619786   2.389    0.8    
-    #> intmed(prop)   0.136183   0.581681  -1.124890   0.176    0.8    
-    #> pnie(prop)     0.388915   1.402690  -2.185063   0.973    0.4    
-    #> pm(overall)    0.525098   1.943008  -3.284767   0.761    0.4    
-    #> int(overall)   1.205185  35.806482 -71.744677   2.565    0.8    
-    #> pe(overall)    1.594100  37.182657 -73.867781   3.121    0.8    
-    #> ---
-    #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    #> ----------------------------------------------------------------
-    #> 
-    #> Measurement error 2: 
-    #> 0.2
-    #> Measurement error correction for measurement error 2: 
-    #>              Estimate Std.error  95% CIL 95% CIU  P.val    
-    #> cde          -0.75412   5.22537 -7.76519   4.563    0.8    
-    #> pnde          0.62702   0.30391  0.60213   1.339 <2e-16 ***
-    #> tnde          0.78123   0.32689  0.62308   1.453 <2e-16 ***
-    #> pnie          0.47492   0.26602 -0.10643   0.551    0.4    
-    #> tnie          0.62913   0.38329 -0.05255   0.901    0.4    
-    #> te            1.25615   0.42165  0.81349   1.711 <2e-16 ***
-    #> pm            0.50084   0.24072 -0.05760   0.550    0.4    
-    #> intref        1.38115   5.02381 -3.23321   8.399    0.8    
-    #> intmed        0.15421   0.14675 -0.00979   0.351    0.4    
-    #> cde(prop)    -0.60035   5.35333 -9.63146   2.672    0.8    
-    #> intref(prop)  1.09951   5.44289 -1.89004  10.405    0.8    
-    #> intmed(prop)  0.12276   0.08979 -0.01345   0.213    0.4    
-    #> pnie(prop)    0.37807   0.19949 -0.12326   0.337    0.4    
-    #> pm(overall)   0.50084   0.24072 -0.05760   0.550    0.4    
-    #> int(overall)  1.22227   5.38419 -1.81768  10.391    0.8    
-    #> pe(overall)   1.60034   5.35333 -1.67211  10.631    0.8    
-    #> ---
-    #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    #> ----------------------------------------------------------------
-    #> 
-    #> Measurement error 3: 
-    #> 0.3
-    #> Measurement error correction for measurement error 3: 
-    #>              Estimate Std.error  95% CIL 95% CIU  P.val    
-    #> cde          -0.76129   1.33306 -3.20424  -0.430 <2e-16 ***
-    #> pnde          0.60669   0.37375  0.23471   1.179 <2e-16 ***
-    #> tnde          0.74254   0.28941  0.80468   1.483 <2e-16 ***
-    #> pnie          0.46111   0.35651 -0.04244   0.760    0.4    
-    #> tnie          0.59697   0.56361  0.07590   1.347    0.4    
-    #> te            1.20365   0.33816  1.22784   2.086 <2e-16 ***
-    #> pm            0.49596   0.33641  0.04104   0.849    0.4    
-    #> intref        1.36798   1.14929  1.06884   3.719 <2e-16 ***
-    #> intmed        0.13585   0.26965  0.08448   0.692 <2e-16 ***
-    #> cde(prop)    -0.63248   0.86535 -2.05258  -0.252 <2e-16 ***
-    #> intref(prop)  1.13652   0.83032  0.62796   2.382 <2e-16 ***
-    #> intmed(prop)  0.11287   0.14903  0.06456   0.389 <2e-16 ***
-    #> pnie(prop)    0.38309   0.22556 -0.04363   0.484    0.4    
-    #> pm(overall)   0.49596   0.33641  0.04104   0.849    0.4    
-    #> int(overall)  1.24939   0.87982  0.80807   2.771 <2e-16 ***
-    #> pe(overall)   1.63248   0.86535  1.25234   3.053 <2e-16 ***
-    #> ---
-    #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    #> ----------------------------------------------------------------
+
+    ## Sensitivity Analysis For Measurement Error 
+    ##  
+    ## The variable measured with error: C1
+    ## Type of the variable measured with error: continuous
+    ## 
+    ## Measurement error 1: 
+    ## 0.1
+    ## Measurement error correction for measurement error 1: 
+    ##              Estimate Std.error  95% CIL 95% CIU  P.val    
+    ## cde          -0.89920   1.49756 -2.03146   1.510    0.4    
+    ## pnde          0.86165   0.97681 -0.14416   2.273    0.4    
+    ## tnde          1.57740   0.79880  0.41354   2.422 <2e-16 ***
+    ## pnie          0.40305   0.59068 -0.44561   0.983    0.4    
+    ## tnie          1.11880   0.87595 -0.31990   1.920    0.4    
+    ## te            1.98045   0.24452  1.39639   1.976 <2e-16 ***
+    ## pm            0.56492   0.48856 -0.15532   1.073    0.4    
+    ## intref        1.76085   0.91436 -0.16929   1.954    0.8    
+    ## intmed        0.71575   0.61911 -0.06062   1.336    0.8    
+    ## cde(prop)    -0.45404   0.82159 -1.11545   0.772    0.4    
+    ## intref(prop)  0.88911   0.50485 -0.10211   1.070    0.8    
+    ## intmed(prop)  0.36141   0.34085 -0.03617   0.732    0.8    
+    ## pnie(prop)    0.20352   0.36945 -0.22385   0.710    0.4    
+    ## pm(overall)   0.56492   0.48856 -0.15532   1.073    0.4    
+    ## int(overall)  1.25052   0.83305 -0.13827   1.802    0.8    
+    ## pe(overall)   1.45404   0.82159  0.22768   2.115 <2e-16 ***
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## ----------------------------------------------------------------
+    ## 
+    ## Measurement error 2: 
+    ## 0.2
+    ## Measurement error correction for measurement error 2: 
+    ##              Estimate Std.error  95% CIL 95% CIU  P.val    
+    ## cde          -0.92052   3.00816  0.18249   7.040 <2e-16 ***
+    ## pnde          0.79412   1.32818  0.41802   3.553 <2e-16 ***
+    ## tnde          1.58422   0.98048  0.27876   2.541 <2e-16 ***
+    ## pnie          0.36262   0.57824  0.01708   1.224 <2e-16 ***
+    ## tnie          1.15271   1.15281 -1.44384   1.109    0.8    
+    ## te            1.94683   0.42780  1.50249   2.559 <2e-16 ***
+    ## pm            0.59210   0.60066 -0.69157   0.727    0.8    
+    ## intref        1.71464   2.00263 -3.51582   1.335    0.8    
+    ## intmed        0.79010   0.89006 -1.47470   0.722    0.8    
+    ## cde(prop)    -0.47283   1.41915  0.08851   3.361 <2e-16 ***
+    ## intref(prop)  0.88074   0.94840 -1.71090   0.525    0.8    
+    ## intmed(prop)  0.40584   0.40952 -0.70617   0.283    0.8    
+    ## pnie(prop)    0.18626   0.38256  0.00689   0.828 <2e-16 ***
+    ## pm(overall)   0.59210   0.60066 -0.69157   0.727    0.8    
+    ## int(overall)  1.28657   1.35192 -2.41680   0.809    0.8    
+    ## pe(overall)   1.47283   1.41915 -2.36058   0.911    0.8    
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## ----------------------------------------------------------------
+    ## 
+    ## Measurement error 3: 
+    ## 0.3
+    ## Measurement error correction for measurement error 3: 
+    ##              Estimate Std.error 95% CIL 95% CIU  P.val    
+    ## cde           -0.9621    1.7173 -3.3233   1.038    0.4    
+    ## pnde           0.6655    0.9500 -0.9106   1.348    0.4    
+    ## tnde           1.3903    0.5443  0.3793   1.602 <2e-16 ***
+    ## pnie           0.4351    0.2458  0.2453   0.827 <2e-16 ***
+    ## tnie           1.1599    0.6618  0.6208   2.132 <2e-16 ***
+    ## te             1.8254    0.3779  1.1856   1.996 <2e-16 ***
+    ## pm             0.6354    0.6573  0.3257   1.790 <2e-16 ***
+    ## intref         1.6275    0.8520  0.3101   2.413 <2e-16 ***
+    ## intmed         0.7248    0.4412  0.2272   1.310 <2e-16 ***
+    ## cde(prop)     -0.5271    1.3644 -2.8281   0.516    0.4    
+    ## intref(prop)   0.8916    0.7695  0.1581   2.043 <2e-16 ***
+    ## intmed(prop)   0.3971    0.4177  0.1231   1.099 <2e-16 ***
+    ## pnie(prop)     0.2384    0.2465  0.1640   0.693 <2e-16 ***
+    ## pm(overall)    0.6354    0.6573  0.3257   1.790 <2e-16 ***
+    ## int(overall)   1.2887    1.1512  0.2832   3.141 <2e-16 ***
+    ## pe(overall)    1.5271    1.3644  0.4838   3.828 <2e-16 ***
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## ----------------------------------------------------------------
 
     plot(me1) +
       theme(axis.text.x = element_text(angle = 30, vjust = 0.8))
 
-![](man/figuresplot_cmsens_me_con-1.png)
+![](man/figures/plot_cmsens_me_con-1.png)
 
 Then, assume that the exposure was measured with error. Sensitivity
 analysis using MCSIMEX with two assumed misclassification matrices:
@@ -543,69 +541,70 @@ analysis using MCSIMEX with two assumed misclassification matrices:
 Summarizing and plotting the results:
 
     summary(me2)
-    #> Sensitivity Analysis For Measurement Error 
-    #>  
-    #> The variable measured with error: A
-    #> Type of the variable measured with error: categorical
-    #> 
-    #> Measurement error 1: 
-    #>      [,1] [,2]
-    #> [1,] 0.95 0.05
-    #> [2,] 0.05 0.95
-    #> 
-    #> Measurement error correction for measurement error 1: 
-    #>               Estimate Std.error   95% CIL 95% CIU  P.val    
-    #> cde            1.66250   5.38504  -9.96214   3.529    0.4    
-    #> pnde           0.66439   1.03384  -0.82488   1.551    0.4    
-    #> tnde           0.71316   0.88486   0.26286   2.479 <2e-16 ***
-    #> pnie           0.68170   0.45187  -0.59191   0.451    0.4    
-    #> tnie           0.73047   0.24284   0.47805   1.016 <2e-16 ***
-    #> te             1.39486   1.16927  -0.28677   2.522    0.4    
-    #> pm             0.52369   0.66993  -0.94646   0.489    0.4    
-    #> intref        -0.99811   4.68259  -2.14747   9.219    0.4    
-    #> intmed         0.04877   0.41312   0.26672   1.161 <2e-16 ***
-    #> cde(prop)      1.19188  10.05963  -1.99766  19.802    0.8    
-    #> intref(prop)  -0.71557   9.39357 -17.85534   2.593    0.8    
-    #> intmed(prop)   0.03496   1.21130  -2.19237   0.372    0.4    
-    #> pnie(prop)     0.48873   0.55790   0.01861   1.269 <2e-16 ***
-    #> pm(overall)    0.52369   0.66993  -0.94646   0.489    0.4    
-    #> int(overall)  -0.68060  10.59821 -20.04771   2.965    0.8    
-    #> pe(overall)   -0.19188  10.05963 -18.80181   2.998    0.8    
-    #> ---
-    #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    #> ----------------------------------------------------------------
-    #> 
-    #> Measurement error 2: 
-    #>      [,1] [,2]
-    #> [1,]  0.9  0.1
-    #> [2,]  0.1  0.9
-    #> 
-    #> Measurement error correction for measurement error 2: 
-    #>              Estimate Std.error  95% CIL 95% CIU  P.val    
-    #> cde          -2.76063   3.55151 -6.38787   1.841    0.8    
-    #> pnde          1.16821   0.84776 -0.04832   2.053    0.4    
-    #> tnde          1.13573   1.60192 -0.19131   3.772    0.4    
-    #> pnie          0.18603   0.51782 -0.56827   0.725    0.8    
-    #> tnie          0.15355   0.46162  0.11120   1.181 <2e-16 ***
-    #> te            1.32176   1.13656  0.51115   3.203 <2e-16 ***
-    #> pm            0.11617   0.47594  0.14018   1.162 <2e-16 ***
-    #> intref        3.92884   4.13804 -1.34167   8.364    0.8    
-    #> intmed       -0.03248   0.82938 -0.15466   1.719    0.8    
-    #> cde(prop)    -2.08860   2.93955 -4.57456   2.521    0.8    
-    #> intref(prop)  2.97243   3.26657 -2.65981   5.411    0.8    
-    #> intmed(prop) -0.02457   0.33753 -0.30968   0.525    0.8    
-    #> pnie(prop)    0.14075   0.73407 -0.17485   1.449    0.8    
-    #> pm(overall)   0.11617   0.47594  0.14018   1.162 <2e-16 ***
-    #> int(overall)  2.94786   3.49111 -2.96949   5.547    0.8    
-    #> pe(overall)   3.08860   2.93955 -1.52053   5.575    0.8    
-    #> ---
-    #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    #> ----------------------------------------------------------------
+
+    ## Sensitivity Analysis For Measurement Error 
+    ##  
+    ## The variable measured with error: A
+    ## Type of the variable measured with error: categorical
+    ## 
+    ## Measurement error 1: 
+    ##      [,1] [,2]
+    ## [1,] 0.95 0.05
+    ## [2,] 0.05 0.95
+    ## 
+    ## Measurement error correction for measurement error 1: 
+    ##              Estimate Std.error 95% CIL 95% CIU  P.val    
+    ## cde           -2.1015    1.8922 -4.1193   0.283    0.4    
+    ## pnde           0.3371    0.5456  0.3142   1.550 <2e-16 ***
+    ## tnde           1.3548    1.1370  1.0611   3.874 <2e-16 ***
+    ## pnie           0.4395    1.0075 -1.8225   0.553    0.4    
+    ## tnie           1.4573    0.8097 -0.3901   1.639    0.4    
+    ## te             1.7944    0.6348  0.9798   2.353 <2e-16 ***
+    ## pm             0.8121    0.4923 -0.4160   0.823    0.4    
+    ## intref         2.4386    1.7419  1.0562   5.441 <2e-16 ***
+    ## intmed         1.0177    1.1526 -0.3659   2.415    0.4    
+    ## cde(prop)     -1.1711    1.6980 -4.0771   0.112    0.4    
+    ## intref(prop)   1.3590    2.0469  0.4590   5.487 <2e-16 ***
+    ## intmed(prop)   0.5672    0.7479 -0.4068   1.314    0.4    
+    ## pnie(prop)     0.2449    0.5699 -0.9852   0.233    0.4    
+    ## pm(overall)    0.8121    0.4923 -0.4160   0.823    0.4    
+    ## int(overall)   1.9262    1.7856  0.7426   5.195 <2e-16 ***
+    ## pe(overall)    2.1711    1.6980  0.8875   5.077 <2e-16 ***
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## ----------------------------------------------------------------
+    ## 
+    ## Measurement error 2: 
+    ##      [,1] [,2]
+    ## [1,]  0.9  0.1
+    ## [2,]  0.1  0.9
+    ## 
+    ## Measurement error correction for measurement error 2: 
+    ##              Estimate Std.error  95% CIL 95% CIU  P.val    
+    ## cde          -1.18161   2.36527 -3.13756   1.922    0.8    
+    ## pnde          1.06178   1.56577 -1.10885   2.428    0.4    
+    ## tnde          2.76304   0.85003  0.91367   3.059 <2e-16 ***
+    ## pnie         -0.31918   0.80462 -0.47918   1.533    0.4    
+    ## tnie          1.38208   1.55881  0.13399   3.557 <2e-16 ***
+    ## te            2.44386   0.30741  2.03274   2.805 <2e-16 ***
+    ## pm            0.56553   0.63835  0.05346   1.453 <2e-16 ***
+    ## intref        2.24338   0.91534  0.50545   2.573 <2e-16 ***
+    ## intmed        1.70127   0.87836  0.15808   2.024 <2e-16 ***
+    ## cde(prop)    -0.48350   0.94243 -1.28185   0.736    0.8    
+    ## intref(prop)  0.91797   0.38278  0.19292   1.042 <2e-16 ***
+    ## intmed(prop)  0.69614   0.35930  0.07472   0.827 <2e-16 ***
+    ## pnie(prop)   -0.13061   0.32534 -0.18446   0.627    0.4    
+    ## pm(overall)   0.56553   0.63835  0.05346   1.453 <2e-16 ***
+    ## int(overall)  1.61410   0.68937  0.33191   1.791 <2e-16 ***
+    ## pe(overall)   1.48350   0.94243  0.26418   2.282 <2e-16 ***
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## ----------------------------------------------------------------
 
     plot(me2) +
       theme(axis.text.x = element_text(angle = 30, vjust = 0.8))
 
-![](man/figuresplot_cmsens_me_cat-1.png)
+![](man/figures/plot_cmsens_me_cat-1.png)
 
 References
 ----------
