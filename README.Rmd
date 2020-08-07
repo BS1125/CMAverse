@@ -74,7 +74,7 @@ Table: Table: Supported Data Types and Functionalities of `cmest`
 
 ### Sensitivity Analysis
 
-`cmsens` conducts sensitivity analysis for unmeasured confounding via the *E-value* approach by [Vanderweele et al. (2017)](https://pubmed.ncbi.nlm.nih.gov/28693043/) and sensitivity analysis for measurement error via *regression calibration* by [Carroll et al. (1995)](https://www.taylorfrancis.com/books/9780429139635), *SIMEX* by [Cook et al. (1994)](https://www.jstor.org/stable/2290994?seq=1#metadata_info_tab_contents) or *MCSIMEX* by [Küchenhoff et al. (2006)](https://pubmed.ncbi.nlm.nih.gov/16542233/). The sensitivity analysis for measurement error is currently available for *the regression-based approach* and *the g-formula approach*.
+`cmsens` conducts sensitivity analysis for unmeasured confounding via the *E-value* approach by [Vanderweele et al. (2017)](https://pubmed.ncbi.nlm.nih.gov/28693043/) and sensitivity analysis for measurement error via *regression calibration* by [Carroll et al. (1995)](https://www.taylorfrancis.com/books/9780429139635), *SIMEX* by [Cook et al. (1994)](https://www.jstor.org/stable/2290994?seq=1#metadata_info_tab_contents) and [Küchenhoff et al. (2006)](https://pubmed.ncbi.nlm.nih.gov/16542233/). The sensitivity analysis for measurement error is currently available for *the regression-based approach* and *the g-formula approach*.
 
 ## Installation
 
@@ -95,7 +95,7 @@ library(CMAverse)
 We illustrate the general workflow of the `CMAverse` package by a quick example. Firstly, let's simulate some data and plot the DAG of the scientific setting. The simulated dataset contains a binary exposure, a binary mediator, a continuous mediator, a continuous outcome and two pre-exposure confounders.
 
 ```{r message=F,warning=F}
-n <- 40
+n <- 1000
 C1 <- rnorm(n, mean = 1, sd = 1)
 C2 <- rbinom(n, 1, 0.6)
 C2[which(C2 == 0)] <- "C2_0"
@@ -128,7 +128,7 @@ est <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
                 mediator = c("M1", "M2"), prec = c("C1", "C2"), EMint = TRUE,
                 mreg = list("logistic", "linear"), yreg = "linear",
                 astar = 0, a = 1, mval = list(0, 0),
-                estimation = "imputation", inference = "bootstrap", nboot = 20)
+                estimation = "imputation", inference = "bootstrap", nboot = 200)
 ```
 
 Summarizing and plotting the results:
@@ -166,11 +166,11 @@ plot(me1) +
   theme(axis.text.x = element_text(angle = 30, vjust = 0.8))
 ```
 
-Then, assume that the exposure was measured with error. Sensitivity analysis for measurement error using MCSIMEX with two assumed misclassification matrices:
+Then, assume that the exposure was measured with error. Sensitivity analysis for measurement error using SIMEX with two assumed misclassification matrices:
 
 ```{r message=F,warning=F,results='hide'}
 me2 <- cmsens(object = est, sens = "me", MEmethod = "simex", MEvariable = "A", 
-              MEvartype = "cat", B = 5,
+              MEvartype = "cat", B = 200,
               MEerror = list(matrix(c(0.95, 0.05, 0.05, 0.95), nrow = 2), 
                              matrix(c(0.9, 0.1, 0.1, 0.9), nrow = 2)))
 ```
