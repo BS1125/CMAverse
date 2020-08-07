@@ -3,46 +3,48 @@
 #' \code{cmsens} is used to conduct sensitivity analysis for unmeasured confounding via 
 #' the \emph{E-value} approach by Vanderweele et al. (2017) and sensitivity analysis for 
 #' measurement error via \emph{regression calibration} by Carroll et al. (1995), 
-#' \emph{SIMEX} by Cook et al. (1994) or \emph{MCSIMEX} by Küchenhoff et al. (2006).
+#' \emph{SIMEX} by Cook et al. (1994) and Küchenhoff et al. (2006).
 #'
 #' @param object an object of class \code{cmest}.
 #' @param sens sensitivity analysis for unmeasured confounding or measurement error. 
 #' \code{uc} represents unmeasured confounding and \code{me} represents measurement error.
 #' See \code{Details}.
 #' @param MEmethod method for measurement error correction. \code{rc} represents regression
-#' calibration and \code{simex} represents SIMEX or MCSIMEX. See \code{Details}.
+#' calibration and \code{simex} represents SIMEX. See \code{Details}.
 #' @param MEvariable variable measured with error.
 #' @param MEvartype type of the variable measured with error.
 #' Can be \code{continuous} or \code{categorical} (first 3 letters are enough).
 #' @param MEerror a vector of standard deviations of the measurement error (when \code{MEvartype}
 #' is \code{continuous}) or a list of misclassification matrices (when \code{MEvartype}
 #' is \code{categorical}). 
-#' @param lambda a vector of lambdas for SIMEX or MCSIMEX. Default is \code{c(0.5, 1, 1.5, 2)}. 
-#' @param B number of simulations for SIMEX or MCSIMEX. Default is \code{200}.
-#' @param nboot.rc number of boots for variance estimation with regression calibration. Default 
-#' is \code{400}.
+#' @param lambda a vector of lambdas for SIMEX. Default is \code{c(0.5, 1, 1.5, 2)}. 
+#' @param B number of simulations for SIMEX. Default is \code{200}.
+#' @param nboot.rc number of boots for estimating the var-cov matrix of coefficients 
+#' with regression calibration. Default is \code{400}.
 #'
 #' @details
 #' 
 #' For unmeasured confounding, all E-values are on the (risk or rate) ratio scale. If the causal 
-#' effects are estimated on the difference scale, the point estimates are transformed into ratios.
+#' effects are estimated on the difference scale, the point estimates are transformed into 
+#' ratios using the transformation described by Vanderweele et al. (2017).
 #' 
 #' Sensitivity analysis for measurement error only supports a single variable measured with error.
-#' Regression calibration only supports an independent continuous variable in a regression formula.
-#' SIMEX supports both continuous variables and categorical variables.
+#' Regression calibration only supports an independent continuous variable in a regression 
+#' formula measured with error. SIMEX supports a continuous or categorical variable measured 
+#' with error.
 #' 
 #' @return
 #' If \code{sens} is \code{uc}, an object of class 'cmest.uc' is returned:
 #' \item{call}{the function call,}
 #' \item{evalues}{the data frame in which the first three columns are the point estimates, 
 #' lower limits of confidence intervals, upper limits of confidence intervals of causal effects on 
-#' the ratio scale and the last three columns are the E-values on the ratio scale for point estimates, 
-#' lower limits of confidence intervals, upper limits of confidence intervals of causal effects,}
+#' the ratio scale and the last three columns are the E-values on the ratio scale for them,}
 #' If \code{sens} is \code{me}, an object of class 'cmest.me' is returned:
 #' \item{call}{the function call,}
 #' \item{ME}{a list which might contain MEvariable, MEvartype, MEerror, reliability ratio, lambda and B,}
 #' \item{naive}{naive causal mediation analysis results}
-#' \item{sens}{a list of causal mediation analysis results after measurement error correction,}
+#' \item{sens}{a list of causal mediation analysis results after correcting errors in 
+#' \code{MEerror},}
 #' 
 #' ...
 #'
@@ -66,9 +68,17 @@
 #' 
 #' Stefanski LA, Cook JR. Simulation-extrapolation: the measurement error jackknife (1995). 
 #' Journal of the American Statistical Association. 90(432): 1247 - 56.
+#' 
+#' Valeri L, Lin X, VanderWeele TJ. Mediation analysis when a continuous mediator is measured 
+#' with error and the outcome follows a generalized linear model (2014). Statistics in 
+#' medicine, 33(28): 4875–4890. 
 #'
 #' @examples
-#' naive <- cmest(data = cma2020, model = "rb", outcome = "Y", 
+#' 
+#' rm(list=ls())
+#' library(CMAverse)
+#' 
+#' naive <- cmest(data = cma2020, model = "rb", outcome = "contY", 
 #' exposure = "A", mediator = c("M1", "M2"), 
 #' prec = c("C1", "C2"), EMint = TRUE,
 #' mreg = list("logistic", "multinomial"), yreg = "linear",
@@ -82,7 +92,8 @@
 #' MEvariable = "C1", MEvartype = "con",
 #' MEerror = c(0.1, 0.2))
 #' summary(exp2)
-#' plot(exp2)
+#' plot(exp2) +
+#' theme(axis.text.x = element_text(angle = 30, vjust = 0.8))
 #' 
 #' exp3 <- cmsens(object = naive, sens = "me", MEmethod = "simex", 
 #' MEvariable = "M1", MEvartype = "cat",
@@ -190,6 +201,7 @@ cmsens <- function(object = NULL, sens = "uc", MEmethod = "simex",
     out$naive <- object[c("effect.pe", "effect.se", "effect.ci.low", 
                           "effect.ci.high", "effect.pval")]
     
+    n <- nrow(data)
     estimation <- object$methods$estimation
     inference <- object$methods$inference
     casecontrol <- object$methods$casecontrol
@@ -218,39 +230,46 @@ cmsens <- function(object = NULL, sens = "uc", MEmethod = "simex",
     
     for (i in 1:length(MEerror)) {
       
-      yreg <- reg.output$yreg
-      mreg <- reg.output$mreg
-      wmreg <- reg.output$wmreg
-      postcreg <- reg.output$postcreg
-      ereg <- reg.output$ereg
+      reg.output.mid <- reg.output
       
       if (MEmethod == "rc") {
         if (MEvartype != "continuous") stop("Regression calibration only supports a continuous variable measured with error")
-        for (reg_name in c("yreg", "mreg", "postcreg")) {
-          reg <- get(reg_name)
-          if (!is.null(reg)) {
-            switch(as.character(reg_name %in% c("mreg", "postcreg")),
-                   "TRUE" = assign(reg_name, lapply(1:length(reg), function(x)
-                     eval(bquote(rcreg(reg = .(reg[[x]]), data = data, MEvariable = .(MEvariable), 
-                                       MEerror = .(MEerror[[i]]), variance = .(variance), nboot = .(nboot.rc)))))),
-                   "FALSE" = assign(reg_name, eval(bquote(rcreg(reg = .(reg), data = data, MEvariable = .(MEvariable), 
-                                                                MEerror = .(MEerror[[i]]), variance = .(variance), nboot = .(nboot.rc))))))
-          }
+        for (r in 1:length(reg.output.mid)) {
+          if (inherits(reg.output.mid[[r]], "list")) {
+            reg.output.mid[[r]] <- lapply(1:length(reg.output.mid[[r]]), function(x)
+              eval(bquote(rcreg(reg = .(reg.output.mid[[r]][[x]]), data = .(data), 
+                                MEvariable = .(MEvariable), MEerror = .(MEerror[[i]]), 
+                                variance = .(variance), nboot = .(nboot.rc)))))
+          } else reg.output.mid[[r]] <- eval(bquote(rcreg(reg = .(reg.output.mid[[r]]), 
+                                                      data = .(data),
+                                                      MEvariable = .(MEvariable), 
+                                                      MEerror = .(MEerror[[i]]), 
+                                                      variance = .(variance), 
+                                                      nboot = .(nboot.rc))))
         }
       } else if (MEmethod == "simex") {
-        for (reg_name in c("yreg", "mreg", "postcreg")) {
-          reg <- get(reg_name)
-          if (!is.null(reg)) {
-            switch(as.character(reg_name %in% c("mreg", "postcreg")),
-                   "TRUE" = assign(reg_name, lapply(1:length(reg), function(x)
-                     eval(bquote(simexreg(reg = .(reg[[x]]), data = data, MEvariable = .(MEvariable), MEvartype = .(MEvartype), 
-                                          MEerror = .(MEerror[[i]]), variance = .(variance), lambda = .(lambda), B = .(B)))))),
-                   "FALSE" = assign(reg_name, eval(bquote(simexreg(reg = .(reg), data = data, MEvariable = .(MEvariable), 
-                                                                   MEvartype = .(MEvartype), MEerror = .(MEerror[[i]]), 
-                                                                   variance = .(variance), lambda = .(lambda), B = .(B))))))
-          }
+        for (r in 1:length(reg.output.mid)) {
+          if (inherits(reg.output.mid[[r]], "list")) {
+            reg.output.mid[[r]] <- lapply(1:length(reg.output.mid[[r]]), function(x)
+              eval(bquote(simexreg(reg = .(reg.output.mid[[r]][[x]]), data = .(data), 
+                                   MEvariable = .(MEvariable), MEvartype = .(MEvartype), 
+                                   MEerror = .(MEerror[[i]]), variance = .(variance), 
+                                   lambda = .(lambda), B = .(B)))))
+          } else reg.output.mid[[r]] <- eval(bquote(simexreg(reg = .(reg.output.mid[[r]]), 
+                                                             data = .(data), 
+                                                         MEvariable = .(MEvariable), 
+                                                         MEvartype = .(MEvartype), 
+                                                         MEerror = .(MEerror[[i]]), 
+                                                         variance = .(variance), 
+                                                         lambda = .(lambda), B = .(B))))
         }
       } else stop("Unsupported MEmethod; use 'rc' or 'simex'")
+      
+      yreg <- reg.output.mid$yreg
+      mreg <- reg.output.mid$mreg
+      ereg <- reg.output.mid$ereg
+      wmreg <- reg.output.mid$wmreg
+      postcreg <- reg.output.mid$postcreg
       
       # add a progress bar for bootstrap inference
       if (inference == "bootstrap") {
@@ -261,6 +280,7 @@ cmsens <- function(object = NULL, sens = "uc", MEmethod = "simex",
       environment(estinf) <- environment()
       sens[[i]] <- estinf()[c("effect.pe", "effect.se", "effect.ci.low", 
                               "effect.ci.high", "effect.pval")]
+      sens[[i]]$reg.output <- reg.output.mid
       
     }
     

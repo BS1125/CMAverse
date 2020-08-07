@@ -281,7 +281,7 @@ estinf <- function() {
       # effect names
       if (full) effect_name <- c("cde", "pnde", "tnde", "pnie", "tnie", "te", "pm",
                                  "intref", "intmed", "cde(prop)", "intref(prop)", "intmed(prop)", "pnie(prop)",
-                                 "pm(overall)", "int(overall)", "pe(overall)")
+                                 "int", "pe")
       if (!full) effect_name <- c("cde", "pnde", "tnde", "pnie", "tnie", "te")
     } else {
       # transform standard errors of effects in log scale
@@ -297,7 +297,7 @@ estinf <- function() {
       if (full) effect_name <- c("RRcde", "RRpnde", "RRtnde", "RRpnie", "RRtnie", "RRte", "pm",
                                  "ERRcde", "ERRintref", "ERRintmed", "ERRpnie",
                                  "ERRcde(prop)", "ERRintref(prop)", "ERRintmed(prop)", "ERRpnie(prop)",
-                                 "pm(overall)", "int(overall)", "pe(overall)")
+                                 "int", "pe")
       if (!full) effect_name <- c("RRcde", "RRpnde", "RRtnde", "RRpnie", "RRtnie", "RRte")
     }
 
@@ -398,12 +398,12 @@ estinf <- function() {
       if (length(postc) == 0 && full) effect_name <-
           c("cde", "pnde", "tnde", "pnie", "tnie", "te", "pm",
             "intref", "intmed", "cde(prop)", "intref(prop)", "intmed(prop)", "pnie(prop)",
-            "pm(overall)", "int(overall)", "pe(overall)")
+            "int", "pe")
       if (length(postc) == 0 && !full) effect_name <- c("cde", "pnde", "tnde", "pnie", "tnie", "te")
       if (length(postc) != 0 && full) effect_name <-
           c("cde", "rpnde", "rtnde", "rpnie", "rtnie", "te", "rpm",
             "rintref", "rintmed", "cde(prop)", "rintref(prop)", "rintmed(prop)", "rpnie(prop)",
-            "rpm(overall)", "rint(overall)", "rpe(overall)")
+            "rint", "rpe")
       if (length(postc) != 0 && !full) effect_name <- c("cde", "rpnde", "rtnde", "rpnie", "rtnie", "te")
     } else {
       # transform standard errors of effects in log scale
@@ -417,13 +417,13 @@ estinf <- function() {
         c("RRcde", "RRpnde", "RRtnde", "RRpnie", "RRtnie", "RRte", "pm",
           "ERRcde", "ERRintref", "ERRintmed", "ERRpnie",
           "ERRcde(prop)", "ERRintref(prop)", "ERRintmed(prop)", "ERRpnie(prop)",
-          "pm(overall)", "int(overall)", "pe(overall)")
+          "int", "pe")
       if (length(postc) == 0 && !full) effect_name <- c("RRcde", "RRpnde", "RRtnde", "RRpnie", "RRtnie", "RRte")
       if (length(postc) != 0 && full) effect_name <-
         c("RRcde", "rRRpnde", "rRRtnde", "rRRpnie", "rRRtnie", "RRte", "rpm",
           "ERRcde", "rERRintref", "rERRintmed", "rERRpnie",
           "ERRcde(prop)", "rERRintref(prop)", "rERRintmed(prop)", "rERRpnie(prop)",
-          "rpm(overall)", "rint(overall)", "rpe(overall)")
+          "rint", "rpe")
       if (length(postc) != 0 && !full) effect_name <- c("RRcde", "rRRpnde", "rRRtnde", "rRRpnie", "rRRtnie", "RRte")
 
     }
@@ -517,7 +517,7 @@ estinf <- function() {
       # effect names
       if (full) effect_name <- c("cde", "pnde", "tnde", "pnie", "tnie", "te", "pm",
                                  "intref", "intmed", "cde(prop)", "intref(prop)", "intmed(prop)", "pnie(prop)",
-                                 "pm(overall)", "int(overall)", "pe(overall)")
+                                 "int", "pe")
       if (!full) effect_name <- c("cde", "pnde", "tnde", "pnie", "tnie", "te")
     } else {
       # transform standard errors of effects in log scale
@@ -530,7 +530,7 @@ estinf <- function() {
       if (full) effect_name <- c("RRcde", "RRpnde", "RRtnde", "RRpnie", "RRtnie", "RRte", "pm",
                                  "ERRcde", "ERRintref", "ERRintmed", "ERRpnie",
                                  "ERRcde(prop)", "ERRintref(prop)", "ERRintmed(prop)", "ERRpnie(prop)",
-                                 "pm(overall)", "int(overall)", "pe(overall)")
+                                 "int", "pe")
       if (!full) effect_name <- c("RRcde", "RRpnde", "RRtnde", "RRpnie", "RRtnie", "RRte")
     }
 
@@ -558,13 +558,14 @@ estinf <- function() {
     if (!multimp) {
 
       # point estimates of causal effects
-      est <- est.iorw(data = data, indices = NULL, outReg = TRUE)
+      est <- est.iorw(data = data, indices = NULL, outReg = TRUE, full = full)
       effect.pe <- est$est
       n_effect <- length(effect.pe)
       out$reg.output <- est$reg.output
 
       # bootstrap results
-      boots <- boot::boot(data = data, statistic = est.iorw, R = nboot, outReg = FALSE)
+      boots <- boot::boot(data = data, statistic = est.iorw, R = nboot, outReg = FALSE,
+                          full = full)
       # bootstrap percentile CIs
       effect.ci.low <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = (1 - 0.95)/2, na.rm = TRUE))
       effect.ci.high <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 1 - (1 - 0.95)/2, na.rm = TRUE))
@@ -583,7 +584,7 @@ estinf <- function() {
       m <- length(data_imp)
       # estimate causal effects for each imputed data set
       est_imp <- lapply(1:m, function(x)
-        est.iorw(data = data_imp[[x]], indices = NULL, outReg = TRUE))
+        est.iorw(data = data_imp[[x]], indices = NULL, outReg = TRUE, full = full))
       est_imp_df <- do.call(rbind, lapply(1:m, function(x) est_imp[[x]]$est))
       effect.pe <- colMeans(est_imp_df)
       n_effect <- length(effect.pe)
@@ -597,7 +598,7 @@ estinf <- function() {
         assign("counter", curVal + 1, envir = env)
         setTxtProgressBar(get("progbar", envir = env), curVal + 1)
         return(colMeans(do.call(rbind, lapply(1:m, function(x)
-          est.iorw(data = data_imp[[x]], outReg = FALSE)))))
+          est.iorw(data = data_imp[[x]], outReg = FALSE, full = full)))))
       }
       environment(boot.step) <- environment()
       # bootstrap results
@@ -618,7 +619,8 @@ estinf <- function() {
       # standard errors by bootstrapping
       effect.se <- sapply(1:n_effect, function(x) sd(boots$t[, x]))
       # effect names
-      effect_name <- c("te", "pnde", "tnie")
+      if (full) effect_name <- c("te", "pnde", "tnie", "pm")
+      if (!full) effect_name <- c("te", "pnde", "tnie")
     } else {
       # transform standard errors of effects in log scale
       effect.se <- sapply(1:n_effect, function(x) sd(exp(boots$t[, x])))
@@ -627,7 +629,8 @@ estinf <- function() {
       effect.ci.low <- exp(effect.ci.low)
       effect.ci.high <- exp(effect.ci.high)
       # effect names
-      effect_name <- c("RRte", "RRpnde", "RRtnie")
+      if (full) effect_name <- c("RRte", "RRpnde", "RRtnie", "pm")
+      if (!full) effect_name <- c("RRte", "RRpnde", "RRtnie")
     }
 
     names(effect.pe) <- names(effect.se) <- names(effect.ci.low) <- names(effect.ci.high) <-
@@ -734,12 +737,12 @@ estinf <- function() {
       if (length(postc) == 0 && full) effect_name <-
           c("cde", "pnde", "tnde", "pnie", "tnie", "te", "pm",
             "intref", "intmed", "cde(prop)", "intref(prop)", "intmed(prop)", "pnie(prop)",
-            "pm(overall)", "int(overall)", "pe(overall)")
+            "int", "pe")
       if (length(postc) == 0 && !full) effect_name <- c("cde", "pnde", "tnde", "pnie", "tnie", "te")
       if (length(postc) != 0 && full) effect_name <-
           c("cde", "rpnde", "rtnde", "rpnie", "rtnie", "te", "rpm",
             "rintref", "rintmed", "cde(prop)", "rintref(prop)", "rintmed(prop)", "rpnie(prop)",
-            "rpm(overall)", "rint(overall)", "rpe(overall)")
+            "rint", "rpe")
       if (length(postc) != 0 && !full) effect_name <- c("cde", "rpnde", "rtnde", "rpnie", "rtnie", "te")
     } else {
       # transform standard errors of effects in log scale
@@ -753,13 +756,13 @@ estinf <- function() {
         c("RRcde", "RRpnde", "RRtnde", "RRpnie", "RRtnie", "RRte", "pm",
           "ERRcde", "ERRintref", "ERRintmed", "ERRpnie",
           "ERRcde(prop)", "ERRintref(prop)", "ERRintmed(prop)", "ERRpnie(prop)",
-          "pm(overall)", "int(overall)", "pe(overall)")
+          "int", "pe")
       if (length(postc) == 0 && !full) effect_name <- c("RRcde", "RRpnde", "RRtnde", "RRpnie", "RRtnie", "RRte")
       if (length(postc) != 0 && full) effect_name <-
         c("RRcde", "rRRpnde", "rRRtnde", "rRRpnie", "rRRtnie", "RRte", "rpm",
           "ERRcde", "rERRintref", "rERRintmed", "rERRpnie",
           "ERRcde(prop)", "rERRintref(prop)", "rERRintmed(prop)", "rERRpnie(prop)",
-          "rpm(overall)", "rint(overall)", "rpe(overall)")
+          "rint", "rpe")
       if (length(postc) != 0 && !full) effect_name <- c("RRcde", "rRRpnde", "rRRtnde", "rRRpnie", "rRRtnie", "RRte")
 
     }
@@ -846,7 +849,7 @@ estinf <- function() {
       # effect names
       if (full) effect_name <- c("cde", "pnde", "tnde", "pnie", "tnie", "te", "pm",
                                  "intref", "intmed", "cde(prop)", "intref(prop)", "intmed(prop)", "pnie(prop)",
-                                 "pm(overall)", "int(overall)", "pe(overall)")
+                                 "int", "pe")
       if (!full) effect_name <- c("cde", "pnde", "tnde", "pnie", "tnie", "te")
     } else {
       # transform standard errors of effects in log scale
@@ -859,7 +862,7 @@ estinf <- function() {
       if (full) effect_name <- c("RRcde", "RRpnde", "RRtnde", "RRpnie", "RRtnie", "RRte", "pm",
                                  "ERRcde", "ERRintref", "ERRintmed", "ERRpnie",
                                  "ERRcde(prop)", "ERRintref(prop)", "ERRintmed(prop)", "ERRpnie(prop)",
-                                 "pm(overall)", "int(overall)", "pe(overall)")
+                                 "int", "pe")
       if (!full) effect_name <- c("RRcde", "RRpnde", "RRtnde", "RRpnie", "RRtnie", "RRte")
     }
 

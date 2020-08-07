@@ -243,11 +243,10 @@ est.wb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       intref_prop <- intref/te
       intmed_prop <- intmed/te
       pnie_prop <- pnie/te
-      overall_pm <- (pnie + intmed)/te
-      overall_int <- (intref + intmed)/te
-      overall_pe <- (intref + intmed + pnie)/te
+      int <- (intref + intmed)/te
+      pe <- (intref + intmed + pnie)/te
       est <- c(cde, pnde, tnde, pnie, tnie, te, pm, intref, intmed, cde_prop, intref_prop, 
-               intmed_prop, pnie_prop, overall_pm, overall_int, overall_pe)
+               intmed_prop, pnie_prop, int, pe)
 
     } else est <- c(cde, pnde, tnde, pnie, tnie, te)
 
@@ -277,13 +276,12 @@ est.wb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       ERRintmed_prop <- ERRintmed/ERRte
       ERRintref_prop <- ERRintref/ERRte
       ERRpnie_prop <- ERRpnie/ERRte
-      overall_pm <- (ERRpnie + ERRintmed)/ERRte
-      overall_int <- (ERRintref + ERRintmed)/ERRte
-      overall_pe <- (ERRintref + ERRintmed + ERRpnie)/ERRte
+      int <- (ERRintref + ERRintmed)/ERRte
+      pe <- (ERRintref + ERRintmed + ERRpnie)/ERRte
       est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte, pm,
                ERRcde, ERRintref, ERRintmed, ERRpnie,
                ERRcde_prop, ERRintref_prop, ERRintmed_prop, ERRpnie_prop,
-               overall_pm, overall_int, overall_pe)
+               int, pe)
     } else est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte)
 
   } else stop("Unsupported yreg")

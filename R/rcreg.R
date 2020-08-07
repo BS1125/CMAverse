@@ -1,4 +1,4 @@
-rcreg <- function(reg = NULL, data = NULL, weights = NULL,
+rcreg <- function(reg = NULL, data = NULL, weights = NULL, model = TRUE,
                   MEvariable = NULL, MEerror = NULL, variance = FALSE, nboot = 400) {
 
   cl <- match.call()
@@ -34,7 +34,7 @@ rcreg <- function(reg = NULL, data = NULL, weights = NULL,
     regCall$weights <- weights
     if (inherits(reg, "multinom")) {
       # output the model frame for a multinom object
-      regCall$model <- TRUE
+      regCall$model <- model
       regCall$trace <- FALSE
     }
     if (inherits(reg, "polr")) {
@@ -89,6 +89,7 @@ rcreg <- function(reg = NULL, data = NULL, weights = NULL,
     RCcoef <- RC$RCcoef
     RCreg <- RC$RCreg
     out$RCcoef <- RCcoef
+    n <- nrow(data)
     n_coef <- length(RCcoef)
     if (identical(class(reg), "lm") |
         (identical(class(reg), c("glm", "lm")) && family(reg)$family == "gaussian")) {

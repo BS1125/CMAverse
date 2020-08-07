@@ -183,9 +183,8 @@ deltamethod <- function(data = NULL, yreg = NULL, mreg = NULL) {
       intref_prop_formula <- paste0("(", intref_formula, ")/(", te_formula, ")")
       intmed_prop_formula <- paste0("(", intmed_formula, ")/(", te_formula, ")")
       pnie_prop_formula <- paste0("(", pnie_formula, ")/(", te_formula, ")")
-      overall_pm_formula <- paste0("((", pnie_formula, ")+(", intmed_formula, "))/(", te_formula, ")")
-      overall_int_formula <- paste0("((", intref_formula, ")+(", intmed_formula, "))/(", te_formula, ")")
-      overall_pe_formula <- paste0("((", intref_formula, ")+(", intmed_formula, ")+(", pnie_formula,
+      int_formula <- paste0("((", intref_formula, ")+(", intmed_formula, "))/(", te_formula, ")")
+      pe_formula <- paste0("((", intref_formula, ")+(", intmed_formula, ")+(", pnie_formula,
                                    "))/(", te_formula, ")")
       delta_formula <- list(cde_formula = cde_formula, pnde_formula = pnde_formula,
                             tnde_formula = tnde_formula, pnie_formula = pnie_formula,
@@ -193,8 +192,8 @@ deltamethod <- function(data = NULL, yreg = NULL, mreg = NULL) {
                             intref_formula = intref_formula, intmed_formula = intmed_formula, 
                             cde_prop_formula = cde_prop_formula, intref_prop_formula = intref_prop_formula,
                             intmed_prop_formula = intmed_prop_formula, pnie_prop_formula = pnie_prop_formula,
-                            overall_pm_formula = overall_pm_formula, overall_int_formula = overall_int_formula,
-                            overall_pe_formula = overall_pe_formula)
+                            int_formula = int_formula,
+                            pe_formula = pe_formula)
     } else delta_formula <- list(cde_formula = cde_formula, pnde_formula = pnde_formula,
                                  tnde_formula = tnde_formula, pnie_formula = pnie_formula,
                                  tnie_formula = tnie_formula, te_formula = te_formula)
@@ -354,11 +353,9 @@ deltamethod <- function(data = NULL, yreg = NULL, mreg = NULL) {
       intmed_err_prop_formula <- paste0("(", intmed_err_formula, ")/(", te_err_formula, ")")
       intref_err_prop_formula <-paste0("(", intref_err_formula, ")/(", te_err_formula, ")")
       pnie_err_prop_formula <- paste0("(", pnie_err_formula, ")/(", te_err_formula, ")")
-      overall_pm_formula <- paste0("((", pnie_err_formula, ")+(", intmed_err_formula, "))/(",
-                                   te_err_formula, ")")
-      overall_int_formula <- paste0("((", intref_err_formula, ")+(", intmed_err_formula, "))/(",
+      int_formula <- paste0("((", intref_err_formula, ")+(", intmed_err_formula, "))/(",
                                     te_err_formula, ")")
-      overall_pe_formula <- paste0("((", intref_err_formula, ")+(", intmed_err_formula, ")+(",
+      pe_formula <- paste0("((", intref_err_formula, ")+(", intmed_err_formula, ")+(",
                                    pnie_err_formula,
                                    "))/(", te_err_formula, ")")
       delta_formula <- list(cde_logrr_formula = cde_logrr_formula, pnde_logrr_formula = pnde_logrr_formula,
@@ -370,8 +367,8 @@ deltamethod <- function(data = NULL, yreg = NULL, mreg = NULL) {
                             cde_err_prop_formula = cde_err_prop_formula,
                             intref_err_prop_formula = intref_err_prop_formula,
                             intmed_err_prop_formula = intmed_err_prop_formula, pnie_err_prop_formula = pnie_err_prop_formula,
-                            overall_pm_formula = overall_pm_formula, overall_int_formula = overall_int_formula,
-                            overall_pe_formula = overall_pe_formula)
+                            int_formula = int_formula,
+                            pe_formula = pe_formula)
     } else delta_formula <- list(cde_logrr_formula = cde_logrr_formula, pnde_logrr_formula = pnde_logrr_formula,
                                  tnde_logrr_formula = tnde_logrr_formula, pnie_logrr_formula = pnie_logrr_formula,
                                  tnie_logrr_formula = tnie_logrr_formula, te_logrr_formula = te_logrr_formula)

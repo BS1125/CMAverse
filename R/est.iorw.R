@@ -1,4 +1,4 @@
-est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE) {
+est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
 
   if (is.null(indices)) indices <- 1:n
   # resample data
@@ -225,7 +225,11 @@ est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE) {
     tot <- EYtot1 - EYtot0
     dir <- EYdir1 - EYdir0
     ind <- tot - dir
-    est <- c(tot = tot, dir = dir, ind = ind)
+    
+    if (full) {
+    pm <- ind / tot
+    est <- c(tot, dir, ind, pm)
+    } else est <- c(tot, dir, ind)
 
   } else if (((is_lm_yreg | is_glm_yreg) &&
               (family_yreg$family %in% c("binomial", "quasibinomial", "multinom", "poisson", "quasipoisson", "ziplss") |
@@ -238,8 +242,12 @@ est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE) {
     logRRtot <- log(EYtot1) - log(EYtot0)
     logRRdir <- log(EYdir1) - log(EYdir0)
     logRRind <- logRRtot - logRRdir
-    est <- c(logRRtot, logRRdir, logRRind)
-
+    
+    if (full) {
+    pm <- (exp(logRRdir) * (exp(logRRind) - 1)) / (exp(logRRtot) - 1)
+    est <- c(logRRtot, logRRdir, logRRind, pm)
+} else est <- c(logRRtot, logRRdir, logRRind)
+    
   } else stop("Unsupported yreg")
 
   # progress bar

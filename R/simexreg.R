@@ -1,4 +1,4 @@
-simexreg <- function (reg = NULL, data = NULL, weights = NULL, 
+simexreg <- function (reg = NULL, data = NULL, weights = NULL, model = TRUE,
                       MEvariable = NULL, MEvartype = NULL, MEerror = NULL,
                       variance = FALSE, lambda = c(0.5, 1, 1.5, 2), B = 200) {
 
@@ -33,7 +33,7 @@ simexreg <- function (reg = NULL, data = NULL, weights = NULL,
   regCall$weights <- weights
   if (inherits(reg, "multinom")) {
     # output the model frame for a multinom object
-    regCall$model <- TRUE
+    regCall$model <- model
     regCall$trace <- FALSE
   }
   if (inherits(reg, "polr")) {
