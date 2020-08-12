@@ -1,4 +1,4 @@
-deltamethod <- function(data = NULL, yreg = NULL, mreg = NULL) {
+inf.delta <- function(data = NULL, yreg = NULL, mreg = NULL) {
 
   # for categorical exposure, create indicator vectors for a and astar
   if (is.factor(data[, exposure]) | is.character(data[, exposure])) {
@@ -36,7 +36,7 @@ deltamethod <- function(data = NULL, yreg = NULL, mreg = NULL) {
   # variance-covariance matrix of betas
   vcov_betas <- vcov(mreg)
   # stack the two diagonally
-  vcov_block <- Matrix::bdiag(vcov_thetas, vcov_betas)
+  vcov_block <- bdiag(vcov_thetas, vcov_betas)
 
   theta0 <- "x1"
   theta1 <- paste0("x", 2:elevel)
@@ -242,7 +242,7 @@ deltamethod <- function(data = NULL, yreg = NULL, mreg = NULL) {
                                 paste(beta1, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
                                 paste(beta1, paste0("(", astar, ")"), sep = "*", collapse = "+"), "))")
 
-      if (full) cde_err_formula <- paste0("(exp(((", paste(theta1, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
+      if (full) cde_err_formula <- paste0("exp(((", paste(theta1, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
                                           paste(theta1, paste0("(", astar, ")"), sep = "*", collapse = "+"), "))+(",
                                           paste(theta3, paste0("(", a, ")"), sep = "*", collapse = "+"), ")*", mstar, "-exp((",
                                           paste(theta3, paste0("(", astar, ")"), sep = "*", collapse = "+"),
@@ -378,7 +378,7 @@ deltamethod <- function(data = NULL, yreg = NULL, mreg = NULL) {
   effect_se <- c()
   for (formula in names(delta_formula)) {
     delta_formula[[formula]] <- as.formula(paste0("~", delta_formula[[formula]]))
-    effect_se <- c(effect_se, msm::deltamethod(delta_formula[[formula]], c(thetas, betas), vcov_block))
+    effect_se <- c(effect_se, deltamethod(delta_formula[[formula]], c(thetas, betas), vcov_block))
   }
 
   out <- effect_se

@@ -214,8 +214,8 @@ est.gformula <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRU
       } else if ((is_lm_postcreg[p] | is_glm_postcreg[p]) && family_postcreg[[p]]$family == "inverse.gaussian") {
 
         lambda <- 1/summary(postcreg[[p]])$dispersion
-        mid_a <- SuppDists::rinvGauss(n, nu = postcpred_a, lambda = lambda)
-        mid_astar <- SuppDists::rinvGauss(n, nu = postcpred_astar, lambda = lambda)
+        mid_a <- rinvGauss(n, nu = postcpred_a, lambda = lambda)
+        mid_astar <- rinvGauss(n, nu = postcpred_astar, lambda = lambda)
 
         rm(lambda)
 
@@ -229,8 +229,8 @@ est.gformula <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRU
       } else if ((is_lm_postcreg[p] | is_glm_postcreg[p]) && startsWith(family_reg[[p]]$family, "Negative Binomial")) {
 
         theta <- summary(postcreg[[p]])$theta
-        mid_a <- MASS::rnegbin(n, mu = postcpred_a, theta = theta)
-        mid_astar <- MASS::rpois(n, mu = postcpred_astar, theta = theta)
+        mid_a <- rnegbin(n, mu = postcpred_a, theta = theta)
+        mid_astar <- rnegbin(n, mu = postcpred_astar, theta = theta)
 
         rm(theta)
 
@@ -324,8 +324,8 @@ est.gformula <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRU
     } else if ((is_lm_mreg[p] | is_glm_mreg[p]) && family_mreg[[p]]$family == "inverse.gaussian") {
 
       lambda <- 1/summary(mreg[[p]])$dispersion
-      mid_a <- SuppDists::rinvGauss(n, nu = mpred_a, lambda = lambda)
-      mid_astar <- SuppDists::rinvGauss(n, nu = mpred_astar, lambda = lambda)
+      mid_a <- rinvGauss(n, nu = mpred_a, lambda = lambda)
+      mid_astar <- rinvGauss(n, nu = mpred_astar, lambda = lambda)
 
       rm(lambda)
 
@@ -339,8 +339,8 @@ est.gformula <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRU
     } else if ((is_lm_mreg[p] | is_glm_mreg[p]) && startsWith(family_reg[[p]]$family, "Negative Binomial")) {
 
       theta <- summary(mreg[[p]])$theta
-      mid_a <- MASS::rnegbin(n, mu = mpred_a, theta = theta)
-      mid_astar <- MASS::rpois(n, mu = mpred_astar, theta = theta)
+      mid_a <- rnegbin(n, mu = mpred_a, theta = theta)
+      mid_astar <- rnegbin(n, mu = mpred_astar, theta = theta)
 
       rm(theta)
 
@@ -451,8 +451,8 @@ est.gformula <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRU
       pnie_prop <- pnie/te
       int <- (intref + intmed)/te
       pe <- (intref + intmed + pnie)/te
-      est <- c(cde, pnde, tnde, pnie, tnie, te, pm, intref, intmed, 
-               cde_prop, intref_prop, intmed_prop, pnie_prop, int, pe)
+      est <- c(cde, pnde, tnde, pnie, tnie, te, intref, intmed, 
+               cde_prop, intref_prop, intmed_prop, pnie_prop, pm, int, pe)
 
     } else est <- c(cde, pnde, tnde, pnie, tnie, te)
 
@@ -484,10 +484,10 @@ est.gformula <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRU
       ERRpnie_prop <- ERRpnie/ERRte
       int <- (ERRintref + ERRintmed)/ERRte
       pe <- (ERRintref + ERRintmed + ERRpnie)/ERRte
-      est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte, pm,
+      est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte, 
                ERRcde, ERRintref, ERRintmed, ERRpnie,
                ERRcde_prop, ERRintref_prop, ERRintmed_prop, ERRpnie_prop,
-               int, pe)
+               pm, int, pe)
     } else est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte)
 
   } else stop("Unsupported yreg")

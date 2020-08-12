@@ -13,5 +13,6 @@
 #'   \item{contY}{a continuous outcome}
 #'   \item{binY}{a binary outcome}
 #' }
+#' @export
 
 "cma2020"

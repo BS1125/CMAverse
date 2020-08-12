@@ -25,7 +25,7 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       call_ereg$data <- data
       ereg <- eval.parent(call_ereg)
       # calculate w_{a,i}=P(A=A_i)/P(A=A_i|C_i)
-      wanom <- left_join(dplyr::select(data, exposure), count(data, !!as.name(exposure)), by = exposure)[, "n"]/n
+      wanom <- left_join(select(data, exposure), count(data, !!as.name(exposure)), by = exposure)[, "n"]/n
       wadenom_prob <- as.matrix(predict(ereg, newdata = data,
                                         type = ifelse(is_multinom_ereg | is_polr_ereg, "probs", "response")))
       a_lev <- levels(droplevels(as.factor(data[, exposure])))
@@ -42,20 +42,22 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       rm(a_lev, wa_data, wanom, wadenom_prob, category, wadenom)
     } else wa <- rep(1, n)
 
-    # calculate w_{m_p,i}=P(M_p=M_{p,i}|A=A_i)/P(M_p=M_{p,i}|A=A_i,C=C_i,L=L_i,M_1=M_{1,i},...,M_{p-1}=M_{p-1,i})
+    # calculate w_{m_p,i}=P(M_p=M_{p,i}|A=A_i,M_1=M_{1,i},...,M_{p-1}=M_{p-1,i})/
+    # P(M_p=M_{p,i}|A=A_i,C=C_i,L=L_i,M_1=M_{1,i},...,M_{p-1}=M_{p-1,i})
     wmdenom <- wmnom <- matrix(nrow = n, ncol = length(mediator))
     wmdenomreg <- wmnomreg <- list()
     for (p in 1:length(mediator)) {
       call_wmdenomreg <- call_wmreg[[p]]
-      call_wmnomreg <- call_wmreg[[p]]
-      call_wmnomreg$formula <- as.formula(paste0(mediator[p], "~", exposure))
+      call_wmnomreg <- call_mreg[[p]]
       # weights for wmdenomreg[[p]] and wmnomreg[[p]]
-      if (!is.null(weights_wmreg[[p]])) weights_wmreg <- weights_wmreg[[p]][indices] * w4casecon
-      if (is.null(weights_wmreg[[p]])) weights_wmreg <- w4casecon
+      if (!is.null(weights_wmreg[[p]])) weights_wmdenomreg <- weights_wmreg[[p]][indices] * w4casecon
+      if (is.null(weights_wmreg[[p]])) weights_wmdenomreg <- w4casecon
+      if (!is.null(weights_mreg[[p]])) weights_wmnomreg <- weights_mreg[[p]][indices] * w4casecon
+      if (is.null(weights_mreg[[p]])) weights_wmnomreg <- w4casecon
       # update wmdenomreg[[p]] and wmnomreg[[p]]
-      call_wmdenomreg$weights <- weights_wmreg
+      call_wmdenomreg$weights <- weights_wmdenomreg
       call_wmdenomreg$data <- data
-      call_wmnomreg$weights <- weights_wmreg
+      call_wmnomreg$weights <- weights_wmnomreg
       call_wmnomreg$data <- data
       wmdenomreg[[p]] <- eval.parent(call_wmdenomreg)
       wmnomreg[[p]] <- eval.parent(call_wmnomreg)
@@ -80,8 +82,6 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
        category, wmdenom, wmnom)
     # weights for each mediator regression
     w_mreg <- replicate(length(mediator), wa)
-    if (length(mediator) > 1) for (p in 2:length(mediator)) for (j in 1:(p - 1))
-      w_mreg[, p] <- w_mreg[, p] * wm[, j]
     # weights for outcome regression
     w_yreg <- wa
     for (p in 1:ncol(wm)) w_yreg <- w_yreg * wm[, p]
@@ -118,7 +118,7 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       call_ereg$data <- data[control_indices, ]
       ereg <- eval.parent(call_ereg)
       # calculate w_{a,i}=P(A=A_i)/P(A=A_i|C_i)
-      wanom <- left_join(dplyr::select(data, exposure), count(data, !!as.name(exposure)), by = exposure)[, "n"]/n
+      wanom <- left_join(select(data, exposure), count(data, !!as.name(exposure)), by = exposure)[, "n"]/n
       wadenom_prob <- as.matrix(predict(ereg, newdata = data,
                                         type = ifelse(is_multinom_ereg | is_polr_ereg, "probs", "response")))
       a_lev <- levels(droplevels(as.factor(data[, exposure])))
@@ -135,17 +135,17 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       rm(a_lev, wa_data, wanom, wadenom_prob, category, wadenom)
     } else wa <- rep(1, n)
 
-    # calculate w_{m_p,i}=P(M_p=M_{p,i}|A=A_i)/P(M_p=M_{p,i}|A=A_i,C=C_i,L=L_i,M_1=M_{1,i},...,M_{p-1}=M_{p-1,i})
+    # calculate w_{m_p,i}=P(M_p=M_{p,i}|A=A_i,M_1=M_{1,i},...,M_{p-1}=M_{p-1,i})/
+    # P(M_p=M_{p,i}|A=A_i,C=C_i,L=L_i,M_1=M_{1,i},...,M_{p-1}=M_{p-1,i})
     wmdenom <- wmnom <- matrix(nrow = n, ncol = length(mediator))
     wmdenomreg <- wmnomreg <- list()
     for (p in 1:length(mediator)) {
       call_wmdenomreg <- call_wmreg[[p]]
-      call_wmnomreg <- call_wmreg[[p]]
-      call_wmnomreg$formula <- as.formula(paste0(mediator[p], "~", exposure))
+      call_wmnomreg <- call_mreg[[p]]
       # update wmdenomreg[[p]] and wmnomreg[[p]]
       call_wmdenomreg$weights <- weights_wmreg[[p]][indices][control_indices]
       call_wmdenomreg$data <- data[control_indices, ]
-      call_wmnomreg$weights <- weights_wmreg[[p]][indices][control_indices]
+      call_wmnomreg$weights <- weights_mreg[[p]][indices][control_indices]
       call_wmnomreg$data <- data[control_indices, ]
       wmdenomreg[[p]] <- eval.parent(call_wmdenomreg)
       wmnomreg[[p]] <- eval.parent(call_wmnomreg)
@@ -170,18 +170,16 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
        category, wmdenom, wmnom)
     # weights for each mediator regression
     w_mreg <- replicate(length(mediator), wa)
-    if (length(mediator) > 1) for (p in 2:length(mediator)) for (j in 1:(p - 1))
-      w_mreg[, p] <- w_mreg[, p] * wm[, j]
     # weights for outcome regression
     w_yreg <- wa
     for (p in 1:ncol(wm)) w_yreg <- w_yreg * wm[, p]
 
     for (p in 1:length(mediator)) {
       # weights for mreg[[p]]
-      if (!is.null(weights_mreg[[p]])) weights_mreg <- (weights_mreg[[p]][indices] * w_mreg[, p])[control_indices]
-      if (is.null(weights_mreg[[p]])) weights_mreg <- w_mreg[, p][control_indices]
+      if (!is.null(weights_mreg[[p]])) w.mid <- (weights_mreg[[p]][indices] * w_mreg[, p])[control_indices]
+      if (is.null(weights_mreg[[p]])) w.mid <- w_mreg[, p][control_indices]
       # update mreg[[p]]
-      call_mreg[[p]]$weights <- weights_mreg
+      call_mreg[[p]]$weights <- w.mid
       call_mreg[[p]]$data <- data[control_indices, ]
       mreg[[p]] <- eval.parent(call_mreg[[p]])
     }
@@ -205,7 +203,7 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       call_ereg$data <- data
       ereg <- eval.parent(call_ereg)
       # calculate w_{a,i}=P(A=A_i)/P(A=A_i|C_i)
-      wanom <- left_join(dplyr::select(data, exposure), count(data, !!as.name(exposure)), by = exposure)[, "n"]/n
+      wanom <- left_join(select(data, exposure), count(data, !!as.name(exposure)), by = exposure)[, "n"]/n
       wadenom_prob <- as.matrix(predict(ereg, newdata = data,
                                         type = ifelse(is_multinom_ereg | is_polr_ereg, "probs", "response")))
       a_lev <- levels(droplevels(as.factor(data[, exposure])))
@@ -227,12 +225,11 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     wmdenomreg <- wmnomreg <- list()
     for (p in 1:length(mediator)) {
       call_wmdenomreg <- call_wmreg[[p]]
-      call_wmnomreg <- call_wmreg[[p]]
-      call_wmnomreg$formula <- as.formula(paste0(mediator[p], "~", exposure))
+      call_wmnomreg <- call_mreg[[p]]
       # update wmdenomreg[[p]] and wmnomreg[[p]]
       call_wmdenomreg$weights <- weights_wmreg[[p]][indices]
       call_wmdenomreg$data <- data
-      call_wmnomreg$weights <- weights_wmreg[[p]][indices]
+      call_wmnomreg$weights <- weights_mreg[[p]][indices]
       call_wmnomreg$data <- data
       wmdenomreg[[p]] <- eval.parent(call_wmdenomreg)
       wmnomreg[[p]] <- eval.parent(call_wmnomreg)
@@ -257,18 +254,16 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
        category, wmdenom, wmnom)
     # weights for each mediator regression
     w_mreg <- replicate(length(mediator), wa)
-    if (length(mediator) > 1) for (p in 2:length(mediator)) for (j in 1:(p - 1))
-      w_mreg[, p] <- w_mreg[, p] * wm[, j]
     # weights for outcome regression
     w_yreg <- wa
     for (p in 1:ncol(wm)) w_yreg <- w_yreg * wm[, p]
 
     for (p in 1:length(mediator)) {
       # weights for mreg[[p]]
-      if (!is.null(weights_mreg[[p]])) weights_mreg <- (weights_mreg[[p]][indices] * w_mreg[, p])
-      if (is.null(weights_mreg[[p]])) weights_mreg <- w_mreg[, p]
+      if (!is.null(weights_mreg[[p]])) w.mid <- (weights_mreg[[p]][indices] * w_mreg[, p])
+      if (is.null(weights_mreg[[p]])) w.mid <- w_mreg[, p]
       # update mreg[[p]]
-      call_mreg[[p]]$weights <- weights_mreg
+      call_mreg[[p]]$weights <- w.mid
       call_mreg[[p]]$data <- data
       mreg[[p]] <- eval.parent(call_mreg[[p]])
     }
@@ -390,8 +385,8 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     } else if ((is_lm_mreg[p] | is_glm_mreg[p]) && family_mreg[[p]]$family == "inverse.gaussian") {
 
       lambda <- 1/summary(mreg[[p]])$dispersion
-      mid_a <- SuppDists::rinvGauss(n, nu = mpred_a, lambda = lambda)
-      mid_astar <- SuppDists::rinvGauss(n, nu = mpred_astar, lambda = lambda)
+      mid_a <- rinvGauss(n, nu = mpred_a, lambda = lambda)
+      mid_astar <- rinvGauss(n, nu = mpred_astar, lambda = lambda)
 
       rm(lambda)
 
@@ -405,8 +400,8 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     } else if ((is_lm_mreg[p] | is_glm_mreg[p]) && startsWith(family_reg[[p]]$family, "Negative Binomial")) {
 
       theta <- summary(mreg[[p]])$theta
-      mid_a <- MASS::rnegbin(n, mu = mpred_a, theta = theta)
-      mid_astar <- MASS::rpois(n, mu = mpred_astar, theta = theta)
+      mid_a <- rnegbin(n, mu = mpred_a, theta = theta)
+      mid_astar <- rnegbin(n, mu = mpred_astar, theta = theta)
 
       rm(theta)
 
@@ -511,8 +506,8 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       pnie_prop <- pnie/te
       int <- (intref + intmed)/te
       pe <- (intref + intmed + pnie)/te
-      est <- c(cde, pnde, tnde, pnie, tnie, te, pm, intref, intmed, cde_prop, intref_prop, 
-               intmed_prop, pnie_prop, int, pe)
+      est <- c(cde, pnde, tnde, pnie, tnie, te, intref, intmed, cde_prop, intref_prop, 
+               intmed_prop, pnie_prop, pm, int, pe)
 
     } else est <- c(cde, pnde, tnde, pnie, tnie, te)
 
@@ -544,10 +539,10 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       ERRpnie_prop <- ERRpnie/ERRte
       int <- (ERRintref + ERRintmed)/ERRte
       pe <- (ERRintref + ERRintmed + ERRpnie)/ERRte
-      est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte, pm,
+      est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte, 
                ERRcde, ERRintref, ERRintmed, ERRpnie,
                ERRcde_prop, ERRintref_prop, ERRintmed_prop, ERRpnie_prop,
-               int, pe)
+               pm, int, pe)
     } else est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte)
 
   } else stop("Unsupported yreg")

@@ -10,7 +10,7 @@ est.ne <- function(data = NULL, indices = NULL, outReg = FALSE, full = NULL) {
   yreg <- eval.parent(call_yreg)
 
   # the expanded dataset
-  expdata <- medflex::neImpute(yreg, nMed = length(mediator))
+  expdata <- neImpute(yreg, nMed = length(mediator))
   # natural effect model formula
   ne_a <- paste0(exposure, "0")
   ne_m <- paste0(exposure, "1")
@@ -128,8 +128,8 @@ est.ne <- function(data = NULL, indices = NULL, outReg = FALSE, full = NULL) {
       pnie_prop <- pnie/te
       int <- (intref + intmed)/te
       pe <- (intref + intmed + pnie)/te
-      est <- c(cde, pnde, tnde, pnie, tnie, te, pm, intref, intmed, cde_prop, intref_prop, 
-               intmed_prop, pnie_prop, int, pe)
+      est <- c(cde, pnde, tnde, pnie, tnie, te, intref, intmed, cde_prop, intref_prop, 
+               intmed_prop, pnie_prop, pm, int, pe)
 
     } else est <- c(cde, pnde, tnde, pnie, tnie, te)
 
@@ -156,10 +156,10 @@ est.ne <- function(data = NULL, indices = NULL, outReg = FALSE, full = NULL) {
       ERRpnie_prop <- ERRpnie/ERRte
       int <- (ERRintref + ERRintmed)/ERRte
       pe <- (ERRintref + ERRintmed + ERRpnie)/ERRte
-      est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte, pm,
+      est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte, 
                ERRcde, ERRintref, ERRintmed, ERRpnie,
                ERRcde_prop, ERRintref_prop, ERRintmed_prop, ERRpnie_prop,
-               int, pe)
+               pm, int, pe)
     } else est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte)
 
   } else stop("Unsupported yreg")

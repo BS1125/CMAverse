@@ -140,6 +140,7 @@ est.wb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
   subj_astar <- which(data[, exposure] == astar)
   subj_a <- which(data[, exposure] == a)
 
+  a_lev <- levels(droplevels(as.factor(data[, exposure])))
   # simulate A
   if (is.factor(data[, exposure])) {
     a_sim <- factor(c(rep(a, n)), levels = a_lev)
@@ -245,8 +246,8 @@ est.wb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       pnie_prop <- pnie/te
       int <- (intref + intmed)/te
       pe <- (intref + intmed + pnie)/te
-      est <- c(cde, pnde, tnde, pnie, tnie, te, pm, intref, intmed, cde_prop, intref_prop, 
-               intmed_prop, pnie_prop, int, pe)
+      est <- c(cde, pnde, tnde, pnie, tnie, te, intref, intmed, cde_prop, intref_prop, 
+               intmed_prop, pnie_prop, pm, int, pe)
 
     } else est <- c(cde, pnde, tnde, pnie, tnie, te)
 
@@ -278,10 +279,10 @@ est.wb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       ERRpnie_prop <- ERRpnie/ERRte
       int <- (ERRintref + ERRintmed)/ERRte
       pe <- (ERRintref + ERRintmed + ERRpnie)/ERRte
-      est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte, pm,
+      est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte, 
                ERRcde, ERRintref, ERRintmed, ERRpnie,
                ERRcde_prop, ERRintref_prop, ERRintmed_prop, ERRpnie_prop,
-               int, pe)
+               pm, int, pe)
     } else est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte)
 
   } else stop("Unsupported yreg")

@@ -1,12 +1,28 @@
 Package: CMAverse
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Causal Mediation Analysis
 Version: 0.1.0
 URL: https://CMAverse.org, https://github.com/LindaValeri/CMAverse
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Author: Baoyi Shi <bs3141@cumc.columbia.edu>
+        Christine Choirat <cchoirat@gmail.com, cchoirat@datascience.ch>
+        Linda Valeri <lv2424@cumc.columbia.edu>
+Maintainer: Baoyi Shi <bs3141@cumc.columbia.edu>
+Description: CMAverse provides a suite of functions for reproducible causal mediation 
+    analysis including DAG visualization, statistical modeling and sensitivity analysis. It 
+    implements six causal mediation analysis approaches including the regression-based 
+    approach by Valeri et al. (2013) <doi: 10.1037/a0031034> and VanderWeele et al. (2014) 
+    <doi: 10.1515/em-2012-0010>, the weighting-based approach by VanderWeele et al. (2014)
+    <doi: 10.1515/em-2012-0010>, the inverse odd-ratio weighting approach by Tchetgen Tchetgen 
+    (2013) <doi: 10.1002/sim.5864>, the natural effect model by Vansteelandt et al. (2012) 
+    <doi: 10.1515/2161-962X.1014>, the marginal structural model by VanderWeele 
+    et al. (2017) <doi: 10.1111/rssb.12194>, and the g-formula approach by Lin et al. (2017) 
+    <doi: 10.1097/EDE.0000000000000609>. Moreover, CMAverse conducts sensitivity analysis for
+    unmeasured confounding via the E-value approach by VanderWeele et al. (2017) 
+    <doi: 10.7326/M16-2607> and Smith et al. (2019) <doi: 10.1097/EDE.0000000000001064>, and 
+    sensitivity analysis for measurement error via regression calibration by Carroll et al. (1995) 
+    <doi: 10.1201/9781420010138> and SIMEX by Cook et al. (1994) <doi: 10.2307/2290994> and 
+    Küchenhoff et al. (2006) <doi: 10.1111/j.1541-0420.2005.00396.x>. CMAverse also performs
+    multiple imputation for a dataset with missing data.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
@@ -26,12 +42,14 @@ Imports:
     msm,
     Matrix,
     EValue,
-    ggplot2
+    ggplot2,
+    medflex
 RoxygenNote: 7.1.0
 Suggests: 
     knitr,
+    kableExtra,
+    dagitty,
     rmarkdown,
     testthat
 VignetteBuilder: knitr
-Depends: 
-    R (>= 2.10)
+Depends: R (>= 2.10)

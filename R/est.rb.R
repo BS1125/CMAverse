@@ -21,7 +21,7 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     if (is.null(weights_yreg)) weights_yreg <- w4casecon
     # update yreg
     if (inference == "delta") {
-      call_yreg$design <- eval(bquote(survey::svydesign(~1, weights = ~.(weights_yreg), data = .(data))))
+      call_yreg$design <- eval(bquote(svydesign(id=~1, weights = .(~weights_yreg), data = .(data))))
     } else {
       call_yreg$weights <- weights_yreg
       call_yreg$data <- data
@@ -34,7 +34,7 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       if (is.null(weights_mreg[[p]])) weights_mreg <- w4casecon
       # update mreg[[p]]
       if (inference == "delta" && !is_svymultinom_mreg[p]) {
-        call_mreg[[p]]$design <- eval(bquote(survey::svydesign(~1, weights = ~.(weights_mreg), data = .(data))))
+        call_mreg[[p]]$design <- eval(bquote(svydesign(~1, weights = .(~weights_mreg), data = .(data))))
       } else {
         call_mreg[[p]]$weights <- weights_mreg
         call_mreg[[p]]$data <- data
@@ -52,7 +52,7 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
 
     # update yreg
     if (inference == "delta"&& !is.null(weights_yreg)) {
-      call_yreg$design <- eval(bquote(survey::svydesign(~1, weights = ~.(weights_yreg[indices]), data = .(data))))
+      call_yreg$design <- eval(bquote(svydesign(~1, weights = .(~weights_yreg[indices]), data = .(data))))
     } else {
       call_yreg$weights <- weights_yreg[indices]
       call_yreg$data <- data
@@ -64,7 +64,7 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       # update mreg[[p]]
       if (inference == "delta" && !is.null(weights_mreg[[p]]) && !is_svymultinom_mreg[p]) {
         call_mreg[[p]]$design <-
-          eval(bquote(survey::svydesign(~1, weights = ~.(weights_mreg[[p]][indices][control_indices]), data = .(data[control_indices, ]))))
+          eval(bquote(svydesign(~1, weights = .(~weights_mreg[[p]][indices][control_indices]), data = .(data[control_indices, ]))))
       } else {
         call_mreg[[p]]$weights <- weights_mreg[[p]][indices][control_indices]
         call_mreg[[p]]$data <- data[control_indices, ]
@@ -79,7 +79,7 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     # not a case control design
     # update yreg
     if (inference == "delta" && !is.null(weights_yreg)) {
-      call_yreg$design <- eval(bquote(survey::svydesign(~1, weights = ~.(weights_yreg[indices]), data = .(data))))
+      call_yreg$design <- eval(bquote(svydesign(~1, weights = .(~weights_yreg[indices]), data = .(data))))
     } else {
       call_yreg$weights <- weights_yreg[indices]
       call_yreg$data <- data
@@ -91,7 +91,7 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       # update mreg[[p]]
       if (inference == "delta" && !is.null(weights_mreg[[p]]) && !is_svymultinom_mreg[p]) {
         call_mreg[[p]]$design <-
-          eval(bquote(survey::svydesign(~1, weights = ~.(weights_mreg[[p]][indices]), data = .(data))))
+          eval(bquote(svydesign(~1, weights = .(~weights_mreg[[p]][indices]), data = .(data))))
       } else {
         call_mreg[[p]]$weights <- weights_mreg[[p]][indices]
         call_mreg[[p]]$data <- data
@@ -240,8 +240,8 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
         pnie_prop <- pnie/te
         int <- (intref+intmed)/te
         pe <- (intref+intmed+pnie)/te
-        est <- c(cde, pnde, tnde, pnie, tnie, te, pm, intref, intmed, cde_prop, intref_prop, 
-                 intmed_prop, pnie_prop, int, pe)
+        est <- c(cde, pnde, tnde, pnie, tnie, te, intref, intmed, cde_prop, intref_prop, 
+                 intmed_prop, pnie_prop, pm, int, pe)
       } else est <- c(cde, pnde, tnde, pnie, tnie, te)
 
     } else {
@@ -325,10 +325,10 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
         ERRpnie_prop <- ERRpnie/ERRte
         int <- (ERRintref+ERRintmed)/ERRte
         pe <- (ERRintref+ERRintmed+ERRpnie)/ERRte
-        est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte, pm,
+        est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte, 
                  ERRcde, ERRintref, ERRintmed, ERRpnie,
                  ERRcde_prop, ERRintref_prop, ERRintmed_prop, ERRpnie_prop,
-                 int, pe)
+                 pm, int, pe)
       } else est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte)
 
     }
@@ -438,8 +438,8 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       } else if ((is_lm_mreg[p] | is_glm_mreg[p]) && family_mreg[[p]]$family == "inverse.gaussian") {
 
         lambda <- 1/summary(mreg[[p]])$dispersion
-        mid_a <- SuppDists::rinvGauss(n, nu = mpred_a, lambda = lambda)
-        mid_astar <- SuppDists::rinvGauss(n, nu = mpred_astar, lambda = lambda)
+        mid_a <- rinvGauss(n, nu = mpred_a, lambda = lambda)
+        mid_astar <- rinvGauss(n, nu = mpred_astar, lambda = lambda)
 
         rm(lambda)
 
@@ -453,8 +453,8 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       } else if ((is_lm_mreg[p] | is_glm_mreg[p]) && startsWith(family_reg[[p]]$family, "Negative Binomial")) {
 
         theta <- summary(mreg[[p]])$theta
-        mid_a <- MASS::rnegbin(n, mu = mpred_a, theta = theta)
-        mid_astar <- MASS::rpois(n, mu = mpred_astar, theta = theta)
+        mid_a <- rnegbin(n, mu = mpred_a, theta = theta)
+        mid_astar <- rnegbin(n, mu = mpred_astar, theta = theta)
 
         rm(theta)
 
@@ -559,8 +559,8 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
         pnie_prop <- pnie/te
         int <- (intref + intmed)/te
         pe <- (intref + intmed + pnie)/te
-        est <- c(cde, pnde, tnde, pnie, tnie, te, pm, intref, intmed, cde_prop, intref_prop, 
-                 intmed_prop, pnie_prop, int, pe)
+        est <- c(cde, pnde, tnde, pnie, tnie, te, intref, intmed, cde_prop, intref_prop, 
+                 intmed_prop, pnie_prop, pm, int, pe)
 
       } else est <- c(cde, pnde, tnde, pnie, tnie, te)
 
@@ -592,10 +592,10 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
         ERRpnie_prop <- ERRpnie/ERRte
         int <- (ERRintref + ERRintmed)/ERRte
         pe <- (ERRintref + ERRintmed + ERRpnie)/ERRte
-        est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte, pm,
+        est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte, 
                  ERRcde, ERRintref, ERRintmed, ERRpnie,
                  ERRcde_prop, ERRintref_prop, ERRintmed_prop, ERRpnie_prop,
-                 int, pe)
+                 pm, int, pe)
       } else est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte)
 
     } else stop("Unsupported yreg")

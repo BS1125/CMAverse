@@ -1,3 +1,4 @@
+#' @export
 simexreg <- function (reg = NULL, data = NULL, weights = NULL, model = TRUE,
                       MEvariable = NULL, MEvartype = NULL, MEerror = NULL,
                       variance = FALSE, lambda = c(0.5, 1, 1.5, 2), B = 200) {
@@ -23,7 +24,7 @@ simexreg <- function (reg = NULL, data = NULL, weights = NULL, model = TRUE,
     if (length(MEvariable) != 0 && !is.matrix(MEerror)) stop("MEerror should be a matrix")
     if (dim(MEerror)[1] != dim(MEerror)[2] |
         dim(MEerror)[1] != length(unique(data[, MEvariable]))) stop("Incorrect dimension of MEerror")
-    if (!simex::check.mc.matrix(list(MEerror))) stop("MEerror may contain negative values for exponents smaller than 1")
+    if (!check.mc.matrix(list(MEerror))) stop("MEerror may contain negative values for exponents smaller than 1")
   } else stop("Unsupported MEvartype; use 'continuous' or 'categorical'")
   if (is.null(data)) stop("Unspecified data")
   if (!all(lambda>0)) stop("lambda should be positive")
@@ -31,16 +32,8 @@ simexreg <- function (reg = NULL, data = NULL, weights = NULL, model = TRUE,
   # update reg with data and weights
   regCall$data <- data
   regCall$weights <- weights
-  if (inherits(reg, "multinom")) {
-    # output the model frame for a multinom object
-    regCall$model <- model
-    regCall$trace <- FALSE
-  }
-  if (inherits(reg, "polr")) {
-    # output the model frame for a polr object
-    regCall$model <- TRUE
-    regCall$Hess <- TRUE
-  }
+  if (inherits(reg, "multinom")) regCall$trace <- FALSE
+  if (inherits(reg, "polr")) regCall$Hess <- TRUE
   reg <- eval.parent(regCall)
   
   # the vector of variable names in the regression formula
@@ -144,7 +137,7 @@ simexreg <- function (reg = NULL, data = NULL, weights = NULL, model = TRUE,
          identical(regClass, "lm")) && MEvartype == "continuous") {
       reg_fit <- reg
       reg_fit$coefficients <- SIMEXcoef
-      SIMEXsigma <- sqrt(sum((reg_fit$model[, 1] - predict(reg_fit, newdata = data)) ^ 2) / 
+      SIMEXsigma <- sqrt(sum((model.frame(reg_fit)[, 1] - predict(reg_fit, newdata = data)) ^ 2) / 
                            (n - ncoef) - (SIMEXcoef[MEvariable] * MEerror) ^ 2)
       out$SIMEXsigma <- SIMEXsigma
     }
@@ -157,33 +150,36 @@ simexreg <- function (reg = NULL, data = NULL, weights = NULL, model = TRUE,
 
 }
 
-coef.simexreg <- function(simexreg) {
-  return(simexreg$SIMEXcoef)
+#' @export
+coef.simexreg <- function(object, ...) {
+  return(object$SIMEXcoef)
 }
 
-vcov.simexreg <- function(simexreg) {
-  return(simexreg$SIMEXvcov)
+#' @export
+vcov.simexreg <- function(object, ...) {
+  return(object$SIMEXvcov)
 }
 
-
-sigma.simexreg <- function(simexreg) {
-  return(simexreg$SIMEXsigma)
+#' @export
+sigma.simexreg <- function(object, ...) {
+  return(object$SIMEXsigma)
 }
 
-
-formula.simexreg <- function(simexreg) {
-  return(formula(simexreg$NAIVEreg))
+#' @export
+formula.simexreg <- function(x, ...) {
+  return(formula(x$NAIVEreg))
 }
 
-
-family.simexreg <- function(simexreg, ...) {
-  if (inherits(simexreg$NAIVEreg, "lm") | inherits(simexreg$NAIVEreg, "glm")) {
-    return(family(simexreg$NAIVEreg, ...))
+#' @export
+family.simexreg <- function(object, ...) {
+  if (inherits(object$NAIVEreg, "lm") | inherits(object$NAIVEreg, "glm")) {
+    return(family(object$NAIVEreg, ...))
   } else return(NULL)
 }
 
-predict.simexreg <- function(simexreg, ...){
-  reg <- simexreg$NAIVEreg
+#' @export
+predict.simexreg <- function(object, ...){
+  reg <- object$NAIVEreg
   if (identical(class(reg), c("multinom", "nnet"))) {
     if(length(reg$lev) == 2) {
       coef_index <- 1+(1:length(reg$vcoefnames))
@@ -192,29 +188,31 @@ predict.simexreg <- function(simexreg, ...){
                                        byrow=TRUE)[, 1+(1:length(reg$vcoefnames)),
                                                    drop=FALSE][-1, , drop=FALSE]))
     }
-    reg$wts[coef_index] <- simexreg$SIMEXcoef
+    reg$wts[coef_index] <- object$SIMEXcoef
   } else if (identical(class(reg), "polr")) {
-    reg$coefficients <- simexreg$SIMEXcoef[1:length(coef(reg))]
-    reg$zeta <- simexreg$SIMEXcoef[(length(coef(reg)) + 1):length(simexreg$SIMEXcoef)]
-  } else reg$coefficients <- simexreg$SIMEXcoef
+    reg$coefficients <- object$SIMEXcoef[1:length(coef(reg))]
+    reg$zeta <- object$SIMEXcoef[(length(coef(reg)) + 1):length(object$SIMEXcoef)]
+  } else reg$coefficients <- object$SIMEXcoef
   out <- predict(reg, ...)
   return(out)
 }
 
-model.frame.simexreg <- function(simexreg) {
-  return(model.frame(simexreg$NAIVEreg))
+#' @export
+model.frame.simexreg <- function(formula, ...) {
+  return(model.frame(formula$NAIVEreg))
 }
 
-print.simexreg <- function(simexreg, ...) {
+#' @export
+print.simexreg <- function(x, ...) {
   cat("Call:\n")
-  print(simexreg$call)
+  print(x$call)
   cat(paste("\nNaive regression object: \n"))
-  print(simexreg$NAIVEreg, ...)
+  print(x$NAIVEreg, ...)
   cat("\nVariable measured with error:\n")
-  cat(simexreg$ME$MEvariable)
+  cat(x$ME$MEvariable)
   cat("\nMeasurement error:\n")
-  cat(simexreg$ME$MEerror)
+  cat(x$ME$MEerror)
   cat("\nError-corrected coefficient estimates:\n")
-  print(simexreg$SIMEXcoef)
+  print(x$SIMEXcoef)
 }
 

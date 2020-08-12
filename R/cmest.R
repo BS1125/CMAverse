@@ -3,9 +3,9 @@
 #' \code{cmest} is used to conduct causal mediation analysis via six statistical approaches 
 #' including \emph{the regression-based approach} by Valeri et al. (2013) and VanderWeele 
 #' et al. (2014), \emph{the weighting-based approach} by VanderWeele et al. (2014), 
-#' \emph{the inverse odd-ratio weighting approach} by Tchetgen Tchetgen et al. (2013), 
+#' \emph{the inverse odd-ratio weighting approach} by Tchetgen Tchetgen (2013), 
 #' \emph{the natural effect model} by Vansteelandt et al. (2012), \emph{the marginal structural 
-#' model} by VanderWeele et al. (2009), and \emph{the g-formula approach} by Lin et al. (2017).
+#' model} by VanderWeele et al. (2017), and \emph{the g-formula approach} by Lin et al. (2017).
 #'
 #' @param data dataset for causal mediation analysis.
 #' @param model causal mediation analysis approach. "\code{rb}", "\code{wb}", "\code{iorw}", 
@@ -66,27 +66,28 @@
 #' 
 #' \strong{Regressions}
 #'
-#' Each regression in \code{yreg}, \code{mreg}, \code{wmreg}, \code{ereg} and \code{postcreg} 
-#' can be specified by a user-defined regression object or the character name of a regression. 
+#' Each regression in \code{yreg}, \code{mreg}, \code{wmreg},
+#' \code{ereg} and \code{postcreg} can be specified by a user-defined regression 
+#' object or the character name of a regression. 
 #' 
 #' \emph{The Character Name of A Regression}
 #' 
 #' \itemize{
-#' \item{"\code{linear}": }{linear regression fitted by \link{glm()} with \code{family = gaussian()}}
-#' \item{"\code{logistic}": }{logistic regression fitted by \link{glm()} with \code{family = logit()}}
-#' \item{"\code{loglinear}": }{log linear regression fitted by \link{glm()} with 
+#' \item{"\code{linear}": }{linear regression fitted by \link{glm} with \code{family = gaussian()}}
+#' \item{"\code{logistic}": }{logistic regression fitted by \link{glm} with \code{family = logit()}}
+#' \item{"\code{loglinear}": }{log linear regression fitted by \link{glm} with 
 #' \code{family = poisson()} for a binary response}
-#' \item{"\code{poisson}": }{poisson regression fitted by \link{glm()} with 
+#' \item{"\code{poisson}": }{poisson regression fitted by \link{glm} with 
 #' \code{family = poisson()} for a count response}
-#' \item{"\code{quasipoisson}": }{quasipoisson regression fitted by \link{glm()} with 
+#' \item{"\code{quasipoisson}": }{quasipoisson regression fitted by \link{glm} with 
 #' \code{family = quasipoisson()}}
-#' \item{"\code{negbin}": }{negative binomial regression fitted by \link[MASS]{glm.nb()}}
-#' \item{"\code{multinomial}": }{multinomial regression fitted by \link[nnet]{multinom()}}
-#' \item{"\code{ordinal}": }{ordered logistic regression fitted by \link[MASS]{polr()}}
-#' \item{"\code{coxph}": }{cox proportional hazard model fitted by \link[survival]{coxph()}}
-#' \item{"\code{aft_exp}": }{accelerated failure time model fitted by \link[survival]{survreg()}
+#' \item{"\code{negbin}": }{negative binomial regression fitted by \link[MASS]{glm.nb}}
+#' \item{"\code{multinomial}": }{multinomial regression fitted by \link[nnet]{multinom}}
+#' \item{"\code{ordinal}": }{ordered logistic regression fitted by \link[MASS]{polr}}
+#' \item{"\code{coxph}": }{cox proportional hazard model fitted by \link[survival]{coxph}}
+#' \item{"\code{aft_exp}": }{accelerated failure time model fitted by \link[survival]{survreg}
 #' with \code{dist = "exponential"}}
-#' \item{"\code{aft_weibull}": }{accelerated failure time model fitted by \link[survival]{polr()}
+#' \item{"\code{aft_weibull}": }{accelerated failure time model fitted by \link[survival]{survreg}
 #' with \code{dist = "weibull"}}
 #' }
 #' \code{coxph}, \code{aft_exp} and \code{aft_weibull} are currently not implemented for 
@@ -97,7 +98,8 @@
 #' A user-defined regression object can be fitted by \link{lm}, \link{glm}, \link{glm.nb}, 
 #' \link[mgcv]{gam}, \link[nnet]{multinom}, \link[MASS]{polr}, \link[survival]{coxph} and
 #' \link[survival]{survreg}. Objects fitted by \link[survival]{coxph} and \link[survival]{survreg} 
-#' are currently not supported for \code{mreg}, \code{wmreg}, \code{ereg} and \code{postcreg}.
+#' are currently not supported for \code{mreg}, \code{wmreg}, 
+#' \code{ereg} and \code{postcreg}.
 #' 
 #' The \code{cmest} function calculates weights for regressions when weighting is required. If a 
 #' user-defined regression object is fitted with prior weights, the final weights for this 
@@ -126,7 +128,7 @@
 #'     should regress \code{A} on \code{C}.}
 #'     
 #'     \item{\code{iorw}: }{\emph{the inverse odd-ratio weighting approach} by
-#'       Tchetgen Tchetgen et al. (2013). \code{yreg} and \code{ereg} are required and 
+#'       Tchetgen Tchetgen (2013). \code{yreg} and \code{ereg} are required and 
 #'       \code{A} must be categorical. If specified as a user defined regression object, 
 #'       \code{yreg} should regress \code{Y} on \code{A} and \code{C} and \code{ereg} should 
 #'       regress \code{A} on \code{M} and \code{C}.}
@@ -138,12 +140,13 @@
 #'     the first variable needs to point to the exposure, the variable(s) right after the 
 #'     exposure need to point to the mediator(s), e.g., \eqn{Y ~ A + M_1 + M_2 + A*M_1 + C}.}
 #'       
-#'     \item{\code{msm}: }{\emph{the marginal structural model} by VanderWeele et al. (2009).
-#'     \code{yreg}, \code{mreg} and \code{wmreg} are required and all mediators must be 
-#'     categorical. When \code{prec} is not empty, \code{ereg} is also required and \code{A} 
-#'     must be categorical. If specified as a user defined regression object, \code{yreg} 
-#'     should regress \code{Y} on \code{A} and \code{M}, \code{mreg[p]} should regress 
-#'     \code{M_p} on \code{A}, \code{M_1}, ..., and \code{M_{p-1}} for \code{p=1,...,k}, 
+#'     \item{\code{msm}: }{\emph{the marginal structural model} by VanderWeele et al. (2017).
+#'     \code{yreg}, \code{mreg} and \code{wmreg} are required and all 
+#'     mediators must be categorical. When \code{prec} is not empty, \code{ereg} is also 
+#'     required and \code{A} must be categorical. If specified as a user defined regression 
+#'     object, \code{yreg} should regress \code{Y} on \code{A} and \code{M}, 
+#'     \code{mreg[p]} should regress \code{M_p} on \code{A}, \code{M_1}, ..., and 
+#'     \code{M_{p-1}} for \code{p=1,...,k}, 
 #'     \code{wmreg[p]} should regress \code{M_p} on \code{A}, \code{M_1}, ..., \code{M_{p-1}},
 #'     \code{C} and \code{L} for \code{p=1,...,k}, and \code{ereg} should regress \code{A} on 
 #'     \code{C}.}
@@ -206,23 +209,23 @@
 #' When \code{model = "rb", "wb", "ne", "msm" or "gformula"} with \code{length(postc) = 0} and 
 #' \code{full = TRUE}, \code{cde} (controlled direct effect), \code{pnde} (pure natural direct 
 #' effect), \code{tnde} (total natural direct effect), \code{pnie} (pure natural indirect effect), 
-#' \code{tnie} (total natural indirect effect), \code{te} (total effect), \code{pm} (proportion 
-#' mediated), \code{intref} (reference interaction), \code{intmed} (mediated interaction), 
-#' \code{cde(prop)} (proportion \code{cde}), \code{intref(prop)} 
-#' (proportion \code{intref}), \code{intmed(prop)} (proportion \code{intmed}), \code{pnie(prop)} 
-#' (proportion \code{pnie}), \code{int} (proportion attributable to interaction) and 
-#' \code{pe} (proportion eliminated) are estimated. 
+#' \code{tnie} (total natural indirect effect), \code{te} (total effect),  \code{intref} 
+#' (reference interaction), \code{intmed} (mediated interaction), 
+#' \code{cde(prop)} (proportion \code{cde}), \code{intref(prop)} (proportion 
+#' \code{intref}), \code{intmed(prop)} (proportion \code{intmed}), \code{pnie(prop)} 
+#' (proportion \code{pnie}), \code{pm} (proportion mediated), \code{int} (proportion 
+#' attributable to interaction) and \code{pe} (proportion eliminated) are estimated. 
 #' 
 #' When \code{model = "rb", "wb", "ne", "msm" or "gformula"} with \code{length(postc) = 0} and
 #' \code{full = FALSE}, \code{cde}, \code{pnde}, \code{tnde}, \code{pnie}, \code{tnie} and 
 #' \code{te} are estimated.
 #' 
 #' When \code{model = "msm" or "gformula"} with \code{length(postc) != 0} and \code{full = TRUE}, 
-#' \code{pnde}, \code{tnde}, \code{pnie}, \code{tnie},  \code{pm}, \code{intref}, \code{intmed}, 
-#' \code{intref(prop)}, \code{intmed(prop)}, \code{pie(prop)}, \code{int} and \code{pe} are 
-#' replaced by their randomized analogues \code{rpnde}, \code{rtnde}, \code{rpnie}, 
-#' \code{rtnie}, \code{rpm}, \code{rintref}, \code{rintmed}, \code{rpie}, \code{rintref(prop)}, 
-#' \code{rintmed(prop)}, \code{rpie(prop)}, \code{rint} and \code{rpe}.
+#' \code{pnde}, \code{tnde}, \code{pnie}, \code{tnie},  \code{intref}, \code{intmed}, 
+#' \code{intref(prop)}, \code{intmed(prop)}, \code{pie(prop)}, \code{pm}, \code{int} and 
+#' \code{pe} are replaced by their randomized analogues \code{rpnde}, \code{rtnde}, 
+#' \code{rpnie}, \code{rtnie}, \code{rintref}, \code{rintmed}, \code{rintref(prop)}, 
+#' \code{rintmed(prop)}, \code{rpie(prop)}, \code{rpm}, \code{rint} and \code{rpe}.
 #' 
 #' When \code{model = "msm" or "gformula"} with \code{length(postc) != 0} and
 #' \code{full = FALSE}, \code{cde}, \code{rpnde}, \code{rtnde}, \code{rpnie}, \code{rtnie} and 
@@ -238,27 +241,27 @@
 #' \code{full = TRUE}, \code{RRcde} (\code{cde} risk rario or rate ratio), \code{RRpnde} 
 #' (\code{pnde} risk rario or rate ratio), \code{RRtnde} (\code{tnde} risk rario or rate ratio), 
 #' \code{RRpnie} (\code{pnie} risk rario or rate ratio), \code{RRtnie} (\code{tnie} risk rario 
-#' or rate ratio), \code{RRte} (\code{te} risk rario or rate ratio), \code{pm}, \code{ERRcde} 
+#' or rate ratio), \code{RRte} (\code{te} risk rario or rate ratio), \code{ERRcde} 
 #' (excess risk rario or rate ratio due to \code{cde}), \code{ERRintref} (excess risk rario or 
 #' rate ratio due to \code{intref}), \code{ERRintmed} (excess risk rario or rate ratio due to 
 #' \code{intmed}), \code{ERRpie} (excess risk rario or rate ratio due to \code{pie}), 
 #' \code{ERRcde(prop)} (proportion \code{ERRcde}), \code{ERRintref(prop)} (proportion 
 #' \code{ERRintref}), \code{ERRintmed(prop)} (proportion \code{ERRintmed}), \code{ERRpie(prop)} 
-#' (proportion \code{ERRpie}), \code{int} (proportion attributable to interaction) and 
-#' \code{pe} (proportion eliminated) are estimated. 
+#' (proportion \code{ERRpie}), \code{pm}, \code{int} (proportion attributable to 
+#' interaction) and \code{pe} (proportion eliminated) are estimated. 
 #' 
 #' When \code{model = "rb", "wb", "ne", "msm" or "gformula"} with \code{length(postc) = 0} and
 #' \code{full = FALSE}, \code{RRcde}, \code{RRpnde}, \code{RRtnde}, \code{RRpnie}, \code{RRtnie} 
 #' and \code{RRte} are estimated.
 #' 
 #' When \code{model = "msm" or "gformula"} with \code{length(postc) != 0} and \code{full = TRUE}, 
-#' \code{RRpnde}, \code{RRtnde}, \code{RRpnie}, \code{RRtnie},  \code{pm}, \code{ERRintref}, 
+#' \code{RRpnde}, \code{RRtnde}, \code{RRpnie}, \code{RRtnie},  \code{ERRintref}, 
 #' \code{ERRintmed}, \code{ERRpie}, \code{ERRintref(prop)}, \code{ERRintmed(prop)}, 
-#' \code{ERRpie(prop)}, \code{int} and \code{pe} are 
+#' \code{ERRpie(prop)}, \code{pm}, \code{int} and \code{pe} are 
 #' replaced by their randomized analogues \code{rRRpnde}, \code{rRRtnde}, \code{rRRpnie}, 
-#' \code{rRRtnie}, \code{rpm}, \code{rERRintref}, \code{rERRintmed}, \code{rERRpie}, 
+#' \code{rRRtnie}, \code{rERRintref}, \code{rERRintmed}, \code{rERRpie}, 
 #' \code{rERRintref(prop)}, \code{rERRintmed(prop)}, \code{rERRpie(prop)}, 
-#' \code{rint} and \code{rpe}.
+#' \code{rpm}, \code{rint} and \code{rpe}.
 #' 
 #' When \code{model = "msm" or "gformula"} with \code{length(postc) != 0} and
 #' \code{full = FALSE}, \code{RRcde}, \code{rRRpnde}, \code{rRRtnde}, \code{rRRpnie}, 
@@ -292,7 +295,7 @@
 #' @seealso \code{\link{cmdag}}, \code{\link{cmsens}}
 #'
 #' @references
-#' Valeri L, Vanderweele TJ (2013). Mediation analysis allowing for
+#' Valeri L, VanderWeele TJ (2013). Mediation analysis allowing for
 #' exposure-mediator interactions and causal interpretation: theoretical assumptions and
 #' implementation with SAS and SPSS macros. Psychological Methods. 18(2): 137 - 150.
 #' 
@@ -305,9 +308,6 @@
 #' Nguyen QC, Osypuk TL, Schmidt NM, Glymour MM, Tchetgen Tchetgen EJ. Practical guidance
 #' for conducting mediation analysis with multiple mediators using inverse odds ratio
 #' weighting (2015). American Journal of Epidemiology. 181(5): 349 - 356.
-#' 
-#' VanderWeele TJ. Marginal structural models for the estimation of direct and indirect
-#' effects (2009). Epidemiology. 20(1): 18 - 26.
 #' 
 #' VanderWeele TJ, Tchetgen Tchetgen EJ (2017). Mediation analysis with time varying
 #' exposures and mediators. Journal of the Royal Statistical Society: Series B (Statistical
@@ -346,33 +346,58 @@
 #' inference = "delta")
 #' summary(exp1)
 #' plot(exp1) +
-#' theme(axis.text.x = element_text(angle = 45))
+#' ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45))
 #' 
 #' # multiple-mediator case with rb
+#' # 10 boots are used for illustration
 #' exp2 <- cmest(data = cma2020, model = "rb", outcome = "contY", 
 #' exposure = "A", mediator = c("M1", "M2"), prec = c("C1", "C2"), 
 #' EMint = TRUE, mreg = list("logistic", "multinomial"), 
 #' yreg = "linear", astar = 0, a = 1, mval = list(0, "M2_0"), 
-#' estimation = "imputation", inference = "bootstrap", nboot = 100)
+#' estimation = "imputation", inference = "bootstrap", nboot = 10)
 #' 
 #' # multiple-mediator case with ne
+#' # 10 boots are used for illustration
 #' exp3 <- cmest(data = cma2020, model = "ne", outcome = "contY", 
 #' exposure = "A", mediator = c("M1", "M2"), prec = c("C1", "C2"), 
-#' yreg = lm(Y ~ A + M1 + M2 + A*M1 + A*M2 + C1 + C2, data = cma2020), 
+#' yreg = glm(contY ~ A + M1 + M2 + A*M1 + A*M2 + C1 + C2, family = gaussian, data = cma2020), 
 #' astar = 0, a = 1, mval = list(0, "M2_0"), estimation = "imputation", 
-#' inference = "bootstrap", nboot = 100)
+#' inference = "bootstrap", nboot = 10)
 #' 
 #' # case control study with msm
+#' # 10 boots are used for illustration
 #' exp4 <- cmest(data = cma2020, model = "msm", casecontrol = TRUE, 
 #' yrare = TRUE, outcome = "binY", exposure = "A", 
-#' mediator = c("M1", "M2"), prec = c("C1", "C2"), yreg = "logistic", 
+#' mediator = c("M1", "M2"), EMint = TRUE, prec = c("C1", "C2"), yreg = "logistic", 
 #' ereg = "logistic", mreg = list(glm(M1 ~ A, family = binomial, 
-#' data = cma2020), multinom(M2 ~ A + M1, data = cma2020)), 
+#' data = cma2020), nnet::multinom(M2 ~ A + M1, data = cma2020, trace = FALSE)), 
 #' wmreg = list(glm(M1 ~ A + C1 + C2, family = binomial, data = cma2020), 
-#' multinom(M2 ~ A + M1 + C1 + C2, data = cma2020)), astar = 0, a = 1, 
+#' nnet::multinom(M2 ~ A + M1 + C1 + C2, data = cma2020, trace = FALSE)), astar = 0, a = 1, 
 #' mval = list(0, "M2_0"), estimation = "imputation", 
-#' inference = "bootstrap", nboot = 100)
+#' inference = "bootstrap", nboot = 10)
 #' 
+#' @importFrom stats glm binomial poisson as.formula gaussian quasipoisson model.frame printCoefmat 
+#' family sd coef vcov sigma predict rbinom rmultinom rnorm rgamma rpois weighted.mean 
+#' model.matrix getCall quantile qnorm pnorm lm cov formula
+#' @importFrom nnet multinom
+#' @importFrom MASS polr glm.nb gamma.shape rnegbin
+#' @importFrom survival survreg coxph
+#' @importFrom survey svyglm svydesign svysurvreg svycoxph as.svrepdesign withReplicates
+#' @importFrom utils txtProgressBar setTxtProgressBar
+#' @importFrom EValue evalues.RR
+#' @importFrom Matrix bdiag
+#' @importFrom msm deltamethod
+#' @importFrom SuppDists rinvGauss
+#' @importFrom dplyr select left_join count
+#' @importFrom medflex neImpute
+#' @importFrom boot boot
+#' @importFrom mice complete mice
+#' @importFrom simex check.mc.matrix
+#' @importFrom ggplot2 ggproto ggplot geom_errorbar aes geom_point ylab geom_hline position_dodge2 
+#' scale_colour_hue theme element_blank facet_grid 
+#' @importFrom ggdag dagify ggdag theme_dag_blank
+#' @importFrom gridExtra grid.arrange
+#' @importFrom grid textGrob gpar
 #'
 #' @export
 
@@ -385,23 +410,9 @@ cmest <- function(data = NULL, model = NULL,
                   astar = 0, a = 1, mval = NULL, yref = NULL, precval = NULL,
                   nboot = 200, multimp = FALSE, ...) {
   
-  usethis::use_package("ggplot2")
-  usethis::use_package("dplyr")
-  usethis::use_package("mice")
-  usethis::use_package("nnet")
-  usethis::use_package("MASS")
-  usethis::use_package("survey")
-  usethis::use_package("survival")
-  usethis::use_package("SuppDists")
-  usethis::use_package("boot")
-  usethis::use_package("msm")
-  usethis::use_package("Matrix")
-  require(dplyr)
-  
   cl <- match.call()
   
   n <- nrow(data)
-  
   # output list
   out <- list(call = cl)
   
@@ -509,6 +520,7 @@ cmest <- function(data = NULL, model = NULL,
   if (!is.logical(multimp)) stop("multimp should be TRUE or FALSE")
   # args_mice
   args_mice <- list(...)
+  args_mice$print <- FALSE
   
   ###################################################################################################
   ##########################################Run Regressions##########################################
@@ -533,7 +545,7 @@ cmest <- function(data = NULL, model = NULL,
              logistic = ereg <- eval(bquote(glm(.(as.formula(exposure_formula)), family = binomial(), data = .(data)))),
              loglinear = ereg <- eval(bquote(glm(.(as.formula(exposure_formula)), family = poisson(), data = .(data)))),
              multinomial = ereg <- eval(bquote(nnet::multinom(.(as.formula(exposure_formula)), data = .(data), trace = FALSE))),
-             ordinal = ereg <- eval(bquote(MASS::polr(.(as.formula(exposure_formula)), data = .(data)))))
+             ordinal = ereg <- eval(bquote(polr(.(as.formula(exposure_formula)), data = .(data)))))
     }
   } else {
     if (!is.null(ereg)) warning("ereg is ignored when model is 'wb' or 'msm' with length(prec) = 0 or model is 'rb', 'ne' or 'gformula'")
@@ -558,7 +570,7 @@ cmest <- function(data = NULL, model = NULL,
                logistic = wmreg[[p]] <- eval(bquote(glm(.(as.formula(wmreg_formula)), family = binomial(), data = .(data)))),
                loglinear = wmreg[[p]] <- eval(bquote(glm(.(as.formula(wmreg_formula)), family = poisson(), data = .(data)))),
                multinomial = wmreg[[p]] <- eval(bquote(nnet::multinom(.(as.formula(wmreg_formula)), data = .(data), trace = FALSE))),
-               ordinal = wmreg[[p]] <- eval(bquote(MASS::polr(.(as.formula(wmreg_formula)), data = .(data)))))
+               ordinal = wmreg[[p]] <- eval(bquote(polr(.(as.formula(wmreg_formula)), data = .(data)))))
       }
     }
   } else {
@@ -596,9 +608,9 @@ cmest <- function(data = NULL, model = NULL,
                loglinear = mreg[[p]] <- eval(bquote(glm(.(as.formula(mediator_formula)), family = poisson(), data = .(data)))),
                poisson = mreg[[p]]  <- eval(bquote(glm(.(as.formula(mediator_formula)), family = poisson(), data = .(data)))),
                quasipoisson = mreg[[p]] <- eval(bquote(glm(.(as.formula(mediator_formula)), family = quasipoisson(), data = .(data)))),
-               negbin = mreg[[p]] <- eval(bquote(MASS::glm.nb(.(as.formula(mediator_formula)), data = .(data)))),
+               negbin = mreg[[p]] <- eval(bquote(glm.nb(.(as.formula(mediator_formula)), data = .(data)))),
                multinomial = mreg[[p]] <- eval(bquote(nnet::multinom(.(as.formula(mediator_formula)), data = .(data), trace = FALSE))),
-               ordinal = mreg[[p]] <- eval(bquote(MASS::polr(.(as.formula(mediator_formula)), data = .(data)))))
+               ordinal = mreg[[p]] <- eval(bquote(polr(.(as.formula(mediator_formula)), data = .(data)))))
       }
     }
   } else {
@@ -628,9 +640,9 @@ cmest <- function(data = NULL, model = NULL,
                loglinear = postcreg[[p]] <- eval(bquote(glm(.(as.formula(postc_formula)), family = poisson(), data = .(data)))),
                poisson = postcreg[[p]]  <- eval(bquote(glm(.(as.formula(postc_formula)), family = poisson(), data = .(data)))),
                quasipoisson = postcreg[[p]] <- eval(bquote(glm(.(as.formula(postc_formula)), family = quasipoisson(), data = .(data)))),
-               negbin = postcreg[[p]] <- eval(bquote(MASS::glm.nb(.(as.formula(postc_formula)), data = .(data)))),
+               negbin = postcreg[[p]] <- eval(bquote(glm.nb(.(as.formula(postc_formula)), data = .(data)))),
                multinomial = postcreg[[p]] <- eval(bquote(nnet::multinom(.(as.formula(postc_formula)), data = .(data), trace = FALSE))),
-               ordinal = postcreg[[p]] <- eval(bquote(MASS::polr(.(as.formula(postc_formula)), data = .(data)))))
+               ordinal = postcreg[[p]] <- eval(bquote(polr(.(as.formula(postc_formula)), data = .(data)))))
       }
     }
   } else {
@@ -687,35 +699,35 @@ cmest <- function(data = NULL, model = NULL,
                                               family = poisson(), data = .(data)))),
            quasipoisson = yreg <- eval(bquote(glm(formula = .(as.formula(outcome_formula)),
                                                   family = quasipoisson(), data = .(data)))),
-           negbin = yreg <- eval(bquote(MASS::glm.nb(formula = .(as.formula(outcome_formula)),
+           negbin = yreg <- eval(bquote(glm.nb(formula = .(as.formula(outcome_formula)),
                                                      data = .(data)))),
            multinomial = yreg <- eval(bquote(nnet::multinom(formula = .(as.formula(outcome_formula)),
                                                             data = .(data), trace = FALSE))),
-           ordinal = yreg <- eval(bquote(MASS::polr(formula = .(as.formula(outcome_formula)),
+           ordinal = yreg <- eval(bquote(polr(formula = .(as.formula(outcome_formula)),
                                                     data = .(data)))),
-           coxph = yreg <- eval(bquote(survival::coxph(formula = .(as.formula(outcome_formula)),
+           coxph = yreg <- eval(bquote(coxph(formula = .(as.formula(outcome_formula)),
                                                        data = .(data)))),
-           aft_exp = yreg <- eval(bquote(survival::survreg(formula = .(as.formula(outcome_formula)),
+           aft_exp = yreg <- eval(bquote(survreg(formula = .(as.formula(outcome_formula)),
                                                            dist = "exponential", data = .(data)))),
-           aft_weibull = yreg <- eval(bquote(survival::survreg(formula = .(as.formula(outcome_formula)),
+           aft_weibull = yreg <- eval(bquote(survreg(formula = .(as.formula(outcome_formula)),
                                                                dist = "weibull", data = .(data)))))
   }
   
   # for delta method inference, use survey regressions for yreg and mreg when weights are applied
-  if (inference == "delta" && (!is.null(model.frame(yreg)$'(weights)') |
-                               (casecontrol && !is.null(yprevalence)))) {
-    if (inherits(yreg, "glm")) yreg <- eval(bquote(survey::svyglm(formula = .(formula(yreg)), family = .(family(yreg)),
-                                                      design = survey::svydesign(~ 1, weights = .(model.frame(yreg)$'(weights)'), data = .(data)))))
-    if (inherits(yreg, "survreg")) yreg <- eval(bquote(survey::svysurvreg(formula = .(formula(yreg)),
-                                                              design = survey::svydesign(~ 1, weights = .(model.frame(yreg)$'(weights)'), data = .(data)))))
-    if (inherits(yreg, "coxph")) yreg <- eval(bquote(survey::svycoxph(formula = .(formula(yreg)),
-                                                          design = survey::svydesign(~ 1, weights = .(model.frame(yreg)$'(weights)'), data = .(data)))))
+  if (inference == "delta" && casecontrol && !is.null(yprevalence)) {
+    if (inherits(yreg, "glm")) yreg <- eval(bquote(svyglm(formula = .(formula(yreg)), family = .(family(yreg)),
+                                                      design = svydesign(~ 1, data = .(data)))))
+    if (inherits(yreg, "survreg")) yreg <- eval(bquote(svysurvreg(formula = .(formula(yreg)),
+                                                              design = svydesign(~ 1, weights = .(model.frame(yreg)$'(weights)'), data = .(data)))))
+    if (inherits(yreg, "coxph")) yreg <- eval(bquote(svycoxph(formula = .(formula(yreg)),
+                                                          design = svydesign(~ 1, data = .(data)))))
   }
-  if (inference == "delta" && (!is.null(model.frame(mreg[[1]])$'(weights)') |
-                               (casecontrol && !is.null(yprevalence)))) {
-    if (inherits(mreg[[1]], "glm")) mreg[[1]] <- eval(bquote(survey::svyglm(formula = .(formula(mreg[[1]])), family = .(family(mreg[[1]])),
-                                                                design = survey::svydesign(~ 1, weights = .(model.frame(mreg[[1]])$'(weights)'), data = .(data)))))
-    if (inherits(mreg[[1]], "multinom")) mreg[[1]] <- eval(bquote(svymultinom(formula = .(formula(mreg[[1]])), weights = .(model.frame(mreg[[1]])$'(weights)'), data = .(data))))
+  if (inference == "delta" && casecontrol && !is.null(yprevalence)) {
+    if (inherits(mreg[[1]], "glm")) mreg[[1]] <- eval(bquote(svyglm(formula = .(formula(mreg[[1]])), 
+                                                                            family = .(family(mreg[[1]])),
+                                                                design = svydesign(~ 1, data = .(data)))))
+    if (inherits(mreg[[1]], "multinom")) mreg[[1]] <- eval(bquote(svymultinom(formula = .(formula(mreg[[1]])), 
+                                                                              data = .(data))))
   }
   
   ###################################################################################################
@@ -737,72 +749,71 @@ cmest <- function(data = NULL, model = NULL,
 
 #' @describeIn cmest Print the results of cmest nicely
 #' @export
-print.cmest <- function(cmest) {
-  if (cmest$methods$model == "rb") model_str <- "Regression-based Approach"
-  if (cmest$methods$model == "wb") model_str <- "Weighting-based Approach"
-  if (cmest$methods$model == "ne") model_str <- "Natural Effect Model"
-  if (cmest$methods$model == "iorw") model_str <- "Inverse Odds Ratio Weighting Approach"
-  if (cmest$methods$model == "msm") model_str <- "Marginal Structural Model"
-  if (cmest$methods$model == "gformula") model_str <- "G-formula Approach"
-  if (cmest$methods$estimation == "paramfunc") est_str <- "Closed-form parameter function estimation"
-  if (cmest$methods$estimation == "imputation") est_str <- "Direct counterfactual imputation estimation"
-  if (cmest$methods$inference == "delta") inf_str <- "delta method standard errors, confidence intervals and p-values"
-  if (cmest$methods$inference == "bootstrap") inf_str <- "bootstrap standard errors, percentile confidence intervals and p-values"
-  if (cmest$methods$model != "ne" && (cmest$methods$casecontrol)) cat("Causal Mediation Analysis For A Case Control Study Via the ")
-  if (!(cmest$methods$model != "ne" && (cmest$methods$casecontrol))) cat("\n Causal Mediation Analysis Via the ")
+print.cmest <- function(x, ...) {
+  if (x$methods$model == "rb") model_str <- "Regression-based Approach"
+  if (x$methods$model == "wb") model_str <- "Weighting-based Approach"
+  if (x$methods$model == "ne") model_str <- "Natural Effect Model"
+  if (x$methods$model == "iorw") model_str <- "Inverse Odds Ratio Weighting Approach"
+  if (x$methods$model == "msm") model_str <- "Marginal Structural Model"
+  if (x$methods$model == "gformula") model_str <- "G-formula Approach"
+  if (x$methods$estimation == "paramfunc") est_str <- "Closed-form parameter function estimation"
+  if (x$methods$estimation == "imputation") est_str <- "Direct counterfactual imputation estimation"
+  if (x$methods$inference == "delta") inf_str <- "delta method standard errors, confidence intervals and p-values"
+  if (x$methods$inference == "bootstrap") inf_str <- "bootstrap standard errors, percentile confidence intervals and p-values"
+  if (x$methods$model != "ne" && (x$methods$casecontrol)) cat("Causal Mediation Analysis For A Case Control Study Via the ")
+  if (!(x$methods$model != "ne" && (x$methods$casecontrol))) cat("\n Causal Mediation Analysis Via the ")
   cat(model_str)
   cat("\n \n")
   cat(est_str)
   cat(paste(" with \n", inf_str, "\n \n"))
-  out <- data.frame(cmest$effect.pe, cmest$effect.se, cmest$effect.ci.low, cmest$effect.ci.high, cmest$effect.pval)
+  out <- data.frame(x$effect.pe, x$effect.se, x$effect.ci.low, x$effect.ci.high, x$effect.pval)
   colnames(out) <- c("Estimate", "Std.error", "95% CIL", "95% CIU", "P.val")
   print(out)
 }
 
 #' @describeIn cmest Summarize the results of cmest nicely
 #' @export
-summary.cmest <- function(cmest) {
-  summary.df <- data.frame(cmest$effect.pe, cmest$effect.se, cmest$effect.ci.low, cmest$effect.ci.high, cmest$effect.pval)
+summary.cmest <- function(object, ...) {
+  summary.df <- data.frame(object$effect.pe, object$effect.se, object$effect.ci.low, object$effect.ci.high, object$effect.pval)
   colnames(summary.df) <- c("Estimate", "Std.error", "95% CIL", "95% CIU", "P.val")
-  out <- c(cmest, list(summary.df = summary.df))
+  out <- c(object, list(summary.df = summary.df))
   class(out) <- c("summary.cmest")
   return(out)
 }
 
 #' @describeIn cmest Print the summary of cmest nicely
 #' @export
-print.summary.cmest <- function(summary.cmest, digits = 4) {
-  if (summary.cmest$methods$model == "rb") model_str <- "Regression-based Approach"
-  if (summary.cmest$methods$model == "wb") model_str <- "Weighting-based Approach"
-  if (summary.cmest$methods$model == "ne") model_str <- "Natural Effect Model"
-  if (summary.cmest$methods$model == "iorw") model_str <- "Inverse Odds Ratio Weighting Approach"
-  if (summary.cmest$methods$model == "msm") model_str <- "Marginal Structural Model"
-  if (summary.cmest$methods$model == "gformula") model_str <- "G-formula Approach"
-  if (summary.cmest$methods$estimation == "paramfunc") est_str <- "Closed-form parameter function estimation"
-  if (summary.cmest$methods$estimation == "imputation") est_str <- "Direct counterfactual imputation estimation"
-  if (summary.cmest$methods$inference == "delta") inf_str <- "delta method standard errors, confidence intervals and p-values"
-  if (summary.cmest$methods$inference == "bootstrap") inf_str <- "bootstrap standard errors, percentile confidence intervals and p-values"
+print.summary.cmest <- function(x, digits = 4, ...) {
+  if (x$methods$model == "rb") model_str <- "Regression-based Approach"
+  if (x$methods$model == "wb") model_str <- "Weighting-based Approach"
+  if (x$methods$model == "ne") model_str <- "Natural Effect Model"
+  if (x$methods$model == "iorw") model_str <- "Inverse Odds Ratio Weighting Approach"
+  if (x$methods$model == "msm") model_str <- "Marginal Structural Model"
+  if (x$methods$model == "gformula") model_str <- "G-formula Approach"
+  if (x$methods$estimation == "paramfunc") est_str <- "Closed-form parameter function estimation"
+  if (x$methods$estimation == "imputation") est_str <- "Direct counterfactual imputation estimation"
+  if (x$methods$inference == "delta") inf_str <- "delta method standard errors, confidence intervals and p-values"
+  if (x$methods$inference == "bootstrap") inf_str <- "bootstrap standard errors, percentile confidence intervals and p-values"
   cat("\n")
-  if (summary.cmest$methods$model != "ne" && (summary.cmest$methods$casecontrol)) cat("Causal Mediation Analysis For A Case Control Study Via the ")
-  if (!(summary.cmest$methods$model != "ne" && (summary.cmest$methods$casecontrol))) cat("Causal Mediation Analysis Via the ")
+  if (x$methods$model != "ne" && (x$methods$casecontrol)) cat("Causal Mediation Analysis For A Case Control Study Via the ")
+  if (!(x$methods$model != "ne" && (x$methods$casecontrol))) cat("Causal Mediation Analysis Via the ")
   cat(model_str)
   cat("\n \n")
   cat(est_str)
   cat(paste(" with \n", inf_str, "\n \n"))
-  printCoefmat(summary.cmest$summary.df, digits = digits, has.Pvalue = TRUE)
+  printCoefmat(x$summary.df, digits = digits, has.Pvalue = TRUE)
 }
 
 #' @describeIn cmest Plot the results of cmest with \link[ggplot2]{ggplot}
 #' @export
-plot.cmest <- function(cmest) {
-  require(ggplot2)
-  effect_df <- data.frame(Effect = factor(names(cmest$effect.pe), levels = names(cmest$effect.pe)),
-                          PE = cmest$effect.pe,
-                          CIlower = cmest$effect.ci.low,
-                          CIupper = cmest$effect.ci.high)
+plot.cmest <- function(x, ...) {
+  effect_df <- data.frame(Effect = factor(names(x$effect.pe), levels = names(x$effect.pe)),
+                          PE = x$effect.pe,
+                          CIlower = x$effect.ci.low,
+                          CIupper = x$effect.ci.high)
   
-  if ((inherits(cmest$reg.output$yreg, "lm") | inherits(cmest$reg.output$yreg, "glm")) &&
-      (family(cmest$reg.output$yreg)$family %in% c("gaussian","Gamma","inverse.gaussian","quasi"))) {
+  if ((inherits(x$reg.output$yreg, "lm") | inherits(x$reg.output$yreg, "glm")) &&
+      (family(x$reg.output$yreg)$family %in% c("gaussian","Gamma","inverse.gaussian","quasi"))) {
     refline <- 0
   } else refline <- 1
   ggplot() +

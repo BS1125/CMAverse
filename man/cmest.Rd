@@ -41,17 +41,17 @@ cmest(
   ...
 )
 
-\method{print}{cmest}(cmest)
+\method{print}{cmest}(x, ...)
 
-\method{summary}{cmest}(cmest)
+\method{summary}{cmest}(object, ...)
 
-\method{print}{summary.cmest}(summary.cmest, digits = 4)
+\method{print}{summary.cmest}(x, digits = 4, ...)
 
-\method{plot}{cmest}(cmest)
+\method{plot}{cmest}(x, ...)
 
-\method{print}{cmsens.uc}(cmsens.uc)
+\method{print}{cmsens.uc}(x, ...)
 
-\method{print}{cmsens.me}(cmsens.me)
+\method{print}{cmsens.me}(x, ...)
 }
 \arguments{
 \item{data}{dataset for causal mediation analysis.}
@@ -161,34 +161,35 @@ and \code{nboot},}
 \code{cmest} is used to conduct causal mediation analysis via six statistical approaches 
 including \emph{the regression-based approach} by Valeri et al. (2013) and VanderWeele 
 et al. (2014), \emph{the weighting-based approach} by VanderWeele et al. (2014), 
-\emph{the inverse odd-ratio weighting approach} by Tchetgen Tchetgen et al. (2013), 
+\emph{the inverse odd-ratio weighting approach} by Tchetgen Tchetgen (2013), 
 \emph{the natural effect model} by Vansteelandt et al. (2012), \emph{the marginal structural 
-model} by VanderWeele et al. (2009), and \emph{the g-formula approach} by Lin et al. (2017).
+model} by VanderWeele et al. (2017), and \emph{the g-formula approach} by Lin et al. (2017).
 }
 \details{
 \strong{Regressions}
 
-Each regression in \code{yreg}, \code{mreg}, \code{wmreg}, \code{ereg} and \code{postcreg} 
-can be specified by a user-defined regression object or the character name of a regression. 
+Each regression in \code{yreg}, \code{mreg}, \code{wmreg},
+\code{ereg} and \code{postcreg} can be specified by a user-defined regression 
+object or the character name of a regression. 
 
 \emph{The Character Name of A Regression}
 
 \itemize{
-\item{"\code{linear}": }{linear regression fitted by \link{glm()} with \code{family = gaussian()}}
-\item{"\code{logistic}": }{logistic regression fitted by \link{glm()} with \code{family = logit()}}
-\item{"\code{loglinear}": }{log linear regression fitted by \link{glm()} with 
+\item{"\code{linear}": }{linear regression fitted by \link{glm} with \code{family = gaussian()}}
+\item{"\code{logistic}": }{logistic regression fitted by \link{glm} with \code{family = logit()}}
+\item{"\code{loglinear}": }{log linear regression fitted by \link{glm} with 
 \code{family = poisson()} for a binary response}
-\item{"\code{poisson}": }{poisson regression fitted by \link{glm()} with 
+\item{"\code{poisson}": }{poisson regression fitted by \link{glm} with 
 \code{family = poisson()} for a count response}
-\item{"\code{quasipoisson}": }{quasipoisson regression fitted by \link{glm()} with 
+\item{"\code{quasipoisson}": }{quasipoisson regression fitted by \link{glm} with 
 \code{family = quasipoisson()}}
-\item{"\code{negbin}": }{negative binomial regression fitted by \link[MASS]{glm.nb()}}
-\item{"\code{multinomial}": }{multinomial regression fitted by \link[nnet]{multinom()}}
-\item{"\code{ordinal}": }{ordered logistic regression fitted by \link[MASS]{polr()}}
-\item{"\code{coxph}": }{cox proportional hazard model fitted by \link[survival]{coxph()}}
-\item{"\code{aft_exp}": }{accelerated failure time model fitted by \link[survival]{survreg()}
+\item{"\code{negbin}": }{negative binomial regression fitted by \link[MASS]{glm.nb}}
+\item{"\code{multinomial}": }{multinomial regression fitted by \link[nnet]{multinom}}
+\item{"\code{ordinal}": }{ordered logistic regression fitted by \link[MASS]{polr}}
+\item{"\code{coxph}": }{cox proportional hazard model fitted by \link[survival]{coxph}}
+\item{"\code{aft_exp}": }{accelerated failure time model fitted by \link[survival]{survreg}
 with \code{dist = "exponential"}}
-\item{"\code{aft_weibull}": }{accelerated failure time model fitted by \link[survival]{polr()}
+\item{"\code{aft_weibull}": }{accelerated failure time model fitted by \link[survival]{survreg}
 with \code{dist = "weibull"}}
 }
 \code{coxph}, \code{aft_exp} and \code{aft_weibull} are currently not implemented for 
@@ -199,7 +200,8 @@ with \code{dist = "weibull"}}
 A user-defined regression object can be fitted by \link{lm}, \link{glm}, \link{glm.nb}, 
 \link[mgcv]{gam}, \link[nnet]{multinom}, \link[MASS]{polr}, \link[survival]{coxph} and
 \link[survival]{survreg}. Objects fitted by \link[survival]{coxph} and \link[survival]{survreg} 
-are currently not supported for \code{mreg}, \code{wmreg}, \code{ereg} and \code{postcreg}.
+are currently not supported for \code{mreg}, \code{wmreg}, 
+\code{ereg} and \code{postcreg}.
 
 The \code{cmest} function calculates weights for regressions when weighting is required. If a 
 user-defined regression object is fitted with prior weights, the final weights for this 
@@ -228,7 +230,7 @@ confounder(s) following the temporal order.
     should regress \code{A} on \code{C}.}
     
     \item{\code{iorw}: }{\emph{the inverse odd-ratio weighting approach} by
-      Tchetgen Tchetgen et al. (2013). \code{yreg} and \code{ereg} are required and 
+      Tchetgen Tchetgen (2013). \code{yreg} and \code{ereg} are required and 
       \code{A} must be categorical. If specified as a user defined regression object, 
       \code{yreg} should regress \code{Y} on \code{A} and \code{C} and \code{ereg} should 
       regress \code{A} on \code{M} and \code{C}.}
@@ -240,12 +242,13 @@ confounder(s) following the temporal order.
     the first variable needs to point to the exposure, the variable(s) right after the 
     exposure need to point to the mediator(s), e.g., \eqn{Y ~ A + M_1 + M_2 + A*M_1 + C}.}
       
-    \item{\code{msm}: }{\emph{the marginal structural model} by VanderWeele et al. (2009).
-    \code{yreg}, \code{mreg} and \code{wmreg} are required and all mediators must be 
-    categorical. When \code{prec} is not empty, \code{ereg} is also required and \code{A} 
-    must be categorical. If specified as a user defined regression object, \code{yreg} 
-    should regress \code{Y} on \code{A} and \code{M}, \code{mreg[p]} should regress 
-    \code{M_p} on \code{A}, \code{M_1}, ..., and \code{M_{p-1}} for \code{p=1,...,k}, 
+    \item{\code{msm}: }{\emph{the marginal structural model} by VanderWeele et al. (2017).
+    \code{yreg}, \code{mreg} and \code{wmreg} are required and all 
+    mediators must be categorical. When \code{prec} is not empty, \code{ereg} is also 
+    required and \code{A} must be categorical. If specified as a user defined regression 
+    object, \code{yreg} should regress \code{Y} on \code{A} and \code{M}, 
+    \code{mreg[p]} should regress \code{M_p} on \code{A}, \code{M_1}, ..., and 
+    \code{M_{p-1}} for \code{p=1,...,k}, 
     \code{wmreg[p]} should regress \code{M_p} on \code{A}, \code{M_1}, ..., \code{M_{p-1}},
     \code{C} and \code{L} for \code{p=1,...,k}, and \code{ereg} should regress \code{A} on 
     \code{C}.}
@@ -308,23 +311,23 @@ categorical, count or survival outcome, the causal effects on the ratio scale ar
 When \code{model = "rb", "wb", "ne", "msm" or "gformula"} with \code{length(postc) = 0} and 
 \code{full = TRUE}, \code{cde} (controlled direct effect), \code{pnde} (pure natural direct 
 effect), \code{tnde} (total natural direct effect), \code{pnie} (pure natural indirect effect), 
-\code{tnie} (total natural indirect effect), \code{te} (total effect), \code{pm} (proportion 
-mediated), \code{intref} (reference interaction), \code{intmed} (mediated interaction), 
-\code{cde(prop)} (proportion \code{cde}), \code{intref(prop)} 
-(proportion \code{intref}), \code{intmed(prop)} (proportion \code{intmed}), \code{pnie(prop)} 
-(proportion \code{pnie}), \code{int} (proportion attributable to interaction) and 
-\code{pe} (proportion eliminated) are estimated. 
+\code{tnie} (total natural indirect effect), \code{te} (total effect),  \code{intref} 
+(reference interaction), \code{intmed} (mediated interaction), 
+\code{cde(prop)} (proportion \code{cde}), \code{intref(prop)} (proportion 
+\code{intref}), \code{intmed(prop)} (proportion \code{intmed}), \code{pnie(prop)} 
+(proportion \code{pnie}), \code{pm} (proportion mediated), \code{int} (proportion 
+attributable to interaction) and \code{pe} (proportion eliminated) are estimated. 
 
 When \code{model = "rb", "wb", "ne", "msm" or "gformula"} with \code{length(postc) = 0} and
 \code{full = FALSE}, \code{cde}, \code{pnde}, \code{tnde}, \code{pnie}, \code{tnie} and 
 \code{te} are estimated.
 
 When \code{model = "msm" or "gformula"} with \code{length(postc) != 0} and \code{full = TRUE}, 
-\code{pnde}, \code{tnde}, \code{pnie}, \code{tnie},  \code{pm}, \code{intref}, \code{intmed}, 
-\code{intref(prop)}, \code{intmed(prop)}, \code{pie(prop)}, \code{int} and \code{pe} are 
-replaced by their randomized analogues \code{rpnde}, \code{rtnde}, \code{rpnie}, 
-\code{rtnie}, \code{rpm}, \code{rintref}, \code{rintmed}, \code{rpie}, \code{rintref(prop)}, 
-\code{rintmed(prop)}, \code{rpie(prop)}, \code{rint} and \code{rpe}.
+\code{pnde}, \code{tnde}, \code{pnie}, \code{tnie},  \code{intref}, \code{intmed}, 
+\code{intref(prop)}, \code{intmed(prop)}, \code{pie(prop)}, \code{pm}, \code{int} and 
+\code{pe} are replaced by their randomized analogues \code{rpnde}, \code{rtnde}, 
+\code{rpnie}, \code{rtnie}, \code{rintref}, \code{rintmed}, \code{rintref(prop)}, 
+\code{rintmed(prop)}, \code{rpie(prop)}, \code{rpm}, \code{rint} and \code{rpe}.
 
 When \code{model = "msm" or "gformula"} with \code{length(postc) != 0} and
 \code{full = FALSE}, \code{cde}, \code{rpnde}, \code{rtnde}, \code{rpnie}, \code{rtnie} and 
@@ -340,27 +343,27 @@ When \code{model = "rb", "wb", "ne", "msm" or "gformula"} with \code{length(post
 \code{full = TRUE}, \code{RRcde} (\code{cde} risk rario or rate ratio), \code{RRpnde} 
 (\code{pnde} risk rario or rate ratio), \code{RRtnde} (\code{tnde} risk rario or rate ratio), 
 \code{RRpnie} (\code{pnie} risk rario or rate ratio), \code{RRtnie} (\code{tnie} risk rario 
-or rate ratio), \code{RRte} (\code{te} risk rario or rate ratio), \code{pm}, \code{ERRcde} 
+or rate ratio), \code{RRte} (\code{te} risk rario or rate ratio), \code{ERRcde} 
 (excess risk rario or rate ratio due to \code{cde}), \code{ERRintref} (excess risk rario or 
 rate ratio due to \code{intref}), \code{ERRintmed} (excess risk rario or rate ratio due to 
 \code{intmed}), \code{ERRpie} (excess risk rario or rate ratio due to \code{pie}), 
 \code{ERRcde(prop)} (proportion \code{ERRcde}), \code{ERRintref(prop)} (proportion 
 \code{ERRintref}), \code{ERRintmed(prop)} (proportion \code{ERRintmed}), \code{ERRpie(prop)} 
-(proportion \code{ERRpie}), \code{int} (proportion attributable to interaction) and 
-\code{pe} (proportion eliminated) are estimated. 
+(proportion \code{ERRpie}), \code{pm}, \code{int} (proportion attributable to 
+interaction) and \code{pe} (proportion eliminated) are estimated. 
 
 When \code{model = "rb", "wb", "ne", "msm" or "gformula"} with \code{length(postc) = 0} and
 \code{full = FALSE}, \code{RRcde}, \code{RRpnde}, \code{RRtnde}, \code{RRpnie}, \code{RRtnie} 
 and \code{RRte} are estimated.
 
 When \code{model = "msm" or "gformula"} with \code{length(postc) != 0} and \code{full = TRUE}, 
-\code{RRpnde}, \code{RRtnde}, \code{RRpnie}, \code{RRtnie},  \code{pm}, \code{ERRintref}, 
+\code{RRpnde}, \code{RRtnde}, \code{RRpnie}, \code{RRtnie},  \code{ERRintref}, 
 \code{ERRintmed}, \code{ERRpie}, \code{ERRintref(prop)}, \code{ERRintmed(prop)}, 
-\code{ERRpie(prop)}, \code{int} and \code{pe} are 
+\code{ERRpie(prop)}, \code{pm}, \code{int} and \code{pe} are 
 replaced by their randomized analogues \code{rRRpnde}, \code{rRRtnde}, \code{rRRpnie}, 
-\code{rRRtnie}, \code{rpm}, \code{rERRintref}, \code{rERRintmed}, \code{rERRpie}, 
+\code{rRRtnie}, \code{rERRintref}, \code{rERRintmed}, \code{rERRpie}, 
 \code{rERRintref(prop)}, \code{rERRintmed(prop)}, \code{rERRpie(prop)}, 
-\code{rint} and \code{rpe}.
+\code{rpm}, \code{rint} and \code{rpe}.
 
 When \code{model = "msm" or "gformula"} with \code{length(postc) != 0} and
 \code{full = FALSE}, \code{RRcde}, \code{rRRpnde}, \code{rRRtnde}, \code{rRRpnie}, 
@@ -398,37 +401,39 @@ astar = 0, a = 1, mval = list("M2_0"), estimation = "paramfunc",
 inference = "delta")
 summary(exp1)
 plot(exp1) +
-theme(axis.text.x = element_text(angle = 45))
+ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45))
 
 # multiple-mediator case with rb
+# 10 boots are used for illustration
 exp2 <- cmest(data = cma2020, model = "rb", outcome = "contY", 
 exposure = "A", mediator = c("M1", "M2"), prec = c("C1", "C2"), 
 EMint = TRUE, mreg = list("logistic", "multinomial"), 
 yreg = "linear", astar = 0, a = 1, mval = list(0, "M2_0"), 
-estimation = "imputation", inference = "bootstrap", nboot = 100)
+estimation = "imputation", inference = "bootstrap", nboot = 10)
 
 # multiple-mediator case with ne
+# 10 boots are used for illustration
 exp3 <- cmest(data = cma2020, model = "ne", outcome = "contY", 
 exposure = "A", mediator = c("M1", "M2"), prec = c("C1", "C2"), 
-yreg = lm(Y ~ A + M1 + M2 + A*M1 + A*M2 + C1 + C2, data = cma2020), 
+yreg = glm(contY ~ A + M1 + M2 + A*M1 + A*M2 + C1 + C2, family = gaussian, data = cma2020), 
 astar = 0, a = 1, mval = list(0, "M2_0"), estimation = "imputation", 
-inference = "bootstrap", nboot = 100)
+inference = "bootstrap", nboot = 10)
 
 # case control study with msm
+# 10 boots are used for illustration
 exp4 <- cmest(data = cma2020, model = "msm", casecontrol = TRUE, 
 yrare = TRUE, outcome = "binY", exposure = "A", 
-mediator = c("M1", "M2"), prec = c("C1", "C2"), yreg = "logistic", 
+mediator = c("M1", "M2"), EMint = TRUE, prec = c("C1", "C2"), yreg = "logistic", 
 ereg = "logistic", mreg = list(glm(M1 ~ A, family = binomial, 
-data = cma2020), multinom(M2 ~ A + M1, data = cma2020)), 
+data = cma2020), nnet::multinom(M2 ~ A + M1, data = cma2020, trace = FALSE)), 
 wmreg = list(glm(M1 ~ A + C1 + C2, family = binomial, data = cma2020), 
-multinom(M2 ~ A + M1 + C1 + C2, data = cma2020)), astar = 0, a = 1, 
+nnet::multinom(M2 ~ A + M1 + C1 + C2, data = cma2020, trace = FALSE)), astar = 0, a = 1, 
 mval = list(0, "M2_0"), estimation = "imputation", 
-inference = "bootstrap", nboot = 100)
-
+inference = "bootstrap", nboot = 10)
 
 }
 \references{
-Valeri L, Vanderweele TJ (2013). Mediation analysis allowing for
+Valeri L, VanderWeele TJ (2013). Mediation analysis allowing for
 exposure-mediator interactions and causal interpretation: theoretical assumptions and
 implementation with SAS and SPSS macros. Psychological Methods. 18(2): 137 - 150.
 
@@ -441,9 +446,6 @@ mediation analysis. Statistics in medicine. 32: 4567 - 4580.
 Nguyen QC, Osypuk TL, Schmidt NM, Glymour MM, Tchetgen Tchetgen EJ. Practical guidance
 for conducting mediation analysis with multiple mediators using inverse odds ratio
 weighting (2015). American Journal of Epidemiology. 181(5): 349 - 356.
-
-VanderWeele TJ. Marginal structural models for the estimation of direct and indirect
-effects (2009). Epidemiology. 20(1): 18 - 26.
 
 VanderWeele TJ, Tchetgen Tchetgen EJ (2017). Mediation analysis with time varying
 exposures and mediators. Journal of the Royal Statistical Society: Series B (Statistical

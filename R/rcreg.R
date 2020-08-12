@@ -1,4 +1,5 @@
-rcreg <- function(reg = NULL, data = NULL, weights = NULL, model = TRUE,
+#' @export
+rcreg <- function(reg = NULL, data = NULL, weights = NULL,
                   MEvariable = NULL, MEerror = NULL, variance = FALSE, nboot = 400) {
 
   cl <- match.call()
@@ -32,16 +33,9 @@ rcreg <- function(reg = NULL, data = NULL, weights = NULL, model = TRUE,
     # update reg with data and weights
     regCall$data <- data
     regCall$weights <- weights
-    if (inherits(reg, "multinom")) {
-      # output the model frame for a multinom object
-      regCall$model <- model
-      regCall$trace <- FALSE
-    }
-    if (inherits(reg, "polr")) {
-      # output the model frame for a polr object
-      regCall$model <- TRUE
-      regCall$Hess <- TRUE
-    }
+    if (inherits(reg, "multinom")) regCall$trace <- FALSE
+    if (inherits(reg, "polr")) regCall$Hess <- TRUE
+    
     reg <- eval.parent(regCall)
     out <- list(call = cl, NAIVEreg = reg,
                 ME = list(MEvariable = MEvariable, MEerror = MEerror, variance = variance))
@@ -67,7 +61,9 @@ rcreg <- function(reg = NULL, data = NULL, weights = NULL, model = TRUE,
       rcdata <- data
       rcdata[, MEvariable] <- EX
       # error-corrected regression object
-      RCreg <- update(reg, data = rcdata)
+      RCreg_call <- getCall(reg)
+      RCreg_call$data <- rcdata
+      RCreg <- eval.parent(RCreg_call)
       if (identical(class(reg), "polr")) {
         RCcoef <- c(coef(RCreg), RCreg$zeta)
       } else if (identical(class(reg), c("multinom", "nnet"))) {
@@ -93,13 +89,13 @@ rcreg <- function(reg = NULL, data = NULL, weights = NULL, model = TRUE,
     n_coef <- length(RCcoef)
     if (identical(class(reg), "lm") |
         (identical(class(reg), c("glm", "lm")) && family(reg)$family == "gaussian")) {
-      RCsigma <- sqrt(sum((RCreg$model[, 1] - predict(RCreg, newdata = data)) ^ 2) /
+      RCsigma <- sqrt(sum((model.frame(RCreg)[, 1] - predict(RCreg, newdata = data)) ^ 2) /
                         (n-n_coef) - (RCcoef[MEvariable]* MEerror) ^ 2 )
       out$RCsigma <- unname(RCsigma)
     }
 
     if (variance) {
-      boots <- boot::boot(data = data, ind_data = ind_data, statistic = rc_step, R = nboot)
+      boots <- boot(data = data, ind_data = ind_data, statistic = rc_step, R = nboot)
       mean_boots <- apply(boots$t, 2, mean)
       RCvcov <- Reduce("+", lapply(1:nboot, function(x)
         as.matrix(boots$t[x,] - mean_boots)%*%t(as.matrix(boots$t[x,] - mean_boots)))) /
@@ -115,30 +111,36 @@ rcreg <- function(reg = NULL, data = NULL, weights = NULL, model = TRUE,
 
 }
 
-coef.rcreg <- function(rcreg) {
-  return(rcreg$RCcoef)
+#' @export
+coef.rcreg <- function(object, ...) {
+  return(object$RCcoef)
 }
 
-vcov.rcreg <- function(rcreg) {
-  return(rcreg$RCvcov)
+#' @export
+vcov.rcreg <- function(object, ...) {
+  return(object$RCvcov)
 }
 
-sigma.rcreg <- function(rcreg) {
-  return(rcreg$RCsigma)
+#' @export
+sigma.rcreg <- function(object, ...) {
+  return(object$RCsigma)
 }
 
-formula.rcreg <- function(rcreg, ...) {
-  return(formula(rcreg$NAIVEreg, ...))
+#' @export
+formula.rcreg <- function(x, ...) {
+  return(formula(x$NAIVEreg, ...))
 }
 
-family.rcreg <- function(rcreg, ...) {
-  if (inherits(rcreg$NAIVEreg, "lm") | inherits(rcreg$NAIVEreg, "glm")) {
-    return(family(rcreg$NAIVEreg, ...))
+#' @export
+family.rcreg <- function(object, ...) {
+  if (inherits(object$NAIVEreg, "lm") | inherits(object$NAIVEreg, "glm")) {
+    return(family(object$NAIVEreg, ...))
   } else return(NULL)
 }
 
-predict.rcreg <- function(rcreg, ...) {
-  reg <- rcreg$NAIVEreg
+#' @export
+predict.rcreg <- function(object, ...) {
+  reg <- object$NAIVEreg
   if (identical(class(reg), c("multinom", "nnet"))) {
     if(length(reg$lev) == 2) {
       coef_index <- 1+(1:length(reg$vcoefnames))
@@ -147,29 +149,31 @@ predict.rcreg <- function(rcreg, ...) {
                                        byrow=TRUE)[, 1+(1:length(reg$vcoefnames)),
                                                    drop=FALSE][-1, , drop=FALSE]))
     }
-    reg$wts[coef_index] <- rcreg$RCcoef
+    reg$wts[coef_index] <- object$RCcoef
   } else if (identical(class(reg), "polr")) {
-    reg$coefficients <- rcreg$RCcoef[1:length(coef(reg))]
-    reg$zeta <- rcreg$RCcoef[(length(coef(reg)) + 1):length(rcreg$RCcoef)]
-  } else reg$coefficients <- rcreg$RCcoef
+    reg$coefficients <- object$RCcoef[1:length(coef(reg))]
+    reg$zeta <- object$RCcoef[(length(coef(reg)) + 1):length(object$RCcoef)]
+  } else reg$coefficients <- object$RCcoef
   out <- predict(reg, ...)
   return(out)
 }
 
-model.frame.rcreg <- function(rcreg) {
-  return(model.frame(rcreg$NAIVEreg))
+#' @export
+model.frame.rcreg <- function(formula, ...) {
+  return(model.frame(formula$NAIVEreg))
 }
 
-print.rcreg <- function(rcreg, ...) {
+#' @export
+print.rcreg <- function(x, ...) {
   cat("Call:\n")
-  print(rcreg$call)
+  print(x$call)
   cat(paste("\nNaive regression object: \n"))
-  print(rcreg$NAIVEreg, ...)
+  print(x$NAIVEreg, ...)
   cat("\nVariable measured with error:\n")
-  cat(rcreg$ME$MEvariable)
+  cat(x$ME$MEvariable)
   cat("\nMeasurement error:\n")
-  cat(rcreg$ME$MEerror)
+  cat(x$ME$MEerror)
   cat("\nError-corrected coefficient estimates:\n")
-  print(rcreg$RCcoef)
+  print(x$RCcoef)
 }
 

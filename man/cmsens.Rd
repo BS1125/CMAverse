@@ -19,11 +19,11 @@ cmsens(
   nboot.rc = 400
 )
 
-\method{summary}{cmsens.me}(cmsens.me)
+\method{summary}{cmsens.me}(object, ...)
 
-\method{print}{summary.cmsens.me}(summary.cmsens.me, digits = 4)
+\method{print}{summary.cmsens.me}(x, digits = 4, ...)
 
-\method{plot}{cmsens.me}(cmsens.me)
+\method{plot}{cmsens.me}(x, ...)
 }
 \arguments{
 \item{object}{an object of class \code{cmest}.}
@@ -68,9 +68,9 @@ If \code{sens} is \code{me}, an object of class 'cmest.me' is returned:
 }
 \description{
 \code{cmsens} is used to conduct sensitivity analysis for unmeasured confounding via 
-the \emph{E-value} approach by Vanderweele et al. (2017) and sensitivity analysis for 
-measurement error via \emph{regression calibration} by Carroll et al. (1995), 
-\emph{SIMEX} by Cook et al. (1994) and Küchenhoff et al. (2006).
+the \emph{E-value} approach by Vanderweele et al. (2017) and Smith et al. (2019), and 
+sensitivity analysis for measurement error via \emph{regression calibration} by Carroll 
+et al. (1995) and \emph{SIMEX} by Cook et al. (1994) and Küchenhoff et al. (2006).
 }
 \details{
 For unmeasured confounding, all E-values are on the (risk or rate) ratio scale. If the causal 
@@ -96,12 +96,13 @@ with error.
 rm(list=ls())
 library(CMAverse)
 
+# 10 boots are used for illustration
 naive <- cmest(data = cma2020, model = "rb", outcome = "contY", 
 exposure = "A", mediator = c("M1", "M2"), 
 prec = c("C1", "C2"), EMint = TRUE,
 mreg = list("logistic", "multinomial"), yreg = "linear",
 astar = 0, a = 1, mval = list(0, "M2_0"),
-estimation = "imputation", inference = "bootstrap")
+estimation = "imputation", inference = "bootstrap", nboot = 10)
 
 exp1 <- cmsens(object = naive, sens = "uc")
 exp1
@@ -111,12 +112,13 @@ MEvariable = "C1", MEvartype = "con",
 MEerror = c(0.1, 0.2))
 summary(exp2)
 plot(exp2) +
-theme(axis.text.x = element_text(angle = 30, vjust = 0.8))
+ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 30, vjust = 0.8))
 
+# B = 10 is used for illustration
 exp3 <- cmsens(object = naive, sens = "me", MEmethod = "simex", 
 MEvariable = "M1", MEvartype = "cat",
 MEerror = list(matrix(c(0.95,0.05,0.05,0.95), nrow = 2), 
-matrix(c(0.9,0.1,0.1,0.9), nrow = 2)))
+matrix(c(0.9,0.1,0.1,0.9), nrow = 2)), B = 10)
 summary(exp3)
 
 }

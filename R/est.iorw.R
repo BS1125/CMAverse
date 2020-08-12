@@ -151,6 +151,7 @@ est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     rm(y_lev)
   }
 
+  a_lev <- levels(droplevels(as.factor(data[, exposure])))
   # simulate A
   if (is.factor(data[, exposure])) {
     a_sim <- factor(c(rep(a, n)), levels = a_lev)
@@ -190,7 +191,7 @@ est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       is_multinom_yreg | is_polr_yreg) {
 
     if (!is.null(yref_index)) {
-      if (dim(EY0m_pred)[2] == 1) {
+      if (dim(tot0_pred)[2] == 1) {
         EYtot0 <- weighted.mean(cbind(1 - tot0_pred, tot0_pred)[, yref_index], na.rm = TRUE, w = weightsEY_tot)
         EYtot1 <- weighted.mean(cbind(1 - tot1_pred, tot1_pred)[, yref_index], na.rm = TRUE, w = weightsEY_tot)
         EYdir0 <- weighted.mean(cbind(1 - dir0_pred, dir0_pred)[, yref_index], na.rm = TRUE, w = weightsEY_dir)

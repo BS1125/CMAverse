@@ -71,4 +71,5 @@ cmdag(outcome = "Y", exposure = "A", mediator = c("M1", "M2"),
 ## prec and postc aren't empty
 cmdag(outcome = "Y", exposure = "A", mediator = c("M1", "M2"),
      prec = c("C1", "c2", "c3"), postc = c("L1", "L2"), node = FALSE, text_col = "black")
+
 }

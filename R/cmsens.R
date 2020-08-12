@@ -1,9 +1,9 @@
 #' Sensitivity Analysis For Unmeasured Confounding and Measurement Error
 #'
 #' \code{cmsens} is used to conduct sensitivity analysis for unmeasured confounding via 
-#' the \emph{E-value} approach by Vanderweele et al. (2017) and sensitivity analysis for 
-#' measurement error via \emph{regression calibration} by Carroll et al. (1995), 
-#' \emph{SIMEX} by Cook et al. (1994) and Küchenhoff et al. (2006).
+#' the \emph{E-value} approach by Vanderweele et al. (2017) and Smith et al. (2019), and 
+#' sensitivity analysis for measurement error via \emph{regression calibration} by Carroll 
+#' et al. (1995) and \emph{SIMEX} by Cook et al. (1994) and Küchenhoff et al. (2006).
 #'
 #' @param object an object of class \code{cmest}.
 #' @param sens sensitivity analysis for unmeasured confounding or measurement error. 
@@ -78,12 +78,13 @@
 #' rm(list=ls())
 #' library(CMAverse)
 #' 
+#' # 10 boots are used for illustration
 #' naive <- cmest(data = cma2020, model = "rb", outcome = "contY", 
 #' exposure = "A", mediator = c("M1", "M2"), 
 #' prec = c("C1", "C2"), EMint = TRUE,
 #' mreg = list("logistic", "multinomial"), yreg = "linear",
 #' astar = 0, a = 1, mval = list(0, "M2_0"),
-#' estimation = "imputation", inference = "bootstrap")
+#' estimation = "imputation", inference = "bootstrap", nboot = 10)
 #' 
 #' exp1 <- cmsens(object = naive, sens = "uc")
 #' exp1
@@ -93,22 +94,43 @@
 #' MEerror = c(0.1, 0.2))
 #' summary(exp2)
 #' plot(exp2) +
-#' theme(axis.text.x = element_text(angle = 30, vjust = 0.8))
+#' ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 30, vjust = 0.8))
 #' 
+#' # B = 10 is used for illustration
 #' exp3 <- cmsens(object = naive, sens = "me", MEmethod = "simex", 
 #' MEvariable = "M1", MEvartype = "cat",
 #' MEerror = list(matrix(c(0.95,0.05,0.05,0.95), nrow = 2), 
-#' matrix(c(0.9,0.1,0.1,0.9), nrow = 2)))
+#' matrix(c(0.9,0.1,0.1,0.9), nrow = 2)), B = 10)
 #' summary(exp3)
+#' 
+#' @importFrom stats glm binomial poisson as.formula gaussian quasipoisson model.frame printCoefmat 
+#' family sd coef vcov sigma predict rbinom rmultinom rnorm rgamma rpois weighted.mean 
+#' model.matrix getCall quantile qnorm pnorm lm cov formula
+#' @importFrom nnet multinom 
+#' @importFrom MASS polr glm.nb gamma.shape rnegbin
+#' @importFrom survival survreg coxph
+#' @importFrom survey svyglm svydesign svysurvreg svycoxph as.svrepdesign withReplicates
+#' @importFrom utils txtProgressBar setTxtProgressBar
+#' @importFrom EValue evalues.RR
+#' @importFrom Matrix bdiag
+#' @importFrom msm deltamethod
+#' @importFrom SuppDists rinvGauss
+#' @importFrom dplyr select left_join count
+#' @importFrom medflex neImpute
+#' @importFrom boot boot
+#' @importFrom mice complete mice
+#' @importFrom simex check.mc.matrix
+#' @importFrom ggplot2 ggproto ggplot geom_errorbar aes geom_point ylab geom_hline position_dodge2 
+#' scale_colour_hue theme element_blank facet_grid 
+#' @importFrom ggdag dagify ggdag theme_dag_blank
+#' @importFrom gridExtra grid.arrange
+#' @importFrom grid textGrob gpar
 #' 
 #' @export
 
 cmsens <- function(object = NULL, sens = "uc", MEmethod = "simex",
                    MEvariable = NULL, MEvartype = NULL, MEerror = NULL,
                    lambda = c(0.5, 1, 1.5, 2), B = 200, nboot.rc = 400) {
-  
-  usethis::use_package("simex")
-  usethis::use_package("EValue")
   
   if (is.null(object)) stop("Unspecified object")
   
@@ -153,7 +175,7 @@ cmsens <- function(object = NULL, sens = "uc", MEmethod = "simex",
       d <- unname(effect.pe / outcome.se)
       sd <- unname(effect.se / outcome.se)
       for (i in out.index) {
-        evalues_mid <- EValue::evalues.RR(est = exp(0.91 * d[i]), lo = exp(0.91 * d[i] - 1.78 * sd[i]),
+        evalues_mid <- evalues.RR(est = exp(0.91 * d[i]), lo = exp(0.91 * d[i] - 1.78 * sd[i]),
                                           hi = exp(0.91 * d[i] + 1.78 * sd[i]))
         evalues_mid <- c(evalues_mid[1, ], evalues_mid[2, ])
         names(evalues_mid) <- c("estRR", "lowerRR", "upperRR", "Evalue.estRR", "Evalue.lowerRR", "Evalue.upperRR")
@@ -164,7 +186,7 @@ cmsens <- function(object = NULL, sens = "uc", MEmethod = "simex",
       ci_lo <- summ[, "95% CIL"]
       ci_up <-summ[, "95% CIU"]
       for (i in out.index) {
-        evalues_mid <- EValue::evalues.RR(est = effect.pe[i], lo = ci_lo[i], hi = ci_up[i])
+        evalues_mid <- evalues.RR(est = effect.pe[i], lo = ci_lo[i], hi = ci_up[i])
         evalues_mid <- c(evalues_mid[1, ], evalues_mid[2, ])
         names(evalues_mid) <- c("estRR", "lowerRR", "upperRR", "Evalue.estRR", "Evalue.lowerRR", "Evalue.upperRR")
         evalues <- rbind(evalues, evalues_mid)
@@ -240,12 +262,14 @@ cmsens <- function(object = NULL, sens = "uc", MEmethod = "simex",
               eval(bquote(rcreg(reg = .(reg.output.mid[[r]][[x]]), data = .(data), 
                                 MEvariable = .(MEvariable), MEerror = .(MEerror[[i]]), 
                                 variance = .(variance), nboot = .(nboot.rc)))))
-          } else reg.output.mid[[r]] <- eval(bquote(rcreg(reg = .(reg.output.mid[[r]]), 
-                                                      data = .(data),
-                                                      MEvariable = .(MEvariable), 
-                                                      MEerror = .(MEerror[[i]]), 
-                                                      variance = .(variance), 
-                                                      nboot = .(nboot.rc))))
+          } else {
+            reg.output.mid[[r]] <- eval(bquote(rcreg(reg = .(reg.output.mid[[r]]), 
+                                                          data = .(data),
+                                                          MEvariable = .(MEvariable), 
+                                                          MEerror = .(MEerror[[i]]), 
+                                                          variance = .(variance), 
+                                                          nboot = .(nboot.rc))))
+          }
         }
       } else if (MEmethod == "simex") {
         for (r in 1:length(reg.output.mid)) {
@@ -279,7 +303,7 @@ cmsens <- function(object = NULL, sens = "uc", MEmethod = "simex",
       }
       environment(estinf) <- environment()
       sens[[i]] <- estinf()[c("effect.pe", "effect.se", "effect.ci.low", 
-                              "effect.ci.high", "effect.pval")]
+                               "effect.ci.high", "effect.pval")]
       sens[[i]]$reg.output <- reg.output.mid
       
     }
@@ -295,29 +319,29 @@ cmsens <- function(object = NULL, sens = "uc", MEmethod = "simex",
 
 #' @describeIn cmest Print the results of cmsens.uc nicely
 #' @export
-print.cmsens.uc <- function(cmsens.uc) {
+print.cmsens.uc <- function(x, ...) {
   cat("Sensitivity Analysis For Unmeasured Confounding \n")
   cat("\nEvalues on the ratio scale: \n")
-  print(cmsens.uc$evalues)
+  print(x$evalues)
 }
 
 #' @describeIn cmest Print the results of cmsens.me nicely
 #' @export
-print.cmsens.me <- function(cmsens.me) {
+print.cmsens.me <- function(x, ...) {
   cat("Sensitivity Analysis For Measurement Error \n \n")
   cat("The variable measured with error: ")
-  cat(cmsens.me$ME$MEvariable)
+  cat(x$ME$MEvariable)
   cat("\nType of the variable measured with error: ")
-  cat(cmsens.me$ME$MEvartype)
+  cat(x$ME$MEvartype)
   cat("\n")
-  for (i in 1:length(cmsens.me$sens)) {
+  for (i in 1:length(x$sens)) {
     cat(paste0("\nMeasurement error ", i, ": \n"))
-    if (cmsens.me$ME$MEvartype == "continuous") cat(cmsens.me$ME$MEerror[i])
-    if (cmsens.me$ME$MEvartype == "categorical") print(cmsens.me$ME$MEerror[[i]])
+    if (x$ME$MEvartype == "continuous") cat(x$ME$MEerror[i])
+    if (x$ME$MEvartype == "categorical") print(x$ME$MEerror[[i]])
     cat(paste0("\nMeasurement error correction for measurement error ", i, ": \n"))
-    out <- data.frame(cmsens.me$sens[[i]]$effect.pe, cmsens.me$sens[[i]]$effect.se, 
-                      cmsens.me$sens[[i]]$effect.ci.low, cmsens.me$sens[[i]]$effect.ci.high, 
-                      cmsens.me$sens[[i]]$effect.pval)
+    out <- data.frame(x$sens[[i]]$effect.pe, x$sens[[i]]$effect.se, 
+                      x$sens[[i]]$effect.ci.low, x$sens[[i]]$effect.ci.high, 
+                      x$sens[[i]]$effect.pval)
     colnames(out) <- c("Estimate", "Std.error", "95% CIL", "95% CIU", "P.val")
     print(out)
     cat("----------------------------------------------------------------\n")
@@ -326,61 +350,60 @@ print.cmsens.me <- function(cmsens.me) {
 
 #' @describeIn cmsens Summarize the results of cmsens.me nicely
 #' @export
-summary.cmsens.me <- function(cmsens.me) {
+summary.cmsens.me <- function(object, ...) {
   summary.df <- list()
-  for (i in 1:length(cmsens.me$sens)) {
-    summary.df[[i]] <- data.frame(cmsens.me$sens[[i]]$effect.pe, cmsens.me$sens[[i]]$effect.se, 
-                                  cmsens.me$sens[[i]]$effect.ci.low, cmsens.me$sens[[i]]$effect.ci.high, 
-                                  cmsens.me$sens[[i]]$effect.pval)
+  for (i in 1:length(object$sens)) {
+    summary.df[[i]] <- data.frame(object$sens[[i]]$effect.pe, object$sens[[i]]$effect.se, 
+                                  object$sens[[i]]$effect.ci.low, object$sens[[i]]$effect.ci.high, 
+                                  object$sens[[i]]$effect.pval)
     colnames(summary.df[[i]]) <- c("Estimate", "Std.error", "95% CIL", "95% CIU", "P.val")
   }
-  out <- c(cmsens.me, list(summary.df = summary.df))
+  out <- c(object, list(summary.df = summary.df))
   class(out) <- c("summary.cmsens.me")
   return(out)
 }
 
 #' @describeIn cmsens Print the summary of cmsens.me nicely
 #' @export
-print.summary.cmsens.me <- function(summary.cmsens.me, digits = 4) {
+print.summary.cmsens.me <- function(x, digits = 4, ...) {
   cat("Sensitivity Analysis For Measurement Error \n \n")
   cat("The variable measured with error: ")
-  cat(summary.cmsens.me$ME$MEvariable)
+  cat(x$ME$MEvariable)
   cat("\nType of the variable measured with error: ")
-  cat(summary.cmsens.me$ME$MEvartype)
+  cat(x$ME$MEvartype)
   cat("\n")
-  for (i in 1:length(summary.cmsens.me$sens)) {
+  for (i in 1:length(x$sens)) {
     cat(paste0("\nMeasurement error ", i, ": \n"))
-    if (summary.cmsens.me$ME$MEvartype == "continuous") cat(summary.cmsens.me$ME$MEerror[i])
-    if (summary.cmsens.me$ME$MEvartype == "categorical") print(summary.cmsens.me$ME$MEerror[[i]])
+    if (x$ME$MEvartype == "continuous") cat(x$ME$MEerror[i])
+    if (x$ME$MEvartype == "categorical") print(x$ME$MEerror[[i]])
     cat(paste0("\nMeasurement error correction for measurement error ", i, ": \n"))
-    printCoefmat(summary.cmsens.me$summary.df[[i]], digits = digits, has.Pvalue = TRUE)
+    printCoefmat(x$summary.df[[i]], digits = digits, has.Pvalue = TRUE)
     cat("----------------------------------------------------------------\n")
   }
 }
 
 #' @describeIn cmsens Plot the results of cmsens.me with \link[ggplot2]{ggplot}
 #' @export
-plot.cmsens.me <- function(cmsens.me) {
-  require(ggplot2)
-  naive.pe <- cmsens.me$naive$effect.pe
-  naive.ci.low <- cmsens.me$naive$effect.ci.low
-  naive.ci.high <- cmsens.me$naive$effect.ci.high
-  if (cmsens.me$ME$MEvartype == "continuous") {
+plot.cmsens.me <- function(x, ...) {
+  naive.pe <- x$naive$effect.pe
+  naive.ci.low <- x$naive$effect.ci.low
+  naive.ci.high <- x$naive$effect.ci.high
+  if (x$ME$MEvartype == "continuous") {
     effect_df <- data.frame(Effect = factor(names(naive.pe), levels = names(naive.pe)),
                             Point = naive.pe,
                             CIlower = naive.ci.low,
                             CIupper = naive.ci.high,
                             ReliabilityRatio = rep(1, length(naive.pe)))
-    for (i in 1:length(cmsens.me$sens)) {
-      pe.mid <- cmsens.me$sens[[i]]$effect.pe
-      ci.low.mid <- cmsens.me$sens[[i]]$effect.ci.low
-      ci.high.mid <- cmsens.me$sens[[i]]$effect.ci.high
+    for (i in 1:length(x$sens)) {
+      pe.mid <- x$sens[[i]]$effect.pe
+      ci.low.mid <- x$sens[[i]]$effect.ci.low
+      ci.high.mid <- x$sens[[i]]$effect.ci.high
       effect_df <- rbind(effect_df,
                          data.frame(Effect = factor(names(pe.mid), levels = names(pe.mid)),
                                     Point = pe.mid,
                                     CIlower = ci.low.mid,
                                     CIupper = ci.high.mid,
-                                    ReliabilityRatio = rep(factor(round(cmsens.me$ME$reliabilityRatio[i], 2)), 
+                                    ReliabilityRatio = rep(factor(round(x$ME$reliabilityRatio[i], 2)), 
                                                            length(pe.mid))))
       
     }
@@ -396,10 +419,10 @@ plot.cmsens.me <- function(cmsens.me) {
       scale_colour_hue()+
       geom_hline(yintercept = 0, color = "red")+
       theme(legend.position = "bottom")
-  } else if (cmsens.me$ME$MEvartype == "categorical") {
-    pe.mid <- cmsens.me$sens[[1]]$effect.pe
-    ci.low.mid <- cmsens.me$sens[[1]]$effect.ci.low
-    ci.high.mid <- cmsens.me$sens[[1]]$effect.ci.high
+  } else if (x$ME$MEvartype == "categorical") {
+    pe.mid <- x$sens[[1]]$effect.pe
+    ci.low.mid <- x$sens[[1]]$effect.ci.low
+    ci.high.mid <- x$sens[[1]]$effect.ci.high
     effect_df <- data.frame(Effect = rep(factor(names(pe.mid), levels = names(pe.mid)), 2),
                             Point = c(pe.mid, naive.pe),
                             CIlower = c(ci.low.mid, naive.ci.low),
@@ -408,11 +431,11 @@ plot.cmsens.me <- function(cmsens.me) {
                                           rep("Naive", length(naive.pe)))),
                             MisclassificationMAtrix = factor(rep("MEerror[1]", 
                                                                  length(pe.mid)+length(naive.pe))))
-    if (length(cmsens.me$sens) > 1) {
-      for (i in 2:length(cmsens.me$sens)) {
-        pe.mid <- cmsens.me$sens[[i]]$effect.pe
-        ci.low.mid <- cmsens.me$sens[[i]]$effect.ci.low
-        ci.high.mid <- cmsens.me$sens[[i]]$effect.ci.high
+    if (length(x$sens) > 1) {
+      for (i in 2:length(x$sens)) {
+        pe.mid <- x$sens[[i]]$effect.pe
+        ci.low.mid <- x$sens[[i]]$effect.ci.low
+        ci.high.mid <- x$sens[[i]]$effect.ci.high
         effect_df <- rbind(effect_df,
                            data.frame(Effect = rep(factor(names(pe.mid), levels = names(pe.mid)), 2),
                                       Point = c(pe.mid, naive.pe),
