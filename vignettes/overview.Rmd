@@ -1,0 +1,602 @@
+---
+title: "Overview of Statistical Approaches for Causal Mediation Analysis"
+author: "Baoyi Shi"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Overview of Causal Mediation Analysis Approaches and Sensitivity Analysis Approaches}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+This document describes how the six causal mediation analysis approaches including *the regression-based approach* by [Valeri et al. (2013)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3659198/) and [VanderWeele et al. (2014)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/), 
+*the weighting-based approach* by [VanderWeele et al. (2014)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/), *the inverse odd-ratio weighting approach* by [Tchetgen Tchetgen (2013)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3954805/), *the natural effect model* by
+[Vansteelandt et al. (2012)](https://www.degruyter.com/view/journals/em/1/1/article-p131.xml?language=en), *the marginal structural model* by [VanderWeele 
+et al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5560424/), and *the $g$-formula approach* by [Lin et al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5285457/) are implemented by the `cmest` function in the `CMAverse` package. See publications of these approaches for methodological details .
+
+We categorize the approaches based on whether the approach deals with post-exposure confounding. *The regression-based approach*, *the weighting-based approach*, *the inverse odd-ratio weighting approach* and *the natural effect model* only deal with pre-exposure confounding. *The marginal structural model* and *the $g$-formula approach* deal with both pre-exposure confounding and post-exposure confounding.
+
+The outcome, the exposure and the set of pre-exposure confounder(s) are denoted as $Y$, $A$ and $C$ respectively. The set of mediator(s) $\{M_p\}_{p=1,...,k}$ is denoted as $M$ and $M=(M_1,...,M_k)$ follows the temporal order of the mediator(s). The set of post-exposure confounder(s) $\{L_q\}_{q=1,...,s}$ is denoted as $L$ and $L=(L_1,...,L_s)$ follows the temporal order of the post-exposure confounder(s). 
+
+# Pre-exposure Confounding
+
+## DAG
+
+```{r echo=F,warning=F,message=F,fig.width=6,fig.height=3}
+library(dagitty)
+g1 <- dagitty( "dag {
+    A -> Y
+    A -> M -> Y
+    C -> A
+    C -> M
+    C -> Y
+}")
+coordinates(g1) <- list(x=c(A=0,Y=4,M=2,C=0.2),y=c(A=0,Y=0,M=-0.8,C=-1))
+plot(g1)
+```
+
+## Estimands
+
+For a continuous outcome, causal effects are estimated on the difference scale (summarized in table 1). For a categorical, count, or survival outcome, causal effects are estimated on the (risk or rate) ratio scale (summarized in table 2). See [Valeri et al. (2013)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3659198/) and [VanderWeele (2015)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4220271/) for details about these effects.
+
+```{r echo=F,warning=F,message=F}
+library(knitr)
+library(dplyr)
+library(kableExtra)
+tb1 <- data.frame(c("Controlled Direct Effect", "Pure Natural Direct Effect",
+                    "Total Natural Direct Effect", "Pure Natural Indirect Effect",
+                    "Total Natural Indirect Effect", "Total Effect", 
+                    "Reference Interaction", "Mediated Interaction", "Proportion $CDE$",
+                    "Proportion $INT_{ref}$", "Proportion $INT_{med}$", "Proportion $PNIE$", "Proportion Mediated", "Proportion Attributable to Interaction", 
+                    "Proportion Eliminated"),
+           c("$CDE$", "$PNDE$", "$TNDE$", "$PNIE$", "$TNIE$", "$TE$",  "$INT_{ref}$", 
+             "$INT_{med}$", "$prop^{CDE}$", "$prop^{INT_{ref}}$", "$prop^{INT_{med}}$", 
+             "$prop^{PNIE}$", "$PM$", "$INT$", "$PE$"),
+           c("$E[Y_{am}-Y_{a^*m}]$", "$E[Y_{aM_a^*}-Y_{a^*M_a^*}]$", "$E[Y_{aM_a}-Y_{a^*M_a}]$", 
+             "$E[Y_{a^*M_a}-Y_{a^*M_a^*}]$", "$E[Y_{aM_a}-Y_{aM_a^*}]$", "$PNDE+TNIE$", 
+             "$PNDE-CDE$", "$TNIE-PNIE$", "$CDE/TE$", 
+             "$INT_{ref}/TE$", "$INT_{med}/TE$", "$PNIE/TE$", "$TNIE/TE$", 
+             "$(INT_{ref}+INT_{med})/TE$", 
+             "$(INT_{ref}+INT_{med}+PNIE)/TE$"))
+colnames(tb1) <- c("Full Name", "Abbreviation", "Formula")
+knitr::kable(tb1, escape = FALSE, caption = "Table 1: Causal Effects on the Difference Scale") %>%
+  footnote(general = "$a$ and $a^*$ are two reference values for $A$. $m$ is the reference value for $M$. $M_a$ denotes the counterfactual value of $M$ that would have been observed had $A$ been set to be $a$. $Y_{am}$ denotes the counterfactual value of $Y$ that would have been observed had $A$ been set to be $a$, and $M$ to be $m$. $Y_{aMa*}$ denotes the counterfactual value of $Y$ that would have been observed had $A$ been set to be $a$, and $M$ to be $M_{a*}$.") %>%
+  column_spec(1, width = "20em") %>%
+  column_spec(2, width = "8em") %>%
+  column_spec(3, width = "10em") %>%
+  kable_styling(bootstrap_options = c("bordered", "striped", "hover", "responsive", "condensed"))
+```
+
+```{r echo=F,warning=F,message=F}
+tb2 <- data.frame(c("Controlled Direct Effect", "Pure Natural Direct Effect",
+                    "Total Natural Direct Effect", "Pure Natural Indirect Effect",
+                    "Total Natural Indirect Effect", "Total Effect", 
+                    "Excess RR due to Controlled Direct Effect", 
+                    "Excess RR due to Reference Interaction", 
+                    "Excess RR due to Mediated Interaction", 
+                    "Excess RR due to Pure Natural Indirect Effect", 
+                    "Proportion $err^{CDE}$",
+                    "Proportion $err^{INT_{ref}}$", "Proportion $err^{INT_{med}}$", 
+                    "Proportion $err^{PNIE}$", "Proportion Mediated",
+                    "Proportion Attributable to Interaction", 
+                    "Proportion Eliminated"),
+           c("$rr^{CDE}$", "$rr^{PNDE}$", "$rr^{TNDE}$", "$rr^{PNIE}$", "$rr^{TNIE}$", "$rr^{TE}$", 
+             "$err^{CDE}$", "$err^{INT_{ref}}$", "$err^{INT_{med}}$", "$err^{PNIE}$", 
+             "$prop^{err^{CDE}}$", 
+             "$prop^{err^{INT_{ref}}}$", "$prop^{err^{INT_{med}}}$", 
+             "$prop^{err^{PNIE}}$", "$PM$", "$INT$", "$PE$"),
+           c("$E[Y_{am}]/E[Y_{a^*m}]$", "$E[Y_{aM_a^*}]/E[Y_{a^*M_a^*}]$", 
+             "$E[Y_{aM_a}]/E[Y_{a^*M_a}]$", "$E[Y_{a^*M_a}]/E[Y_{a^*M_a^*}]$", 
+             "$E[Y_{aM_a}]/E[Y_{aM_a^*}]$", "$rr^{PNDE}\\times rr^{TNIE}$", 
+              "$(E[Y_{am}-Y_{a^*m}])/E[Y_{a^*M_a^*}]$",
+             "$rr^{PNDE}-1-err^{CDE}$", "$rr^{TNIE}*rr^{PNDE}-rr^{PNDE}-rr^{PNIE}+1$", 
+             "$rr^{PNIE}-1$", "$err^{CDE}/(rr^{TE}-1)$", 
+             "$err^{INT_{ref}}/(rr^{TE}-1)$", 
+             "$err^{INT_{med}}/(rr^{TE}-1)$", "$err^{PNIE}/(rr^{TE}-1)$", 
+             "$(rr^{PNDE}*(rr^{TNIE}-1))/(rr^{TE}-1)$",
+             "$(err^{INT_{ref}}+err^{INT_{med}})/(rr^{TE}-1)$", 
+             "$(err^{INT_{ref}}+err^{INT_{med}}+err^{PNIE})/(rr^{TE}-1)$"))
+colnames(tb2) <- c("Full Name", "Abbreviation", "Formula")
+knitr::kable(tb2, escape = FALSE, caption = "Table 2: Causal Effects on the Ratio Scale") %>%
+  footnote(general = "$a$ and $a^*$ are two reference values for $A$. $m$ is the reference value for $M$. $M_a$ denotes the counterfactual value of $M$ that would have been observed had $A$ been set to be $a$. $Y_{am}$ denotes the counterfactual value of $Y$ that would have been observed had $A$ been set to be $a$, and $M$ to be $m$. $Y_{aMa*}$ denotes the counterfactual value of $Y$ that would have been observed had $A$ been set to be $a$, and $M$ to be $M_{a*}$. $RR$ represents risk or rate ratio.") %>%
+  column_spec(1, width = "20em") %>%
+  column_spec(2, width = "8em") %>%
+  column_spec(3, width = "10em") %>%
+  kable_styling(bootstrap_options = c("bordered", "striped", "hover", "responsive"))
+```
+
+
+## The Regression-based Approach
+
+With the regression-based approach, all causal effects are estimated through either closed-form parameter function estimation or direct counterfactual imputation estimation.
+
+### Closed-form Parameter Function Estimation
+
+Closed-form parameter function estimation is available when there is only a single mediator, i.e., $M=M_1$. Also, `yreg` must be chosen from `linear`, `logistic`, `loglinear`, `poisson`, `quasipoisson`, `negbin`, `coxph`, `aft_exp`, and `aft_weibull`. `mreg` must be chosen from `linear`, `logistic` and `multinomial`. The causal effects estimated through closed-form parameter function estimation are conditional on values of pre-exposure confounders specified by the `precval` argument. Closed-form parameter functions are summarized below.
+
+#### Linear `yreg`, Linear `mreg` and Noncategorical Exposure
+
+If the exposure is not categorical, `yreg="linear"` and `mreg=list("linear")`, the `cmest` function estimates the causal effects by the following steps:
+
+1. Fit a linear regression model for the mediator:
+$$E[M|A,C]=\beta_0+\beta_1A+\beta_2'C$$
+
+2. Fit a linear regression model for the outcome:
+$$E[Y|A,M,C]=\theta_0+\theta_1A+\theta_2M+\theta_3AM+\theta_4'C$$
+
+3. Estimate $CDE$, $PNDE$, $TNDE$, $PNIE$ and $TNIE$ by the following parameter functions:
+    + $CDE=(\theta_1+\theta_3m)(a-a^*)$
+    + $PNDE=\{\theta_1+\theta_3(\beta_0+\beta_1a^*+\beta_2'c)\}(a-a^*)$
+    + $TNDE=\{\theta_1+\theta_3(\beta_0+\beta_1a+\beta_2'c)\}(a-a^*)$
+    + $PNIE=(\theta_2\beta_1+\theta_3\beta_1a^*)(a-a^*)$
+    + $TNIE=(\theta_2\beta_1+\theta_3\beta_1a)(a-a^*)$
+  
+4. Calculate other effects using formulas in table 1.
+
+#### Linear `yreg`, Linear `mreg` and Categorical Exposure
+
+If the exposure is categorical, `yreg="linear"` and `mreg=list("linear")`, the `cmest` function estimates the causal effects by the following steps:
+
+1. Fit a linear regression model for the mediator:
+$$E[M|A,C]=\beta_0+\sum_{k=1}^H\beta_{1h}I\{A=h\}+\beta_2'C$$
+
+2. Fit a linear regression model for the outcome:
+$$E[Y|A,M,C]=\theta_0+\sum_{h=1}^H\theta_{1h}I\{A=h\}+\theta_2M+\sum_{h=1}^H\theta_{3h}I\{A=h\}M+\theta_4'C$$
+
+3. Estimate $CDE$, $PNDE$, $TNDE$, $PNIE$ and $TNIE$ by the following parameter functions:
+    + $CDE=\sum_{h=1}^H\theta_{1h}I\{a=h\}-\sum_{h=1}^H\theta_{1h}I\{a^*=h\}+(\sum_{h=1}^H\theta_{3h}I\{a=h\}-\sum_{h=1}^H\theta_{3h}I\{a^*=h\})m$
+    + $PNDE=\sum_{h=1}^H\theta_{1h}I\{a=h\}-\sum_{h=1}^H\theta_{1h}I\{a^*=h\}+(\sum_{h=1}^H\theta_{3h}I\{a=h\}-\sum_{h=1}^H\theta_{3h}I\{a^*=h\})(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a^*=h\}+\beta_2'c)$
+    + $TNDE=\sum_{h=1}^H\theta_{1h}I\{a=h\}-\sum_{h=1}^H\theta_{1h}I\{a^*=h\}+(\sum_{h=1}^H\theta_{3h}I\{a=h\}-\sum_{h=1}^H\theta_{3h}I\{a^*=h\})(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a=h\}+\beta_2'c)$
+    + $PNIE=(\theta_2+\sum_{h=1}^H\theta_{3h}I\{a^*=h\})(\sum_{h=1}^H\beta_{1h}I\{a=h\}-\sum_{h=1}^H\beta_{1h}I\{a^*=h\})$
+    + $TNIE=(\theta_2+\sum_{h=1}^H\theta_{3h}I\{a=h\})(\sum_{h=1}^H\beta_{1h}I\{a=h\}-\sum_{h=1}^H\beta_{1h}I\{a^*=h\})$
+
+4. Calculate other effects using formulas in table 1.
+
+#### Linear `yreg`, Logistic `mreg` and Noncategorical Exposure
+
+If the exposure is not categorical, `yreg="linear"` and `mreg=list("logistic")`, the `cmest` function estimates the causal effects by the following steps:
+
+1. Fit a logistic regression model for the mediator:
+$$logitE[M|A,C]=\beta_0+\beta_1A+\beta_2'C$$
+
+2. Fit a linear regression model for the outcome:
+$$E[Y|A,M,C]=\theta_0+\theta_1A+\theta_2M+\theta_3AM+\theta_4'C$$
+
+3. Estimate $CDE$, $PNDE$, $TNDE$, $PNIE$ and $TNIE$ by the following parameter functions:
+    + $CDE=(\theta_1+\theta_3m)(a-a^*)$
+    + $PNDE=\{\theta_1+\theta_3\frac{exp(\beta_0+\beta_1a^*+\beta_2'c)}{1+exp(\beta_0+\beta_1a^*+\beta_2'c)}\}(a-a^*)$
+    + $TNDE=\{\theta_1+\theta_3\frac{exp(\beta_0+\beta_1a+\beta_2'c)}{1+exp(\beta_0+\beta_1a+\beta_2'c)}\}(a-a^*)$
+    + $PNIE=(\theta_2+\theta_3a^*)(\frac{exp(\beta_0+\beta_1a+\beta_2'c)}{1+exp(\beta_0+\beta_1a+\beta_2'c)}-\frac{exp(\beta_0+\beta_1a^*+\beta_2'c)}{1+exp(\beta_0+\beta_1a^*+\beta_2'c)})$
+    + $TNIE=(\theta_2+\theta_3a)(\frac{exp(\beta_0+\beta_1a+\beta_2'c)}{1+exp(\beta_0+\beta_1a+\beta_2'c)}-\frac{exp(\beta_0+\beta_1a^*+\beta_2'c)}{1+exp(\beta_0+\beta_1a^*+\beta_2'c)})$
+
+4. Calculate other effects using formulas in table 1.
+
+#### Linear `yreg`, Logistic `mreg` and Categorical Exposure
+
+If the exposure is categorical, `yreg="linear"` and `mreg=list("logistic")`, the `cmest` function estimates the causal effects by the following steps:
+
+1. Fit a logistic regression model for the mediator:
+$$logitE[M|A,C]=\beta_0+\sum_{h=1}^H\beta_{1h}I\{A=h\}+\beta_2'C$$
+
+2. Fit a linear regression model for the outcome:
+$$E[Y|A,M,C]=\theta_0+\sum_{h=1}^H\theta_{1h}I\{A=h\}+\theta_2M+\sum_{h=1}^H\theta_{3h}I\{A=h\}M+\theta_4'C$$
+
+3. Estimate $CDE$, $PNDE$, $TNDE$, $PNIE$ and $TNIE$ by the following parameter functions:
+    + $CDE=\sum_{h=1}^H\theta_{1h}I\{a=h\}-\sum_{h=1}^H\theta_{1h}I\{a^*=h\}+(\sum_{h=1}^H\theta_{3h}I\{a=h\}-\sum_{h=1}^H\theta_{3h}I\{a^*=h\})m$
+    + $PNDE=\sum_{h=1}^H\theta_{1h}I\{a=h\}-\sum_{h=1}^H\theta_{1h}I\{a^*=h\}+(\sum_{h=1}^H\theta_{3h}I\{a=h\}-\sum_{h=1}^H\theta_{3h}I\{a^*=h\})\frac{exp(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a^*=h\}+\beta_2'c)}{1+exp(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a^*=h\}+\beta_2'c)}$
+    + $TNDE=\sum_{h=1}^H\theta_{1h}I\{a=h\}-\sum_{h=1}^H\theta_{1h}I\{a^*=h\}+(\sum_{h=1}^H\theta_{3h}I\{a=h\}-\sum_{h=1}^H\theta_{3h}I\{a^*=h\})\frac{exp(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a=h\}+\beta_2'c)}{1+exp(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a=h\}+\beta_2'c)}$
+    + $PNIE=(\theta_2+\sum_{h=1}^H\theta_{3h}I\{a^*=h\})(\frac{exp(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a=h\}+\beta_2'c)}{1+exp(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a=h\}+\beta_2'c)}-\frac{exp(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a^*=h\}+\beta_2'c)}{1+exp(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a^*=h\}+\beta_2'c)})$
+    + $TNIE=(\theta_2+\sum_{h=1}^H\theta_{3h}I\{a=h\})(\frac{exp(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a=h\}+\beta_2'c)}{1+exp(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a=h\}+\beta_2'c)}-\frac{exp(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a^*=h\}+\beta_2'c)}{1+exp(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a^*=h\}+\beta_2'c)})$
+
+4. Calculate other effects using formulas in table 1.
+
+#### Linear `yreg`, Multinomial `mreg` and Noncategorical Exposure
+
+If the exposure is not categorical, `yreg="linear"` and `mreg=list("multinomial")`, the `cmest` function estimates the causal effects by the following steps:
+
+1. Fit a multinomial regression model for the mediator:
+$$log\frac{E[M=j|A,C]}{E[M=0|A,C]}=\beta_{0j}+\beta_{1j}A+\beta_{2j}'C, j=1,2,...,J$$
+
+2. Fit a linear regression model for the outcome:
+$$E[Y|A,M,C]=\theta_0+\theta_1A+\sum_{j=1}^J\theta_{2j}I\{M=j\}+A\sum_{j=1}^J\theta_{3j}I\{M=j\}+\theta_4'C$$
+
+3. Estimate $CDE$, $PNDE$, $TNDE$, $PNIE$ and $TNIE$ by the following parameter functions:
+    + $CDE=(\theta_1+\sum_{j=1}^J\theta_{3j}I\{m=j\})(a-a^*)$
+    + $PNDE=\{\theta_1+\frac{\sum_{j=1}^J\theta_{3j}exp(\beta_{0j}+\beta_{1j}a^*+\beta_{2j}'c)}{1+\sum_{j=1}^Jexp(\beta_{0j}+\beta_{1j}a^*+\beta_{2j}'c)}\}(a-a^*)$
+    + $TNDE=\{\theta_1+\frac{\sum_{j=1}^J\theta_{3j}exp(\beta_{0j}+\beta_{1j}a+\beta_{2j}'c)}{1+\sum_{j=1}^Jexp(\beta_{0j}+\beta_{1j}a+\beta_{2j}'c)}\}(a-a^*)$
+    + $PNIE=\frac{\sum_{j=1}^J(\theta_{2j}+\theta_{3j}a^*)exp(\beta_{0j}+\beta_{1j}a+\beta_{2j}'c)}{1+\sum_{j=1}^Jexp(\beta_{0j}+\beta_{1j}a+\beta_{2j}'c)}-\frac{\sum_{j=1}^J(\theta_{2j}+\theta_{3j}a^*)exp(\beta_{0j}+\beta_{1j}a^*+\beta_{2j}'c)}{1+\sum_{j=1}^Jexp(\beta_{0j}+\beta_{1j}a^*+\beta_{2j}'c)}$
+    + $TNIE=\frac{\sum_{j=1}^J(\theta_{2j}+\theta_{3j}a)exp(\beta_{0j}+\beta_{1j}a+\beta_{2j}'c)}{1+\sum_{j=1}^Jexp(\beta_{0j}+\beta_{1j}a+\beta_{2j}'c)}-\frac{\sum_{j=1}^J(\theta_{2j}+\theta_{3j}a)exp(\beta_{0j}+\beta_{1j}a^*+\beta_{2j}'c)}{1+\sum_{j=1}^Jexp(\beta_{0j}+\beta_{1j}a^*+\beta_{2j}'c)}$
+
+4. Calculate other effects using formulas in table 1.
+
+#### Linear `yreg`, Multinomial `mreg` and Categorical Exposure
+
+If the exposure is categorical, `yreg="linear"` and `mreg=list("multinomial")`, the `cmest` function estimates the causal effects by the following steps:
+
+1. Fit a multinomial regression model for the mediator:
+$$log\frac{E[M=j|A,C]}{E[M=0|A,C]}=\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{A=h\}+\beta_{2j}'C, j=1,2,...,J$$
+
+2. Fit a linear regression model for the outcome:
+$$E[Y|A,M,C]=\theta_0+\sum_{h=1}^H\theta_{1h}I\{A=h\}+\sum_{j=1}^J\theta_{2j}I\{M=j\}+\sum_{j=1}^J\sum_{h=1}^H\theta_{3jh}I\{M=j\}I\{A=h\}+\theta_4'C$$ 
+
+3. Estimate $CDE$, $PNDE$, $TNDE$, $PNIE$ and $TNIE$ by the following parameter functions:
+    + $CDE=\sum_{h=1}^H\theta_{1h}I\{a=h\}-\sum_{h=1}^H\theta_{1h}I\{a^*=h\}+(\sum_{j=1}^J\sum_{h=1}^H\theta_{3jh}I\{m=j\}I\{a=h\}-\sum_{j=1}^J\sum_{h=1}^H\theta_{3jh}I\{m=j\}I\{a^*=h\})$
+    + $PNDE=\sum_{h=1}^H\theta_{1h}I\{a=h\}-\sum_{h=1}^H\theta_{1h}I\{a^*=h\}+\frac{\sum_{j=1}^J(\sum_{h=1}^H\theta_{3jh}I\{a=h\}-\sum_{h=1}^H\theta_{3jh}I\{a^*=h\})exp(\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a^*=h\}+\beta_{2j}'c)}{1+\sum_{j=1}^Jexp(\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a^*=h\}+\beta_{2j}'c)}$
+    + $TNDE=\sum_{h=1}^H\theta_{1h}I\{a=h\}-\sum_{h=1}^H\theta_{1h}I\{a^*=h\}+\frac{\sum_{j=1}^J(\sum_{h=1}^H\theta_{3jh}I\{a=h\}-\sum_{h=1}^H\theta_{3jh}I\{a^*=h\})exp(\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a=h\}+\beta_{2j}'c)}{1+\sum_{j=1}^Jexp(\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a=h\}+\beta_{2j}'c)}$
+    + $PNIE=\frac{\sum_{j=1}^J(\theta_{2j}+\sum_{h=1}^H\theta_{3jh}I\{a^*=h\})exp(\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a=h\}+\beta_{2j}'c)}{1+\sum_{j=1}^Jexp(\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a=h\}+\beta_{2j}'c)}-\frac{\sum_{j=1}^J(\theta_{2j}+\sum_{h=1}^H\theta_{3jh}I\{a^*=h\})exp(\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a^*=h\}+\beta_{2j}'c)}{1+\sum_{j=1}^Jexp(\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a^*=h\}+\beta_{2j}'c)}$
+    + $TNIE=\frac{\sum_{j=1}^J(\theta_{2j}+\sum_{h=1}^H\theta_{3jh}I\{a=h\})exp(\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a=h\}+\beta_{2j}'c)}{1+\sum_{j=1}^Jexp(\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a=h\}+\beta_{2j}'c)}-\frac{\sum_{j=1}^J(\theta_{2j}+\sum_{h=1}^H\theta_{3jh}I\{a=h\})exp(\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a^*=h\}+\beta_{2j}'c)}{1+\sum_{j=1}^Jexp(\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a^*=h\}+\beta_{2j}'c)}$
+
+4. Calculate other effects using formulas in table 1.
+
+#### Nonlinear `yreg`, Linear `mreg` and Noncategorical Exposure
+
+If the exposure is not categorical, `yreg!="linear"` and `mreg=list("linear")`, the `cmest` function estimates the causal effects by the following steps:
+
+1. Fit a linear regression model for the mediator:
+$$E[M|A,C]=\beta_0+\beta_1A+\beta_2'C+\epsilon_M,\epsilon_M\sim N(0,\sigma^2)$$
+
+2. Fit the specified regression model for the outcome:
+$$g(E[Y|A,M,C])=\theta_0+\theta_1A+\theta_2M+\theta_3AM+\theta_4'C$$
+
+3. Estimate $rr^{CDE}$, $rr^{PNDE}$, $rr^{TNDE}$, $rr^{PNIE}$, $rr^{TNIE}$ and $err^{CDE}$ by the following parameter functions:
+    + $rr^{CDE}=exp((\theta_1+\theta_3m)(a-a^*))$
+    + $rr^{PNDE}=exp(\{\theta_1+\theta_3(\beta_0+\beta_1a^*+\beta_2'c+\theta_2\sigma^2)\}(a-a^*)+0.5\theta_3^2\sigma^2(a^2-a^{*2}))$
+    + $rr^{TNDE}=exp(\{\theta_1+\theta_3(\beta_0+\beta_1a+\beta_2'c+\theta_2\sigma^2)\}(a-a^*)+0.5\theta_3^2\sigma^2(a^2-a^{*2}))$
+    + $rr^{PNIE}=exp((\theta_2\beta_1+\theta_3\beta_1a^*)(a-a^*))$
+    + $rr^{TNIE}=exp((\theta_2\beta_1+\theta_3\beta_1a)(a-a^*))$
+    + $err^{CDE}=(exp(\theta_1(a-a^*)+\theta_3am)-exp(\theta_3a^*m))exp(\theta_2m-(\theta_2+\theta_3a^*)(\beta_0+\beta_1a^*+\beta_2'c)-0.5(\theta_2+\theta_3a^*)^2\sigma^2)$
+
+4. Calculate other effects using formulas in table 2.
+
+#### Nonlinear `yreg`, Linear `mreg` and Categorical Exposure
+
+If the exposure is categorical, `yreg!="linear"` and `mreg=list("linear")`, the `cmest` function estimates the causal effects by the following steps:
+
+1. Fit a linear regression model for the mediator:
+$$E[M|A,C]=\beta_0+\sum_{h=1}^H\beta_{1h}I\{A=h\}+\beta_2'C+\epsilon_M,\epsilon_M\sim N(0,\sigma^2)$$
+
+2. Fit the specified regression model for the outcome:
+$$g(E[Y|A,M,C])=\theta_0+\sum_{h=1}^H\theta_{1h}I\{A=h\}+\theta_2M+\sum_{h=1}^H\theta_{3h}I\{A=h\}M+\theta_4'C$$
+
+3. Estimate $rr^{CDE}$, $rr^{PNDE}$, $rr^{TNDE}$, $rr^{PNIE}$, $rr^{TNIE}$ and $err^{CDE}$ by the following parameter functions:
+    + $rr^{CDE}=exp(\sum_{h=1}^H\theta_{1h}I\{a=h\}-\sum_{h=1}^H\theta_{1h}I\{a^*=h\}+(\sum_{h=1}^H\theta_{3h}I\{a=h\}-\sum_{h=1}^H\theta_{3h}I\{a^*=h\})m)$
+    + $rr^{PNDE}=exp(\sum_{h=1}^H\theta_{1h}I\{a=h\}-\sum_{h=1}^H\theta_{1h}I\{a^*=h\}+(\sum_{h=1}^H\theta_{3h}I\{a=h\}-\sum_{h=1}^H\theta_{3h}I\{a^*=h\})(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a^*=h\}+\beta_2'c+\theta_2\sigma^2)+0.5\sigma^2(\sum_{h=1}^H\theta_{3h}^2I\{a=h\}-\sum_{h=1}^H\theta_{3h}^2I\{a^*=h\}))$
+    + $rr^{TNDE}=exp(\sum_{h=1}^H\theta_{1h}I\{a=h\}-\sum_{h=1}^H\theta_{1h}I\{a^*=h\}+(\sum_{h=1}^H\theta_{3h}I\{a=h\}-\sum_{h=1}^H\theta_{3h}I\{a^*=h\})(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a=h\}+\beta_2'c+\theta_2\sigma^2)+0.5\sigma^2(\sum_{h=1}^H\theta_{3h}^2I\{a=h\}-\sum_{h=1}^H\theta_{3h}^2I\{a^*=h\}))$
+    + $rr^{PNIE}=exp(\theta_2(\sum_{h=1}^H\beta_{1h}I\{a=h\}-\sum_{h=1}^H\beta_{1h}I\{a^*=h\})+\sum_{h=1}^H\theta_{3h}I\{a^*=h\}(\sum_{h=1}^H\beta_{1h}I\{a=h\}-\sum_{h=1}^H\beta_{1h}I\{a^*=h\}))$
+    + $rr^{TNIE}=exp(\theta_2(\sum_{h=1}^H\beta_{1h}I\{a=h\}-\sum_{h=1}^H\beta_{1h}I\{a^*=h\})+\sum_{h=1}^H\theta_{3h}I\{a=h\}(\sum_{h=1}^H\beta_{1h}I\{a=h\}-\sum_{h=1}^H\beta_{1h}I\{a^*=h\}))$
+    + $err^{CDE}=(exp(\sum_{h=1}^H\theta_{1h}I\{a=h\}-\sum_{h=1}^H\theta_{1h}I\{a^*=h\}+\sum_{h=1}^H\theta_{3h}I\{a=h\}m)-exp(\sum_{h=1}^H\theta_{3h}I\{a^*=h\}m))exp(\theta_2m-(\theta_2+\sum_{h=1}^H\theta_{3h}I\{a^*=h\})(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a^*=h\}+\beta_2'c)-0.5(\theta_2+\sum_{h=1}^H\theta_{3h}I\{a^*=h\})^2\sigma^2)$
+
+4. Calculate other effects using formulas in table 2.
+
+#### Nonlinear `yreg`, Logistic `mreg` and Noncategorical Exposure
+
+If the exposure is not categorical, `yreg!="linear"` and `mreg=list("logistic")`, the `cmest` function estimates the causal effects by the following steps:
+
+1. Fit a logistic regression model for the mediator:
+$$logitE[M|A,C]=\beta_0+\beta_1A+\beta_2'C$$
+
+2. Fit the specified regression model for the outcome:
+$$g(E[Y|A,M,C])=\theta_0+\theta_1A+\theta_2M+\theta_3AM+\theta_4'C$$
+
+3. Estimate $rr^{CDE}$, $rr^{PNDE}$, $rr^{TNDE}$, $rr^{PNIE}$, $rr^{TNIE}$ and $err^{CDE}$ by the following parameter functions:
+    + $rr^{CDE}=exp((\theta_1+\theta_3m)(a-a^*))$
+    + $rr^{PNDE}=\frac{exp(\theta_1a)\{1+exp(\theta_2+\theta_3a+\beta_0+\beta_1a^*+\beta_2'c)\}}{exp(\theta_1a^*)\{1+exp(\theta_2+\theta_3a^*+\beta_0+\beta_1a^*+\beta_2'c)\}}$
+    + $rr^{TNDE}=\frac{exp(\theta_1a)\{1+exp(\theta_2+\theta_3a+\beta_0+\beta_1a+\beta_2'c)\}}{exp(\theta_1a^*)\{1+exp(\theta_2+\theta_3a^*+\beta_0+\beta_1a+\beta_2'c)\}}$
+    + $rr^{PNIE}=\frac{\{1+exp(\beta_0+\beta_1a^*+\beta_2'c)\}\{1+exp(\theta_2+\theta_3a^*+\beta_0+\beta_1a+\beta_2'c)\}}{\{1+exp(\beta_0+\beta_1a+\beta_2'c)\}\{1+exp(\theta_2+\theta_3a^*+\beta_0+\beta_1a^*+\beta_2'c)\}}$
+    + $rr^{TNIE}=\frac{\{1+exp(\beta_0+\beta_1a^*+\beta_2'c)\}\{1+exp(\theta_2+\theta_3a+\beta_0+\beta_1a+\beta_2'c)\}}{\{1+exp(\beta_0+\beta_1a+\beta_2'c)\}\{1+exp(\theta_2+\theta_3a+\beta_0+\beta_1a^*+\beta_2'c)\}}$
+    + $err^{CDE}=\frac{exp(\theta_2m)(exp(\theta_1(a-a^*)+\theta_3am)-exp(\theta_3a^*m))(1+exp(\beta_0+\beta_1a^*+\beta_2'c))}{1+exp(\beta_0+\beta_1a^*+\beta_2'c+\theta_2+\theta_3a^*)}$
+
+4. Calculate other effects using formulas in table 2.
+
+#### Nonlinear `yreg`, Logistic `mreg` and Categorical Exposure
+
+If the exposure is categorical, `yreg!="linear"` and `mreg=list("logistic")`, the `cmest` function estimates the causal effects by the following steps:
+
+1. Fit a logistic regression model for the mediator:
+$$logitE[M|A,C]=\beta_0+\sum_{h=1}^H\beta_{1h}I\{A=h\}+\beta_2'C$$
+
+2. Fit the specified regression model for the outcome:
+$$g(E[Y|A,M,C])=\theta_0+\sum_{h=1}^H\theta_{1h}I\{A=h\}+\theta_2M+\sum_{h=1}^H\theta_{3h}I\{A=h\}M+\theta_4'C$$
+
+3. Estimate $rr^{CDE}$, $rr^{PNDE}$, $rr^{TNDE}$, $rr^{PNIE}$, $rr^{TNIE}$ and $err^{CDE}$ by the following parameter functions:
+    + $rr^{CDE}=exp(\sum_{h=1}^H\theta_{1h}I\{a=h\}-\sum_{h=1}^H\theta_{1h}I\{a^*=h\}+(\sum_{h=1}^H\theta_{3h}I\{a=h\}-\sum_{h=1}^H\theta_{3h}I\{a^*=h\})m)$
+    + $rr^{PNDE}=\frac{exp(\sum_{h=1}^H\theta_{1h}I\{a=h\})\{1+exp(\theta_2+\sum_{h=1}^H\theta_{3h}I\{a=h\}+\beta_0+\sum_{h=1}^H\beta_{1h}I\{a^*=h\}+\beta_2'c)\}}{exp(\sum_{h=1}^H\theta_{1h}I\{a^*=h\})\{1+exp(\theta_2+\sum_{h=1}^H\theta_{3h}I\{a^*=h\}+\beta_0+\sum_{h=1}^H\beta_{1h}I\{a^*=h\}+\beta_2'c)\}}$
+    + $rr^{TNDE}=\frac{exp(\sum_{h=1}^H\theta_{1h}I\{a=h\})\{1+exp(\theta_2+\sum_{h=1}^H\theta_{3h}I\{a=h\}+\beta_0+\sum_{h=1}^H\beta_{1h}I\{a=h\}+\beta_2'c)\}}{exp(\sum_{h=1}^H\theta_{1h}I\{a^*=h\})\{1+exp(\theta_2+\sum_{h=1}^H\theta_{3h}I\{a^*=h\}+\beta_0+\sum_{h=1}^H\beta_{1h}I\{a=h\}+\beta_2'c)\}}$
+    + $rr^{PNIE}=\frac{\{1+exp(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a^*=h\}+\beta_2'c)\}\{1+exp(\theta_2+\sum_{h=1}^H\theta_{3h}I\{a^*=h\}+\beta_0+\sum_{h=1}^H\beta_{1h}I\{a=h\}+\beta_2'c)\}}{\{1+exp(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a=h\}+\beta_2'c)\}\{1+exp(\theta_2+\sum_{h=1}^H\theta_{3h}I\{a^*=h\}+\beta_0+\sum_{h=1}^H\beta_{1h}I\{a^*=h\}+\beta_2'c)\}}$
+    + $rr^{TNIE}=\frac{\{1+exp(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a^*=h\}+\beta_2'c)\}\{1+exp(\theta_2+\sum_{h=1}^H\theta_{3h}I\{a=h\}+\beta_0+\sum_{h=1}^H\beta_{1h}I\{a=h\}+\beta_2'c)\}}{\{1+exp(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a=h\}+\beta_2'c)\}\{1+exp(\theta_2+\sum_{h=1}^H\theta_{3h}I\{a=h\}+\beta_0+\sum_{h=1}^H\beta_{1h}I\{a^*=h\}+\beta_2'c)\}}$
+    + $err^{CDE}=\frac{exp(\theta_2m)(exp(\sum_{h=1}^H\theta_{1h}I\{a=h\}-\sum_{h=1}^H\theta_{1h}I\{a^*=h\}+\sum_{h=1}^H\theta_{3h}I\{a=h\}m)-exp(\sum_{h=1}^H\theta_{3h}I\{a^*=h\}m))(1+exp(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a^*=h\}+\beta_2'c))}{1+exp(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a^*=h\}+\beta_2'c+\theta_2+\sum_{h=1}^H\theta_{3h}I\{a^*=h\})}$
+
+4. Calculate other effects using formulas in table 2.
+
+#### Nonlinear `yreg`, Multinomial `mreg` and Noncategorical Exposure
+
+If the exposure is not categorical, `yreg!="linear"` and `mreg=list("multinomial")`, the `cmest` function estimates the causal effects by the following steps:
+
+1. Fit a multinomial regression model for the mediator:
+$$log\frac{E[M=j|A,C]}{E[M=0|A,C]}=\beta_{0j}+\beta_{1j}A+\beta_{2j}'C, j=1,2,...,J$$
+
+2. Fit the specified regression model for the outcome:
+$$g(E[Y|A,M,C])=\theta_0+\theta_1A+\sum_{j=1}^J\theta_{2j}I\{M=j\}+A\sum_{j=1}^J\theta_{3j}I\{M=j\}+\theta_4'C$$
+
+3. Estimate $rr^{CDE}$, $rr^{PNDE}$, $rr^{TNDE}$, $rr^{PNIE}$, $rr^{TNIE}$ and $err^{CDE}$ by the following parameter functions:
+    + $rr^{CDE}=exp((\theta_1+\sum_{j=1}^J\theta_{3j}I\{m=j\})(a-a^*))$
+    + $rr^{PNDE}=\frac{exp(\theta_1a)\{1+\sum_{j=1}^Jexp(\theta_{2j}+\theta_{3j}a+\beta_{0j}+\beta_{1j}a^*+\beta_{2j}'c)\}}{exp(\theta_1a^*)\{1+\sum_{j=1}^Jexp(\theta_{2j}+\theta_{3j}a^*+\beta_{0j}+\beta_{1j}a^*+\beta_{2j}'c)\}}$
+    + $rr^{TNDE}=\frac{exp(\theta_1a)\{1+\sum_{j=1}^Jexp(\theta_{2j}+\theta_{3j}a+\beta_{0j}+\beta_{1j}a+\beta_{2j}'c)\}}{exp(\theta_1a^*)\{1+\sum_{j=1}^Jexp(\theta_{2j}+\theta_{3j}a^*+\beta_{0j}+\beta_{1j}a+\beta_{2j}'c)\}}$
+    + $rr^{PNIE}=\frac{\{1+\sum_{j=1}^Jexp(\beta_{0j}+\beta_{1j}a^*+\beta_{2j}'c)\}\{1+\sum_{j=1}^Jexp(\theta_{2j}+\theta_{3j}a^*+\beta_{0j}+\beta_{1j}a+\beta_{2j}'c)\}}{\{1+\sum_{j=1}^Jexp(\beta_{0j}+\beta_{1j}a+\beta_{2j}'c)\}\{1+\sum_{j=1}^Jexp(\theta_{2j}+\theta_{3j}a^*+\beta_{0j}+\beta_{1j}a^*+\beta_{2j}'c)\}}$
+    + $rr^{TNIE}=\frac{\{1+\sum_{j=1}^Jexp(\beta_{0j}+\beta_{1j}a^*+\beta_{2j}'c)\}\{1+\sum_{j=1}^Jexp(\theta_{2j}+\theta_{3j}a+\beta_{0j}+\beta_{1j}a+\beta_{2j}'c)\}}{\{1+\sum_{j=1}^Jexp(\beta_{0j}+\beta_{1j}a+\beta_{2j}'c)\}\{1+\sum_{j=1}^Jexp(\theta_{2j}+\theta_{3j}a+\beta_{0j}+\beta_{1j}a^*+\beta_{2j}'c)\}}$
+    + $err^{CDE}=\frac{exp(\sum_{j=1}^J\theta_{2j}I\{m=j\})(1+\sum_{j=1}^Jexp(\beta_{0j}+\beta_{1j}a^*+\beta_{2j}'c))(exp(\theta_1(a-a^*)+a\sum_{j=1}^J\theta_{3j}I\{m=j\})-exp(a^*\sum_{j=1}^J\theta_{3j}I\{m=j\}))}{1+\sum_{j=1}^Jexp(\theta_{2j}+\theta_{3j}a^*+\beta_{0j}+\beta_{1j}a^*+\beta_{2j}'c)}$
+
+4. Calculate other effects using formulas in table 2.
+
+#### Nonlinear `yreg`, Multinomial `mreg` and Categorical Exposure
+
+If the exposure is categorical, `yreg!="linear"` and `mreg=list("multinomial")`, the `cmest` function estimates the causal effects by the following steps:
+
+1. Fit a multinomial regression model for the mediator:
+$$log\frac{E[M=j|A,C]}{E[M=0|A,C]}=\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{A=h\}+\beta_{2j}'C, j=1,2,...,J$$
+
+2. Fit the specified regression model for the outcome:
+$$g(E[Y|A,M,C])=\theta_0+\sum_{h=1}^H\theta_{1h}I\{A=h\}+\sum_{j=1}^J\theta_{2j}I\{M=j\}+\sum_{j=1}^J\sum_{h=1}^H\theta_{3jh}I\{M=j\}I\{A=h\}+\theta_4'C$$ 
+
+3. Estimate $rr^{CDE}$, $rr^{PNDE}$, $rr^{TNDE}$, $rr^{PNIE}$, $rr^{TNIE}$ and $err^{CDE}$ by the following parameter functions:
+    + $rr^{CDE}=exp(\sum_{h=1}^H\theta_{1h}I\{a=h\}-\sum_{h=1}^H\theta_{1h}I\{a^*=h\}+\sum_{j=1}^J\sum_{h=1}^H\theta_{3jh}I\{m=l\}I\{a=h\}-\sum_{j=1}^J\sum_{h=1}^H\theta_{3jh}I\{m=l\}I\{a^*=h\})$
+    + $rr^{PNDE}=\frac{exp(\sum_{h=1}^H\theta_{1h}I\{a=h\})\{1+\sum_{j=1}^Jexp(\theta_{2j}+\sum_{h=1}^H\theta_{3jh}I\{a=h\}+\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a^*=h\}+\beta_{2j}'c)\}}{exp(\sum_{h=1}^H\theta_{1h}I\{a^*=h\})\{1+\sum_{j=1}^Jexp(\theta_{2j}+\sum_{h=1}^H\theta_{3jh}I\{a^*=h\}+\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a^*=h\}+\beta_{2j}'c)\}}$
+    + $rr^{TNDE}=\frac{exp(\sum_{h=1}^H\theta_{1h}I\{a=h\})\{1+\sum_{j=1}^Jexp(\theta_{2j}+\sum_{h=1}^H\theta_{3jh}I\{a=h\}+\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a=h\}+\beta_{2j}'c)\}}{exp(\sum_{h=1}^H\theta_{1h}I\{a^*=h\})\{1+\sum_{j=1}^Jexp(\theta_{2j}+\sum_{h=1}^H\theta_{3jh}I\{a^*=h\}+\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a=h\}+\beta_{2j}'c)\}}$
+    + $rr^{PNIE}=\frac{\{1+\sum_{j=1}^Jexp(\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a^*=h\}+\beta_{2j}'c)\}\{1+\sum_{j=1}^Jexp(\theta_{2j}+\sum_{h=1}^H\theta_{3jh}I\{a^*=h\}+\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a=h\}+\beta_{2j}'c)\}}{\{1+\sum_{j=1}^Jexp(\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a=h\}+\beta_{2j}'c)\}\{1+\sum_{j=1}^Jexp(\theta_{2j}+\sum_{h=1}^H\theta_{3jh}I\{a^*=h\}+\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a^*=h\}+\beta_{2j}'c)\}}$
+    + $rr^{TNIE}=\frac{\{1+\sum_{j=1}^Jexp(\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a^*=h\}+\beta_{2j}'c)\}\{1+\sum_{j=1}^Jexp(\theta_{2j}+\sum_{h=1}^H\theta_{3jh}I\{a=h\}+\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a=h\}+\beta_{2j}'c)\}}{\{1+\sum_{j=1}^Jexp(\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a=h\}+\beta_{2j}'c)\}\{1+\sum_{j=1}^Jexp(\theta_{2j}+\sum_{h=1}^H\theta_{3jh}I\{a=h\}+\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a^*=h\}+\beta_{2j}'c)\}}$
+    + $err^{CDE}=\frac{exp(\sum_{j=1}^J\theta_{2j}I\{m=j\})(1+\sum_{j=1}^Jexp(\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a^*=h\}+\beta_{2j}'c))(exp((\sum_{h=1}^H\theta_{1h}I\{a=h\}-\sum_{h=1}^H\theta_{1h}I\{a^*=h\})+\sum_{j=1}^J\sum_{h=1}^H\theta_{3jh}I\{a=h\}I\{m=j\})-exp(\sum_{j=1}^J\sum_{h=1}^H\theta_{3jh}I\{a^*=h\}I\{m=j\}))}{1+\sum_{j=1}^Jexp(\theta_{2j}+\sum_{h=1}^H\theta_{3jh}I\{a^*=h\}+\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a^*=h\}+\beta_{2j}'c)}$
+
+4. Calculate other effects using formulas in table 2.
+
+### Direct Counterfactural Imputation Estimation
+
+The `cmest` function conducts direct counterfactural imputation estimation by the following steps:
+
+1. Fit a regression model for $E(Y|A,M,C)$. This regression model is specified by the `yreg` argument.
+
+2. For $p=1,...,k$, fit a regression model for the distribution of $M_p$ given $A$, $M_1$, ..., $M_{p-1}$ and $C$. These regression models are specified by the `mreg` argument.
+
+3. For $p=1,...,k$ and $i=1,...,n$, simulate the counterfacturals $M_{a,p,i}$ and $M_{a^*,p,i}$.
+    + Simulate $M_{a,p,i}$ by randomly drawing a value from the distribution of $M_{p}$ given $A=a,M_1=M_{a,1,i},...,M_{p-1}=M_{a,p-1,i},C=C_i$. Denote $M_{a,i}=(M_{a,1,i},...,M_{a,k,i})^T$.
+    + Simulate $M_{a^*,p,i}$ by randomly drawing a value from the distribution of $M_{p}$ given $A=a^*,M_1=M_{a^*,1,i},...,M_{p-1}=M_{a^*,p-1,i},C=C_i$. Denote $M_{a^*,i}=(M_{a^*,1,i},...,M_{a^*,k,i})^T$.
+
+4. For $i=1,...,n$, obtain $E[Y_i|A=a^*,M=m,C=C_i]$,$E[Y_i|A=a,M=m,C=C_i]$,$E[Y_i|A=a^*,M=M_{a^*,i},C=C_i]$,$E[Y_i|A=a^*,M=M_{a,i},C=C_i]$,$E[Y_i|A=a,M=M_{a^*,i},C=C_i]$ and $E[Y_i|A=a,M=M_{a,i},C=C_i]$ from the regression model in step 1.
+
+5. Impute the counterfacturals $E[Y_{a^*m}]$, $E[Y_{am}]$, $E[Y_{a^*Ma^*}]$, $E[Y_{aMa}]$, $E[Y_{aMa^*}]$ and $E[Y_{a^*Ma}]$.
+    + Impute $E[Y_{a^*m}]$ by taking an average of $\{E[Y_i|A=a^*,M=m,C=C_i]\}_{i=1,...,n}$.
+    + Impute $E[Y_{am}]$ by taking an average of $\{E[Y_i|A=a,M=m,C=C_i]\}_{i=1,...,n}$.
+    + Impute $E[Y_{a^*Ma^*}]$ by taking an average of $\{E[Y_i|A=a^*,M=M_{a^*,i},C=C_i]\}_{i=1,...,n}$.
+    + Impute $E[Y_{aMa}]$ by taking an average of $\{E[Y_i|A=a,M=M_{a,i},C=C_i]\}_{i=1,...,n}$.
+    + Impute $E[Y_{aMa^*}]$ by taking an average of $\{E[Y_i|A=a,M=M_{a^*,i},C=C_i]\}_{i=1,...,n}$.
+    + Impute $E[Y_{a^*Ma}]$ by taking an average of $\{E[Y_i|A=a^*,M=M_{a,i},C=C_i]\}_{i=1,...,n}$.
+
+6. Calculate causal effects with formulas in table 1 or table 2.
+
+
+## The Weighting-based Approach
+
+With the weighting-based approach, the `cmest` function estimates causal effect through direct counterfactural imputation estimation by the following steps:
+
+1. Fit a regression model for the distribution of $E(Y|A,M,C)$. This regression model is specified by the `yreg` argument.
+
+2. If $C$ is not empty, fit a regression model for $P(A|C)$ and obtain $P(A=A_i|C=C_i)$ for $i=1,...,n$. This regression model is specified by the `ereg` argument.
+
+3. For $i=1,...,n$, obtain $E[Y_i|A=a^*,M=m,C=C_i]$,$E[Y_i|A=a,M=m,C=C_i]$,$E[Y_i|A=a^*,M=M_{a^*,i},C=C_i]$,$E[Y_i|A=a^*,M=M_{a,i},C=C_i]$,$E[Y_i|A=a,M=M_{a^*,i},C=C_i]$ and $E[Y_i|A=a,M=M_{a,i},C=C_i]$ from the regression model in step 1.
+
+4. Impute the counterfacturals $E[Y_{a^*m}]$, $E[Y_{am}]$, $E[Y_{a^*Ma^*}]$, $E[Y_{aMa}]$, $E[Y_{aMa^*}]$ and $E[Y_{a^*Ma}]$.
+    + Impute $E[Y_{a^*m}]$ by taking an average of $\{E[Y_i|A=a^*,M=m,C=C_i]\}_{i=1,...,n}$.
+    + Impute $E[Y_{am}]$ by taking an average of $\{E[Y_i|A=a,M=m,C=C_i]\}_{i=1,...,n}$.
+    + Impute $E[Y_{a^*Ma^*}]$ by taking a weighted average of $\{Y_i\}_{i\in \{i:A_i=a^*\}}$, and each subject i is given a weight $\frac{P(A=A_i)}{P(A=A_i|C=C_i)}$.
+    + Impute $E[Y_{aMa}]$ by taking a weighted average of $\{Y_i\}_{i\in \{i:A_i=a\}}$, and each subject i is given a weight $\frac{P(A=A_i)}{P(A=A_i|C=C_i)}$.
+    + Impute $E[Y_{aMa^*}]$ by taking a weighted average of $\{E[Y_i|A=a,M=M_i,C=C_i]\}_{i\in \{i:A_i=a^*\}}$, and each subject i is given a weight $\frac{P(A=A_i)}{P(A=A_i|C=C_i)}$.
+    + Impute $E[Y_{a^*Ma}]$ by taking a weighted average of $\{E[Y_i|A=a^*,M=M_i,C=C_i]\}_{i\in \{i:A_i=a\}}$, and each subject i is given a weight $\frac{P(A=A_i)}{P(A=A_i|C=C_i)}$.
+
+5. Calculate causal effects with formulas in table 1 or table 2.
+
+
+## The Inverse Odds Ratio Weighting Approach
+
+With the inverse odds ratio weighting approach, the `cmest` function estimates causal effect through direct counterfactural imputation estimation by the following steps:
+
+1. Fit a regression model for $P(A|M,C)$ and obtain $\frac{P(A=0|M=M_i,C=C_i)}{P(A=A_i|M=M_i,C=C_i)}$ for $i=1,...,n$. This regression model is specified by the `ereg` argument. 
+
+2. Fit a regression model for $E(Y|A,C)$. This regression model is specified by the `yreg` argument. 
+
+3. Fit a weighted regression model for $E(Y|A,C)$ and each subject $i$ is given a weight $\frac{P(A=0|M=M_i,C=C_i)}{P(A=A_i|M=M_i,C=C_i)}$. This regression model is obtained by adding the weights to the regression model in step 2.
+
+4. Impute the counterfacturals $E_{tot}[Y_{a}]$, $E_{tot}[Y_{a^*}]$, $E_{dir}[Y_{a}]$ and $E_{dir}[Y_{a^*}]$.
+    + Impute $E_{tot}[Y_{a}]$ by taking an average of $\{E[Y_i|A=a,C=C_i]\}_{i=1,...,n}$ obtained from the regression model in step 2.
+    + Impute $E_{tot}[Y_{a^*}]$ by taking an average of $\{E[Y_i|A=a^*,C=C_i]\}_{i=1,...,n}$ obtained from the regression model in step 2.
+    + Impute $E_{dir}[Y_{a}]$ by taking a weighted average of $\{E[Y_i|A=a,C=C_i]\}_{i=1,...,n}$ obtained from the regression model in step 3 and each subject $i$ is given a weight $\frac{P(A=0|M=M_i,C=C_i)}{P(A=A_i|M=M_i,C=C_i)}$.
+    + Impute $E_{dir}[Y_{a^*}]$ by taking a weighted average of $\{E[Y_i|A=a^*,C=C_i]\}_{i=1,...,n}$ obtained from the regression model in step 3 and each subject $i$ is given a weight $\frac{P(A=0|M=M_i,C=C_i)}{P(A=A_i|M=M_i,C=C_i)}$.
+
+5. + For continuous outcome, calculate $TE$ by $E_{tot}[Y_{a}]-E_{tot}[Y_{a^*}]$, calculate $PNDE$ by $E_{dir}[Y_{a}]-E_{dir}[Y_{a^*}]$ and calculate $TNIE$ by $TE-PNDE$.
+   + For categorical, count or survival outcome, calculate $TE$ by $E_{tot}[Y_{a}]/E_{tot}[Y_{a^*}]$, calculate $PNDE$ by $E_{dir}[Y_{a}]/E_{dir}[Y_{a^*}]$ and calculate $TNIE$ by $TE/PNDE$.
+
+
+## The Natural Effect Model
+
+With the natural effect model, the `cmest` function estimates causal effect through direct counterfactural imputation estimation by the following steps:
+
+1. Fit a regression model for $E(Y|A,M,C)$. This regression model is specified by the `yreg` argument.
+
+2. Expand the dataset using the regression model in step 1 and the `neImpute` function in the `medflex` package.
+
+3. Fit the regression model in step 1 by the expanded dataset in step 2 with the exposure in the regression formula replaced by $A0$ and mediators in the regression formula replaced by $A1$, i.e.,
+$Y\sim A0+A1+A0*A1+C$ if the regression formula in step 1 is $Y\sim A+M_1+M_2+A*M_1+C$.
+
+4. For $i=1,...,n$, obtain $E[Y_i|A=a^*,M=m,C=C_i]$ and $E[Y_i|A=a,M=m,C=C_i]$ from the regression model in step 1; obtain $E[Y_i|A0=a^*,A1=a^*,C=C_i]$,$E[Y_i|A0=a^*,A1=a,C=C_i]$,$E[Y_i|A0=a,A1=a^*,C=C_i]$ and $E[Y_i|A0=a,A1=a,C=C_i]$ from the regression model in step 3.
+
+5. Impute the counterfacturals $E[Y_{a^*m}]$, $E[Y_{am}]$, $E[Y_{a^*Ma^*}]$, $E[Y_{aMa}]$, $E[Y_{aMa^*}]$ and $E[Y_{a^*Ma}]$.
+    + Impute $E[Y_{a^*m}]$ by taking an average of $\{E[Y_i|A=a^*,M=m,C=C_i]\}_{i=1,...,n}$.
+    + Impute $E[Y_{am}]$ by taking an average of $\{E[Y_i|A=a,M=m,C=C_i]\}_{i=1,...,n}$.
+    + Impute $E[Y_{a^*Ma^*}]$ by taking an average of $\{E[Y_i|A=a^*,A1=a^*,C=C_i]\}_{i=1,...,n}$.
+    + Impute $E[Y_{aMa}]$ by taking an average of $\{E[Y_i|A=a,A1=a,C=C_i]\}_{i=1,...,n}$.
+    + Impute $E[Y_{aMa^*}]$ by taking an average of $\{E[Y_i|A=a,A1=a^*,C=C_i]\}_{i=1,...,n}$.
+    + Impute $E[Y_{a^*Ma}]$ by taking an average of $\{E[Y_i|A=a^*,A1=a,C=C_i]\}_{i=1,...,n}$.
+
+6. Calculate causal effects with formulas in table 1 or table 2.
+
+
+# Post-exposure Confounding
+
+## DAG
+
+```{r echo=F,warning=F,message=F,fig.width=6,fig.height=3}
+g2 <- dagitty::dagitty( "dag {
+    A -> Y
+    A -> M -> Y
+    C -> A
+    C -> M
+    C -> Y
+    A -> L
+    L -> Y
+    L -> M
+    C -> L
+}")
+
+dagitty::coordinates(g2) <- list(x=c(A=0,Y=4,M=2,C=0.2,L=2),y=c(A=0,Y=0,M=-0.8,C=-1,L=0.5))
+
+plot(g2)
+```
+
+## Estimands
+
+For a continuous outcome, causal effects are estimated on the difference scale (summarized in table 3). For a categorical, count, or survival outcome, causal effects are estimated on the (risk or rate) ratio scale (summarized in table 4). Because of the existence of $L$, some causal effects in table 1 and table 2 are not identifiable. However, their randomized analogues are identifiable. See [VanderWeele et al. (2014)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4214081/) for details about randomized analogues of causal effects.
+
+```{r echo=F,warning=F,message=F}
+library(knitr)
+library(dplyr)
+library(kableExtra)
+tb3 <- data.frame(c("Controlled Direct Effect", "Randomized Analogue of $PNDE$",
+                    "Randomized Analogue of $TNDE$", "Randomized Analogue of $PNIE$",
+                    "Randomized Analogue of $TNIE$", "Total Effect", 
+                    "Randomized Analogue of $INT_{ref}$", "Randomized Analogue of $INT_{med}$", "Proportion $CDE$",
+                    "Proportion $rINT_{ref}$", "Proportion $rINT_{med}$", "Proportion $rPNIE$", "Randomized Analogue of $PM$", "Randomized Analogue of $INT$", 
+                    "Randomized Analogue of $PE$"),
+           c("$CDE$", "$rPNDE$", "$rTNDE$", "$rPNIE$", "$rTNIE$", "$TE$",  "$rINT_{ref}$", 
+             "$rINT_{med}$", "$prop^{CDE}$", "$prop^{rINT_{ref}}$", "$prop^{rINT_{med}}$", 
+             "$prop^{rPNIE}$", "$rPM$", "$rINT$", "$rPE$"),
+           c("$E[Y_{am}-Y_{a^*m}]$", "$E[Y_{aG_{a^*}}-Y_{a^*G_{a^*}}]$", "$E[Y_{aG_{a}}-Y_{a^*G_{a}}]$", 
+             "$E[Y_{a^*G_{a}}-Y_{a^*G_{a^*}}]$", "$E[Y_{aG_{a}}-Y_{aG_{a^*}}]$", "$rPNDE+rTNIE$", 
+             "$rPNDE-CDE$", "$rTNIE-rPNIE$", "$CDE/TE$", 
+             "$rINT_{ref}/TE$", "$rINT_{med}/TE$", "$rPNIE/TE$", "$rTNIE/TE$", 
+             "$(rINT_{ref}+rINT_{med})/TE$", 
+             "$(rINT_{ref}+rINT_{med}+rPNIE)/TE$"))
+colnames(tb3) <- c("Full Name", "Abbreviation", "Formula")
+knitr::kable(tb3, escape = FALSE, caption = "Table 3: Causal Effects on the Difference Scale") %>%
+  footnote(general = "$a$ and $a^*$ are two reference values for $A$. $m$ is the reference value for $M$. $G_{a}$ denotes a random draw from the distribution of $M$ among those with $A=a$. $Y_{am}$ denotes the counterfactual value of $Y$ that would have been observed had $A$ been set to be $a$, and $M$ to be $m$. $Y_{aG_{a*}}$ denotes the counterfactual value of $Y$ that would have been observed had $A$ been set to be $a$, and $M$ to be $G_{a*}$.") %>%
+  column_spec(1, width = "20em") %>%
+  column_spec(2, width = "8em") %>%
+  column_spec(3, width = "10em") %>%
+  kable_styling(bootstrap_options = c("bordered", "striped", "hover", "responsive", "condensed"))
+```
+
+```{r echo=F,warning=F,message=F}
+tb4 <- data.frame(c("Controlled Direct Effect", "Randomized Analogue of $PNDE$",
+                    "Randomized Analogue of $TNDE$", "Randomized Analogue of $PNIE$",
+                    "Randomized Analogue of $TNIE$", "Total Effect", 
+                    "Excess RR due to Controlled Direct Effect", 
+                    "Randomized Analogue of $err^{INT_{ref}}$", 
+                    "Randomized Analogue of $err^{INT_{med}}$", 
+                    "Randomized Analogue of $err^{PNIE}$", 
+                    "Proportion $err^{CDE}$",
+                    "Proportion $rerr^{INT_{ref}}$", "Proportion $rerr^{INT_{med}}$", 
+                    "Proportion $rerr^{PNIE}$", "Randomized Analogue of $PM$", "Randomized Analogue of $INT$", 
+                    "Randomized Analogue of $PE$"),
+           c("$rr^{CDE}$", "$rr^{rPNDE}$", "$rr^{rTNDE}$", "$rr^{rPNIE}$", "$rr^{rTNIE}$", "$rr^{TE}$", 
+             "$err^{CDE}$", "$rerr^{INT_{ref}}$", "$rerr^{INT_{med}}$", "$rerr^{PNIE}$", 
+             "$prop^{err^{CDE}}$", 
+             "$prop^{rerr^{INT_{ref}}}$", "$prop^{rerr^{INT_{med}}}$", 
+             "$prop^{rerr^{PNIE}}$", "$rPM$", "$rINT$", "$rPE$"),
+           c("$E[Y_{am}]/E[Y_{a^*m}]$", "$E[Y_{aG_{a^*}}]/E[Y_{a^*G_{a^*}}]$", 
+             "$E[Y_{aG_{a}}]/E[Y_{a^*G_{a}}]$", "$E[Y_{a^*G_{a}}]/E[Y_{a^*G_{a^*}}]$", 
+             "$E[Y_{aG_{a}}]/E[Y_{aG_{a^*}}]$", "$rr^{rPNDE}\\times rr^{rTNIE}$", 
+              "$(E[Y_{am}-Y_{a^*m}])/E[Y_{a^*M_a^*}]$",
+             "$rr^{rPNDE}-1-err^{CDE}$", "$rr^{rTNIE}*rr^{rPNDE}-rr^{rPNDE}-rr^{rPNIE}+1$", 
+             "$rr^{rPNIE}-1$", "$err^{CDE}/(rr^{TE}-1)$", 
+             "$rerr^{INT_{ref}}/(rr^{TE}-1)$", 
+             "$rerr^{INT_{med}}/(rr^{TE}-1)$", "$rerr^{PNIE}/(rr^{TE}-1)$", 
+             "$(rr^{rPNDE}*(rr^{rTNIE}-1))/(rr^{TE}-1)$",
+             "$(rerr^{INT_{ref}}+rerr^{INT_{med}})/(rr^{TE}-1)$", 
+             "$(rerr^{INT_{ref}}+rerr^{INT_{med}}+rerr^{PNIE})/(rr^{TE}-1)$"))
+colnames(tb4) <- c("Full Name", "Abbreviation", "Formula")
+knitr::kable(tb4, escape = FALSE, caption = "Table 4: Causal Effects on the Ratio Scale") %>%
+  footnote(general = "$a$ and $a^*$ are two reference values for $A$. $m$ is the reference value for $M$. $G_{a}$ denotes a random draw from the distribution of $M$ among those with $A=a$. $Y_{am}$ denotes the counterfactual value of $Y$ that would have been observed had $A$ been set to be $a$, and $M$ to be $m$. $Y_{aG_{a*}}$ denotes the counterfactual value of $Y$ that would have been observed had $A$ been set to be $a$, and $M$ to be $G_{a*}$. $RR$ represents risk or rate ratio.") %>%
+  column_spec(1, width = "20em") %>%
+  column_spec(2, width = "8em") %>%
+  column_spec(3, width = "10em") %>%
+  kable_styling(bootstrap_options = c("bordered", "striped", "hover", "responsive"))
+```
+
+## The Marginal Structural Model
+
+With the marginal structural model, the `cmest` function estimates causal effect through direct counterfactural imputation estimation by the following steps:
+
+1. For $p=1,...,k$, fit the regression model specified by `wmreg[p]` for $P(M_p|A,M_1, ...,M_{p-1},L,C)$ and obtain $P(M_p=M_{p,i}|A=A_i,M_1=M_{1,i},...,M_{p-1}=M_{p-1,i},L=L_i,C=C_i)$ for $i=1,...,n$. 
+
+2. For $p=1,...,k$, fit the regression model specified by `mreg[p]` for $P(M_p|A,M_1, ...,M_{p-1})$ and obtain $P(M_p=M_{p,i}|A=A_i,M_1=M_{1,i},...,M_{p-1}=M_{p-1,i})$ for $i=1,...,n$. 
+
+3. If $C$ is not empty, fit the regression model specified by `ereg` for $P(A|C)$ and obtain $P(A=A_i|C=C_i)$ for $i=1,...,n$. 
+
+4. Add weights to the regression model specified by `yreg` for $E(Y|A,M)$ and each subject $i,i=1,...,n$ is given a weight $\frac{P(A=A_i)}{P(A=A_i|C=C_i)}\frac{P(M_1=M_{1,i}|A=A_i)}{P(M_1=M_{1,i}|A=A_i,C=C_i,L=L_i)}...\frac{P(M_k=M_{k,i}|A=A_i,M_1=M_{1,i},...,M_{k-1}=M_{k-1,i})}{P(M_k=M_{k,i}|A=A_i,M_1=M_{1,i},...,M_{k-1}=M_{k-1,i},C=C_i,L=L_i)}$. 
+
+5. For $p=1,...,k$, add weights to the regression model specified by `mreg[p]` for the distribution of $M_p$ given $A$, $M_1$,...,$M_{p-1}$ and each subject $i,i=1,...,n$ is given a weight $\frac{P(A=A_i)}{P(A=A_i|C=C_i)}$.
+
+6. For $p=1,...,k$ and $i=1,...,n$, simulate the counterfacturals $M_{a,p,i}$ and $M_{a^*,p,i}$ from the regression models in step 5.
+    + Simulate $M_{a,p,i}$ by randomly drawing a value from the distribution of $M_{p}$ given $A=a,M_1=M_{a,1,i},...,M_{p-1}=M_{a,p-1,i}$. Denote $M_{a,i}=(M_{a,1,i},...,M_{a,k,i})^T$.
+    + Simulate $M_{a^*,p,i}$ by randomly drawing a value from the distribution of $M_{p}$ given $A=a^*,M_1=M_{a^*,1,i},...,M_{p-1}=M_{a^*,p-1,i}$. Denote $M_{a^*,i}=(M_{a^*,1,i},...,M_{a^*,k,i})^T$.
+
+7. For $i=1,...,n$, obtain $E[Y_i|A=a^*,M=m]$,$E[Y_i|A=a,M=m]$,$E[Y_i|A=a^*,M=M_{a^*,i}]$,$E[Y_i|A=a^*,M=M_{a,i}]$,$E[Y_i|A=a,M=M_{a^*,i}]$ and $E[Y_i|A=a,M=M_{a,i}]$ from the regression model in step 4.
+
+8. Impute the counterfacturals $E[Y_{a^*m}]$, $E[Y_{am}]$, $E[Y_{a^*Ga^*}]$, $E[Y_{aGa}]$, $E[Y_{aGa^*}]$ and $E[Y_{a^*Ga}]$.
+    + Impute $E[Y_{a^*m}]$ by taking a weighted average of $\{E[Y_i|A=a^*,M=m]\}_{i=1,...,n}$;
+    + Impute $E[Y_{am}]$ by taking a weighted average of $\{E[Y_i|A=a,M=m]\}_{i=1,...,n}$;
+    + Impute $E[Y_{a^*Ga^*}]$ by taking a weighted average of $\{E[Y_i|A=a^*,M=M_{a^*,i}]\}_{i=1,...,n}$;
+    + Impute $E[Y_{aGa}]$ by taking a weighted average of $\{E[Y_i|A=a,M=M_{a,i}]\}_{i=1,...,n}$;
+    + Impute $E[Y_{aGa^*}]$ by taking a weighted average of $\{E[Y_i|A=a,M=M_{a^*,i}]\}_{i=1,...,n}$;
+    + Impute $E[Y_{a^*Ga}]$ by taking a weighted average of $\{E[Y_i|A=a^*,M=M_{a,i}]\}_{i=1,...,n}$,
+    
+   each subject $i,i=1,...,n$ is given a weight $\frac{P(A=A_i)}{P(A=A_i|C=C_i)}\frac{P(M_1=M_{1,i}|A=A_i)}{P(M_1=M_{1,i}|A=A_i,C=C_i,L=L_i)}...\frac{P(M_k=M_{k,i}|A=A_i,M_1=M_{1,i},...,M_{k-1}=M_{k-1,i})}{P(M_k=M_{k,i}|A=A_i,M_1=M_{1,i},...,M_{k-1}=M_{k-1,i},C=C_i,L=L_i)}$.
+
+9. Calculate causal effects with formulas in table 3 or table 4.
+
+
+## The $G$-formula Approach
+
+With the $g$-formula approach, the `cmest` function estimates causal effect through direct counterfactural imputation estimation by the following steps:
+
+1. For $q=1,...,s$, fit the regression model specified by `postcreg[q]` for the distribution of $L_q$ given $A$, $L_1$, ..., $L_{q-1}$ and $C$. 
+
+2. For $q=1,...,s$ and $i=1,...,n$, simulate the counterfacturals $L_{a,q,i}$ and $L_{a^*,q,i}$ from the regression models in step 1.
+    + Simulate $L_{a,q,i}$ by randomly drawing a value from the distribution of $L_{q}$ given $A=a,L_1=L_{a,1,i},...,L_{q-1}=L_{a,q-1,i},C=C_i$. Denote $L_{a,i}=(L_{a,1,i},...,L_{a,s,i})^T$.
+    + Simulate $L_{a^*,q,i}$ by randomly drawing a value from the distribution of $L_{q}$ given $A=a^*,L_1=L_{a^*,1,i},...,L_{q-1}=L_{a^*,q-1,i},C=C_i$. Denote $L_{a^*,i}=(L_{a^*,1,i},...,L_{a^*,s,i})^T$.
+    
+3. For $p=1,...,k$, fit the regression model specified by `mreg[p]` for the distribution of $M_p$ given $A$, $M_1$, ..., $M_{p-1}$, $L$ and $C$. 
+
+4. For $p=1,...,k$ and $i=1,...,n$, simulate the counterfacturals $M_{a,p,i}$ and $M_{a^*,p,i}$ from the regression models in step 3.
+    + Simulate $M_{a,p,i}$ by randomly drawing a value from the distribution of $M_{p}$ given $A=a,M_1=M_{a,1,i},...,M_{p-1}=M_{a,p-1,i},L=L_{a,i},C=C_i$. Denote $M_{a,i}=(M_{a,1,i},...,M_{a,k,i})^T$.
+    + Simulate $M_{a^*,p,i}$ by randomly drawing a value from the distribution of $M_{p}$ given $A=a^*,M_1=M_{a^*,1,i},...,M_{p-1}=M_{a^*,p-1,i},L=L_{a^*,i},C=C_i$. Denote $M_{a^*,i}=(M_{a^*,1,i},...,M_{a^*,k,i})^T$.
+
+5. Obtain $\{G_{a,i}\}_{i=1,...,n}$ by randomly permuting $\{M_{a,i}\}_{i=1,...,n}$ and obtain $\{G_{a^*,i}\}_{i=1,...,n}$ by randomly permuting $\{M_{a^*,i}\}_{i=1,...,n}$.
+
+6. Fit the regression model specified by `yreg` for $E(Y|A,M,L,C)$. 
+
+7. For $i=1,...,n$, obtain $E[Y_i|A=a^*,M=m,L=L_{a^*,i},C=C_i]$,$E[Y_i|A=a,M=m,L=L_{a,i},C=C_i]$,$E[Y_i|A=a^*,M=G_{a^*,i},L=L_{a^*,i},C=C_i]$,$E[Y_i|A=a^*,M=G_{a,i},L=L_{a^*,i},C=C_i]$,$E[Y_i|A=a,M=G_{a^*,i},L=L_{a,i},C=C_i]$ and $E[Y_i|A=a,M=G_{a,i},L=L_{a,i},C=C_i]$ from the regression model in step 5.
+
+8. Impute the counterfacturals $E[Y_{a^*m}]$, $E[Y_{am}]$, $E[Y_{a^*Ga^*}]$, $E[Y_{aGa}]$, $E[Y_{aGa^*}]$ and $E[Y_{a^*Ga}]$.
+    + Impute $E[Y_{a^*m}]$ by taking a weighted average of $\{E[Y_i|A=a^*,M=m,L=L_{a^*,i},C=C_i]\}_{i=1,...,n}$;
+    + Impute $E[Y_{am}]$ by taking a weighted average of $\{E[Y_i|A=a,M=m,L=L_{a,i},C=C_i]\}_{i=1,...,n}$;
+    + Impute $E[Y_{a^*Ga^*}]$ by taking a weighted average of $\{E[Y_i|A=a^*,M=G_{a^*,i},L=L_{a^*,i},C=C_i]\}_{i=1,...,n}$;
+    + Impute $E[Y_{aGa}]$ by taking a weighted average of $\{E[Y_i|A=a,M=G_{a,i},L=L_{a,i},C=C_i]\}_{i=1,...,n}$;
+    + Impute $E[Y_{aGa^*}]$ by taking a weighted average of $\{E[Y_i|A=a,M=G_{a^*,i},L=L_{a,i},C=C_i]\}_{i=1,...,n}$;
+    + Impute $E[Y_{a^*Ga}]$ by taking a weighted average of $\{E[Y_i|A=a^*,M=G_{a,i},L=L_{a^*,i},C=C_i]\}_{i=1,...,n}$,
+
+9. Calculate causal effects with formulas in table 3 or table 4.
