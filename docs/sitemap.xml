@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>http://cmaverse.org/index.html</loc>
+  </url>
+  <url>
+    <loc>http://cmaverse.org/reference/cma2020.html</loc>
+  </url>
+  <url>
+    <loc>http://cmaverse.org/reference/cmdag.html</loc>
+  </url>
+  <url>
+    <loc>http://cmaverse.org/reference/cmest.html</loc>
+  </url>
+  <url>
+    <loc>http://cmaverse.org/reference/cmsens.html</loc>
+  </url>
+  <url>
+    <loc>http://cmaverse.org/reference/ggcmest.html</loc>
+  </url>
+  <url>
+    <loc>http://cmaverse.org/reference/ggcmsens.html</loc>
+  </url>
+  <url>
+    <loc>http://cmaverse.org/reference/rcreg.html</loc>
+  </url>
+  <url>
+    <loc>http://cmaverse.org/reference/simexreg.html</loc>
+  </url>
+  <url>
+    <loc>http://cmaverse.org/articles/overview.html</loc>
+  </url>
+  <url>
+    <loc>http://cmaverse.org/articles/quickstart.html</loc>
+  </url>
+</urlset>
