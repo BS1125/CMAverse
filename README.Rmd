@@ -118,7 +118,7 @@ The DAG can be plotted using the `cmdag` function.
 
 ```{r plot_dag,message=F,warning=F}
 cmdag(outcome = "Y", exposure = "A", mediator = c("M1", "M2"), 
-      prec = c("C1", "C2"), postc = NULL,
+      basec = c("C1", "C2", "C3"), postc = NULL,
       node = FALSE, text_col = "black")
 ```
 
@@ -126,7 +126,7 @@ Then, we estimate the causal effects using the `cmest` function. We use the regr
 
 ```{r message=F,warning=F,results='hide'}
 est <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
-                mediator = c("M1", "M2"), prec = c("C1", "C2"), EMint = TRUE,
+                mediator = c("M1", "M2"), basec = c("C1", "C2"), EMint = TRUE,
                 mreg = list("logistic", "linear"), yreg = "linear",
                 astar = 0, a = 1, mval = list(0, 0),
                 estimation = "imputation", inference = "bootstrap", nboot = 20)
@@ -139,7 +139,7 @@ summary(est)
 ```
 
 ```{r plot_cmest,message=F,warning=F,fig.width=8,fig.height=5}
-plot(est) +
+ggcmest(est) +
   ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 30, vjust = 0.8))
 ```
 
@@ -163,7 +163,7 @@ summary(me1)
 ```
 
 ```{r plot_cmsens_me_con,message=F,warning=F,fig.width=8,fig.height=5}
-plot(me1) +
+ggcmsens(me1) +
   ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 30, vjust = 0.8))
 ```
 
@@ -183,7 +183,7 @@ summary(me2)
 ```
 
 ```{r plot_cmsens_me_cat,message=F,warning=F,fig.width=8,fig.height=6}
-plot(me2) +
+ggcmsens(me2) +
   ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 30, vjust = 0.8))
 ```
 
