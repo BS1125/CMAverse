@@ -18,7 +18,7 @@ test_that("cmest works correctly for binary Y and binary M", {
   
   # results of cmest
   res_binbin <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
-                      mediator = "M", prec = c("C1", "C2"), EMint = TRUE,
+                      mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                       mreg = list("logistic"), yreg = "logistic",
                       astar = 0, a = 1, mval = list(1),
                       estimation = "paramfunc", inference = "delta")
@@ -94,7 +94,7 @@ test_that("cmest works correctly for binary Y and continuous M", {
   
   # results of cmest
   res_bincont <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
-                       mediator = "M", prec = c("C1", "C2"), EMint = TRUE,
+                       mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                        mreg = list("linear"), yreg = "logistic",
                        astar = 0, a = 1, mval = list(1),
                        estimation = "paramfunc", inference = "delta")
@@ -164,7 +164,7 @@ test_that("cmest works correctly for continuous Y and continuous M", {
   
   # results of cmest
   res_contcont <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
-                        mediator = "M", prec = c("C1", "C2"), EMint = TRUE,
+                        mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                         mreg = list("linear"), yreg = "linear",
                         astar = 0, a = 1, mval = list(1),
                         estimation = "paramfunc", inference = "delta")
@@ -230,7 +230,7 @@ test_that("cmest works correctly for continuous Y and binary M", {
   
   # results of cmest
   res_contbin <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
-                       mediator = "M", prec = c("C1", "C2"), EMint = TRUE,
+                       mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                        mreg = list("logistic"), yreg = "linear",
                        astar = 0, a = 1, mval = list(1),
                        estimation = "paramfunc", inference = "delta")

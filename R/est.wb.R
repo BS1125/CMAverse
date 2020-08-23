@@ -15,7 +15,7 @@ est.wb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     prob1 <- mean(data[, outcome] == y_case)
     w4casecon <- ifelse(data[, outcome] == y_case, yprevalence / prob1, (1 - yprevalence) / (1 - prob1))
 
-    if (length(prec) != 0) {
+    if (length(basec) != 0) {
       # weights for ereg
       if (!is.null(weights_ereg)) weights_ereg <- weights_ereg[indices] * w4casecon
       if (is.null(weights_ereg)) weights_ereg <- w4casecon
@@ -57,7 +57,7 @@ est.wb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     # data from controls
     control_indices <- which(data[, outcome] == y_control)
 
-    if (length(prec) != 0) {
+    if (length(basec) != 0) {
       # update ereg
       call_ereg$weights <- weights_ereg[indices][control_indices]
       call_ereg$data <- data[control_indices, ]
@@ -90,7 +90,7 @@ est.wb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
   } else {
 
     # not a case control design
-    if (length(prec) != 0) {
+    if (length(basec) != 0) {
       # update ereg
       call_ereg$weights <- weights_ereg[indices]
       call_ereg$data <- data
@@ -124,7 +124,7 @@ est.wb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
   out <- list()
   if (outReg) {
     out$reg.output$yreg <- yreg
-    if (length(prec) != 0) out$reg.output$ereg <- ereg
+    if (length(basec) != 0) out$reg.output$ereg <- ereg
   }
 
   # the index of the reference level for a categorical outcome
@@ -151,7 +151,7 @@ est.wb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
   }
 
   # simulate C
-  prec_sim <- data[, prec]
+  basec_sim <- data[, basec]
 
   # simulate mstar for cde
   mstar_sim <- do.call(cbind, lapply(1:length(mediator), function(x)
@@ -160,13 +160,13 @@ est.wb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     } else data.frame(rep(mval[[x]], n))))
 
   # design matrices for outcome simulation
-  ydesign0m <- data.frame(astar_sim, mstar_sim, prec_sim)
-  ydesign1m <- data.frame(a_sim, mstar_sim, prec_sim)
-  ydesign01 <- data.frame(astar_sim, data[, mediator], prec_sim)[subj_a, ]
-  ydesign10 <- data.frame(a_sim, data[, mediator], prec_sim)[subj_astar, ]
-  rm(a_sim, astar_sim, mstar_sim, prec_sim)
+  ydesign0m <- data.frame(astar_sim, mstar_sim, basec_sim)
+  ydesign1m <- data.frame(a_sim, mstar_sim, basec_sim)
+  ydesign01 <- data.frame(astar_sim, data[, mediator], basec_sim)[subj_a, ]
+  ydesign10 <- data.frame(a_sim, data[, mediator], basec_sim)[subj_astar, ]
+  rm(a_sim, astar_sim, mstar_sim, basec_sim)
   colnames(ydesign0m) <- colnames(ydesign1m) <- colnames(ydesign01) <-
-    colnames(ydesign10) <- c(exposure, mediator, prec)
+    colnames(ydesign10) <- c(exposure, mediator, basec)
 
   # predict Y
   type <- ifelse(is_coxph_yreg, "risk", ifelse(is_multinom_yreg | is_polr_yreg, "probs", "response"))

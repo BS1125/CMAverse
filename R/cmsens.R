@@ -12,8 +12,8 @@
 #' @param MEmethod method for measurement error correction. \code{rc} represents regression
 #' calibration and \code{simex} represents SIMEX. See \code{Details}.
 #' @param MEvariable variable measured with error.
-#' @param MEvartype type of the variable measured with error.
-#' Can be \code{continuous} or \code{categorical} (first 3 letters are enough).
+#' @param MEvartype type of the variable measured with error. Can be \code{continuous} or 
+#' \code{categorical} (first 3 letters are enough).
 #' @param MEerror a vector of standard deviations of the measurement error (when \code{MEvartype}
 #' is \code{continuous}) or a list of misclassification matrices (when \code{MEvartype}
 #' is \code{categorical}). 
@@ -21,7 +21,10 @@
 #' @param B number of simulations for SIMEX. Default is \code{200}.
 #' @param nboot.rc number of boots for estimating the var-cov matrix of coefficients 
 #' with regression calibration. Default is \code{400}.
-#'
+#' @param x an object of class \code{cmsens}
+#' @param digits minimal number of significant digits. See \link{print.default}.
+#' @param ... other arguments.
+#' 
 #' @details
 #' 
 #' For unmeasured confounding, all E-values are on the (risk or rate) ratio scale. If the causal 
@@ -48,7 +51,7 @@
 #' 
 #' ...
 #'
-#' @seealso \code{\link{cmdag}}, \code{\link{cmest}}
+#' @seealso \code{\link{ggcmsens}}, \code{\link{cmdag}}, \code{\link{cmest}}
 #'
 #' @references
 #' VanderWeele TJ, Ding P. Sensitivity analysis in observational research: introducing the 
@@ -75,13 +78,12 @@
 #'
 #' @examples
 #' 
-#' rm(list=ls())
 #' library(CMAverse)
 #' 
 #' # 10 boots are used for illustration
 #' naive <- cmest(data = cma2020, model = "rb", outcome = "contY", 
 #' exposure = "A", mediator = c("M1", "M2"), 
-#' prec = c("C1", "C2"), EMint = TRUE,
+#' basec = c("C1", "C2"), EMint = TRUE,
 #' mreg = list("logistic", "multinomial"), yreg = "linear",
 #' astar = 0, a = 1, mval = list(0, "M2_0"),
 #' estimation = "imputation", inference = "bootstrap", nboot = 10)
@@ -93,8 +95,6 @@
 #' MEvariable = "C1", MEvartype = "con",
 #' MEerror = c(0.1, 0.2))
 #' summary(exp2)
-#' plot(exp2) +
-#' ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 30, vjust = 0.8))
 #' 
 #' # B = 10 is used for illustration
 #' exp3 <- cmsens(object = naive, sens = "me", MEmethod = "simex", 
@@ -105,7 +105,7 @@
 #' 
 #' @importFrom stats glm binomial poisson as.formula gaussian quasipoisson model.frame printCoefmat 
 #' family sd coef vcov sigma predict rbinom rmultinom rnorm rgamma rpois weighted.mean 
-#' model.matrix getCall quantile qnorm pnorm lm cov formula
+#' model.matrix getCall quantile qnorm pnorm lm cov formula update
 #' @importFrom nnet multinom 
 #' @importFrom MASS polr glm.nb gamma.shape rnegbin
 #' @importFrom survival survreg coxph
@@ -122,9 +122,6 @@
 #' @importFrom simex check.mc.matrix
 #' @importFrom ggplot2 ggproto ggplot geom_errorbar aes geom_point ylab geom_hline position_dodge2 
 #' scale_colour_hue theme element_blank facet_grid 
-#' @importFrom ggdag dagify ggdag theme_dag_blank
-#' @importFrom gridExtra grid.arrange
-#' @importFrom grid textGrob gpar
 #' 
 #' @export
 
@@ -220,8 +217,7 @@ cmsens <- function(object = NULL, sens = "uc", MEmethod = "simex",
                                             lambda = lambda, B = B)
     if (MEvartype == "continuous") out$ME$reliabilityRatio <- 
         1 - MEerror/sd(data[, MEvariable], na.rm = TRUE)
-    out$naive <- object[c("effect.pe", "effect.se", "effect.ci.low", 
-                          "effect.ci.high", "effect.pval")]
+    out$naive <- object
     
     n <- nrow(data)
     estimation <- object$methods$estimation
@@ -235,14 +231,14 @@ cmsens <- function(object = NULL, sens = "uc", MEmethod = "simex",
     exposure <- object$variables$exposure
     mediator <- object$variables$mediator
     EMint <- object$variables$EMint
-    prec <- object$variables$prec
+    basec <- object$variables$basec
     postc <- object$variables$postc
     multimp <- object$multimp$multimp
     a <- object$ref$a
     astar <- object$ref$asta
     mval <- object$ref$mval
     yref <- object$ref$yref
-    precval <- object$ref$precval
+    basecval <- object$ref$basecval
     nboot <- object$methods$nboot
     args_mice <- object$multimp$args_mice
     
@@ -382,9 +378,73 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
   }
 }
 
-#' @describeIn cmsens Plot the results of cmsens.me with \link[ggplot2]{ggplot}
+#' Plotting Results of Sensitivity Analysis for Measurement Error
+#' 
+#' This function is used to plot the results of \code{cmsens} nicely via plotting functions
+#' in the \code{ggplot2} package. Additional layers can be added to this plot using other 
+#' plotting functions in the \code{ggplot2} package.
+#' 
+#' @param x an object of class \code{cmsens.me}
+#' @param errorbar.width width of errorbars for confidence intervals. Default is \code{0.3}.
+#' @param errorbar.size size of errorbars for confidence intervals. Default is \code{0.3}.
+#' @param errorbar.position position adjustment for confidence intervals, either as a string, 
+#' or the result of a call to a position adjustment function. Default is 
+#' \code{position_dodge2(width = 0.5)}. See \link[ggplot2]{geom_errorbar} for details.
+#' @param point.size size of points for point estimates. Default is \code{1}.
+#' @param point.position position adjustment for point estimates, either as a string, or 
+#' the result of a call to a position adjustment function. Default is 
+#' \code{position_dodge2(width = 0.3)}. See \link[ggplot2]{geom_errorbar} for details.
+#' @param refline a logical value. If \code{true}, include a reference line at 
+#' \code{y = 0} when effects are on the difference scale and include a reference line at 
+#' \code{y = 1} when effects are on the ratio scale. Default is \code{TRUE}.
+#' @param refline.colour colour of the reference line. Default is \code{red}.
+#' @param refline.size size of the reference line. Default is \code{0.3}.
+#' 
+#' @seealso \code{\link{cmsens}}, \code{\link{ggplot2}}.
+#' 
+#' @examples
+#' 
+#' library(CMAverse)
+#' library(ggplot2)
+#' 
+#' naive <- cmest(data = cma2020, model = "rb", outcome = "contY", 
+#' exposure = "A", mediator = c("M1", "M2"), 
+#' basec = c("C1", "C2"), EMint = TRUE,
+#' mreg = list("logistic", "multinomial"), yreg = "linear",
+#' astar = 0, a = 1, mval = list(0, "M2_0"),
+#' estimation = "imputation", inference = "bootstrap", nboot = 10)
+#' 
+#' x <- cmsens(object = naive, sens = "me", MEmethod = "rc", 
+#' MEvariable = "C1", MEvartype = "con",
+#' MEerror = c(0.1, 0.2))
+#' 
+#' ggcmsens(x) +
+#' theme(axis.text.x = element_text(angle = 45))
+#' 
+#' ggcmsens(x) +
+#' coord_flip(xlim = NULL, ylim = NULL, expand = TRUE, clip = "on")
+#' 
 #' @export
-plot.cmsens.me <- function(x, ...) {
+#' 
+ggcmsens <- function(x, errorbar.width = 0.3, errorbar.size = 0.3, 
+                     errorbar.position = position_dodge2(width = 0.5),
+                     point.size = 1, point.position = position_dodge2(width = 0.3),
+                     refline = TRUE, refline.colour = "red", refline.size = 0.3) {
+  # reference line
+  if (refline) {
+    if (!x$naive$multimp$multimp) {
+      if ((inherits(x$naive$reg.output$yreg, "lm") | inherits(x$naive$reg.output$yreg, "glm")) &&
+          (family(x$naive$reg.output$yreg)$family %in% c("gaussian","Gamma","inverse.gaussian","quasi"))) {
+        ref <- 0
+      } else ref <- 1
+    } else {
+      if ((inherits(x$naive$reg.output[[1]]$yreg, "lm") | inherits(x$naive$reg.output[[1]]$yreg, "glm")) &&
+          (family(x$naive$reg.output[[1]]$yreg)$family %in% c("gaussian","Gamma","inverse.gaussian","quasi"))) {
+        ref <- 0
+      } else ref <- 1
+    }
+  } else ref <- NULL
+  # naive results
   naive.pe <- x$naive$effect.pe
   naive.ci.low <- x$naive$effect.ci.low
   naive.ci.high <- x$naive$effect.ci.high
@@ -409,15 +469,15 @@ plot.cmsens.me <- function(x, ...) {
     }
     ggplot() +
       geom_errorbar(aes(x = Effect, ymin = CIlower, ymax = CIupper,
-                        colour = ReliabilityRatio), width = 0.3,
-                    data = effect_df,
-                    position = position_dodge2(width=0.5))+
+                        colour = ReliabilityRatio), data = effect_df, 
+                    width = errorbar.width, size = errorbar.size, 
+                    position = errorbar.position) +
       geom_point(aes(x = Effect, y = Point, colour = ReliabilityRatio),
-                 data = effect_df,
-                 position = position_dodge2(width=0.3)) +
-      ylab("Point Estimate and 95% CI")+
-      scale_colour_hue()+
-      geom_hline(yintercept = 0, color = "red")+
+                 data = effect_df, size = point.size,
+                 position = point.position) +
+      ylab("Point Estimate and 95% CI") +
+      scale_colour_hue() +
+      geom_hline(yintercept = ref, color = refline.colour, size = refline.size) +
       theme(legend.position = "bottom")
   } else if (x$ME$MEvartype == "categorical") {
     pe.mid <- x$sens[[1]]$effect.pe
@@ -450,16 +510,16 @@ plot.cmsens.me <- function(x, ...) {
     }
     ggplot() +
       geom_errorbar(aes(x = Effect, ymin = CIlower, ymax = CIupper,
-                        colour = MC), width = 0.3,
-                    data = effect_df,
-                    position = position_dodge2(width=0.5))+
+                        colour = MC), data = effect_df, 
+                    width = errorbar.width, size = errorbar.size, 
+                    position = errorbar.position) +
       geom_point(aes(x = Effect, y = Point, colour = MC),
-                 data = effect_df,
-                 position = position_dodge2(width=0.3)) +
+                 data = effect_df, size = point.size,
+                 position = point.position) +
       facet_grid(MisclassificationMAtrix~.) +
-      ylab("Point Estimate and 95% CI")+
-      scale_colour_hue()+
-      geom_hline(yintercept = 0, color = "red")+
+      ylab("Point Estimate and 95% CI") +
+      scale_colour_hue() +
+      geom_hline(yintercept = ref, color = refline.colour, size = refline.size) +
       theme(legend.position = "bottom", legend.title = element_blank())
   }
 }

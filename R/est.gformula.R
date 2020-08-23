@@ -132,12 +132,12 @@ est.gformula <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRU
   }
 
   # simulate C
-  prec_sim <- data[, prec]
+  basec_sim <- data[, basec]
 
   # design matrices for simulating postc[1]
-  postcdesign_a <- data.frame(a_sim, prec_sim)
-  postcdesign_astar <- data.frame(astar_sim, prec_sim)
-  colnames(postcdesign_a) <- colnames(postcdesign_astar) <- c(exposure, prec)
+  postcdesign_a <- data.frame(a_sim, basec_sim)
+  postcdesign_astar <- data.frame(astar_sim, basec_sim)
+  colnames(postcdesign_a) <- colnames(postcdesign_astar) <- c(exposure, basec)
 
   postc_a <- postc_astar <- data.frame(matrix(nrow = n, ncol = length(postc)))
   colnames(postc_a) <- colnames(postc_astar) <- postc
@@ -246,9 +246,9 @@ est.gformula <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRU
   }
 
   # design matrices for simulating mediator[1]
-  mdesign_a <- data.frame(a_sim, prec_sim, postc_a)
-  mdesign_astar <- data.frame(astar_sim, prec_sim, postc_astar)
-  colnames(mdesign_a) <- colnames(mdesign_astar) <- c(exposure, prec, postc)
+  mdesign_a <- data.frame(a_sim, basec_sim, postc_a)
+  mdesign_astar <- data.frame(astar_sim, basec_sim, postc_astar)
+  colnames(mdesign_a) <- colnames(mdesign_astar) <- c(exposure, basec, postc)
 
   m_a <- m_astar <- data.frame(matrix(nrow = n, ncol = length(mediator)))
   colnames(m_a) <- colnames(m_astar) <- mediator
@@ -366,15 +366,15 @@ est.gformula <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRU
     } else data.frame(rep(mval[[x]], n))))
 
   # design matrices for outcome simulation
-  ydesign0m <- data.frame(astar_sim, mstar_sim, prec_sim, postc_astar)
-  ydesign1m <- data.frame(a_sim, mstar_sim, prec_sim, postc_a)
-  ydesign00 <- data.frame(astar_sim, m_astar, prec_sim, postc_astar)
-  ydesign01 <- data.frame(astar_sim, m_a, prec_sim, postc_astar)
-  ydesign10 <- data.frame(a_sim, m_astar, prec_sim, postc_a)
-  ydesign11 <- data.frame(a_sim, m_a, prec_sim, postc_a)
-  rm(a_sim, astar_sim, m_a, m_astar, mstar_sim, prec_sim, postc_a, postc_astar)
+  ydesign0m <- data.frame(astar_sim, mstar_sim, basec_sim, postc_astar)
+  ydesign1m <- data.frame(a_sim, mstar_sim, basec_sim, postc_a)
+  ydesign00 <- data.frame(astar_sim, m_astar, basec_sim, postc_astar)
+  ydesign01 <- data.frame(astar_sim, m_a, basec_sim, postc_astar)
+  ydesign10 <- data.frame(a_sim, m_astar, basec_sim, postc_a)
+  ydesign11 <- data.frame(a_sim, m_a, basec_sim, postc_a)
+  rm(a_sim, astar_sim, m_a, m_astar, mstar_sim, basec_sim, postc_a, postc_astar)
   colnames(ydesign0m) <- colnames(ydesign1m) <- colnames(ydesign00) <- colnames(ydesign01) <-
-    colnames(ydesign10) <- colnames(ydesign11) <- c(exposure, mediator, prec, postc)
+    colnames(ydesign10) <- colnames(ydesign11) <- c(exposure, mediator, basec, postc)
 
   # predict Y
   type <- ifelse(is_coxph_yreg, "risk", ifelse(is_multinom_yreg | is_polr_yreg, "probs", "response"))

@@ -1,7 +1,7 @@
 estinf <- function() {
   
   # restrict data types of variables
-  allvar <- c(outcome, exposure, mediator, postc, prec)
+  allvar <- c(outcome, exposure, mediator, postc, basec)
   for (i in 1:length(allvar))
     if (!(is.numeric(data[, allvar[i]]) | is.factor(data[, allvar[i]]) |
           is.character(data[, allvar[i]]))) stop(paste0("The variable ", allvar[i], " should be numeric, factor or character"))
@@ -121,36 +121,36 @@ estinf <- function() {
     if(estimation == "paramfunc") {
       
       # create a list of covariate values to calculate conditional causal effects
-      if (length(prec) != 0) {
+      if (length(basec) != 0) {
         
-        if (!is.null(precval)) {
-          if (!is.list(precval)) stop("precval should be a list")
-          if (length(precval) != length(prec)) stop("length(precval) != length(prec)")
+        if (!is.null(basecval)) {
+          if (!is.list(basecval)) stop("basecval should be a list")
+          if (length(basecval) != length(basec)) stop("length(basecval) != length(basec)")
         }
         
-        if (is.null(precval)) precval <- rep(list(NULL), length(prec))
+        if (is.null(basecval)) basecval <- rep(list(NULL), length(basec))
         
-        for (i in 1:length(prec)) {
-          if (is.factor(data[, prec[i]]) | is.character(data[, prec[i]])) {
-            c_lev <- levels(droplevels(as.factor(data[, prec[i]])))
-            if (is.null(precval[[i]])) {
-              c_data <- data[, prec[i], drop = FALSE]
-              c_data[, prec[i]] <- factor(c_data[, prec[i]], levels = c_lev)
-              # set precval[[i]] to be the mean values of dummy variables
-              precval[[i]] <- unname(colMeans(as.matrix(model.matrix(as.formula(paste0("~", prec[i])),
+        for (i in 1:length(basec)) {
+          if (is.factor(data[, basec[i]]) | is.character(data[, basec[i]])) {
+            c_lev <- levels(droplevels(as.factor(data[, basec[i]])))
+            if (is.null(basecval[[i]])) {
+              c_data <- data[, basec[i], drop = FALSE]
+              c_data[, basec[i]] <- factor(c_data[, basec[i]], levels = c_lev)
+              # set basecval[[i]] to be the mean values of dummy variables
+              basecval[[i]] <- unname(colMeans(as.matrix(model.matrix(as.formula(paste0("~", basec[i])),
                                                                      data = c_data)[, -1]), na.rm = TRUE))
               rm(c_data)
-            } else precval[[i]] <- as.numeric(c_lev == precval[[i]])[-1]
+            } else basecval[[i]] <- as.numeric(c_lev == basecval[[i]])[-1]
             rm(c_lev)
-          } else if (is.numeric(data[, prec[i]]) | is.logical(data[, prec[i]])) {
-            if (is.null(precval[[i]])) {
-              # set precval[[i]] to be the mean value of prec[i]
-              precval[[i]] <- mean(data[, prec[i]], na.rm = TRUE)
-            } else precval[[i]] <- precval[[i]]
-          } else stop(paste0("The prec[", i, "] variable should be numeric, logical, factor or character"))
+          } else if (is.numeric(data[, basec[i]]) | is.logical(data[, basec[i]])) {
+            if (is.null(basecval[[i]])) {
+              # set basecval[[i]] to be the mean value of basec[i]
+              basecval[[i]] <- mean(data[, basec[i]], na.rm = TRUE)
+            } else basecval[[i]] <- basecval[[i]]
+          } else stop(paste0("The basec[", i, "] variable should be numeric, logical, factor or character"))
         }
         
-        out$ref$precval <- precval
+        out$ref$basecval <- basecval
         
       }
     }
@@ -418,11 +418,11 @@ estinf <- function() {
     ###################################################################################################
     
     if (is.null(yreg)) stop("yreg is required")
-    if (length(prec) != 0 && is.null(ereg)) stop("ereg is required for model = 'wb' when length(prec) != 0")
-    if (length(prec) != 0 && (!((is_glm_ereg && (family_ereg$family %in% c("binomial", "quasibinomial", "multinom") |
+    if (length(basec) != 0 && is.null(ereg)) stop("ereg is required for model = 'wb' when length(basec) != 0")
+    if (length(basec) != 0 && (!((is_glm_ereg && (family_ereg$family %in% c("binomial", "quasibinomial", "multinom") |
                                                  startsWith(family_ereg$family, "Ordered Categorical"))) |
                                 is_multinom_ereg | is_polr_ereg))) stop(
-                                  "model = 'wb' only supports categorical exposure when length(prec) != 0")
+                                  "model = 'wb' only supports categorical exposure when length(basec) != 0")
     
     out$ref$mval <- mval
     
@@ -623,11 +623,11 @@ estinf <- function() {
     ###################################################################################################
     
     if (is.null(yreg)) stop("yreg is required")
-    if (length(prec) != 0 && is.null(ereg)) stop("ereg is required for model = 'msm' when length(prec) != 0")
-    if (length(prec) != 0 && (!((is_glm_ereg && (family_ereg$family %in% c("binomial", "quasibinomial", "multinom") |
+    if (length(basec) != 0 && is.null(ereg)) stop("ereg is required for model = 'msm' when length(basec) != 0")
+    if (length(basec) != 0 && (!((is_glm_ereg && (family_ereg$family %in% c("binomial", "quasibinomial", "multinom") |
                                                  startsWith(family_ereg$family, "Ordered Categorical"))) |
                                 is_multinom_ereg | is_polr_ereg))) stop(
-                                  "model = 'msm' only supports categorical exposure when length(prec) != 0")
+                                  "model = 'msm' only supports categorical exposure when length(basec) != 0")
     # a regression is required for each mediator
     if (is.null(mreg)) stop("mreg is required for model = 'msm'")
     if (!is.list(mreg)) stop("mreg should be a list")

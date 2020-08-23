@@ -162,14 +162,14 @@ est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
   }
 
   # simulate C
-  prec_sim <- data[, prec]
+  basec_sim <- data[, basec]
 
   # design matrices for outcome simulation
-  totdesign0 <- dirdesign0 <- data.frame(astar_sim, prec_sim)
-  totdesign1 <- dirdesign1 <- data.frame(a_sim, prec_sim)
-  rm(a_sim, astar_sim, prec_sim)
+  totdesign0 <- dirdesign0 <- data.frame(astar_sim, basec_sim)
+  totdesign1 <- dirdesign1 <- data.frame(a_sim, basec_sim)
+  rm(a_sim, astar_sim, basec_sim)
   colnames(totdesign0) <- colnames(totdesign1) <-
-    colnames(dirdesign0) <- colnames(dirdesign1) <- c(exposure, prec)
+    colnames(dirdesign0) <- colnames(dirdesign1) <- c(exposure, basec)
 
   # predict Y
   type <- ifelse(is_coxph_yreg, "risk", ifelse(is_multinom_yreg | is_polr_yreg, "probs", "response"))

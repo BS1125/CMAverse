@@ -130,18 +130,18 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
 
     # create covariate values to calculate conditional causal effects
     vecc <- c()
-    if (length(prec) != 0) {
-      for (i in 1:length(prec)) {
-        if (is.factor(data[, prec[i]]) | is.character(data[, prec[i]])) {
+    if (length(basec) != 0) {
+      for (i in 1:length(basec)) {
+        if (is.factor(data[, basec[i]]) | is.character(data[, basec[i]])) {
           # extract conditional values of levels existing in the new data set
-          c_lev_orig <- levels(droplevels(as.factor(data_orig[, prec[i]])))
-          c_lev_new <- levels(droplevels(as.factor(data[, prec[i]])))
+          c_lev_orig <- levels(droplevels(as.factor(data_orig[, basec[i]])))
+          c_lev_new <- levels(droplevels(as.factor(data[, basec[i]])))
           c_lev_index <- which(c_lev_orig %in% c_lev_new)
-          vecc <- c(vecc, c(NA, precval[[i]])[c_lev_index][-1])
+          vecc <- c(vecc, c(NA, basecval[[i]])[c_lev_index][-1])
           rm(c_lev_orig, c_lev_new, c_lev_index)
-        } else if (is.numeric(data[, prec[i]]) | is.logical(data[, prec[i]])) {
-          vecc <- c(vecc, precval[[i]])
-        } else stop(paste0("The prec[", i, "] variable should be numeric, logical, factor or character"))
+        } else if (is.numeric(data[, basec[i]]) | is.logical(data[, basec[i]])) {
+          vecc <- c(vecc, basecval[[i]])
+        } else stop(paste0("The basec[", i, "] variable should be numeric, logical, factor or character"))
       }
     }
 
@@ -180,7 +180,7 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
                                                   length(betas)/(mlevel-1)))], ncol = mlevel - 1))
     # t(vecc)%*%beta'2 for mreg
     covariatesTerm <- sapply(0:(mlevel-2), function(x)
-      ifelse(length(prec) == 0, 0, sum(betas[elevel + 1:length(vecc) +
+      ifelse(length(basec) == 0, 0, sum(betas[elevel + 1:length(vecc) +
                                                x * length(betas)/(mlevel-1)] * vecc)))
 
     # closed-form parameter function estimation
@@ -357,12 +357,12 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     }
 
     # simulate C
-    prec_sim <- data[, prec]
+    basec_sim <- data[, basec]
 
     # design matrices for simulating mediator[1]
-    mdesign_a <- data.frame(a_sim, prec_sim)
-    mdesign_astar <- data.frame(astar_sim, prec_sim)
-    colnames(mdesign_a) <- colnames(mdesign_astar) <- c(exposure, prec)
+    mdesign_a <- data.frame(a_sim, basec_sim)
+    mdesign_astar <- data.frame(astar_sim, basec_sim)
+    colnames(mdesign_a) <- colnames(mdesign_astar) <- c(exposure, basec)
 
     m_a <- m_astar <- data.frame(matrix(nrow = n, ncol = length(mediator)))
     colnames(m_a) <- colnames(m_astar) <- mediator
@@ -474,15 +474,15 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       } else data.frame(rep(mval[[x]], n))))
 
     # design matrices for outcome simulation
-    ydesign0m <- data.frame(astar_sim, mstar_sim, prec_sim)
-    ydesign1m <- data.frame(a_sim, mstar_sim, prec_sim)
-    ydesign00 <- data.frame(astar_sim, m_astar, prec_sim)
-    ydesign01 <- data.frame(astar_sim, m_a, prec_sim)
-    ydesign10 <- data.frame(a_sim, m_astar, prec_sim)
-    ydesign11 <- data.frame(a_sim, m_a, prec_sim)
-    rm(a_sim, astar_sim, m_a, m_astar, mstar_sim, prec_sim)
+    ydesign0m <- data.frame(astar_sim, mstar_sim, basec_sim)
+    ydesign1m <- data.frame(a_sim, mstar_sim, basec_sim)
+    ydesign00 <- data.frame(astar_sim, m_astar, basec_sim)
+    ydesign01 <- data.frame(astar_sim, m_a, basec_sim)
+    ydesign10 <- data.frame(a_sim, m_astar, basec_sim)
+    ydesign11 <- data.frame(a_sim, m_a, basec_sim)
+    rm(a_sim, astar_sim, m_a, m_astar, mstar_sim, basec_sim)
     colnames(ydesign0m) <- colnames(ydesign1m) <- colnames(ydesign00) <- colnames(ydesign01) <-
-      colnames(ydesign10) <- colnames(ydesign11) <- c(exposure, mediator, prec)
+      colnames(ydesign10) <- colnames(ydesign11) <- c(exposure, mediator, basec)
 
     # predict Y
     type <- ifelse(is_coxph_yreg, "risk", ifelse(is_multinom_yreg | is_polr_yreg, "probs", "response"))

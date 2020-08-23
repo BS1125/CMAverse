@@ -16,7 +16,7 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     prob1 <- mean(data[, outcome] == y_case)
     w4casecon <- ifelse(data[, outcome] == y_case, yprevalence / prob1, (1 - yprevalence) / (1 - prob1))
 
-    if (length(prec) != 0) {
+    if (length(basec) != 0) {
       # weights for ereg
       if (!is.null(weights_ereg)) weights_ereg <- weights_ereg[indices] * w4casecon
       if (is.null(weights_ereg)) weights_ereg <- w4casecon
@@ -112,7 +112,7 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     # data from controls
     control_indices <- which(data[, outcome] == y_control)
 
-    if (length(prec) != 0) {
+    if (length(basec) != 0) {
       # update ereg
       call_ereg$weights <- weights_ereg[indices][control_indices]
       call_ereg$data <- data[control_indices, ]
@@ -197,7 +197,7 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
   } else {
 
     # not a case control design
-    if (length(prec) != 0) {
+    if (length(basec) != 0) {
       # update ereg
       call_ereg$weights <- weights_ereg[indices]
       call_ereg$data <- data
@@ -285,7 +285,7 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     out$reg.output$mreg <- mreg
     out$reg.output$wmdenomreg <- wmdenomreg
     out$reg.output$wmnomreg <- wmnomreg
-    if (length(prec) != 0) out$reg.output$ereg <- ereg
+    if (length(basec) != 0) out$reg.output$ereg <- ereg
   }
 
   # the index of the reference level for a categorical outcome

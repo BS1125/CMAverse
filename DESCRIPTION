@@ -28,8 +28,7 @@ Encoding: UTF-8
 LazyData: true
 Imports: 
     ggdag,
-    gridExtra,
-    grid,
+    stringr,
     simex,
     dplyr,
     mice,

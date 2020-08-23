@@ -50,7 +50,7 @@ est.ne <- function(data = NULL, indices = NULL, outReg = FALSE, full = NULL) {
   }
 
   # simulate C
-  prec_sim <- data[, prec]
+  basec_sim <- data[, basec]
 
   # simulate mstar for cde
   mstar_sim <- do.call(cbind, lapply(1:length(mediator), function(x)
@@ -59,15 +59,15 @@ est.ne <- function(data = NULL, indices = NULL, outReg = FALSE, full = NULL) {
     } else data.frame(rep(mval[[x]], n))))
 
   # design matrices for outcome simulation
-  ydesign0m <- data.frame(astar_sim, mstar_sim, prec_sim)
-  ydesign1m <- data.frame(a_sim, mstar_sim, prec_sim)
-  ydesign00 <- data.frame(astar_sim, astar_sim, prec_sim)
-  ydesign01 <- data.frame(astar_sim, a_sim, prec_sim)
-  ydesign10 <- data.frame(a_sim, astar_sim, prec_sim)
-  ydesign11 <- data.frame(a_sim, a_sim, prec_sim)
-  rm(a_sim, astar_sim, mstar_sim, prec_sim)
-  colnames(ydesign0m) <- colnames(ydesign1m) <- c(exposure, mediator, prec)
-  colnames(ydesign00) <- colnames(ydesign01) <- colnames(ydesign10) <- colnames(ydesign11) <- c(ne_a, ne_m, prec)
+  ydesign0m <- data.frame(astar_sim, mstar_sim, basec_sim)
+  ydesign1m <- data.frame(a_sim, mstar_sim, basec_sim)
+  ydesign00 <- data.frame(astar_sim, astar_sim, basec_sim)
+  ydesign01 <- data.frame(astar_sim, a_sim, basec_sim)
+  ydesign10 <- data.frame(a_sim, astar_sim, basec_sim)
+  ydesign11 <- data.frame(a_sim, a_sim, basec_sim)
+  rm(a_sim, astar_sim, mstar_sim, basec_sim)
+  colnames(ydesign0m) <- colnames(ydesign1m) <- c(exposure, mediator, basec)
+  colnames(ydesign00) <- colnames(ydesign01) <- colnames(ydesign10) <- colnames(ydesign11) <- c(ne_a, ne_m, basec)
 
   # predict Y
   EY0m_pred <- as.matrix(predict(yreg, newdata = ydesign0m, type = "response"))

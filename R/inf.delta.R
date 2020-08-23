@@ -13,7 +13,7 @@ inf.delta <- function(data = NULL, yreg = NULL, mreg = NULL) {
 
   # create covariate values to calculate conditional causal effects
   vecc <- c()
-  if (length(prec) != 0) for (i in 1:length(prec)) vecc <- c(vecc, precval[[i]])
+  if (length(basec) != 0) for (i in 1:length(basec)) vecc <- c(vecc, basecval[[i]])
 
   # for categorical mediator, create an indicator vector for mstar
   if (is.factor(data[, mediator]) | is.character(data[, mediator])) {
