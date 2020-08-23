@@ -2,7 +2,7 @@ Package: CMAverse
 Type: Package
 Title: Causal Mediation Analysis
 Version: 0.1.0
-URL: https://CMAverse.org, https://github.com/LindaValeri/CMAverse
+URL: https://cmaerse.org, https://github.com/BS1125/CMAverse
 Author: Baoyi Shi <bs3141@cumc.columbia.edu>
         Christine Choirat <cchoirat@gmail.com, cchoirat@datascience.ch>
         Linda Valeri <lv2424@cumc.columbia.edu>
@@ -52,3 +52,4 @@ Suggests:
     testthat
 VignetteBuilder: knitr
 Depends: R (>= 2.10)
+BugReports: https://github.com/BS1125/CMAverse/issues
