@@ -5,7 +5,6 @@
 \alias{print.cmest}
 \alias{summary.cmest}
 \alias{print.summary.cmest}
-\alias{plot.cmest}
 \alias{print.cmsens.uc}
 \alias{print.cmsens.me}
 \title{Causal Mediation Analysis}
@@ -24,7 +23,7 @@ cmest(
   exposure = NULL,
   mediator = NULL,
   EMint = NULL,
-  prec = NULL,
+  basec = NULL,
   postc = NULL,
   yreg = NULL,
   mreg = NULL,
@@ -35,7 +34,7 @@ cmest(
   a = 1,
   mval = NULL,
   yref = NULL,
-  precval = NULL,
+  basecval = NULL,
   nboot = 200,
   multimp = FALSE,
   ...
@@ -46,8 +45,6 @@ cmest(
 \method{summary}{cmest}(object, ...)
 
 \method{print}{summary.cmest}(x, digits = 4, ...)
-
-\method{plot}{cmest}(x, ...)
 
 \method{print}{cmsens.uc}(x, ...)
 
@@ -93,9 +90,10 @@ or \code{aft_weibull}).}
 outcome regression formula includes the interaction(s) between the exposure and each of the 
 mediator(s). Default is \code{FALSE}.}
 
-\item{prec}{a vector of variable name(s) of the pre-exposure confounder(s)}
+\item{basec}{a vector of variable name(s) of the baseline confounder(s)}
 
-\item{postc}{a vector of variable name(s) of the post-exposure confounder(s).}
+\item{postc}{a vector of variable name(s) of mediator-outcome confounder(s) affected 
+by the exposure}
 
 \item{yreg}{outcome regression. See \code{Details}.}
 
@@ -108,11 +106,11 @@ weights with respect to each of the mediator(s) (used when \code{model} is \code
 See \code{Details}.}
 
 \item{ereg}{exposure regression for calculating weights with respect to the exposure (used 
-when \code{model} is \code{wb} or \code{msm} with \code{length(prec)} != 0 or when 
+when \code{model} is \code{wb} or \code{msm} with \code{length(basec)} != 0 or when 
 \code{model} is \code{iorw}). See \code{Details}.}
 
-\item{postcreg}{a list of regression(s) specifying a regression model for each of the 
-post-expossure confounder(s) (used when \code{model} is \code{gformula}). See \code{Details}.}
+\item{postcreg}{a list of regression(s) specifying a regression model for each variable
+in \code{postc} (used when \code{model} is \code{gformula}). See \code{Details}.}
 
 \item{astar}{the first reference value for the exposure. Default is \code{0}.}
 
@@ -123,9 +121,9 @@ post-expossure confounder(s) (used when \code{model} is \code{gformula}). See \c
 
 \item{yref}{reference value for the outcome (used when the outcome is categorical).}
 
-\item{precval}{a list specifying a conditional value for each of the pre-exposure 
+\item{basecval}{a list specifying a conditional value for each of the baseline 
 confounder(s) for estimating conditional causal effects (used when \code{estimation} is 
-\code{paramfunc}). If \code{NULL}, mean value(s) of the pre-exposure confounder(s) are used.}
+\code{paramfunc}). If \code{NULL}, mean value(s) of the baseline confounder(s) are used.}
 
 \item{nboot}{the number of boots applied (used when \code{inference} is \code{bootstrap}). 
 Default is 200.}
@@ -135,6 +133,12 @@ Default is 200.}
 
 \item{...}{Additional arguments passed to the \link[mice]{mice} function. See \link[mice]{mice}
 for details.}
+
+\item{x}{an object of class 'cmest'}
+
+\item{object}{an object of class 'cmest'}
+
+\item{digits}{minimal number of significant digits. See \link{print.default}.}
 }
 \value{
 An object of class 'cmest' is returned:
@@ -144,7 +148,7 @@ An object of class 'cmest' is returned:
 \code{casecontrol}, \code{yprevalence}, \code{yrare}, \code{estimation}, \code{inference} 
 and \code{nboot},}
 \item{variables}{a list of variables used which may include \code{outcome}, \code{event}, 
-\code{exposure}, \code{mediator}, \code{EMint}, \code{prec} and \code{postc},}
+\code{exposure}, \code{mediator}, \code{EMint}, \code{basec} and \code{postc},}
 \item{reg.input}{a list of regressions input,}
 \item{multimp}{a list of arguments used for multiple imputation,}
 \item{ref}{reference values used,}
@@ -213,8 +217,8 @@ the \code{cmest} function.
 
 Let \code{Y} denote the outcome, \code{A} denote the exposure, \code{M=(M_1,...,M_k)^T} 
 denote the set of mediator(s) following the temporal order, \code{C} denote the set of 
-pre-exposure confounder(s), \code{L=(L_1,...,L_s)^T} denote the set of post-exposure 
-confounder(s) following the temporal order.
+variables in \code{basec}, \code{L=(L_1,...,L_s)^T} denote the set of variables in 
+\code{postc} following the temporal order.
 
 \itemize{
     \item{\code{rb}: }{\emph{the regression-based approach} by Valeri et al. (2013) and
@@ -224,7 +228,7 @@ confounder(s) following the temporal order.
 \code{M_1}, ..., \code{M_{p-1}} and \code{C}} for \code{p=1,...,k}.
 
     \item{\code{wb}: }{\emph{the weighting-based approach} by VanderWeele et al. (2014).
-    \code{yreg} is required. When \code{prec} is not empty, \code{ereg} is also required 
+    \code{yreg} is required. When \code{basec} is not empty, \code{ereg} is also required 
     and \code{A} must be categorical. If specified as a user defined regression object, 
     \code{yreg} should regress \code{Y} on \code{A}, \code{M} and \code{C} and \code{ereg} 
     should regress \code{A} on \code{C}.}
@@ -244,7 +248,7 @@ confounder(s) following the temporal order.
       
     \item{\code{msm}: }{\emph{the marginal structural model} by VanderWeele et al. (2017).
     \code{yreg}, \code{mreg} and \code{wmreg} are required and all 
-    mediators must be categorical. When \code{prec} is not empty, \code{ereg} is also 
+    mediators must be categorical. When \code{basec} is not empty, \code{ereg} is also 
     required and \code{A} must be categorical. If specified as a user defined regression 
     object, \code{yreg} should regress \code{Y} on \code{A} and \code{M}, 
     \code{mreg[p]} should regress \code{M_p} on \code{A}, \code{M_1}, ..., and 
@@ -272,7 +276,7 @@ When \code{postc} is not empty, \code{msm} and \code{gformula} can be used, whil
 \item{\code{paramfunc}: }{closed-form parameter function estimation (only available when 
 \code{model = "rb"} with \code{length(mediator) = 1}). The point estimate of each causal 
 effect is obtained by its closed-form formula of regression coefficients. Effects 
-conditional on pre-specified values of \code{C}, i.e., \code{precval}, are estimated.}
+conditional on pre-specified values of \code{C}, i.e., \code{basecval}, are estimated.}
 \item{\code{imputation}: }{direct counterfactual imputation estimation. The point estimate 
 of each causal effect is obtained by imputing counterfactuals directly.}
 }
@@ -381,8 +385,6 @@ When \code{model = "iorw"} and \code{full = TRUE}, \code{RRte}, \code{RRpnde},
 
 \item \code{print}: Print the summary of cmest nicely
 
-\item \code{plot}: Plot the results of cmest with \link[ggplot2]{ggplot}
-
 \item \code{print}: Print the results of cmsens.uc nicely
 
 \item \code{print}: Print the results of cmsens.me nicely
@@ -390,23 +392,20 @@ When \code{model = "iorw"} and \code{full = TRUE}, \code{RRte}, \code{RRpnde},
 
 \examples{
 
-rm(list=ls())
 library(CMAverse)
 
 # single-mediator case with rb
 exp1 <- cmest(data = cma2020, model = "rb", outcome = "contY", 
-exposure = "A", mediator = "M2", prec = c("C1", "C2"), 
+exposure = "A", mediator = "M2", basec = c("C1", "C2"), 
 EMint = TRUE, mreg = list("multinomial"), yreg = "linear", 
 astar = 0, a = 1, mval = list("M2_0"), estimation = "paramfunc", 
 inference = "delta")
 summary(exp1)
-plot(exp1) +
-ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45))
 
 # multiple-mediator case with rb
 # 10 boots are used for illustration
 exp2 <- cmest(data = cma2020, model = "rb", outcome = "contY", 
-exposure = "A", mediator = c("M1", "M2"), prec = c("C1", "C2"), 
+exposure = "A", mediator = c("M1", "M2"), basec = c("C1", "C2"), 
 EMint = TRUE, mreg = list("logistic", "multinomial"), 
 yreg = "linear", astar = 0, a = 1, mval = list(0, "M2_0"), 
 estimation = "imputation", inference = "bootstrap", nboot = 10)
@@ -414,7 +413,7 @@ estimation = "imputation", inference = "bootstrap", nboot = 10)
 # multiple-mediator case with ne
 # 10 boots are used for illustration
 exp3 <- cmest(data = cma2020, model = "ne", outcome = "contY", 
-exposure = "A", mediator = c("M1", "M2"), prec = c("C1", "C2"), 
+exposure = "A", mediator = c("M1", "M2"), basec = c("C1", "C2"), 
 yreg = glm(contY ~ A + M1 + M2 + A*M1 + A*M2 + C1 + C2, family = gaussian, data = cma2020), 
 astar = 0, a = 1, mval = list(0, "M2_0"), estimation = "imputation", 
 inference = "bootstrap", nboot = 10)
@@ -423,7 +422,7 @@ inference = "bootstrap", nboot = 10)
 # 10 boots are used for illustration
 exp4 <- cmest(data = cma2020, model = "msm", casecontrol = TRUE, 
 yrare = TRUE, outcome = "binY", exposure = "A", 
-mediator = c("M1", "M2"), EMint = TRUE, prec = c("C1", "C2"), yreg = "logistic", 
+mediator = c("M1", "M2"), EMint = TRUE, basec = c("C1", "C2"), yreg = "logistic", 
 ereg = "logistic", mreg = list(glm(M1 ~ A, family = binomial, 
 data = cma2020), nnet::multinom(M2 ~ A + M1, data = cma2020, trace = FALSE)), 
 wmreg = list(glm(M1 ~ A + C1 + C2, family = binomial, data = cma2020), 
@@ -472,5 +471,6 @@ Schomaker M, Heumann C. Bootstrap inference when using multiple
 imputation (2018). Statistics in Medicine. 37(14): 2252 - 2266.
 }
 \seealso{
-\code{\link{cmdag}}, \code{\link{cmsens}}
+\code{\link{ggcmest}}, \code{\link{cmdag}}, 
+\code{\link{cmsens}}.
 }

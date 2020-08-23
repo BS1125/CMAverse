@@ -4,7 +4,6 @@
 \alias{cmsens}
 \alias{summary.cmsens.me}
 \alias{print.summary.cmsens.me}
-\alias{plot.cmsens.me}
 \title{Sensitivity Analysis For Unmeasured Confounding and Measurement Error}
 \usage{
 cmsens(
@@ -22,8 +21,6 @@ cmsens(
 \method{summary}{cmsens.me}(object, ...)
 
 \method{print}{summary.cmsens.me}(x, digits = 4, ...)
-
-\method{plot}{cmsens.me}(x, ...)
 }
 \arguments{
 \item{object}{an object of class \code{cmest}.}
@@ -37,8 +34,8 @@ calibration and \code{simex} represents SIMEX. See \code{Details}.}
 
 \item{MEvariable}{variable measured with error.}
 
-\item{MEvartype}{type of the variable measured with error.
-Can be \code{continuous} or \code{categorical} (first 3 letters are enough).}
+\item{MEvartype}{type of the variable measured with error. Can be \code{continuous} or 
+\code{categorical} (first 3 letters are enough).}
 
 \item{MEerror}{a vector of standard deviations of the measurement error (when \code{MEvartype}
 is \code{continuous}) or a list of misclassification matrices (when \code{MEvartype}
@@ -50,6 +47,12 @@ is \code{categorical}).}
 
 \item{nboot.rc}{number of boots for estimating the var-cov matrix of coefficients 
 with regression calibration. Default is \code{400}.}
+
+\item{...}{other arguments.}
+
+\item{x}{an object of class \code{cmsens}}
+
+\item{digits}{minimal number of significant digits. See \link{print.default}.}
 }
 \value{
 If \code{sens} is \code{uc}, an object of class 'cmest.uc' is returned:
@@ -87,19 +90,16 @@ with error.
 \item \code{summary}: Summarize the results of cmsens.me nicely
 
 \item \code{print}: Print the summary of cmsens.me nicely
-
-\item \code{plot}: Plot the results of cmsens.me with \link[ggplot2]{ggplot}
 }}
 
 \examples{
 
-rm(list=ls())
 library(CMAverse)
 
 # 10 boots are used for illustration
 naive <- cmest(data = cma2020, model = "rb", outcome = "contY", 
 exposure = "A", mediator = c("M1", "M2"), 
-prec = c("C1", "C2"), EMint = TRUE,
+basec = c("C1", "C2"), EMint = TRUE,
 mreg = list("logistic", "multinomial"), yreg = "linear",
 astar = 0, a = 1, mval = list(0, "M2_0"),
 estimation = "imputation", inference = "bootstrap", nboot = 10)
@@ -111,8 +111,6 @@ exp2 <- cmsens(object = naive, sens = "me", MEmethod = "rc",
 MEvariable = "C1", MEvartype = "con",
 MEerror = c(0.1, 0.2))
 summary(exp2)
-plot(exp2) +
-ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 30, vjust = 0.8))
 
 # B = 10 is used for illustration
 exp3 <- cmsens(object = naive, sens = "me", MEmethod = "simex", 
@@ -146,5 +144,5 @@ with error and the outcome follows a generalized linear model (2014). Statistics
 medicine, 33(28): 4875–4890.
 }
 \seealso{
-\code{\link{cmdag}}, \code{\link{cmest}}
+\code{\link{ggcmsens}}, \code{\link{cmdag}}, \code{\link{cmest}}
 }

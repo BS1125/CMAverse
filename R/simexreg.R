@@ -1,5 +1,125 @@
+#' Simulation and Extrapolation for Measurement Error
+#'
+#' \code{simexreg} is used to correct a regression object with a variable measured with 
+#' error via \emph{SIMEX} by Cook et al. (1994) and Küchenhoff et al. (2006).
+#'
+#' @param reg the naive regression object. See \code{Details}.
+#' @param data the new dataset for updating \code{reg}
+#' @param weights the new weights for updating \code{reg}
+#' @param MEvariable variable measured with error.
+#' @param MEvartype type of the variable measured with error. Can be \code{continuous} or 
+#' \code{categorical} (first 3 letters are enough).
+#' @param MEerror the standard deviation of the measurement error (when \code{MEvartype}
+#' is \code{continuous}) or the misclassification matrix (when \code{MEvartype}
+#' is \code{categorical}). 
+#' @param variance a logical value. If \code{TRUE}, estimate the jackknife var-cov matrix of
+#' coefficients through Jackknife. Default is \code{FALSE}.
+#' @param lambda a vector of lambdas for \emph{SIMEX}. Default is \code{c(0.5, 1, 1.5, 2)}. 
+#' @param B number of simulations for \emph{SIMEX}. Default is \code{200}.
+#' @param x an object of class 'rcreg'
+#' @param object an object of class 'rcreg'
+#' @param formula an object of class 'rcreg'
+#' @param digits minimal number of significant digits. See \link{print.default}.
+#' @param evaluate a logical value. If \code{TRUE}, the updated call is evaluated. Default
+#' is \code{TRUE}.
+#' @param ... Additional arguments
+#' 
+#' @details
+#' 
+#' \code{reg} fitted by \link{lm}, \link{glm} (with family \code{gaussian}, \code{binomial} or
+#' \code{poisson}), \link[nnet]{multinom}, \link[MASS]{polr}, \link[survival]{coxph} or
+#' \link[survival]{survreg} is supported.
+#'  
+#' @return
+#' If \code{MEvariable} is not in the regression formula of \code{reg}, \code{reg} is 
+#' returned. If \code{MEvariable} is in the regression formula of \code{yeg}, an object of 
+#' class 'simexreg' is returned:
+#' \item{call}{the function call,}
+#' \item{NAIVEreg}{the naive regression object,}
+#' \item{ME}{a list of \code{MEvariable}, \code{MEerror} and \code{variance},}
+#' \item{RCcoef}{coefficient estimates corrected by \emph{SIMEX},}
+#' \item{RCsigma}{the residual standard deviation of a linear regression object corrected by 
+#' \emph{SIMEX},}
+#' \item{RCvcov}{the var-cov matrix of coefficients corrected by \emph{SIMEX},}
+#' ...
+#'
+#' @seealso \code{\link{rcreg}}, \code{\link{ggcmsens}}, \code{\link{cmdag}}, 
+#' \code{\link{cmest}}
+#'
+#' @references
+#' 
+#' Carrol RJ, Ruppert D, Stefanski LA, Crainiceanu C. Measurement Error in Nonlinear Models: 
+#' A Modern Perspective, Second Edition (2006). London: Chapman & Hall.
+#' 
+#' Cook JR, Stefanski LA. Simulation-extrapolation estimation in parametric measurement error 
+#' models (1994). Journal of the American Statistical Association, 89(428): 1314 - 1328.
+#' 
+#' Küchenhoff H, Mwalili SM, Lesaffre E. A general method for dealing with misclassification 
+#' in regression: the misclassification SIMEX (2006). Biometrics. 62(1): 85 - 96.
+#' 
+#' Stefanski LA, Cook JR. Simulation-extrapolation: the measurement error jackknife (1995). 
+#' Journal of the American Statistical Association. 90(432): 1247 - 56.
+#' 
+#' @examples
+#' 
+#' rm(list=ls())
+#' library(CMAverse)
+#' 
+#' # lm
+#' n <- 1000
+#' x1 <- rnorm(n, mean = 5, sd = 3)
+#' x2_true <- rnorm(n, mean = 2, sd = 1)
+#' error1 <- rnorm(n, mean = 0, sd = 0.5)
+#' x2_error <- x2_true + error1
+#' x3 <- rbinom(n, size = 1, prob = 0.4)
+#' y <- 1 + 2 * x1 + 4 * x2_true + 2 * x3  + rnorm(n, mean = 0, sd = 2)
+#' data <- data.frame(x1 = x1, x2_true = x2_true, x2_error = x2_error,
+#'                    x3 = x3, y = y)
+#' reg_naive <- lm(y ~ x1 + x2_error + x3, data = data)
+#' reg_true <- lm(y ~ x1 + x2_true + x3, data = data)
+#' reg_simex <- simexreg(reg = reg_naive, data = data, MEvariable = "x2_error", 
+#' MEvartype = "con", MEerror = 0.5, variance = TRUE)
+#' coef(reg_simex)
+#' vcov(reg_simex)
+#' sigma(reg_simex)
+#' formula(reg_simex)
+#' family(reg_simex)
+#' predict(reg_simex, newdata = data[1, ])
+#' model.frame(reg_simex)
+#' update(reg_simex, data = data, weights = rep(1, n))
+#' summary(reg_simex)
+#'                 
+#' # glm
+#' n <- 1000
+#' x1 <- rnorm(n, mean = 5, sd = 3)
+#' x2_true <- sample(x = c(1:3), size = n, prob = c(0.2,0.3,0.5), replace = TRUE)
+#' MEerror <- matrix(c(0.8,0.1,0.1,0.2,0.7,0.1,0.05,0.25,0.7), nrow = 3)
+#' x2_error <- x2_true
+#' for (j in 1:3) {
+#'   x2_error[which(x2_error == c(1:3)[j])] <-
+#'     sample(x = c(1:3), size = length(which(x2_error == c(1:3)[j])),
+#'            prob = MEerror[, j], replace = TRUE)
+#' }
+#' x2_true <- as.factor(x2_true)
+#' x2_error <- as.factor(x2_error)
+#' x3 <- rnorm(n, mean = 2, sd = 1)
+#' linearpred <- 1 + 0.3 * x1 - 1.5*(x2_true == 2) - 2.5*(x2_true == 3) - 0.2 * x3
+#' py <- exp(linearpred) / (1 + exp(linearpred))
+#' y <- rbinom(n, size = 1, prob = py)
+#' data <- data.frame(x1 = x1, x2_true = x2_true, x2_error = x2_error,
+#'                    x3 = x3, y = y)
+#' reg_naive <- glm(y ~ x1 + x2_error + x3, data = data, family = binomial("logit"))
+#' reg_true <- glm(y ~ x1 + x2_true + x3, data = data, family = binomial("logit"))
+#' reg_simex <- simexreg(reg = reg_naive, data = data, MEvariable = "x2_error",
+#'                       MEerror = MEerror, variance = TRUE, MEvartype = "cat")
+#'                       
+#' @importFrom stats as.formula model.frame family coef predict model.matrix getCall cov 
+#' formula vcov pt
+#' @importFrom boot boot
+#' 
 #' @export
-simexreg <- function (reg = NULL, data = NULL, weights = NULL, model = TRUE,
+#' 
+simexreg <- function (reg = NULL, data = NULL, weights = NULL, 
                       MEvariable = NULL, MEvartype = NULL, MEerror = NULL,
                       variance = FALSE, lambda = c(0.5, 1, 1.5, 2), B = 200) {
 
@@ -12,11 +132,12 @@ simexreg <- function (reg = NULL, data = NULL, weights = NULL, model = TRUE,
          family(reg)$family %in% c("gaussian", "binomial", "poisson")) | 
         identical(regClass, c("multinom", "nnet")) | identical(regClass, "polr") | 
         identical(regClass, "coxph") | identical(regClass, "survreg"))) stop(
-          "Measurement error correction applied to unsupported regression object")
+          "SIMEX applied to unsupported regression object")
   
   if (length(MEvariable) > 1) stop("length(MEvariable) > 1")
   if (length(MEvariable) != length(MEvartype)) stop("length(MEvariable) != length(MEvartype)")
-  
+  if (MEvartype == "con") MEvartype <- "continuous"
+  if (MEvartype == "cat") MEvartype <- "categorical"
   if (MEvartype == "continuous") {
     if (length(MEvariable) != length(MEerror)) stop("length(MEvariable) != length(MEerror)")
     if (length(MEerror) != 0 && MEerror < 0) stop("MEerror should be >= 0")
@@ -111,13 +232,11 @@ simexreg <- function (reg = NULL, data = NULL, weights = NULL, model = TRUE,
            identical(regClass, "lm")) && MEvartype == "categorical") SIMsigma <- 
         c(SIMsigma, mean(SIMsigma_mid))
     }
-
     # extrapolation
     extrap_coef <- lm(SIMcoef ~ lambda + I(lambda^2))
     SIMEXcoef <- as.vector(predict(extrap_coef, newdata = data.frame(lambda = -1)))
     names(SIMEXcoef) <- colnames(SIMcoef)
     out$SIMEXcoef <- SIMEXcoef
-
     if (variance) {
     SIMvcov.element <- matrix(unlist(SIMvcov), nrow = length(lambda) , byrow = TRUE)
     extrap_vcov <- lm(SIMvcov.element ~ lambda + I(lambda^2))
@@ -125,14 +244,12 @@ simexreg <- function (reg = NULL, data = NULL, weights = NULL, model = TRUE,
     dimnames(SIMEXvcov) <- list(names(SIMEXcoef), names(SIMEXcoef))
     out$SIMEXvcov <- SIMEXvcov
     }
-    
     if (((identical(regClass, c("glm", "lm")) && family(reg)$family == "gaussian") |
          identical(regClass, "lm")) && MEvartype == "categorical") {
       extrap_sigma <- lm(SIMsigma ~ lambda + I(lambda^2))
       SIMEXsigma <- as.vector(predict(extrap_sigma, newdata = data.frame(lambda = -1)))
       out$SIMEXsigma <- SIMEXsigma
     }
-    
     if (((identical(regClass, c("glm", "lm")) && family(reg)$family == "gaussian") |
          identical(regClass, "lm")) && MEvartype == "continuous") {
       reg_fit <- reg
@@ -141,35 +258,38 @@ simexreg <- function (reg = NULL, data = NULL, weights = NULL, model = TRUE,
                            (n - ncoef) - (SIMEXcoef[MEvariable] * MEerror) ^ 2)
       out$SIMEXsigma <- SIMEXsigma
     }
-
     class(out) <- "simexreg"
-
   }
-
   return(out)
-
 }
 
+#' @describeIn simexreg Extract coefficients corrected by \code{simexreg}
 #' @export
 coef.simexreg <- function(object, ...) {
   return(object$SIMEXcoef)
 }
 
+#' @describeIn simexreg Extract the var-cov matrix of coefficients corrected by 
+#' \code{simexreg}
 #' @export
 vcov.simexreg <- function(object, ...) {
   return(object$SIMEXvcov)
 }
 
+#' @describeIn simexreg Extract the residual standard deviation of a linear regression object 
+#' corrected by \code{simexreg}
 #' @export
 sigma.simexreg <- function(object, ...) {
   return(object$SIMEXsigma)
 }
 
+#' @describeIn simexreg Extract the regression formula
 #' @export
 formula.simexreg <- function(x, ...) {
   return(formula(x$NAIVEreg))
 }
 
+#' @describeIn simexreg Extract the family of a regression of class \code{lm} or \code{glm}
 #' @export
 family.simexreg <- function(object, ...) {
   if (inherits(object$NAIVEreg, "lm") | inherits(object$NAIVEreg, "glm")) {
@@ -177,6 +297,7 @@ family.simexreg <- function(object, ...) {
   } else return(NULL)
 }
 
+#' @describeIn simexreg Predict with new data
 #' @export
 predict.simexreg <- function(object, ...){
   reg <- object$NAIVEreg
@@ -197,11 +318,13 @@ predict.simexreg <- function(object, ...){
   return(out)
 }
 
+#' @describeIn simexreg Extract the model frame
 #' @export
 model.frame.simexreg <- function(formula, ...) {
   return(model.frame(formula$NAIVEreg))
 }
 
+#' @describeIn simexreg Print the results of \code{simexreg} nicely
 #' @export
 print.simexreg <- function(x, ...) {
   cat("Call:\n")
@@ -211,8 +334,57 @@ print.simexreg <- function(x, ...) {
   cat("\nVariable measured with error:\n")
   cat(x$ME$MEvariable)
   cat("\nMeasurement error:\n")
-  cat(x$ME$MEerror)
+  print(x$ME$MEerror)
   cat("\nError-corrected coefficient estimates:\n")
   print(x$SIMEXcoef)
 }
 
+#' @describeIn simexreg Summarize results of \code{simexreg} nicely
+#' @export
+summary.simexreg <- function(object, ...) {
+  if (!object$ME$variance) stop("Set variance = TRUE when fitting simexreg")
+  RCcoef <- coef(object)
+  RCse <- sqrt(diag(vcov(object)))
+  RCt <- RCcoef/RCse
+  df <- nrow(model.frame(object)) - length(RCcoef)
+  RCp <- 2 * pt(-abs(RCt), df)
+  summarydf <- cbind(RCcoef, RCse, RCt, RCp)
+  colnames(summarydf) <- c("Estimate", "Std. Error", "t value", "Pr(>|t|)")
+  rownames(summarydf) <- names(RCcoef)
+  out <- c(object, list(summarydf = summarydf))
+  class(out) <- "summary.simexreg"
+  return(out)
+}
+
+#' @describeIn simexreg Print summary of \code{simexreg} nicely
+#' @export
+print.summary.simexreg <- function(x, digits = 4, ...) {
+  cat("Call:\n")
+  print(x$call)
+  cat(paste("\nNaive regression object: \n"))
+  print(x$NAIVEreg)
+  cat("\nVariable measured with error:\n")
+  cat(x$ME$MEvariable)
+  cat("\nMeasurement error:\n")
+  print(x$ME$MEerror)
+  cat("\nError-corrected results:\n")
+  printCoefmat(x$summarydf, digits = digits)
+}
+
+#' @describeIn simexreg Update \code{simexreg}
+#' @export
+update.simexreg <- function (object, ..., evaluate = TRUE) {
+  simexreg_call <- getCall(object)
+  extras <- match.call(expand.dots = FALSE)$...
+  if (length(extras)) {
+    existing <- !is.na(match(names(extras), names(simexreg_call)))
+    for (a in names(extras)[existing]) simexreg_call[[a]] <- extras[[a]]
+    if (any(!existing)) {
+      simexreg_call <- c(as.list(simexreg_call), extras[!existing])
+      simexreg_call <- as.call(simexreg_call)
+    }
+  }
+  if (evaluate) 
+    eval(simexreg_call, parent.frame())
+  else simexreg_call
+}

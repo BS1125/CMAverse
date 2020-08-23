@@ -8,18 +8,20 @@ cmdag(
   outcome = NULL,
   exposure = NULL,
   mediator = NULL,
-  prec = NULL,
+  basec = NULL,
   postc = NULL,
   x.outcome = 4,
   x.exposure = 0,
   x.mediator = 2,
-  x.prec = 2,
+  x.basec = 2,
   x.postc = 2,
   y.outcome = 0,
   y.exposure = 0,
   y.mediator = 1,
-  y.prec = 2,
+  y.basec = 2,
   y.postc = -0.5,
+  caption.width = 50,
+  caption.size = 10,
   ...
 )
 }
@@ -30,7 +32,7 @@ cmdag(
 
 \item{mediator}{a character or vector of variable name(s) of the mediator(s)}
 
-\item{prec}{(optional) a character or vector of variable name(s) of the pre-exposure confounder(s)}
+\item{basec}{(optional) a character or vector of variable name(s) of the baseline confounder(s)}
 
 \item{postc}{(optional) a character or vector of variable name(s) of the post-exposure confounder(s)}
 
@@ -40,7 +42,7 @@ cmdag(
 
 \item{x.mediator}{x coordinate of the mediator. Default is \code{2}.}
 
-\item{x.prec}{x coordinate of the pre-exposure confounder. Default is \code{2}.}
+\item{x.basec}{x coordinate of the pre-exposure confounder. Default is \code{2}.}
 
 \item{x.postc}{x coordinate of the post-exposure confounder. Default is \code{2}.}
 
@@ -50,26 +52,34 @@ cmdag(
 
 \item{y.mediator}{y coordinate of the mediator. Default is \code{1}.}
 
-\item{y.prec}{y coordinate of the pre-exposure confounder. Default is \code{2}.}
+\item{y.basec}{y coordinate of the baseline confounder. Default is \code{2}.}
 
 \item{y.postc}{y coordinate of the post-exposure confounder. Default is \code{-0.5}.}
+
+\item{caption.width}{line width in characters for the caption. Default is \code{50}.}
+
+\item{caption.size}{text size in pts for the caption. Default is \code{10}.}
 
 \item{...}{additional arguments passed to \code{ggdag()}. See \link[ggdag]{ggdag} for details.}
 }
 \description{
-Create the directed acyclic graph(DAG) for causal mediation analysis.
+Plot the directed acyclic graph (DAG) for causal mediation analysis.
 }
 \examples{
-## prec and postc are empty
+## basec and postc are empty
 cmdag(outcome = "Y", exposure = "A", mediator = c("M1", "M2"),
-     prec = NULL, postc = NULL, node = TRUE, text_col = "white")
+     basec = NULL, postc = NULL, node = TRUE, text_col = "white")
 
-## postc is empty
+#' ## postc is empty
 cmdag(outcome = "Y", exposure = "A", mediator = c("M1", "M2"),
-     prec = c("C1", "c2", "c3"), postc = NULL, node = FALSE, text_col = "black")
+     basec = c("C1", "C2", "C3"), postc = NULL, node = FALSE, text_col = "black")
+     
+## basec is empty
+cmdag(outcome = "Y", exposure = "A", mediator = c("M1", "M2"),
+     basec = NULL, postc = c("L1", "L2"), node = FALSE, text_col = "black")
 
-## prec and postc aren't empty
+## basec and postc aren't empty
 cmdag(outcome = "Y", exposure = "A", mediator = c("M1", "M2"),
-     prec = c("C1", "c2", "c3"), postc = c("L1", "L2"), node = FALSE, text_col = "black")
+     basec = c("C1", "C2", "C3"), postc = c("L1", "L2"), node = FALSE, text_col = "black")
 
 }
