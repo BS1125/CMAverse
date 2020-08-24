@@ -13,13 +13,12 @@ knitr::opts_chunk$set(fig.path = "man/figures/")
 [![Project Status: Active](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
 [![Travis build status](https://travis-ci.com/BS1125/CMAverse.svg?branch=master)](https://travis-ci.com/BS1125/CMAverse)
 [![R build status](https://github.com/BS1125/CMAverse/workflows/R-CMD-check/badge.svg)](https://github.com/BS1125/CMAverse/actions)
+[![Codecov test coverage](https://codecov.io/gh/BS1125/CMAverse/branch/master/graph/badge.svg)](https://codecov.io/gh/BS1125/CMAverse?branch=master)
 
 ## About the Package 
 
 The R package `CMAverse` provides a suite of functions for reproducible causal mediation 
-analysis including `cmdag` for DAG visualization, `cmest` for statistical modeling and `cmsens` for sensitivity analysis.
-
-See the [package website](https://bs1125.github.io/CMAverse/) for details.
+analysis including `cmdag` for DAG visualization, `cmest` for statistical modeling and `cmsens` for sensitivity analysis. See the [package website](https://bs1125.github.io/CMAverse/) for details.
 
 ### DAG Visualization
 

@@ -3,7 +3,7 @@ Type: Package
 Title: Causal Mediation Analysis
 Version: 0.1.0
 URL: https://bs1125.github.io/CMAverse/, https://github.com/BS1125/CMAverse
-Author: @R: c(
+Author@R: c(
     person("Baoyi", "Shi", role = c("aut", "cre"), email = "bs3141@cumc.columbia.edu"),
     person("Christine", "Choirat", role = "aut", email = "cchoirat@gmail.com"),
     person("Linda", "Valeri", role = "aut", email = "lv2424@cumc.columbia.edu"),

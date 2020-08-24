@@ -111,7 +111,7 @@
 <div id="about-the-package" class="section level2">
 <h2 class="hasAnchor">
 <a href="#about-the-package" class="anchor"></a>About the Package</h2>
-<p>The R package <code>CMAverse</code> provides a suite of functions for reproducible causal mediation analysis including <code>cmdag</code> for DAG visualization, <code>cmest</code> for statistical modeling and <code>cmsens</code> for sensitivity analysis.</p>
+<p>The R package <code>CMAverse</code> provides a suite of functions for reproducible causal mediation analysis including <code>cmdag</code> for DAG visualization, <code>cmest</code> for statistical modeling and <code>cmsens</code> for sensitivity analysis. See the <a href="https://bs1125.github.io/CMAverse/">package website</a> for details.</p>
 <div id="dag-visualization" class="section level3">
 <h3 class="hasAnchor">
 <a href="#dag-visualization" class="anchor"></a>DAG Visualization</h3>
@@ -839,7 +839,7 @@ conditional effects are estimated when closed-form parameter function estimation
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
 <p>The latest version can be installed via:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">"LindaValeri/CMAverse"</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">"BS1125/CMAverse"</span>)</span></code></pre></div>
 <p>Load <code>CMAverse</code>:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">library</span>(CMAverse)</span></code></pre></div>
 </div>
@@ -885,26 +885,26 @@ conditional effects are estimated when closed-form parameter function estimation
 <span id="cb6-8"><a href="#cb6-8"></a><span class="co">## </span></span>
 <span id="cb6-9"><a href="#cb6-9"></a><span class="co">## Deviance Residuals: </span></span>
 <span id="cb6-10"><a href="#cb6-10"></a><span class="co">##      Min        1Q    Median        3Q       Max  </span></span>
-<span id="cb6-11"><a href="#cb6-11"></a><span class="co">## -1.97586  -0.75260  -0.00092   0.68488   2.13898  </span></span>
+<span id="cb6-11"><a href="#cb6-11"></a><span class="co">## -2.04693  -0.53712   0.02205   0.58158   2.27407  </span></span>
 <span id="cb6-12"><a href="#cb6-12"></a><span class="co">## </span></span>
 <span id="cb6-13"><a href="#cb6-13"></a><span class="co">## Coefficients:</span></span>
 <span id="cb6-14"><a href="#cb6-14"></a><span class="co">##             Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
-<span id="cb6-15"><a href="#cb6-15"></a><span class="co">## (Intercept)   1.1070     0.4552   2.432   0.0170 *  </span></span>
-<span id="cb6-16"><a href="#cb6-16"></a><span class="co">## Atreat       -0.5102     0.6515  -0.783   0.4356    </span></span>
-<span id="cb6-17"><a href="#cb6-17"></a><span class="co">## M1            0.1619     0.3690   0.439   0.6619    </span></span>
-<span id="cb6-18"><a href="#cb6-18"></a><span class="co">## M2            0.5715     0.1368   4.179 6.67e-05 ***</span></span>
-<span id="cb6-19"><a href="#cb6-19"></a><span class="co">## C1           -0.3074     0.1520  -2.022   0.0461 *  </span></span>
-<span id="cb6-20"><a href="#cb6-20"></a><span class="co">## C2C2_1        1.9603     0.3129   6.266 1.18e-08 ***</span></span>
-<span id="cb6-21"><a href="#cb6-21"></a><span class="co">## Atreat:M1     0.6750     0.4519   1.494   0.1387    </span></span>
-<span id="cb6-22"><a href="#cb6-22"></a><span class="co">## Atreat:M2     0.2863     0.1381   2.074   0.0409 *  </span></span>
+<span id="cb6-15"><a href="#cb6-15"></a><span class="co">## (Intercept)  1.26713    0.43215   2.932  0.00425 ** </span></span>
+<span id="cb6-16"><a href="#cb6-16"></a><span class="co">## Atreat      -0.86779    0.61501  -1.411  0.16161    </span></span>
+<span id="cb6-17"><a href="#cb6-17"></a><span class="co">## M1          -0.04839    0.31170  -0.155  0.87697    </span></span>
+<span id="cb6-18"><a href="#cb6-18"></a><span class="co">## M2           0.53167    0.11817   4.499 1.99e-05 ***</span></span>
+<span id="cb6-19"><a href="#cb6-19"></a><span class="co">## C1          -0.30268    0.10606  -2.854  0.00534 ** </span></span>
+<span id="cb6-20"><a href="#cb6-20"></a><span class="co">## C2C2_1       1.83641    0.29854   6.151 1.97e-08 ***</span></span>
+<span id="cb6-21"><a href="#cb6-21"></a><span class="co">## Atreat:M1    1.03168    0.39837   2.590  0.01117 *  </span></span>
+<span id="cb6-22"><a href="#cb6-22"></a><span class="co">## Atreat:M2    0.35068    0.12888   2.721  0.00779 ** </span></span>
 <span id="cb6-23"><a href="#cb6-23"></a><span class="co">## ---</span></span>
 <span id="cb6-24"><a href="#cb6-24"></a><span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span id="cb6-25"><a href="#cb6-25"></a><span class="co">## </span></span>
-<span id="cb6-26"><a href="#cb6-26"></a><span class="co">## (Dispersion parameter for gaussian family taken to be 1.01058)</span></span>
+<span id="cb6-26"><a href="#cb6-26"></a><span class="co">## (Dispersion parameter for gaussian family taken to be 0.8228192)</span></span>
 <span id="cb6-27"><a href="#cb6-27"></a><span class="co">## </span></span>
-<span id="cb6-28"><a href="#cb6-28"></a><span class="co">##     Null deviance: 480.971  on 99  degrees of freedom</span></span>
-<span id="cb6-29"><a href="#cb6-29"></a><span class="co">## Residual deviance:  92.973  on 92  degrees of freedom</span></span>
-<span id="cb6-30"><a href="#cb6-30"></a><span class="co">## AIC: 294.5</span></span>
+<span id="cb6-28"><a href="#cb6-28"></a><span class="co">##     Null deviance: 440.631  on 99  degrees of freedom</span></span>
+<span id="cb6-29"><a href="#cb6-29"></a><span class="co">## Residual deviance:  75.699  on 92  degrees of freedom</span></span>
+<span id="cb6-30"><a href="#cb6-30"></a><span class="co">## AIC: 273.95</span></span>
 <span id="cb6-31"><a href="#cb6-31"></a><span class="co">## </span></span>
 <span id="cb6-32"><a href="#cb6-32"></a><span class="co">## Number of Fisher Scoring iterations: 2</span></span>
 <span id="cb6-33"><a href="#cb6-33"></a><span class="co">## </span></span>
@@ -916,22 +916,22 @@ conditional effects are estimated when closed-form parameter function estimation
 <span id="cb6-39"><a href="#cb6-39"></a><span class="co">## </span></span>
 <span id="cb6-40"><a href="#cb6-40"></a><span class="co">## Deviance Residuals: </span></span>
 <span id="cb6-41"><a href="#cb6-41"></a><span class="co">##     Min       1Q   Median       3Q      Max  </span></span>
-<span id="cb6-42"><a href="#cb6-42"></a><span class="co">## -1.6293  -0.7643   0.2447   0.6769   2.4303  </span></span>
+<span id="cb6-42"><a href="#cb6-42"></a><span class="co">## -1.6894  -0.8718  -0.1670   0.7951   2.3486  </span></span>
 <span id="cb6-43"><a href="#cb6-43"></a><span class="co">## </span></span>
 <span id="cb6-44"><a href="#cb6-44"></a><span class="co">## Coefficients:</span></span>
 <span id="cb6-45"><a href="#cb6-45"></a><span class="co">##             Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
-<span id="cb6-46"><a href="#cb6-46"></a><span class="co">## (Intercept)   0.9569     0.6038   1.585   0.1130    </span></span>
-<span id="cb6-47"><a href="#cb6-47"></a><span class="co">## Atreat        0.5739     0.5131   1.118   0.2634    </span></span>
-<span id="cb6-48"><a href="#cb6-48"></a><span class="co">## C1           -1.9350     0.4282  -4.519 6.22e-06 ***</span></span>
-<span id="cb6-49"><a href="#cb6-49"></a><span class="co">## C2C2_1        1.2512     0.5305   2.359   0.0183 *  </span></span>
+<span id="cb6-46"><a href="#cb6-46"></a><span class="co">## (Intercept)  1.08423    0.65565   1.654   0.0982 .  </span></span>
+<span id="cb6-47"><a href="#cb6-47"></a><span class="co">## Atreat       0.05031    0.50534   0.100   0.9207    </span></span>
+<span id="cb6-48"><a href="#cb6-48"></a><span class="co">## C1          -1.58663    0.35549  -4.463 8.07e-06 ***</span></span>
+<span id="cb6-49"><a href="#cb6-49"></a><span class="co">## C2C2_1       0.76626    0.53989   1.419   0.1558    </span></span>
 <span id="cb6-50"><a href="#cb6-50"></a><span class="co">## ---</span></span>
 <span id="cb6-51"><a href="#cb6-51"></a><span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span id="cb6-52"><a href="#cb6-52"></a><span class="co">## </span></span>
 <span id="cb6-53"><a href="#cb6-53"></a><span class="co">## (Dispersion parameter for binomial family taken to be 1)</span></span>
 <span id="cb6-54"><a href="#cb6-54"></a><span class="co">## </span></span>
 <span id="cb6-55"><a href="#cb6-55"></a><span class="co">##     Null deviance: 138.589  on 99  degrees of freedom</span></span>
-<span id="cb6-56"><a href="#cb6-56"></a><span class="co">## Residual deviance:  93.449  on 96  degrees of freedom</span></span>
-<span id="cb6-57"><a href="#cb6-57"></a><span class="co">## AIC: 101.45</span></span>
+<span id="cb6-56"><a href="#cb6-56"></a><span class="co">## Residual deviance:  99.309  on 96  degrees of freedom</span></span>
+<span id="cb6-57"><a href="#cb6-57"></a><span class="co">## AIC: 107.31</span></span>
 <span id="cb6-58"><a href="#cb6-58"></a><span class="co">## </span></span>
 <span id="cb6-59"><a href="#cb6-59"></a><span class="co">## Number of Fisher Scoring iterations: 5</span></span>
 <span id="cb6-60"><a href="#cb6-60"></a><span class="co">## </span></span>
@@ -941,24 +941,24 @@ conditional effects are estimated when closed-form parameter function estimation
 <span id="cb6-64"><a href="#cb6-64"></a><span class="co">##     weights = getCall(x$regsumm$mreg[[2L]])$weights)</span></span>
 <span id="cb6-65"><a href="#cb6-65"></a><span class="co">## </span></span>
 <span id="cb6-66"><a href="#cb6-66"></a><span class="co">## Deviance Residuals: </span></span>
-<span id="cb6-67"><a href="#cb6-67"></a><span class="co">##     Min       1Q   Median       3Q      Max  </span></span>
-<span id="cb6-68"><a href="#cb6-68"></a><span class="co">## -2.0916  -0.6713   0.0814   0.6163   3.5031  </span></span>
+<span id="cb6-67"><a href="#cb6-67"></a><span class="co">##      Min        1Q    Median        3Q       Max  </span></span>
+<span id="cb6-68"><a href="#cb6-68"></a><span class="co">## -2.20635  -0.67665   0.01575   0.55827   2.50908  </span></span>
 <span id="cb6-69"><a href="#cb6-69"></a><span class="co">## </span></span>
 <span id="cb6-70"><a href="#cb6-70"></a><span class="co">## Coefficients:</span></span>
 <span id="cb6-71"><a href="#cb6-71"></a><span class="co">##             Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
-<span id="cb6-72"><a href="#cb6-72"></a><span class="co">## (Intercept)   1.9941     0.2659   7.500 3.36e-11 ***</span></span>
-<span id="cb6-73"><a href="#cb6-73"></a><span class="co">## Atreat        0.8373     0.1991   4.206 5.90e-05 ***</span></span>
-<span id="cb6-74"><a href="#cb6-74"></a><span class="co">## M1           -1.2076     0.2408  -5.015 2.46e-06 ***</span></span>
-<span id="cb6-75"><a href="#cb6-75"></a><span class="co">## C1            0.6033     0.1255   4.808 5.71e-06 ***</span></span>
-<span id="cb6-76"><a href="#cb6-76"></a><span class="co">## C2C2_1        2.1212     0.2036  10.418  &lt; 2e-16 ***</span></span>
+<span id="cb6-72"><a href="#cb6-72"></a><span class="co">## (Intercept)   2.1163     0.2747   7.705 1.25e-11 ***</span></span>
+<span id="cb6-73"><a href="#cb6-73"></a><span class="co">## Atreat        0.8060     0.1960   4.113 8.29e-05 ***</span></span>
+<span id="cb6-74"><a href="#cb6-74"></a><span class="co">## M1           -1.2360     0.2287  -5.405 4.80e-07 ***</span></span>
+<span id="cb6-75"><a href="#cb6-75"></a><span class="co">## C1            0.2852     0.1064   2.681  0.00866 ** </span></span>
+<span id="cb6-76"><a href="#cb6-76"></a><span class="co">## C2C2_1        2.2721     0.2049  11.088  &lt; 2e-16 ***</span></span>
 <span id="cb6-77"><a href="#cb6-77"></a><span class="co">## ---</span></span>
 <span id="cb6-78"><a href="#cb6-78"></a><span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span id="cb6-79"><a href="#cb6-79"></a><span class="co">## </span></span>
-<span id="cb6-80"><a href="#cb6-80"></a><span class="co">## (Dispersion parameter for gaussian family taken to be 0.9281253)</span></span>
+<span id="cb6-80"><a href="#cb6-80"></a><span class="co">## (Dispersion parameter for gaussian family taken to be 0.8951861)</span></span>
 <span id="cb6-81"><a href="#cb6-81"></a><span class="co">## </span></span>
-<span id="cb6-82"><a href="#cb6-82"></a><span class="co">##     Null deviance: 280.844  on 99  degrees of freedom</span></span>
-<span id="cb6-83"><a href="#cb6-83"></a><span class="co">## Residual deviance:  88.172  on 95  degrees of freedom</span></span>
-<span id="cb6-84"><a href="#cb6-84"></a><span class="co">## AIC: 283.2</span></span>
+<span id="cb6-82"><a href="#cb6-82"></a><span class="co">##     Null deviance: 237.532  on 99  degrees of freedom</span></span>
+<span id="cb6-83"><a href="#cb6-83"></a><span class="co">## Residual deviance:  85.043  on 95  degrees of freedom</span></span>
+<span id="cb6-84"><a href="#cb6-84"></a><span class="co">## AIC: 279.59</span></span>
 <span id="cb6-85"><a href="#cb6-85"></a><span class="co">## </span></span>
 <span id="cb6-86"><a href="#cb6-86"></a><span class="co">## Number of Fisher Scoring iterations: 2</span></span>
 <span id="cb6-87"><a href="#cb6-87"></a><span class="co">## </span></span>
@@ -968,21 +968,21 @@ conditional effects are estimated when closed-form parameter function estimation
 <span id="cb6-91"><a href="#cb6-91"></a><span class="co">##  bootstrap standard errors, percentile confidence intervals and p-values </span></span>
 <span id="cb6-92"><a href="#cb6-92"></a><span class="co">##  </span></span>
 <span id="cb6-93"><a href="#cb6-93"></a><span class="co">##              Estimate Std.error  95% CIL 95% CIU  P.val    </span></span>
-<span id="cb6-94"><a href="#cb6-94"></a><span class="co">## cde          -0.51023   0.73827 -1.85715   0.508    0.7    </span></span>
-<span id="cb6-95"><a href="#cb6-95"></a><span class="co">## pnde          0.71507   0.28541  0.28210   1.224 &lt;2e-16 ***</span></span>
-<span id="cb6-96"><a href="#cb6-96"></a><span class="co">## tnde          0.97783   0.32750  0.45240   1.535 &lt;2e-16 ***</span></span>
-<span id="cb6-97"><a href="#cb6-97"></a><span class="co">## pnie          0.44157   0.19616  0.10119   0.728 &lt;2e-16 ***</span></span>
-<span id="cb6-98"><a href="#cb6-98"></a><span class="co">## tnie          0.70433   0.25460  0.42384   1.293 &lt;2e-16 ***</span></span>
-<span id="cb6-99"><a href="#cb6-99"></a><span class="co">## te            1.41939   0.32773  0.94226   2.045 &lt;2e-16 ***</span></span>
-<span id="cb6-100"><a href="#cb6-100"></a><span class="co">## intref        1.22530   0.66472  0.29166   2.542 &lt;2e-16 ***</span></span>
-<span id="cb6-101"><a href="#cb6-101"></a><span class="co">## intmed        0.26276   0.18852  0.02431   0.642 &lt;2e-16 ***</span></span>
-<span id="cb6-102"><a href="#cb6-102"></a><span class="co">## cde(prop)    -0.35947   0.54242 -1.39513   0.310    0.7    </span></span>
-<span id="cb6-103"><a href="#cb6-103"></a><span class="co">## intref(prop)  0.86326   0.51346  0.23009   1.951 &lt;2e-16 ***</span></span>
-<span id="cb6-104"><a href="#cb6-104"></a><span class="co">## intmed(prop)  0.18512   0.11712  0.01846   0.387 &lt;2e-16 ***</span></span>
-<span id="cb6-105"><a href="#cb6-105"></a><span class="co">## pnie(prop)    0.31110   0.14884  0.07357   0.569 &lt;2e-16 ***</span></span>
-<span id="cb6-106"><a href="#cb6-106"></a><span class="co">## pm            0.49622   0.13949  0.32465   0.777 &lt;2e-16 ***</span></span>
-<span id="cb6-107"><a href="#cb6-107"></a><span class="co">## int           1.04838   0.61555  0.24855   2.272 &lt;2e-16 ***</span></span>
-<span id="cb6-108"><a href="#cb6-108"></a><span class="co">## pe            1.35947   0.54242  0.69010   2.395 &lt;2e-16 ***</span></span>
+<span id="cb6-94"><a href="#cb6-94"></a><span class="co">## cde          -0.86779   0.65365 -1.87101   0.259    0.2    </span></span>
+<span id="cb6-95"><a href="#cb6-95"></a><span class="co">## pnde          0.74058   0.22560  0.37923   1.111 &lt;2e-16 ***</span></span>
+<span id="cb6-96"><a href="#cb6-96"></a><span class="co">## tnde          1.00528   0.26771  0.70567   1.575 &lt;2e-16 ***</span></span>
+<span id="cb6-97"><a href="#cb6-97"></a><span class="co">## pnie          0.44970   0.14327  0.15184   0.630 &lt;2e-16 ***</span></span>
+<span id="cb6-98"><a href="#cb6-98"></a><span class="co">## tnie          0.71440   0.16437  0.41717   0.949 &lt;2e-16 ***</span></span>
+<span id="cb6-99"><a href="#cb6-99"></a><span class="co">## te            1.45498   0.24416  1.14724   1.929 &lt;2e-16 ***</span></span>
+<span id="cb6-100"><a href="#cb6-100"></a><span class="co">## intref        1.60837   0.64125  0.60196   2.720 &lt;2e-16 ***</span></span>
+<span id="cb6-101"><a href="#cb6-101"></a><span class="co">## intmed        0.26471   0.13269  0.12715   0.566 &lt;2e-16 ***</span></span>
+<span id="cb6-102"><a href="#cb6-102"></a><span class="co">## cde(prop)    -0.59643   0.44885 -1.39017   0.149    0.2    </span></span>
+<span id="cb6-103"><a href="#cb6-103"></a><span class="co">## intref(prop)  1.10542   0.40454  0.39795   1.749 &lt;2e-16 ***</span></span>
+<span id="cb6-104"><a href="#cb6-104"></a><span class="co">## intmed(prop)  0.18193   0.07459  0.07879   0.334 &lt;2e-16 ***</span></span>
+<span id="cb6-105"><a href="#cb6-105"></a><span class="co">## pnie(prop)    0.30908   0.10013  0.10438   0.439 &lt;2e-16 ***</span></span>
+<span id="cb6-106"><a href="#cb6-106"></a><span class="co">## pm            0.49101   0.11292  0.29700   0.723 &lt;2e-16 ***</span></span>
+<span id="cb6-107"><a href="#cb6-107"></a><span class="co">## int           1.28735   0.46559  0.48987   2.030 &lt;2e-16 ***</span></span>
+<span id="cb6-108"><a href="#cb6-108"></a><span class="co">## pe            1.59643   0.44885  0.85062   2.390 &lt;2e-16 ***</span></span>
 <span id="cb6-109"><a href="#cb6-109"></a><span class="co">## ---</span></span>
 <span id="cb6-110"><a href="#cb6-110"></a><span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span id="cb6-111"><a href="#cb6-111"></a><span class="co">## </span></span>
@@ -1010,12 +1010,12 @@ conditional effects are estimated when closed-form parameter function estimation
 <span id="cb7-4"><a href="#cb7-4"></a><span class="co">## </span></span>
 <span id="cb7-5"><a href="#cb7-5"></a><span class="co">## Evalues on the ratio scale: </span></span>
 <span id="cb7-6"><a href="#cb7-6"></a><span class="co">##          estRR   lowerRR  upperRR Evalue.estRR Evalue.lowerRR Evalue.upperRR</span></span>
-<span id="cb7-7"><a href="#cb7-7"></a><span class="co">## cde  0.8100555 0.4462601 1.470420     1.772503             NA              1</span></span>
-<span id="cb7-8"><a href="#cb7-8"></a><span class="co">## pnde 1.3434224 1.0668730 1.691657     2.022658       1.333978             NA</span></span>
-<span id="cb7-9"><a href="#cb7-9"></a><span class="co">## tnde 1.4973575 1.1493807 1.950685     2.360330       1.563742             NA</span></span>
-<span id="cb7-10"><a href="#cb7-10"></a><span class="co">## pnie 1.1999789 1.0241821 1.405951     1.689847       1.181557             NA</span></span>
-<span id="cb7-11"><a href="#cb7-11"></a><span class="co">## tnie 1.3374777 1.0889121 1.642783     2.009318       1.400067             NA</span></span>
-<span id="cb7-12"><a href="#cb7-12"></a><span class="co">## te   1.7967975 1.3789746 2.341219     2.993327       2.101883             NA</span></span></code></pre></div>
+<span id="cb7-7"><a href="#cb7-7"></a><span class="co">## cde  0.6877599 0.3962087 1.193850     2.266466             NA              1</span></span>
+<span id="cb7-8"><a href="#cb7-8"></a><span class="co">## pnde 1.3763585 1.1378010 1.664933     2.096084       1.533768             NA</span></span>
+<span id="cb7-9"><a href="#cb7-9"></a><span class="co">## tnde 1.5428319 1.2308983 1.933816     2.457981       1.764014             NA</span></span>
+<span id="cb7-10"><a href="#cb7-10"></a><span class="co">## pnie 1.2140646 1.0758340 1.370056     1.723857       1.361465             NA</span></span>
+<span id="cb7-11"><a href="#cb7-11"></a><span class="co">## tnie 1.3609082 1.1846767 1.563356     2.061738       1.652418             NA</span></span>
+<span id="cb7-12"><a href="#cb7-12"></a><span class="co">## te   1.8730975 1.5243880 2.301576     3.151924       2.418463             NA</span></span></code></pre></div>
 <p>Assume that the continuous pre-exposure confounder was measured with error. Sensitivity analysis for measurement error using regression calibration with a set of assumed standard deviations of the measurement error 0.1, 0.2 and 0.3:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>me1 &lt;-<span class="st"> </span><span class="kw">cmsens</span>(<span class="dt">object =</span> est, <span class="dt">sens =</span> <span class="st">"me"</span>, <span class="dt">MEmethod =</span> <span class="st">"rc"</span>, </span>
 <span id="cb8-2"><a href="#cb8-2"></a>              <span class="dt">MEvariable =</span> <span class="st">"C1"</span>, <span class="dt">MEvartype =</span> <span class="st">"con"</span>, <span class="dt">MEerror =</span> <span class="kw">c</span>(<span class="fl">0.1</span>, <span class="fl">0.2</span>, <span class="fl">0.3</span>))</span></code></pre></div>
@@ -1031,21 +1031,21 @@ conditional effects are estimated when closed-form parameter function estimation
 <span id="cb9-9"><a href="#cb9-9"></a><span class="co">## 0.1</span></span>
 <span id="cb9-10"><a href="#cb9-10"></a><span class="co">## Measurement error correction for measurement error 1: </span></span>
 <span id="cb9-11"><a href="#cb9-11"></a><span class="co">##              Estimate Std.error  95% CIL 95% CIU  P.val    </span></span>
-<span id="cb9-12"><a href="#cb9-12"></a><span class="co">## cde          -0.51327   0.80208 -1.46532   1.120    0.8    </span></span>
-<span id="cb9-13"><a href="#cb9-13"></a><span class="co">## pnde          0.73026   0.23737  0.35483   1.100 &lt;2e-16 ***</span></span>
-<span id="cb9-14"><a href="#cb9-14"></a><span class="co">## tnde          1.03051   0.28261  0.53268   1.483 &lt;2e-16 ***</span></span>
-<span id="cb9-15"><a href="#cb9-15"></a><span class="co">## pnie          0.38677   0.13604  0.24584   0.700 &lt;2e-16 ***</span></span>
-<span id="cb9-16"><a href="#cb9-16"></a><span class="co">## tnie          0.68702   0.13964  0.49694   0.940 &lt;2e-16 ***</span></span>
-<span id="cb9-17"><a href="#cb9-17"></a><span class="co">## te            1.41728   0.27451  1.01696   1.897 &lt;2e-16 ***</span></span>
-<span id="cb9-18"><a href="#cb9-18"></a><span class="co">## intref        1.24353   0.72405 -0.08605   2.357    0.1 .  </span></span>
-<span id="cb9-19"><a href="#cb9-19"></a><span class="co">## intmed        0.30025   0.19339 -0.05923   0.591    0.1 .  </span></span>
-<span id="cb9-20"><a href="#cb9-20"></a><span class="co">## cde(prop)    -0.36215   0.55520 -0.97773   0.762    0.8    </span></span>
-<span id="cb9-21"><a href="#cb9-21"></a><span class="co">## intref(prop)  0.87740   0.48825 -0.08885   1.400    0.1 .  </span></span>
-<span id="cb9-22"><a href="#cb9-22"></a><span class="co">## intmed(prop)  0.21185   0.12598 -0.04130   0.371    0.1 .  </span></span>
-<span id="cb9-23"><a href="#cb9-23"></a><span class="co">## pnie(prop)    0.27290   0.10395  0.15553   0.503 &lt;2e-16 ***</span></span>
-<span id="cb9-24"><a href="#cb9-24"></a><span class="co">## pm            0.48474   0.10145  0.32725   0.683 &lt;2e-16 ***</span></span>
-<span id="cb9-25"><a href="#cb9-25"></a><span class="co">## int           1.08925   0.60727 -0.13016   1.717    0.1 .  </span></span>
-<span id="cb9-26"><a href="#cb9-26"></a><span class="co">## pe            1.36215   0.55520  0.23840   1.978    0.1 .  </span></span>
+<span id="cb9-12"><a href="#cb9-12"></a><span class="co">## cde          -0.87002   0.61819 -1.89922   0.174    0.2    </span></span>
+<span id="cb9-13"><a href="#cb9-13"></a><span class="co">## pnde          0.74054   0.22713  0.42010   1.193 &lt;2e-16 ***</span></span>
+<span id="cb9-14"><a href="#cb9-14"></a><span class="co">## tnde          0.98168   0.23526  0.71285   1.487 &lt;2e-16 ***</span></span>
+<span id="cb9-15"><a href="#cb9-15"></a><span class="co">## pnie          0.47960   0.19472  0.15297   0.818 &lt;2e-16 ***</span></span>
+<span id="cb9-16"><a href="#cb9-16"></a><span class="co">## tnie          0.72074   0.24985  0.39572   1.142 &lt;2e-16 ***</span></span>
+<span id="cb9-17"><a href="#cb9-17"></a><span class="co">## te            1.46128   0.22463  1.15663   1.931 &lt;2e-16 ***</span></span>
+<span id="cb9-18"><a href="#cb9-18"></a><span class="co">## intref        1.61056   0.49791  0.98416   2.566 &lt;2e-16 ***</span></span>
+<span id="cb9-19"><a href="#cb9-19"></a><span class="co">## intmed        0.24114   0.13630  0.12018   0.556 &lt;2e-16 ***</span></span>
+<span id="cb9-20"><a href="#cb9-20"></a><span class="co">## cde(prop)    -0.59538   0.42222 -1.32777   0.097    0.2    </span></span>
+<span id="cb9-21"><a href="#cb9-21"></a><span class="co">## intref(prop)  1.10216   0.36833  0.55857   1.808 &lt;2e-16 ***</span></span>
+<span id="cb9-22"><a href="#cb9-22"></a><span class="co">## intmed(prop)  0.16502   0.07780  0.07732   0.339 &lt;2e-16 ***</span></span>
+<span id="cb9-23"><a href="#cb9-23"></a><span class="co">## pnie(prop)    0.32820   0.11522  0.11205   0.517 &lt;2e-16 ***</span></span>
+<span id="cb9-24"><a href="#cb9-24"></a><span class="co">## pm            0.49322   0.13704  0.27182   0.729 &lt;2e-16 ***</span></span>
+<span id="cb9-25"><a href="#cb9-25"></a><span class="co">## int           1.26718   0.41533  0.67220   2.097 &lt;2e-16 ***</span></span>
+<span id="cb9-26"><a href="#cb9-26"></a><span class="co">## pe            1.59538   0.42222  0.90270   2.328 &lt;2e-16 ***</span></span>
 <span id="cb9-27"><a href="#cb9-27"></a><span class="co">## ---</span></span>
 <span id="cb9-28"><a href="#cb9-28"></a><span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span id="cb9-29"><a href="#cb9-29"></a><span class="co">## ----------------------------------------------------------------</span></span>
@@ -1054,21 +1054,21 @@ conditional effects are estimated when closed-form parameter function estimation
 <span id="cb9-32"><a href="#cb9-32"></a><span class="co">## 0.2</span></span>
 <span id="cb9-33"><a href="#cb9-33"></a><span class="co">## Measurement error correction for measurement error 2: </span></span>
 <span id="cb9-34"><a href="#cb9-34"></a><span class="co">##              Estimate Std.error  95% CIL 95% CIU  P.val    </span></span>
-<span id="cb9-35"><a href="#cb9-35"></a><span class="co">## cde          -0.52320   0.77058 -1.93076   0.869    0.4    </span></span>
-<span id="cb9-36"><a href="#cb9-36"></a><span class="co">## pnde          0.68230   0.18798  0.50515   1.086 &lt;2e-16 ***</span></span>
-<span id="cb9-37"><a href="#cb9-37"></a><span class="co">## tnde          0.97976   0.22662  0.69545   1.454 &lt;2e-16 ***</span></span>
-<span id="cb9-38"><a href="#cb9-38"></a><span class="co">## pnie          0.40809   0.17855  0.20896   0.741 &lt;2e-16 ***</span></span>
-<span id="cb9-39"><a href="#cb9-39"></a><span class="co">## tnie          0.70555   0.17699  0.44102   0.981 &lt;2e-16 ***</span></span>
-<span id="cb9-40"><a href="#cb9-40"></a><span class="co">## te            1.38785   0.22130  1.10623   1.882 &lt;2e-16 ***</span></span>
-<span id="cb9-41"><a href="#cb9-41"></a><span class="co">## intref        1.20550   0.73189  0.07034   2.682    0.1 .  </span></span>
-<span id="cb9-42"><a href="#cb9-42"></a><span class="co">## intmed        0.29746   0.18576 -0.06395   0.626    0.1 .  </span></span>
-<span id="cb9-43"><a href="#cb9-43"></a><span class="co">## cde(prop)    -0.37699   0.52086 -1.24293   0.550    0.4    </span></span>
-<span id="cb9-44"><a href="#cb9-44"></a><span class="co">## intref(prop)  0.86861   0.50459  0.06627   1.724    0.1 .  </span></span>
-<span id="cb9-45"><a href="#cb9-45"></a><span class="co">## intmed(prop)  0.21433   0.11880 -0.03641   0.381    0.1 .  </span></span>
-<span id="cb9-46"><a href="#cb9-46"></a><span class="co">## pnie(prop)    0.29405   0.11098  0.13904   0.497 &lt;2e-16 ***</span></span>
-<span id="cb9-47"><a href="#cb9-47"></a><span class="co">## pm            0.50838   0.09782  0.30890   0.626 &lt;2e-16 ***</span></span>
-<span id="cb9-48"><a href="#cb9-48"></a><span class="co">## int           1.08294   0.59789  0.02986   2.028    0.1 .  </span></span>
-<span id="cb9-49"><a href="#cb9-49"></a><span class="co">## pe            1.37699   0.52086  0.45004   2.243 &lt;2e-16 ***</span></span>
+<span id="cb9-35"><a href="#cb9-35"></a><span class="co">## cde          -0.87707   0.59069 -1.77290   0.183    0.2    </span></span>
+<span id="cb9-36"><a href="#cb9-36"></a><span class="co">## pnde          0.79177   0.16210  0.58571   1.098 &lt;2e-16 ***</span></span>
+<span id="cb9-37"><a href="#cb9-37"></a><span class="co">## tnde          1.07635   0.23109  0.66568   1.467 &lt;2e-16 ***</span></span>
+<span id="cb9-38"><a href="#cb9-38"></a><span class="co">## pnie          0.43490   0.19209  0.12845   0.734 &lt;2e-16 ***</span></span>
+<span id="cb9-39"><a href="#cb9-39"></a><span class="co">## tnie          0.71948   0.19523  0.41077   0.983 &lt;2e-16 ***</span></span>
+<span id="cb9-40"><a href="#cb9-40"></a><span class="co">## te            1.51125   0.23278  1.10932   1.839 &lt;2e-16 ***</span></span>
+<span id="cb9-41"><a href="#cb9-41"></a><span class="co">## intref        1.66884   0.56056  0.77432   2.559 &lt;2e-16 ***</span></span>
+<span id="cb9-42"><a href="#cb9-42"></a><span class="co">## intmed        0.28458   0.19851 -0.04160   0.597    0.3    </span></span>
+<span id="cb9-43"><a href="#cb9-43"></a><span class="co">## cde(prop)    -0.58036   0.38245 -1.17387   0.115    0.2    </span></span>
+<span id="cb9-44"><a href="#cb9-44"></a><span class="co">## intref(prop)  1.10428   0.34723  0.50275   1.646 &lt;2e-16 ***</span></span>
+<span id="cb9-45"><a href="#cb9-45"></a><span class="co">## intmed(prop)  0.18831   0.12689 -0.03255   0.387    0.3    </span></span>
+<span id="cb9-46"><a href="#cb9-46"></a><span class="co">## pnie(prop)    0.28778   0.11798  0.08485   0.488 &lt;2e-16 ***</span></span>
+<span id="cb9-47"><a href="#cb9-47"></a><span class="co">## pm            0.47608   0.09224  0.29155   0.614 &lt;2e-16 ***</span></span>
+<span id="cb9-48"><a href="#cb9-48"></a><span class="co">## int           1.29259   0.45522  0.54852   2.012 &lt;2e-16 ***</span></span>
+<span id="cb9-49"><a href="#cb9-49"></a><span class="co">## pe            1.58036   0.38245  0.88486   2.174 &lt;2e-16 ***</span></span>
 <span id="cb9-50"><a href="#cb9-50"></a><span class="co">## ---</span></span>
 <span id="cb9-51"><a href="#cb9-51"></a><span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span id="cb9-52"><a href="#cb9-52"></a><span class="co">## ----------------------------------------------------------------</span></span>
@@ -1077,21 +1077,21 @@ conditional effects are estimated when closed-form parameter function estimation
 <span id="cb9-55"><a href="#cb9-55"></a><span class="co">## 0.3</span></span>
 <span id="cb9-56"><a href="#cb9-56"></a><span class="co">## Measurement error correction for measurement error 3: </span></span>
 <span id="cb9-57"><a href="#cb9-57"></a><span class="co">##              Estimate Std.error  95% CIL 95% CIU  P.val    </span></span>
-<span id="cb9-58"><a href="#cb9-58"></a><span class="co">## cde          -0.54317   0.73335 -1.96248   0.461    0.3    </span></span>
-<span id="cb9-59"><a href="#cb9-59"></a><span class="co">## pnde          0.70314   0.22138  0.32226   0.940 &lt;2e-16 ***</span></span>
-<span id="cb9-60"><a href="#cb9-60"></a><span class="co">## tnde          0.99720   0.31233  0.43707   1.496 &lt;2e-16 ***</span></span>
-<span id="cb9-61"><a href="#cb9-61"></a><span class="co">## pnie          0.44531   0.22009  0.19050   0.908 &lt;2e-16 ***</span></span>
-<span id="cb9-62"><a href="#cb9-62"></a><span class="co">## tnie          0.73937   0.19495  0.43918   1.155 &lt;2e-16 ***</span></span>
-<span id="cb9-63"><a href="#cb9-63"></a><span class="co">## te            1.44251   0.27177  1.07163   1.980 &lt;2e-16 ***</span></span>
-<span id="cb9-64"><a href="#cb9-64"></a><span class="co">## intref        1.24630   0.77979  0.19616   2.668 &lt;2e-16 ***</span></span>
-<span id="cb9-65"><a href="#cb9-65"></a><span class="co">## intmed        0.29406   0.18015  0.05084   0.613 &lt;2e-16 ***</span></span>
-<span id="cb9-66"><a href="#cb9-66"></a><span class="co">## cde(prop)    -0.37654   0.51963 -1.53247   0.298    0.3    </span></span>
-<span id="cb9-67"><a href="#cb9-67"></a><span class="co">## intref(prop)  0.86399   0.52317  0.13022   1.890 &lt;2e-16 ***</span></span>
-<span id="cb9-68"><a href="#cb9-68"></a><span class="co">## intmed(prop)  0.20386   0.12365  0.03381   0.483 &lt;2e-16 ***</span></span>
-<span id="cb9-69"><a href="#cb9-69"></a><span class="co">## pnie(prop)    0.30870   0.16023  0.15012   0.663 &lt;2e-16 ***</span></span>
-<span id="cb9-70"><a href="#cb9-70"></a><span class="co">## pm            0.51256   0.11820  0.35490   0.749 &lt;2e-16 ***</span></span>
-<span id="cb9-71"><a href="#cb9-71"></a><span class="co">## int           1.06784   0.63632  0.16404   2.372 &lt;2e-16 ***</span></span>
-<span id="cb9-72"><a href="#cb9-72"></a><span class="co">## pe            1.37654   0.51963  0.70184   2.532 &lt;2e-16 ***</span></span>
+<span id="cb9-58"><a href="#cb9-58"></a><span class="co">## cde          -0.89027   0.71029 -2.06766   0.322    0.3    </span></span>
+<span id="cb9-59"><a href="#cb9-59"></a><span class="co">## pnde          0.72419   0.21914  0.49316   1.177 &lt;2e-16 ***</span></span>
+<span id="cb9-60"><a href="#cb9-60"></a><span class="co">## tnde          1.06049   0.25086  0.77695   1.612 &lt;2e-16 ***</span></span>
+<span id="cb9-61"><a href="#cb9-61"></a><span class="co">## pnie          0.38582   0.18250  0.25844   0.860 &lt;2e-16 ***</span></span>
+<span id="cb9-62"><a href="#cb9-62"></a><span class="co">## tnie          0.72212   0.25880  0.33365   1.259 &lt;2e-16 ***</span></span>
+<span id="cb9-63"><a href="#cb9-63"></a><span class="co">## te            1.44631   0.25485  1.13055   1.978 &lt;2e-16 ***</span></span>
+<span id="cb9-64"><a href="#cb9-64"></a><span class="co">## intref        1.61446   0.67105  0.57277   2.870 &lt;2e-16 ***</span></span>
+<span id="cb9-65"><a href="#cb9-65"></a><span class="co">## intmed        0.33630   0.15915  0.05279   0.615 &lt;2e-16 ***</span></span>
+<span id="cb9-66"><a href="#cb9-66"></a><span class="co">## cde(prop)    -0.61554   0.44158 -1.22522   0.234    0.3    </span></span>
+<span id="cb9-67"><a href="#cb9-67"></a><span class="co">## intref(prop)  1.11626   0.39383  0.43702   1.606 &lt;2e-16 ***</span></span>
+<span id="cb9-68"><a href="#cb9-68"></a><span class="co">## intmed(prop)  0.23252   0.08258  0.05130   0.335 &lt;2e-16 ***</span></span>
+<span id="cb9-69"><a href="#cb9-69"></a><span class="co">## pnie(prop)    0.26676   0.09689  0.15121   0.461 &lt;2e-16 ***</span></span>
+<span id="cb9-70"><a href="#cb9-70"></a><span class="co">## pm            0.49929   0.12455  0.24150   0.717 &lt;2e-16 ***</span></span>
+<span id="cb9-71"><a href="#cb9-71"></a><span class="co">## int           1.34878   0.45662  0.51018   1.920 &lt;2e-16 ***</span></span>
+<span id="cb9-72"><a href="#cb9-72"></a><span class="co">## pe            1.61554   0.44158  0.76626   2.225 &lt;2e-16 ***</span></span>
 <span id="cb9-73"><a href="#cb9-73"></a><span class="co">## ---</span></span>
 <span id="cb9-74"><a href="#cb9-74"></a><span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span id="cb9-75"><a href="#cb9-75"></a><span class="co">## ----------------------------------------------------------------</span></span>
@@ -1119,21 +1119,21 @@ conditional effects are estimated when closed-form parameter function estimation
 <span id="cb11-12"><a href="#cb11-12"></a><span class="co">## </span></span>
 <span id="cb11-13"><a href="#cb11-13"></a><span class="co">## Measurement error correction for measurement error 1: </span></span>
 <span id="cb11-14"><a href="#cb11-14"></a><span class="co">##              Estimate Std.error  95% CIL 95% CIU  P.val    </span></span>
-<span id="cb11-15"><a href="#cb11-15"></a><span class="co">## cde          -0.68821   0.83825 -1.66732   0.846    0.8    </span></span>
-<span id="cb11-16"><a href="#cb11-16"></a><span class="co">## pnde          0.79362   0.24571  0.48210   1.348 &lt;2e-16 ***</span></span>
-<span id="cb11-17"><a href="#cb11-17"></a><span class="co">## tnde          1.16950   0.26335  0.79488   1.704 &lt;2e-16 ***</span></span>
-<span id="cb11-18"><a href="#cb11-18"></a><span class="co">## pnie          0.42664   0.15013  0.11345   0.591 &lt;2e-16 ***</span></span>
-<span id="cb11-19"><a href="#cb11-19"></a><span class="co">## tnie          0.80252   0.18877  0.44788   1.091 &lt;2e-16 ***</span></span>
-<span id="cb11-20"><a href="#cb11-20"></a><span class="co">## te            1.59614   0.27775  1.07866   1.993 &lt;2e-16 ***</span></span>
-<span id="cb11-21"><a href="#cb11-21"></a><span class="co">## intref        1.48183   0.82380  0.05331   2.679    0.1 .  </span></span>
-<span id="cb11-22"><a href="#cb11-22"></a><span class="co">## intmed        0.37588   0.20310  0.06242   0.684 &lt;2e-16 ***</span></span>
-<span id="cb11-23"><a href="#cb11-23"></a><span class="co">## cde(prop)    -0.43117   0.52935 -1.03374   0.664    0.8    </span></span>
-<span id="cb11-24"><a href="#cb11-24"></a><span class="co">## intref(prop)  0.92839   0.48720 -0.04842   1.484    0.1 .  </span></span>
-<span id="cb11-25"><a href="#cb11-25"></a><span class="co">## intmed(prop)  0.23549   0.12566  0.03670   0.436 &lt;2e-16 ***</span></span>
-<span id="cb11-26"><a href="#cb11-26"></a><span class="co">## pnie(prop)    0.26730   0.08493  0.07382   0.356 &lt;2e-16 ***</span></span>
-<span id="cb11-27"><a href="#cb11-27"></a><span class="co">## pm            0.50279   0.09626  0.27864   0.599 &lt;2e-16 ***</span></span>
-<span id="cb11-28"><a href="#cb11-28"></a><span class="co">## int           1.16388   0.56899  0.15451   1.908 &lt;2e-16 ***</span></span>
-<span id="cb11-29"><a href="#cb11-29"></a><span class="co">## pe            1.43117   0.52935  0.33619   2.034 &lt;2e-16 ***</span></span>
+<span id="cb11-15"><a href="#cb11-15"></a><span class="co">## cde          -0.69884   0.93427 -2.76621   0.499    0.2    </span></span>
+<span id="cb11-16"><a href="#cb11-16"></a><span class="co">## pnde          0.92925   0.23365  0.42667   1.173 &lt;2e-16 ***</span></span>
+<span id="cb11-17"><a href="#cb11-17"></a><span class="co">## tnde          1.26685   0.25047  0.73463   1.670 &lt;2e-16 ***</span></span>
+<span id="cb11-18"><a href="#cb11-18"></a><span class="co">## pnie          0.34132   0.13041  0.17664   0.604 &lt;2e-16 ***</span></span>
+<span id="cb11-19"><a href="#cb11-19"></a><span class="co">## tnie          0.67891   0.28064  0.31394   1.255 &lt;2e-16 ***</span></span>
+<span id="cb11-20"><a href="#cb11-20"></a><span class="co">## te            1.60817   0.29137  0.99481   2.075 &lt;2e-16 ***</span></span>
+<span id="cb11-21"><a href="#cb11-21"></a><span class="co">## intref        1.62810   0.78348  0.66422   3.422 &lt;2e-16 ***</span></span>
+<span id="cb11-22"><a href="#cb11-22"></a><span class="co">## intmed        0.33759   0.24728  0.05100   0.925 &lt;2e-16 ***</span></span>
+<span id="cb11-23"><a href="#cb11-23"></a><span class="co">## cde(prop)    -0.43456   0.63850 -1.81496   0.333    0.2    </span></span>
+<span id="cb11-24"><a href="#cb11-24"></a><span class="co">## intref(prop)  1.01239   0.54729  0.42472   2.245 &lt;2e-16 ***</span></span>
+<span id="cb11-25"><a href="#cb11-25"></a><span class="co">## intmed(prop)  0.20992   0.13635  0.03803   0.512 &lt;2e-16 ***</span></span>
+<span id="cb11-26"><a href="#cb11-26"></a><span class="co">## pnie(prop)    0.21224   0.07019  0.12534   0.357 &lt;2e-16 ***</span></span>
+<span id="cb11-27"><a href="#cb11-27"></a><span class="co">## pm            0.42217   0.13673  0.24027   0.690 &lt;2e-16 ***</span></span>
+<span id="cb11-28"><a href="#cb11-28"></a><span class="co">## int           1.22232   0.63518  0.46985   2.595 &lt;2e-16 ***</span></span>
+<span id="cb11-29"><a href="#cb11-29"></a><span class="co">## pe            1.43456   0.63850  0.66741   2.815 &lt;2e-16 ***</span></span>
 <span id="cb11-30"><a href="#cb11-30"></a><span class="co">## ---</span></span>
 <span id="cb11-31"><a href="#cb11-31"></a><span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span id="cb11-32"><a href="#cb11-32"></a><span class="co">## ----------------------------------------------------------------</span></span>
@@ -1145,21 +1145,21 @@ conditional effects are estimated when closed-form parameter function estimation
 <span id="cb11-38"><a href="#cb11-38"></a><span class="co">## </span></span>
 <span id="cb11-39"><a href="#cb11-39"></a><span class="co">## Measurement error correction for measurement error 2: </span></span>
 <span id="cb11-40"><a href="#cb11-40"></a><span class="co">##               Estimate Std.error   95% CIL 95% CIU  P.val    </span></span>
-<span id="cb11-41"><a href="#cb11-41"></a><span class="co">## cde          -0.696631  1.017253 -2.533501   1.223    0.3    </span></span>
-<span id="cb11-42"><a href="#cb11-42"></a><span class="co">## pnde          1.112874  0.310692  0.407172   1.444 &lt;2e-16 ***</span></span>
-<span id="cb11-43"><a href="#cb11-43"></a><span class="co">## tnde          1.548400  0.392011  0.889103   2.068 &lt;2e-16 ***</span></span>
-<span id="cb11-44"><a href="#cb11-44"></a><span class="co">## pnie          0.328872  0.245931 -0.058411   0.775    0.2    </span></span>
-<span id="cb11-45"><a href="#cb11-45"></a><span class="co">## tnie          0.764398  0.287063  0.504674   1.511 &lt;2e-16 ***</span></span>
-<span id="cb11-46"><a href="#cb11-46"></a><span class="co">## te            1.877272  0.271040  1.392188   2.262 &lt;2e-16 ***</span></span>
-<span id="cb11-47"><a href="#cb11-47"></a><span class="co">## intref        1.809506  0.973885 -0.166697   3.228    0.1 .  </span></span>
-<span id="cb11-48"><a href="#cb11-48"></a><span class="co">## intmed        0.435526  0.316735 -0.012153   1.146    0.1 .  </span></span>
-<span id="cb11-49"><a href="#cb11-49"></a><span class="co">## cde(prop)    -0.371087  0.534719 -1.289577   0.707    0.3    </span></span>
-<span id="cb11-50"><a href="#cb11-50"></a><span class="co">## intref(prop)  0.963902  0.475943 -0.079846   1.581    0.1 .  </span></span>
-<span id="cb11-51"><a href="#cb11-51"></a><span class="co">## intmed(prop)  0.231999  0.158193  0.002774   0.584    0.1 .  </span></span>
-<span id="cb11-52"><a href="#cb11-52"></a><span class="co">## pnie(prop)    0.175186  0.143356 -0.031953   0.410    0.2    </span></span>
-<span id="cb11-53"><a href="#cb11-53"></a><span class="co">## pm            0.407185  0.139748  0.281387   0.769 &lt;2e-16 ***</span></span>
-<span id="cb11-54"><a href="#cb11-54"></a><span class="co">## int           1.195901  0.611461 -0.064595   2.101    0.1 .  </span></span>
-<span id="cb11-55"><a href="#cb11-55"></a><span class="co">## pe            1.371087  0.534719  0.292725   2.290 &lt;2e-16 ***</span></span>
+<span id="cb11-41"><a href="#cb11-41"></a><span class="co">## cde          -0.736215  0.954986 -2.840858   0.194    0.2    </span></span>
+<span id="cb11-42"><a href="#cb11-42"></a><span class="co">## pnde          1.050472  0.320708  0.422315   1.521 &lt;2e-16 ***</span></span>
+<span id="cb11-43"><a href="#cb11-43"></a><span class="co">## tnde          1.488021  0.299204  0.959927   1.990 &lt;2e-16 ***</span></span>
+<span id="cb11-44"><a href="#cb11-44"></a><span class="co">## pnie          0.294209  0.238333  0.003238   0.825    0.1 .  </span></span>
+<span id="cb11-45"><a href="#cb11-45"></a><span class="co">## tnie          0.731758  0.304975  0.572168   1.497 &lt;2e-16 ***</span></span>
+<span id="cb11-46"><a href="#cb11-46"></a><span class="co">## te            1.782230  0.293253  1.400750   2.284 &lt;2e-16 ***</span></span>
+<span id="cb11-47"><a href="#cb11-47"></a><span class="co">## intref        1.786687  0.871184  0.851292   3.928 &lt;2e-16 ***</span></span>
+<span id="cb11-48"><a href="#cb11-48"></a><span class="co">## intmed        0.437549  0.224634  0.209823   0.966 &lt;2e-16 ***</span></span>
+<span id="cb11-49"><a href="#cb11-49"></a><span class="co">## cde(prop)    -0.413086  0.523835 -1.718662   0.093    0.2    </span></span>
+<span id="cb11-50"><a href="#cb11-50"></a><span class="co">## intref(prop)  1.002501  0.486884  0.422431   2.178 &lt;2e-16 ***</span></span>
+<span id="cb11-51"><a href="#cb11-51"></a><span class="co">## intmed(prop)  0.245506  0.112432  0.104197   0.465 &lt;2e-16 ***</span></span>
+<span id="cb11-52"><a href="#cb11-52"></a><span class="co">## pnie(prop)    0.165079  0.115842  0.002552   0.381    0.1 .  </span></span>
+<span id="cb11-53"><a href="#cb11-53"></a><span class="co">## pm            0.410586  0.139007  0.278730   0.776 &lt;2e-16 ***</span></span>
+<span id="cb11-54"><a href="#cb11-54"></a><span class="co">## int           1.248007  0.574570  0.526628   2.584 &lt;2e-16 ***</span></span>
+<span id="cb11-55"><a href="#cb11-55"></a><span class="co">## pe            1.413086  0.523835  0.906988   2.719 &lt;2e-16 ***</span></span>
 <span id="cb11-56"><a href="#cb11-56"></a><span class="co">## ---</span></span>
 <span id="cb11-57"><a href="#cb11-57"></a><span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span id="cb11-58"><a href="#cb11-58"></a><span class="co">## ----------------------------------------------------------------</span></span>
@@ -1221,6 +1221,8 @@ conditional effects are estimated when closed-form parameter function estimation
 <ul class="list-unstyled">
 <li><a href="http://www.repostatus.org/#active"><img src="http://www.repostatus.org/badges/latest/active.svg" alt="Project Status: Active"></a></li>
 <li><a href="https://travis-ci.com/BS1125/CMAverse"><img src="https://travis-ci.com/BS1125/CMAverse.svg?branch=master" alt="Travis build status"></a></li>
+<li><a href="https://github.com/BS1125/CMAverse/actions"><img src="https://github.com/BS1125/CMAverse/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
+<li><a href="https://codecov.io/gh/BS1125/CMAverse?branch=master"><img src="https://codecov.io/gh/BS1125/CMAverse/branch/master/graph/badge.svg" alt="Codecov test coverage"></a></li>
 </ul>
 </div>
 </div>
