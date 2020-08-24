@@ -7,3 +7,4 @@
 ^\.github$
 ^\.travis\.yml$
 README.Rmd
+^codecov\.yml$

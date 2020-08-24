@@ -4,8 +4,5 @@ pkgdown_sha: ~
 articles:
   overview: overview.html
   quickstart: quickstart.html
-last_built: 2020-08-23T22:46Z
-urls:
-  reference: http://cmaverse.org/reference
-  article: http://cmaverse.org/articles
+last_built: 2020-08-24T04:23Z
 

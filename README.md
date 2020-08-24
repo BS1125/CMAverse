@@ -7,6 +7,10 @@ CMAverse <img src="man/figures/logo.png" align="right" width="240" />
 Active](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
 [![Travis build
 status](https://travis-ci.com/BS1125/CMAverse.svg?branch=master)](https://travis-ci.com/BS1125/CMAverse)
+[![R build
+status](https://github.com/BS1125/CMAverse/workflows/R-CMD-check/badge.svg)](https://github.com/BS1125/CMAverse/actions)
+[![Codecov test
+coverage](https://codecov.io/gh/BS1125/CMAverse/branch/master/graph/badge.svg)](https://codecov.io/gh/BS1125/CMAverse?branch=master)
 
 About the Package
 -----------------
@@ -297,6 +301,7 @@ al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5285457/).
 </tbody>
 </table>
 <section class="footnotes" role="doc-endnotes">
+<hr />
 <ol>
 <li id="fn1" role="doc-endnote"><p>rb: the regression-based approach; wb: the weighting-based approach; iorw: the inverse odds ratio weighting approach; ne: the natural effect model; msm: the marginal structural model; gformula: the g-formula approach.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn2" role="doc-endnote"><p>Y denotes the outcome, A denotes the exposure, M denotes the mediator(s) and C denotes the pre-exposure confounder(s).<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
@@ -400,26 +405,26 @@ Summarizing and plotting the results:
     ## 
     ## Deviance Residuals: 
     ##      Min        1Q    Median        3Q       Max  
-    ## -1.97586  -0.75260  -0.00092   0.68488   2.13898  
+    ## -2.40326  -0.72140  -0.00023   0.57945   2.16324  
     ## 
     ## Coefficients:
     ##             Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)   1.1070     0.4552   2.432   0.0170 *  
-    ## Atreat       -0.5102     0.6515  -0.783   0.4356    
-    ## M1            0.1619     0.3690   0.439   0.6619    
-    ## M2            0.5715     0.1368   4.179 6.67e-05 ***
-    ## C1           -0.3074     0.1520  -2.022   0.0461 *  
-    ## C2C2_1        1.9603     0.3129   6.266 1.18e-08 ***
-    ## Atreat:M1     0.6750     0.4519   1.494   0.1387    
-    ## Atreat:M2     0.2863     0.1381   2.074   0.0409 *  
+    ## (Intercept)   0.7551     0.3521   2.145  0.03462 *  
+    ## Atreat        0.2085     0.5810   0.359  0.72058    
+    ## M1            0.5274     0.3033   1.739  0.08544 .  
+    ## M2            0.5407     0.1140   4.745 7.61e-06 ***
+    ## C1           -0.3910     0.1224  -3.194  0.00192 ** 
+    ## C2C2_1        2.0925     0.2825   7.408 6.03e-11 ***
+    ## Atreat:M1     0.7636     0.4232   1.804  0.07444 .  
+    ## Atreat:M2     0.1610     0.1259   1.279  0.20428    
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
-    ## (Dispersion parameter for gaussian family taken to be 1.01058)
+    ## (Dispersion parameter for gaussian family taken to be 0.8766664)
     ## 
-    ##     Null deviance: 480.971  on 99  degrees of freedom
-    ## Residual deviance:  92.973  on 92  degrees of freedom
-    ## AIC: 294.5
+    ##     Null deviance: 493.158  on 99  degrees of freedom
+    ## Residual deviance:  80.653  on 92  degrees of freedom
+    ## AIC: 280.29
     ## 
     ## Number of Fisher Scoring iterations: 2
     ## 
@@ -431,24 +436,24 @@ Summarizing and plotting the results:
     ## 
     ## Deviance Residuals: 
     ##     Min       1Q   Median       3Q      Max  
-    ## -1.6293  -0.7643   0.2447   0.6769   2.4303  
+    ## -1.8886  -0.8056  -0.4000   0.8544   2.2799  
     ## 
     ## Coefficients:
     ##             Estimate Std. Error z value Pr(>|z|)    
-    ## (Intercept)   0.9569     0.6038   1.585   0.1130    
-    ## Atreat        0.5739     0.5131   1.118   0.2634    
-    ## C1           -1.9350     0.4282  -4.519 6.22e-06 ***
-    ## C2C2_1        1.2512     0.5305   2.359   0.0183 *  
+    ## (Intercept)   0.4647     0.4742   0.980   0.3272    
+    ## Atreat        0.2762     0.4831   0.572   0.5675    
+    ## C1           -1.2857     0.2909  -4.420 9.87e-06 ***
+    ## C2C2_1        0.8843     0.5019   1.762   0.0781 .  
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
     ## (Dispersion parameter for binomial family taken to be 1)
     ## 
-    ##     Null deviance: 138.589  on 99  degrees of freedom
-    ## Residual deviance:  93.449  on 96  degrees of freedom
-    ## AIC: 101.45
+    ##     Null deviance: 138.27  on 99  degrees of freedom
+    ## Residual deviance: 108.42  on 96  degrees of freedom
+    ## AIC: 116.42
     ## 
-    ## Number of Fisher Scoring iterations: 5
+    ## Number of Fisher Scoring iterations: 4
     ## 
     ## 
     ## Call:
@@ -456,24 +461,24 @@ Summarizing and plotting the results:
     ##     weights = getCall(x$regsumm$mreg[[2L]])$weights)
     ## 
     ## Deviance Residuals: 
-    ##     Min       1Q   Median       3Q      Max  
-    ## -2.0916  -0.6713   0.0814   0.6163   3.5031  
+    ##      Min        1Q    Median        3Q       Max  
+    ## -2.43403  -0.68099  -0.04434   0.76494   1.97911  
     ## 
     ## Coefficients:
     ##             Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)   1.9941     0.2659   7.500 3.36e-11 ***
-    ## Atreat        0.8373     0.1991   4.206 5.90e-05 ***
-    ## M1           -1.2076     0.2408  -5.015 2.46e-06 ***
-    ## C1            0.6033     0.1255   4.808 5.71e-06 ***
-    ## C2C2_1        2.1212     0.2036  10.418  < 2e-16 ***
+    ## (Intercept)   1.6218     0.2503   6.479 4.08e-09 ***
+    ## Atreat        1.0407     0.2081   5.002 2.60e-06 ***
+    ## M1           -1.0921     0.2342  -4.662 1.02e-05 ***
+    ## C1            0.5369     0.1174   4.575 1.44e-05 ***
+    ## C2C2_1        2.0989     0.2111   9.941  < 2e-16 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
-    ## (Dispersion parameter for gaussian family taken to be 0.9281253)
+    ## (Dispersion parameter for gaussian family taken to be 1.009011)
     ## 
-    ##     Null deviance: 280.844  on 99  degrees of freedom
-    ## Residual deviance:  88.172  on 95  degrees of freedom
-    ## AIC: 283.2
+    ##     Null deviance: 297.239  on 99  degrees of freedom
+    ## Residual deviance:  95.856  on 95  degrees of freedom
+    ## AIC: 291.56
     ## 
     ## Number of Fisher Scoring iterations: 2
     ## 
@@ -483,21 +488,21 @@ Summarizing and plotting the results:
     ##  bootstrap standard errors, percentile confidence intervals and p-values 
     ##  
     ##              Estimate Std.error  95% CIL 95% CIU  P.val    
-    ## cde          -0.51023   0.73827 -1.85715   0.508    0.7    
-    ## pnde          0.71507   0.28541  0.28210   1.224 <2e-16 ***
-    ## tnde          0.97783   0.32750  0.45240   1.535 <2e-16 ***
-    ## pnie          0.44157   0.19616  0.10119   0.728 <2e-16 ***
-    ## tnie          0.70433   0.25460  0.42384   1.293 <2e-16 ***
-    ## te            1.41939   0.32773  0.94226   2.045 <2e-16 ***
-    ## intref        1.22530   0.66472  0.29166   2.542 <2e-16 ***
-    ## intmed        0.26276   0.18852  0.02431   0.642 <2e-16 ***
-    ## cde(prop)    -0.35947   0.54242 -1.39513   0.310    0.7    
-    ## intref(prop)  0.86326   0.51346  0.23009   1.951 <2e-16 ***
-    ## intmed(prop)  0.18512   0.11712  0.01846   0.387 <2e-16 ***
-    ## pnie(prop)    0.31110   0.14884  0.07357   0.569 <2e-16 ***
-    ## pm            0.49622   0.13949  0.32465   0.777 <2e-16 ***
-    ## int           1.04838   0.61555  0.24855   2.272 <2e-16 ***
-    ## pe            1.35947   0.54242  0.69010   2.395 <2e-16 ***
+    ## cde           0.20847   0.67110 -0.81428   1.450    0.7    
+    ## pnde          1.04534   0.28139  0.60505   1.472 <2e-16 ***
+    ## tnde          1.20701   0.27595  0.84519   1.690 <2e-16 ***
+    ## pnie          0.56334   0.15605  0.35407   0.878 <2e-16 ***
+    ## tnie          0.72502   0.22528  0.46824   1.204 <2e-16 ***
+    ## te            1.77036   0.27203  1.36197   2.153 <2e-16 ***
+    ## intref        0.83687   0.56739 -0.12084   1.655    0.1 .  
+    ## intmed        0.16167   0.18042 -0.07757   0.556    0.1 .  
+    ## cde(prop)     0.11775   0.38463 -0.51699   0.766    0.7    
+    ## intref(prop)  0.47272   0.32113 -0.06683   1.040    0.1 .  
+    ## intmed(prop)  0.09132   0.09752 -0.03780   0.302    0.1 .  
+    ## pnie(prop)    0.31821   0.08482  0.18541   0.461 <2e-16 ***
+    ## pm            0.40953   0.11737  0.27201   0.645 <2e-16 ***
+    ## int           0.56404   0.40801 -0.09191   1.270    0.1 .  
+    ## pe            0.88225   0.38463  0.23372   1.517 <2e-16 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
@@ -528,13 +533,13 @@ analysis for unmeasured confounding:
     ## Sensitivity Analysis For Unmeasured Confounding 
     ## 
     ## Evalues on the ratio scale: 
-    ##          estRR   lowerRR  upperRR Evalue.estRR Evalue.lowerRR Evalue.upperRR
-    ## cde  0.8100555 0.4462601 1.470420     1.772503             NA              1
-    ## pnde 1.3434224 1.0668730 1.691657     2.022658       1.333978             NA
-    ## tnde 1.4973575 1.1493807 1.950685     2.360330       1.563742             NA
-    ## pnie 1.1999789 1.0241821 1.405951     1.689847       1.181557             NA
-    ## tnie 1.3374777 1.0889121 1.642783     2.009318       1.400067             NA
-    ## te   1.7967975 1.3789746 2.341219     2.993327       2.101883             NA
+    ##         estRR   lowerRR  upperRR Evalue.estRR Evalue.lowerRR Evalue.upperRR
+    ## cde  1.088713 0.6374836 1.859337     1.399492       1.000000             NA
+    ## pnde 1.531443 1.2235924 1.916746     2.433592       1.746647             NA
+    ## tnde 1.635794 1.3126569 2.038478     2.655612       1.953290             NA
+    ## pnie 1.258208 1.1109676 1.424962     1.828189       1.462082             NA
+    ## tnie 1.343941 1.1229245 1.608459     2.023821       1.494455             NA
+    ## te   2.058169 1.6567618 2.556830     3.533936       2.699881             NA
 
 Assume that the continuous pre-exposure confounder was measured with
 error. Sensitivity analysis for measurement error using regression
@@ -556,22 +561,22 @@ Summarizing and plotting the results:
     ## Measurement error 1: 
     ## 0.1
     ## Measurement error correction for measurement error 1: 
-    ##              Estimate Std.error  95% CIL 95% CIU  P.val    
-    ## cde          -0.51327   0.80208 -1.46532   1.120    0.8    
-    ## pnde          0.73026   0.23737  0.35483   1.100 <2e-16 ***
-    ## tnde          1.03051   0.28261  0.53268   1.483 <2e-16 ***
-    ## pnie          0.38677   0.13604  0.24584   0.700 <2e-16 ***
-    ## tnie          0.68702   0.13964  0.49694   0.940 <2e-16 ***
-    ## te            1.41728   0.27451  1.01696   1.897 <2e-16 ***
-    ## intref        1.24353   0.72405 -0.08605   2.357    0.1 .  
-    ## intmed        0.30025   0.19339 -0.05923   0.591    0.1 .  
-    ## cde(prop)    -0.36215   0.55520 -0.97773   0.762    0.8    
-    ## intref(prop)  0.87740   0.48825 -0.08885   1.400    0.1 .  
-    ## intmed(prop)  0.21185   0.12598 -0.04130   0.371    0.1 .  
-    ## pnie(prop)    0.27290   0.10395  0.15553   0.503 <2e-16 ***
-    ## pm            0.48474   0.10145  0.32725   0.683 <2e-16 ***
-    ## int           1.08925   0.60727 -0.13016   1.717    0.1 .  
-    ## pe            1.36215   0.55520  0.23840   1.978    0.1 .  
+    ##               Estimate Std.error   95% CIL 95% CIU  P.val    
+    ## cde           0.205194  0.480840 -0.543441   0.991    0.5    
+    ## pnde          1.035260  0.199725  0.733601   1.330 <2e-16 ***
+    ## tnde          1.226583  0.232790  0.841676   1.599 <2e-16 ***
+    ## pnie          0.563154  0.154671  0.272329   0.792 <2e-16 ***
+    ## tnie          0.754477  0.248639  0.349678   1.216 <2e-16 ***
+    ## te            1.789737  0.309951  1.210990   2.242 <2e-16 ***
+    ## intref        0.830067  0.376092  0.202022   1.312 <2e-16 ***
+    ## intmed        0.191323  0.151560 -0.014945   0.468    0.1 .  
+    ## cde(prop)     0.114650  0.287690 -0.340201   0.597    0.5    
+    ## intref(prop)  0.463792  0.221562  0.121826   0.869 <2e-16 ***
+    ## intmed(prop)  0.106900  0.076537 -0.007515   0.245    0.1 .  
+    ## pnie(prop)    0.314657  0.069050  0.223366   0.449 <2e-16 ***
+    ## pm            0.421557  0.097130  0.257573   0.589 <2e-16 ***
+    ## int           0.570693  0.282061  0.121978   1.034 <2e-16 ***
+    ## pe            0.885350  0.287690  0.403499   1.340 <2e-16 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## ----------------------------------------------------------------
@@ -580,21 +585,21 @@ Summarizing and plotting the results:
     ## 0.2
     ## Measurement error correction for measurement error 2: 
     ##              Estimate Std.error  95% CIL 95% CIU  P.val    
-    ## cde          -0.52320   0.77058 -1.93076   0.869    0.4    
-    ## pnde          0.68230   0.18798  0.50515   1.086 <2e-16 ***
-    ## tnde          0.97976   0.22662  0.69545   1.454 <2e-16 ***
-    ## pnie          0.40809   0.17855  0.20896   0.741 <2e-16 ***
-    ## tnie          0.70555   0.17699  0.44102   0.981 <2e-16 ***
-    ## te            1.38785   0.22130  1.10623   1.882 <2e-16 ***
-    ## intref        1.20550   0.73189  0.07034   2.682    0.1 .  
-    ## intmed        0.29746   0.18576 -0.06395   0.626    0.1 .  
-    ## cde(prop)    -0.37699   0.52086 -1.24293   0.550    0.4    
-    ## intref(prop)  0.86861   0.50459  0.06627   1.724    0.1 .  
-    ## intmed(prop)  0.21433   0.11880 -0.03641   0.381    0.1 .  
-    ## pnie(prop)    0.29405   0.11098  0.13904   0.497 <2e-16 ***
-    ## pm            0.50838   0.09782  0.30890   0.626 <2e-16 ***
-    ## int           1.08294   0.59789  0.02986   2.028    0.1 .  
-    ## pe            1.37699   0.52086  0.45004   2.243 <2e-16 ***
+    ## cde           0.19468   0.50651 -0.49799   1.171    0.4    
+    ## pnde          1.05540   0.22573  0.71140   1.483 <2e-16 ***
+    ## tnde          1.22977   0.21530  0.90479   1.659 <2e-16 ***
+    ## pnie          0.57476   0.15495  0.34017   0.835 <2e-16 ***
+    ## tnie          0.74914   0.22664  0.44063   1.183 <2e-16 ***
+    ## te            1.80453   0.24828  1.43627   2.283 <2e-16 ***
+    ## intref        0.86071   0.41853  0.09799   1.497 <2e-16 ***
+    ## intmed        0.17438   0.17270 -0.06124   0.482    0.2    
+    ## cde(prop)     0.10789   0.27788 -0.26532   0.629    0.4    
+    ## intref(prop)  0.47697   0.22368  0.05682   0.816 <2e-16 ***
+    ## intmed(prop)  0.09663   0.08956 -0.03229   0.254    0.2    
+    ## pnie(prop)    0.31851   0.07199  0.19284   0.416 <2e-16 ***
+    ## pm            0.41514   0.10205  0.24503   0.621 <2e-16 ***
+    ## int           0.57361   0.29224  0.04463   1.010 <2e-16 ***
+    ## pe            0.89211   0.27788  0.37071   1.265 <2e-16 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## ----------------------------------------------------------------
@@ -603,21 +608,21 @@ Summarizing and plotting the results:
     ## 0.3
     ## Measurement error correction for measurement error 3: 
     ##              Estimate Std.error  95% CIL 95% CIU  P.val    
-    ## cde          -0.54317   0.73335 -1.96248   0.461    0.3    
-    ## pnde          0.70314   0.22138  0.32226   0.940 <2e-16 ***
-    ## tnde          0.99720   0.31233  0.43707   1.496 <2e-16 ***
-    ## pnie          0.44531   0.22009  0.19050   0.908 <2e-16 ***
-    ## tnie          0.73937   0.19495  0.43918   1.155 <2e-16 ***
-    ## te            1.44251   0.27177  1.07163   1.980 <2e-16 ***
-    ## intref        1.24630   0.77979  0.19616   2.668 <2e-16 ***
-    ## intmed        0.29406   0.18015  0.05084   0.613 <2e-16 ***
-    ## cde(prop)    -0.37654   0.51963 -1.53247   0.298    0.3    
-    ## intref(prop)  0.86399   0.52317  0.13022   1.890 <2e-16 ***
-    ## intmed(prop)  0.20386   0.12365  0.03381   0.483 <2e-16 ***
-    ## pnie(prop)    0.30870   0.16023  0.15012   0.663 <2e-16 ***
-    ## pm            0.51256   0.11820  0.35490   0.749 <2e-16 ***
-    ## int           1.06784   0.63632  0.16404   2.372 <2e-16 ***
-    ## pe            1.37654   0.51963  0.70184   2.532 <2e-16 ***
+    ## cde           0.17445   0.52461 -0.52061   1.362    0.8    
+    ## pnde          1.00592   0.19550  0.75252   1.339 <2e-16 ***
+    ## tnde          1.18763   0.21152  0.90638   1.562 <2e-16 ***
+    ## pnie          0.59265   0.15213  0.35169   0.850 <2e-16 ***
+    ## tnie          0.77437   0.15181  0.55044   1.066 <2e-16 ***
+    ## te            1.78029   0.19271  1.48874   2.125 <2e-16 ***
+    ## intref        0.83146   0.43045 -0.06989   1.379    0.1 .  
+    ## intmed        0.18172   0.16102 -0.17009   0.395    0.3    
+    ## cde(prop)     0.09799   0.27993 -0.31067   0.664    0.8    
+    ## intref(prop)  0.46704   0.24630 -0.02830   0.823    0.1 .  
+    ## intmed(prop)  0.10207   0.08676 -0.08862   0.210    0.3    
+    ## pnie(prop)    0.33290   0.08260  0.20273   0.464 <2e-16 ***
+    ## pm            0.43497   0.07836  0.30620   0.567 <2e-16 ***
+    ## int           0.56911   0.32267 -0.10755   1.014    0.1 .  
+    ## pe            0.90201   0.27993  0.33595   1.311 <2e-16 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## ----------------------------------------------------------------
@@ -652,21 +657,21 @@ Summarizing and plotting the results:
     ## 
     ## Measurement error correction for measurement error 1: 
     ##              Estimate Std.error  95% CIL 95% CIU  P.val    
-    ## cde          -0.68821   0.83825 -1.66732   0.846    0.8    
-    ## pnde          0.79362   0.24571  0.48210   1.348 <2e-16 ***
-    ## tnde          1.16950   0.26335  0.79488   1.704 <2e-16 ***
-    ## pnie          0.42664   0.15013  0.11345   0.591 <2e-16 ***
-    ## tnie          0.80252   0.18877  0.44788   1.091 <2e-16 ***
-    ## te            1.59614   0.27775  1.07866   1.993 <2e-16 ***
-    ## intref        1.48183   0.82380  0.05331   2.679    0.1 .  
-    ## intmed        0.37588   0.20310  0.06242   0.684 <2e-16 ***
-    ## cde(prop)    -0.43117   0.52935 -1.03374   0.664    0.8    
-    ## intref(prop)  0.92839   0.48720 -0.04842   1.484    0.1 .  
-    ## intmed(prop)  0.23549   0.12566  0.03670   0.436 <2e-16 ***
-    ## pnie(prop)    0.26730   0.08493  0.07382   0.356 <2e-16 ***
-    ## pm            0.50279   0.09626  0.27864   0.599 <2e-16 ***
-    ## int           1.16388   0.56899  0.15451   1.908 <2e-16 ***
-    ## pe            1.43117   0.52935  0.33619   2.034 <2e-16 ***
+    ## cde           0.49090   0.66653 -0.53271   1.620    0.7    
+    ## pnde          1.29190   0.22606  0.84103   1.601 <2e-16 ***
+    ## tnde          1.48630   0.24214  0.90556   1.677 <2e-16 ***
+    ## pnie          0.56382   0.20090  0.19747   0.811 <2e-16 ***
+    ## tnie          0.75822   0.20190  0.38812   1.096 <2e-16 ***
+    ## te            2.05012   0.21923  1.55602   2.285 <2e-16 ***
+    ## intref        0.80100   0.52556 -0.02097   1.621    0.1 .  
+    ## intmed        0.19440   0.21698 -0.19848   0.472    0.4    
+    ## cde(prop)     0.23945   0.33537 -0.28719   0.751    0.7    
+    ## intref(prop)  0.39071   0.28658 -0.01042   0.857    0.1 .  
+    ## intmed(prop)  0.09482   0.11744 -0.11853   0.238    0.4    
+    ## pnie(prop)    0.27502   0.10383  0.10654   0.458 <2e-16 ***
+    ## pm            0.36984   0.09474  0.22822   0.561 <2e-16 ***
+    ## int           0.48553   0.38217 -0.04301   1.060    0.1 .  
+    ## pe            0.76055   0.33537  0.24864   1.287 <2e-16 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## ----------------------------------------------------------------
@@ -678,21 +683,21 @@ Summarizing and plotting the results:
     ## 
     ## Measurement error correction for measurement error 2: 
     ##               Estimate Std.error   95% CIL 95% CIU  P.val    
-    ## cde          -0.696631  1.017253 -2.533501   1.223    0.3    
-    ## pnde          1.112874  0.310692  0.407172   1.444 <2e-16 ***
-    ## tnde          1.548400  0.392011  0.889103   2.068 <2e-16 ***
-    ## pnie          0.328872  0.245931 -0.058411   0.775    0.2    
-    ## tnie          0.764398  0.287063  0.504674   1.511 <2e-16 ***
-    ## te            1.877272  0.271040  1.392188   2.262 <2e-16 ***
-    ## intref        1.809506  0.973885 -0.166697   3.228    0.1 .  
-    ## intmed        0.435526  0.316735 -0.012153   1.146    0.1 .  
-    ## cde(prop)    -0.371087  0.534719 -1.289577   0.707    0.3    
-    ## intref(prop)  0.963902  0.475943 -0.079846   1.581    0.1 .  
-    ## intmed(prop)  0.231999  0.158193  0.002774   0.584    0.1 .  
-    ## pnie(prop)    0.175186  0.143356 -0.031953   0.410    0.2    
-    ## pm            0.407185  0.139748  0.281387   0.769 <2e-16 ***
-    ## int           1.195901  0.611461 -0.064595   2.101    0.1 .  
-    ## pe            1.371087  0.534719  0.292725   2.290 <2e-16 ***
+    ## cde           0.750288  0.862815 -1.237708   1.625    0.5    
+    ## pnde          1.466978  0.341426  0.684854   1.791 <2e-16 ***
+    ## tnde          1.588675  0.327021  1.005461   2.127 <2e-16 ***
+    ## pnie          0.621023  0.230810  0.100491   0.910 <2e-16 ***
+    ## tnie          0.742720  0.235060  0.478760   1.207 <2e-16 ***
+    ## te            2.209698  0.251070  1.726055   2.578 <2e-16 ***
+    ## intref        0.716690  0.705724  0.039405   2.047    0.1 .  
+    ## intmed        0.121697  0.242552 -0.004874   0.716    0.1 .  
+    ## cde(prop)     0.339543  0.411494 -0.689288   0.686    0.5    
+    ## intref(prop)  0.324338  0.353888  0.016190   1.078    0.1 .  
+    ## intmed(prop)  0.055074  0.118823 -0.001867   0.362    0.1 .  
+    ## pnie(prop)    0.281044  0.113676  0.047939   0.475 <2e-16 ***
+    ## pm            0.336118  0.123609  0.227552   0.617 <2e-16 ***
+    ## int           0.379412  0.459935  0.014987   1.437    0.1 .  
+    ## pe            0.660457  0.411494  0.313802   1.689 <2e-16 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## ----------------------------------------------------------------
@@ -748,8 +753,8 @@ Schomaker M, Heumann C. Bootstrap inference when using multiple
 imputation (2018). Statistics in Medicine. 37(14): 2252 - 2266.
 
 VanderWeele TJ, Ding P. Sensitivity analysis in observational research:
-introducing the E-Value (2017). Annals of Internal Medicine. 167(4): 
-268 - 274.
+introducing the E-Value (2017). Annals of Internal Medicine. 167(4): 268
+- 274.
 
 Smith LH, VanderWeele TJ. Mediational E-values: Approximate sensitivity
 analysis for unmeasured mediator-outcome confounding (2019).
