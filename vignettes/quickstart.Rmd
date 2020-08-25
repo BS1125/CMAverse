@@ -11,7 +11,7 @@ vignette: >
 ## About the Package 
 
 The R package `CMAverse` provides a suite of functions for reproducible causal mediation 
-analysis including `cmdag` for DAG visualization, `cmest` for statistical modeling and `cmsens` for sensitivity analysis.
+analysis including `cmdag` for DAG visualization, `cmest` for statistical modeling and `cmsens` for sensitivity analysis. See the [package website](https://bs1125.github.io/CMAverse/) for details.
 
 ### DAG Visualization
 
@@ -78,7 +78,7 @@ Table: Table: Supported Data Types and Functionalities of `cmest`
 The latest version can be installed via:
 
 ```{r eval=F}
-devtools::install_github("LindaValeri/CMAverse")
+devtools::install_github("BS1125/CMAverse")
 ```
 
 Load `CMAverse`:
@@ -92,7 +92,7 @@ library(CMAverse)
 We illustrate the general workflow of the `CMAverse` package by a quick example. Firstly, let's simulate some data and plot the DAG of the scientific setting. The simulated dataset contains a binary exposure, a binary mediator, a continuous mediator, a continuous outcome and two pre-exposure confounders.
 
 ```{r message=F,warning=F}
-n <- 100
+n <- 1000
 C1 <- rnorm(n, mean = 1, sd = 1)
 C2 <- rbinom(n, 1, 0.6)
 C2[which(C2 == 0)] <- "C2_0"
@@ -125,7 +125,7 @@ est <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
                 mediator = c("M1", "M2"), basec = c("C1", "C2"), EMint = TRUE,
                 mreg = list("logistic", "linear"), yreg = "linear",
                 astar = 0, a = 1, mval = list(0, 0),
-                estimation = "imputation", inference = "bootstrap", nboot = 20)
+                estimation = "imputation", inference = "bootstrap", nboot = 300)
 ```
 
 Summarizing and plotting the results:
@@ -167,7 +167,7 @@ Then, assume that the exposure was measured with error. Sensitivity analysis for
 
 ```{r message=F,warning=F,results='hide'}
 me2 <- cmsens(object = est, sens = "me", MEmethod = "simex", MEvariable = "A", 
-              MEvartype = "cat", B = 20,
+              MEvartype = "cat", B = 200,
               MEerror = list(matrix(c(0.95, 0.05, 0.05, 0.95), nrow = 2), 
                              matrix(c(0.9, 0.1, 0.1, 0.9), nrow = 2)))
 ```
