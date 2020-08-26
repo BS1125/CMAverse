@@ -50,9 +50,9 @@ rcreg(
 \arguments{
 \item{reg}{the naive regression object. See \code{Details}.}
 
-\item{data}{the new dataset for updating \code{reg}}
+\item{data}{the new dataset for \code{reg}}
 
-\item{weights}{the new weights for updating \code{reg}}
+\item{weights}{the new weights for \code{reg}}
 
 \item{MEvariable}{variable measured with error.}
 
@@ -66,7 +66,7 @@ is \code{400}.}
 
 \item{object}{an object of class 'rcreg'}
 
-\item{...}{Additional arguments}
+\item{...}{additional arguments}
 
 \item{x}{an object of class 'rcreg'}
 
@@ -151,9 +151,9 @@ sigma(reg_rc)
 formula(reg_rc)
 family(reg_rc)
 predict(reg_rc, newdata = data[1, ])
-model.frame(reg_rc)
-update(reg_rc, data = data, weights = rep(1, n))
-summary(reg_rc)
+reg_rc_model <- model.frame(reg_rc)
+reg_rc_update <- update(reg_rc, data = data, weights = rep(1, n))
+reg_rc_summ <- summary(reg_rc)
 
 #glm
 n <- 1000

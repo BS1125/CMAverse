@@ -44,8 +44,7 @@ Imports:
     Matrix,
     EValue,
     ggplot2,
-    medflex,
-    covr
+    medflex
 RoxygenNote: 7.1.0
 Suggests: 
     knitr,

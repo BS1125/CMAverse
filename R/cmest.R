@@ -58,6 +58,9 @@
 #' \code{paramfunc}). If \code{NULL}, mean value(s) of the baseline confounder(s) are used.
 #' @param nboot the number of boots applied (used when \code{inference} is \code{bootstrap}). 
 #' Default is 200. 
+#' @param nRep number of replications or hypothetical values of the exposure to sample for 
+#' each observation unit (used when \code{model} is \code{ne}). See \link[medflex]{neImpute.default}
+#' for details. Default is \code{5}.
 #' @param multimp a logical value (used when \code{data} contains missing values). If 
 #' \code{TRUE}, conduct multiple imputation using the \code{mice} package. Default is \code{FALSE}.
 #' @param x an object of class 'cmest'
@@ -142,7 +145,7 @@
 #'     should regress \code{Y} on \code{A}, \code{M} and \code{C}. The variables in the 
 #'     formula of \code{yreg} should follow the order of \code{A}, \code{M} and \code{C}, i.e., 
 #'     the first variable needs to point to the exposure, the variable(s) right after the 
-#'     exposure need to point to the mediator(s), e.g., \eqn{Y ~ A + M_1 + M_2 + A*M_1 + C}.}
+#'     exposure need to point to the mediator(s), e.g., \code{Y ~ A + M_1 + M_2 + A*M_1 + C}.}
 #'       
 #'     \item{\code{msm}: }{\emph{the marginal structural model} by VanderWeele et al. (2017).
 #'     \code{yreg}, \code{mreg} and \code{wmreg} are required and all 
@@ -343,31 +346,38 @@
 #' library(CMAverse)
 #' 
 #' # single-mediator case with rb
+#' \dontrun{
 #' exp1 <- cmest(data = cma2020, model = "rb", outcome = "contY", 
 #' exposure = "A", mediator = "M2", basec = c("C1", "C2"), 
 #' EMint = TRUE, mreg = list("multinomial"), yreg = "linear", 
 #' astar = 0, a = 1, mval = list("M2_0"), estimation = "paramfunc", 
 #' inference = "delta")
 #' summary(exp1)
+#' }
 #' 
 #' # multiple-mediator case with rb
 #' # 10 boots are used for illustration
+#' \dontrun{
 #' exp2 <- cmest(data = cma2020, model = "rb", outcome = "contY", 
 #' exposure = "A", mediator = c("M1", "M2"), basec = c("C1", "C2"), 
 #' EMint = TRUE, mreg = list("logistic", "multinomial"), 
 #' yreg = "linear", astar = 0, a = 1, mval = list(0, "M2_0"), 
 #' estimation = "imputation", inference = "bootstrap", nboot = 10)
+#' }
 #' 
 #' # multiple-mediator case with ne
 #' # 10 boots are used for illustration
+#' \dontrun{
 #' exp3 <- cmest(data = cma2020, model = "ne", outcome = "contY", 
 #' exposure = "A", mediator = c("M1", "M2"), basec = c("C1", "C2"), 
 #' yreg = glm(contY ~ A + M1 + M2 + A*M1 + A*M2 + C1 + C2, family = gaussian, data = cma2020), 
 #' astar = 0, a = 1, mval = list(0, "M2_0"), estimation = "imputation", 
 #' inference = "bootstrap", nboot = 10)
+#' }
 #' 
 #' # case control study with msm
 #' # 10 boots are used for illustration
+#' \dontrun{
 #' exp4 <- cmest(data = cma2020, model = "msm", casecontrol = TRUE, 
 #' yrare = TRUE, outcome = "binY", exposure = "A", 
 #' mediator = c("M1", "M2"), EMint = TRUE, basec = c("C1", "C2"), yreg = "logistic", 
@@ -377,6 +387,7 @@
 #' nnet::multinom(M2 ~ A + M1 + C1 + C2, data = cma2020, trace = FALSE)), astar = 0, a = 1, 
 #' mval = list(0, "M2_0"), estimation = "imputation", 
 #' inference = "bootstrap", nboot = 10)
+#' }
 #' 
 #' @importFrom stats glm binomial poisson as.formula gaussian quasipoisson model.frame printCoefmat 
 #' family sd coef vcov sigma predict rbinom rmultinom rnorm rgamma rpois weighted.mean 
@@ -407,7 +418,7 @@ cmest <- function(data = NULL, model = NULL,
                   exposure = NULL, mediator = NULL, EMint = NULL, basec = NULL, postc = NULL,
                   yreg = NULL, mreg = NULL, wmreg = NULL, ereg = NULL, postcreg = NULL,
                   astar = 0, a = 1, mval = NULL, yref = NULL, basecval = NULL,
-                  nboot = 200, multimp = FALSE, ...) {
+                  nboot = 200, nRep = 5, multimp = FALSE, ...) {
   
   cl <- match.call()
   
@@ -433,8 +444,7 @@ cmest <- function(data = NULL, model = NULL,
   out$methods$full <- full
   
   # casecontrol, yrare, yprevalence
-  if (model != "ne") {
-    if (!is.logical(casecontrol)) stop("casecontrol should be TRUE or FALSE")
+  if (!is.logical(casecontrol)) stop("casecontrol should be TRUE or FALSE")
     out$methods$casecontrol <- casecontrol
     if (!casecontrol) {
       if (!is.null(yrare)) warning("When casecontrol is FALSE, yrare is ignored")
@@ -447,7 +457,6 @@ cmest <- function(data = NULL, model = NULL,
         out$methods$yprevalence <- yprevalence
       } else out$methods$yrare <- yrare
     }
-  } else warning("casecontrol is ignored when model = 'ne'")
   
   # outcome
   if (length(outcome) == 0) stop("Unspecified outcome")
@@ -514,6 +523,8 @@ cmest <- function(data = NULL, model = NULL,
     if (!is.numeric(nboot)) stop("nboot should be numeric")
     out$methods$nboot <- nboot
   }
+  
+  if (model == "ne") out$methods$nRep <- nRep
   
   # multimp
   if (!is.logical(multimp)) stop("multimp should be TRUE or FALSE")
@@ -989,130 +1000,6 @@ print.cmest <- function(x, ...) {
   #' @describeIn cmest Print the summary of cmest nicely
   #' @export
   print.summary.cmest <- function(x, digits = 4, ...) {
-    # print summary of regression models used
-    if (!x$multimp$multimp) {
-      regnames <- names(x$regsumm)
-      for (name in regnames) {
-        if (name == "yreg") {
-          if (!is.null(x$regsumm$yreg)) {
-            cat("# Outcome Regression: \n")
-            x$regsumm$yreg$call <- update(x$regsumm$yreg,data=getCall(x$regsumm$yreg)$data,
-                                          weights=getCall(x$regsumm$yreg)$weights, 
-                                          evaluate = FALSE)
-            print(x$regsumm$yreg)
-          }
-        }
-        if (name == "ereg") {
-          if (!is.null(x$regsumm$ereg)) {
-            cat("# Exposure Regression for Weighting: \n")
-            x$regsumm$ereg$call <- update(x$regsumm$ereg,data=getCall(x$regsumm$ereg)$data,
-                                          weights=getCall(x$regsumm$ereg)$weights, 
-                                          evaluate = FALSE)
-            print(x$regsumm$ereg)
-          }
-        }
-        if (name == "mreg") {
-          if (!is.null(x$regsumm$mreg)) {
-            cat("# Mediator Regression: \n")
-            for (i in 1:length(x$regsumm$mreg)) {
-              x$regsumm$mreg[[i]]$call <- eval(bquote(update(x$regsumm$mreg[[i]], 
-                                       data=getCall(x$regsumm$mreg[[.(i)]])$data, 
-                                       weights=getCall(x$regsumm$mreg[[.(i)]])$weights, 
-                                       evaluate = FALSE)))
-              print(x$regsumm$mreg[[i]])
-            }
-          }
-        }
-        if (name == "wmreg") {
-          if (!is.null(x$regsumm$wmreg)) {
-            cat("# Mediator Regression for Weighting: \n")
-            for (i in 1:length(x$regsumm$wmreg)) {
-              x$regsumm$wmreg[[i]]$call <- eval(bquote(update(x$regsumm$wmreg[[i]], 
-                                       data=getCall(x$regsumm$wmreg[[.(i)]])$data, 
-                                       weights=getCall(x$regsumm$wmreg[[.(i)]])$weights, 
-                                       evaluate = FALSE)))
-              print(x$regsumm$wmreg[[i]])
-            }
-          }
-        }
-        if (name == "postcreg") {
-          if (!is.null(x$regsumm$postcreg)) {
-            cat("# Post-exposure Confounder Regression: \n")
-            for (i in 1:length(x$regsumm$postcreg)) {
-              x$regsumm$postcreg[[i]]$call <- eval(bquote(update(x$regsumm$postcreg[[i]], 
-                                       data=getCall(x$regsumm$postcreg[[.(i)]])$data, 
-                                       weights=getCall(x$regsumm$postcreg[[.(i)]])$weights, 
-                                       evaluate = FALSE)))
-              print(x$regsumm$postcreg[[i]])
-            }
-          }
-        }
-      }
-    } else {
-      for (m in 1:length(x$regsumm)){ 
-        cat(paste("# Regressions with Imputed Dataset", m, "\n\n"))
-        regnames <- names(x$regsumm[[m]])
-        for (name in regnames) {
-          if (name == "yreg") {
-            if (!is.null(x$regsumm[[m]]$yreg)) {
-              cat("## Outcome Regression: \n")
-              x$regsumm[[m]]$yreg$call <- eval(bquote(update(x$regsumm[[.(m)]]$yreg,
-                                       data=getCall(x$regsumm[[.(m)]]$yreg)$data,
-                                       weights=getCall(x$regsumm[[.(m)]]$yreg)$weights,
-                                       evaluate = FALSE)))
-              print(x$regsumm[[m]]$yreg)
-            }
-          }
-          if (name == "ereg") {
-            if (!is.null(x$regsumm[[m]]$ereg)) {
-              cat("## Exposure Regression for Weighting: \n")
-              x$regsumm[[m]]$ereg$call <- eval(bquote(update(x$regsumm[[.(m)]]$ereg,
-                                                             data=getCall(x$regsumm[[.(m)]]$ereg)$data,
-                                                             weights=getCall(x$regsumm[[.(m)]]$ereg)$weights,
-                                                             evaluate = FALSE)))
-              print(x$regsumm[[m]]$ereg)
-            }
-          }
-          if (name == "mreg") {
-            if (!is.null(x$regsumm[[m]]$mreg)) {
-              cat("## Mediator Regression: \n")
-              for (i in 1:length(x$regsumm[[m]]$mreg)) {
-                x$regsumm[[m]]$mreg[[i]]$call <- eval(bquote(update(x$regsumm[[.(m)]]$mreg[[.(i)]], 
-                                         data=getCall(x$regsumm[[.(m)]]$mreg[[.(i)]])$data, 
-                                         weights=getCall(x$regsumm[[.(m)]]$mreg[[.(i)]])$weights,
-                                         evaluate = FALSE)))
-                print(x$regsumm[[m]]$mreg[[i]])
-              }
-            }
-          }
-          if (name == "wmreg") {
-            if (!is.null(x$regsumm[[m]]$wmreg)) {
-              cat("## Mediator Regression for Weighting: \n")
-              for (i in 1:length(x$regsumm[[m]]$wmreg)) {
-                x$regsumm[[m]]$wmreg[[i]]$call <- eval(bquote(update(x$regsumm[[.(m)]]$wmreg[[.(i)]], 
-                                                                    data=getCall(x$regsumm[[.(m)]]$wmreg[[.(i)]])$data, 
-                                                                    weights=getCall(x$regsumm[[.(m)]]$wmreg[[.(i)]])$weights,
-                                                                    evaluate = FALSE)))
-                print(x$regsumm[[m]]$wmreg[[i]])
-              }
-            }
-          }
-          if (name == "postcreg") {
-            if (!is.null(x$regsumm[[m]]$postcreg)) {
-              cat("## Post-exposure Confounder Regression: \n")
-              for (i in 1:length(x$regsumm[[m]]$postcreg)) {
-                x$regsumm[[m]]$postcreg[[i]]$call <- eval(bquote(update(x$regsumm[[.(m)]]$postcreg[[.(i)]], 
-                                                                    data=getCall(x$regsumm[[.(m)]]$postcreg[[.(i)]])$data, 
-                                                                    weights=getCall(x$regsumm[[.(m)]]$postcreg[[.(i)]])$weights,
-                                                                    evaluate = FALSE)))
-                print(x$regsumm[[m]]$postcreg[[i]])
-              }
-            }
-          }
-        }
-        cat("\n")
-      }
-    }
     # print summary of causal mediation analysis results
     if (x$methods$model == "rb") model_str <- "Regression-based Approach"
     if (x$methods$model == "wb") model_str <- "Weighting-based Approach"

@@ -4,8 +4,8 @@
 #' measured with error via \emph{regression calibration} by Carroll et al. (1995).
 #'
 #' @param reg the naive regression object. See \code{Details}.
-#' @param data the new dataset for updating \code{reg}
-#' @param weights the new weights for updating \code{reg}
+#' @param data the new dataset for \code{reg}
+#' @param weights the new weights for \code{reg}
 #' @param MEvariable variable measured with error.
 #' @param MEerror standard deviation of the measurement error
 #' @param variance a logical value. If \code{TRUE}, estimate the var-cov matrix of
@@ -18,7 +18,7 @@
 #' @param digits minimal number of significant digits. See \link{print.default}.
 #' @param evaluate a logical value. If \code{TRUE}, the updated call is evaluated. Default
 #' is \code{TRUE}.
-#' @param ... Additional arguments
+#' @param ... additional arguments
 #' 
 #' @details
 #' 
@@ -73,9 +73,9 @@
 #' formula(reg_rc)
 #' family(reg_rc)
 #' predict(reg_rc, newdata = data[1, ])
-#' model.frame(reg_rc)
-#' update(reg_rc, data = data, weights = rep(1, n))
-#' summary(reg_rc)
+#' reg_rc_model <- model.frame(reg_rc)
+#' reg_rc_update <- update(reg_rc, data = data, weights = rep(1, n))
+#' reg_rc_summ <- summary(reg_rc)
 #' 
 #' #glm
 #' n <- 1000
@@ -288,7 +288,7 @@ predict.rcreg <- function(object, ...) {
 #' @describeIn rcreg Extract the model frame
 #' @export
 model.frame.rcreg <- function(formula, ...) {
-  return(model.frame(formula$NAIVEreg))
+  return(model.frame(formula$NAIVEreg, ...))
 }
 
 #' @describeIn rcreg Print the results of \code{rcreg} nicely
@@ -315,7 +315,7 @@ summary.rcreg <- function(object, ...) {
   RCt <- RCcoef/RCse
   df <- nrow(model.frame(object)) - length(RCcoef)
   RCp <- 2 * pt(-abs(RCt), df)
-  summarydf <- cbind(RCcoef, RCse, RCt, RCp)
+  summarydf <- data.frame(RCcoef, RCse, RCt, RCp)
   colnames(summarydf) <- c("Estimate", "Std. Error", "t value", "Pr(>|t|)")
   rownames(summarydf) <- names(RCcoef)
   out <- c(object, list(summarydf = summarydf))

@@ -81,16 +81,17 @@
 #' library(CMAverse)
 #' 
 #' # 10 boots are used for illustration
+#' \dontrun{
 #' naive <- cmest(data = cma2020, model = "rb", outcome = "contY", 
 #' exposure = "A", mediator = c("M1", "M2"), 
 #' basec = c("C1", "C2"), EMint = TRUE,
 #' mreg = list("logistic", "multinomial"), yreg = "linear",
 #' astar = 0, a = 1, mval = list(0, "M2_0"),
 #' estimation = "imputation", inference = "bootstrap", nboot = 10)
+#' }
 #' 
+#' \dontrun{
 #' exp1 <- cmsens(object = naive, sens = "uc")
-#' exp1
-#' 
 #' exp2 <- cmsens(object = naive, sens = "me", MEmethod = "rc", 
 #' MEvariable = "C1", MEvartype = "con",
 #' MEerror = c(0.1, 0.2))
@@ -102,6 +103,7 @@
 #' MEerror = list(matrix(c(0.95,0.05,0.05,0.95), nrow = 2), 
 #' matrix(c(0.9,0.1,0.1,0.9), nrow = 2)), B = 10)
 #' summary(exp3)
+#' }
 #' 
 #' @importFrom stats glm binomial poisson as.formula gaussian quasipoisson model.frame printCoefmat 
 #' family sd coef vcov sigma predict rbinom rmultinom rnorm rgamma rpois weighted.mean 
@@ -179,9 +181,8 @@ cmsens <- function(object = NULL, sens = "uc", MEmethod = "simex",
         evalues <- rbind(evalues, evalues_mid)
       }
     } else {
-      summ <- summary(object)
-      ci_lo <- summ[, "95% CIL"]
-      ci_up <-summ[, "95% CIU"]
+      ci_lo <- object$effect.ci.low
+      ci_up <- object$effect.ci.high
       for (i in out.index) {
         evalues_mid <- evalues.RR(est = effect.pe[i], lo = ci_lo[i], hi = ci_up[i])
         evalues_mid <- c(evalues_mid[1, ], evalues_mid[2, ])
@@ -240,6 +241,7 @@ cmsens <- function(object = NULL, sens = "uc", MEmethod = "simex",
     yref <- object$ref$yref
     basecval <- object$ref$basecval
     nboot <- object$methods$nboot
+    nRep <- object$methods$nRep
     args_mice <- object$multimp$args_mice
     
     if (inference == "delta") variance <- TRUE
@@ -347,14 +349,14 @@ print.cmsens.me <- function(x, ...) {
 #' @describeIn cmsens Summarize the results of cmsens.me nicely
 #' @export
 summary.cmsens.me <- function(object, ...) {
-  summary.df <- list()
+  summarydf <- list()
   for (i in 1:length(object$sens)) {
-    summary.df[[i]] <- data.frame(object$sens[[i]]$effect.pe, object$sens[[i]]$effect.se, 
+    summarydf[[i]] <- data.frame(object$sens[[i]]$effect.pe, object$sens[[i]]$effect.se, 
                                   object$sens[[i]]$effect.ci.low, object$sens[[i]]$effect.ci.high, 
                                   object$sens[[i]]$effect.pval)
-    colnames(summary.df[[i]]) <- c("Estimate", "Std.error", "95% CIL", "95% CIU", "P.val")
+    colnames(summarydf[[i]]) <- c("Estimate", "Std.error", "95% CIL", "95% CIU", "P.val")
   }
-  out <- c(object, list(summary.df = summary.df))
+  out <- c(object, list(summarydf = summarydf))
   class(out) <- c("summary.cmsens.me")
   return(out)
 }
@@ -373,7 +375,7 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
     if (x$ME$MEvartype == "continuous") cat(x$ME$MEerror[i])
     if (x$ME$MEvartype == "categorical") print(x$ME$MEerror[[i]])
     cat(paste0("\nMeasurement error correction for measurement error ", i, ": \n"))
-    printCoefmat(x$summary.df[[i]], digits = digits, has.Pvalue = TRUE)
+    printCoefmat(x$summarydf[[i]], digits = digits, has.Pvalue = TRUE)
     cat("----------------------------------------------------------------\n")
   }
 }
@@ -419,10 +421,10 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
 #' MEerror = c(0.1, 0.2))
 #' 
 #' ggcmsens(x) +
-#' theme(axis.text.x = element_text(angle = 45))
+#' ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45))
 #' 
 #' ggcmsens(x) +
-#' coord_flip(xlim = NULL, ylim = NULL, expand = TRUE, clip = "on")
+#' ggplot2::coord_flip(xlim = NULL, ylim = NULL, expand = TRUE, clip = "on")
 #' 
 #' @export
 #' 

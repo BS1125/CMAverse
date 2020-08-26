@@ -119,7 +119,7 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
 
     # for categorical exposure, create indicator vectors for a and astar
     if (is.factor(data[, exposure]) | is.character(data[, exposure])) {
-      a_lev<- levels(droplevels(as.factor(data[, exposure])))
+      a_lev <- levels(droplevels(as.factor(data[, exposure])))
       a <- as.numeric(a_lev == a)[-1]
       astar <- as.numeric(a_lev == astar)[-1]
       elevel <- length(a_lev)
@@ -603,10 +603,12 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
   }
 
   # progress bar
+  if (!multimp) {
   if (inference == "bootstrap") {
     curVal <- get("counter", envir = env)
     assign("counter", curVal + 1, envir = env)
     setTxtProgressBar(get("progbar", envir = env), curVal + 1)
+  }
   }
 
   if (outReg) out$est <- est

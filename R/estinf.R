@@ -598,11 +598,11 @@ estinf <- function() {
       if (!full) effect_name <- c("te", "pnde", "tnie")
     } else {
       # transform standard errors of effects in log scale
-      effect.se <- sapply(1:n_effect, function(x) sd(exp(boots$t[, x])))
+      effect.se <- sapply(1:n_effect, function(x) ifelse(x <= 3, sd(exp(boots$t[, x])), sd(boots$t[, x])))
       # transform effects in log ratio scale into effects in ratio scale
-      effect.pe <- exp(effect.pe)
-      effect.ci.low <- exp(effect.ci.low)
-      effect.ci.high <- exp(effect.ci.high)
+      effect.pe[1:3] <- exp(effect.pe[1:3])
+      effect.ci.low[1:3] <- exp(effect.ci.low[1:3])
+      effect.ci.high[1:3] <- exp(effect.ci.high[1:3])
       # effect names
       if (full) effect_name <- c("RRte", "RRpnde", "RRtnie", "pm")
       if (!full) effect_name <- c("RRte", "RRpnde", "RRtnie")

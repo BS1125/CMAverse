@@ -34,7 +34,8 @@ cmdag(
 
 \item{basec}{(optional) a character or vector of variable name(s) of the baseline confounder(s)}
 
-\item{postc}{(optional) a character or vector of variable name(s) of the post-exposure confounder(s)}
+\item{postc}{(optional) a character or vector of variable name(s) of the post-exposure 
+confounder(s) affected by the exposure}
 
 \item{x.outcome}{x coordinate of the outcome. Default is \code{4}.}
 

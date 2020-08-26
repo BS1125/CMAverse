@@ -52,9 +52,9 @@ simexreg(
 \arguments{
 \item{reg}{the naive regression object. See \code{Details}.}
 
-\item{data}{the new dataset for updating \code{reg}}
+\item{data}{the new dataset for \code{reg}}
 
-\item{weights}{the new weights for updating \code{reg}}
+\item{weights}{the new weights for \code{reg}}
 
 \item{MEvariable}{variable measured with error.}
 
@@ -74,7 +74,7 @@ coefficients through Jackknife. Default is \code{FALSE}.}
 
 \item{object}{an object of class 'rcreg'}
 
-\item{...}{Additional arguments}
+\item{...}{additional arguments}
 
 \item{x}{an object of class 'rcreg'}
 
@@ -159,9 +159,9 @@ sigma(reg_simex)
 formula(reg_simex)
 family(reg_simex)
 predict(reg_simex, newdata = data[1, ])
-model.frame(reg_simex)
-update(reg_simex, data = data, weights = rep(1, n))
-summary(reg_simex)
+reg_simex_model <- model.frame(reg_simex)
+reg_simex_update <- update(reg_simex, data = data, weights = rep(1, n))
+reg_simex_summ <- summary(reg_simex)
                 
 # glm
 n <- 1000

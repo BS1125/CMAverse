@@ -36,6 +36,7 @@ cmest(
   yref = NULL,
   basecval = NULL,
   nboot = 200,
+  nRep = 5,
   multimp = FALSE,
   ...
 )
@@ -127,6 +128,10 @@ confounder(s) for estimating conditional causal effects (used when \code{estimat
 
 \item{nboot}{the number of boots applied (used when \code{inference} is \code{bootstrap}). 
 Default is 200.}
+
+\item{nRep}{number of replications or hypothetical values of the exposure to sample for 
+each observation unit (used when \code{model} is \code{ne}). See \link[medflex]{neImpute.default}
+for details. Default is \code{5}.}
 
 \item{multimp}{a logical value (used when \code{data} contains missing values). If 
 \code{TRUE}, conduct multiple imputation using the \code{mice} package. Default is \code{FALSE}.}
@@ -244,7 +249,7 @@ variables in \code{basec}, \code{L=(L_1,...,L_s)^T} denote the set of variables 
     should regress \code{Y} on \code{A}, \code{M} and \code{C}. The variables in the 
     formula of \code{yreg} should follow the order of \code{A}, \code{M} and \code{C}, i.e., 
     the first variable needs to point to the exposure, the variable(s) right after the 
-    exposure need to point to the mediator(s), e.g., \eqn{Y ~ A + M_1 + M_2 + A*M_1 + C}.}
+    exposure need to point to the mediator(s), e.g., \code{Y ~ A + M_1 + M_2 + A*M_1 + C}.}
       
     \item{\code{msm}: }{\emph{the marginal structural model} by VanderWeele et al. (2017).
     \code{yreg}, \code{mreg} and \code{wmreg} are required and all 
@@ -395,31 +400,38 @@ When \code{model = "iorw"} and \code{full = TRUE}, \code{RRte}, \code{RRpnde},
 library(CMAverse)
 
 # single-mediator case with rb
+\dontrun{
 exp1 <- cmest(data = cma2020, model = "rb", outcome = "contY", 
 exposure = "A", mediator = "M2", basec = c("C1", "C2"), 
 EMint = TRUE, mreg = list("multinomial"), yreg = "linear", 
 astar = 0, a = 1, mval = list("M2_0"), estimation = "paramfunc", 
 inference = "delta")
 summary(exp1)
+}
 
 # multiple-mediator case with rb
 # 10 boots are used for illustration
+\dontrun{
 exp2 <- cmest(data = cma2020, model = "rb", outcome = "contY", 
 exposure = "A", mediator = c("M1", "M2"), basec = c("C1", "C2"), 
 EMint = TRUE, mreg = list("logistic", "multinomial"), 
 yreg = "linear", astar = 0, a = 1, mval = list(0, "M2_0"), 
 estimation = "imputation", inference = "bootstrap", nboot = 10)
+}
 
 # multiple-mediator case with ne
 # 10 boots are used for illustration
+\dontrun{
 exp3 <- cmest(data = cma2020, model = "ne", outcome = "contY", 
 exposure = "A", mediator = c("M1", "M2"), basec = c("C1", "C2"), 
 yreg = glm(contY ~ A + M1 + M2 + A*M1 + A*M2 + C1 + C2, family = gaussian, data = cma2020), 
 astar = 0, a = 1, mval = list(0, "M2_0"), estimation = "imputation", 
 inference = "bootstrap", nboot = 10)
+}
 
 # case control study with msm
 # 10 boots are used for illustration
+\dontrun{
 exp4 <- cmest(data = cma2020, model = "msm", casecontrol = TRUE, 
 yrare = TRUE, outcome = "binY", exposure = "A", 
 mediator = c("M1", "M2"), EMint = TRUE, basec = c("C1", "C2"), yreg = "logistic", 
@@ -429,6 +441,7 @@ wmreg = list(glm(M1 ~ A + C1 + C2, family = binomial, data = cma2020),
 nnet::multinom(M2 ~ A + M1 + C1 + C2, data = cma2020, trace = FALSE)), astar = 0, a = 1, 
 mval = list(0, "M2_0"), estimation = "imputation", 
 inference = "bootstrap", nboot = 10)
+}
 
 }
 \references{

@@ -4,8 +4,8 @@
 #' error via \emph{SIMEX} by Cook et al. (1994) and Küchenhoff et al. (2006).
 #'
 #' @param reg the naive regression object. See \code{Details}.
-#' @param data the new dataset for updating \code{reg}
-#' @param weights the new weights for updating \code{reg}
+#' @param data the new dataset for \code{reg}
+#' @param weights the new weights for \code{reg}
 #' @param MEvariable variable measured with error.
 #' @param MEvartype type of the variable measured with error. Can be \code{continuous} or 
 #' \code{categorical} (first 3 letters are enough).
@@ -22,7 +22,7 @@
 #' @param digits minimal number of significant digits. See \link{print.default}.
 #' @param evaluate a logical value. If \code{TRUE}, the updated call is evaluated. Default
 #' is \code{TRUE}.
-#' @param ... Additional arguments
+#' @param ... additional arguments
 #' 
 #' @details
 #' 
@@ -85,9 +85,9 @@
 #' formula(reg_simex)
 #' family(reg_simex)
 #' predict(reg_simex, newdata = data[1, ])
-#' model.frame(reg_simex)
-#' update(reg_simex, data = data, weights = rep(1, n))
-#' summary(reg_simex)
+#' reg_simex_model <- model.frame(reg_simex)
+#' reg_simex_update <- update(reg_simex, data = data, weights = rep(1, n))
+#' reg_simex_summ <- summary(reg_simex)
 #'                 
 #' # glm
 #' n <- 1000
@@ -256,7 +256,7 @@ simexreg <- function (reg = NULL, data = NULL, weights = NULL,
       reg_fit$coefficients <- SIMEXcoef
       SIMEXsigma <- sqrt(sum((model.frame(reg_fit)[, 1] - predict(reg_fit, newdata = data)) ^ 2) / 
                            (n - ncoef) - (SIMEXcoef[MEvariable] * MEerror) ^ 2)
-      out$SIMEXsigma <- SIMEXsigma
+      out$SIMEXsigma <- unname(SIMEXsigma)
     }
     class(out) <- "simexreg"
   }
@@ -321,7 +321,7 @@ predict.simexreg <- function(object, ...){
 #' @describeIn simexreg Extract the model frame
 #' @export
 model.frame.simexreg <- function(formula, ...) {
-  return(model.frame(formula$NAIVEreg))
+  return(model.frame(formula$NAIVEreg, ...))
 }
 
 #' @describeIn simexreg Print the results of \code{simexreg} nicely
@@ -348,7 +348,7 @@ summary.simexreg <- function(object, ...) {
   RCt <- RCcoef/RCse
   df <- nrow(model.frame(object)) - length(RCcoef)
   RCp <- 2 * pt(-abs(RCt), df)
-  summarydf <- cbind(RCcoef, RCse, RCt, RCp)
+  summarydf <- data.frame(RCcoef, RCse, RCt, RCp)
   colnames(summarydf) <- c("Estimate", "Std. Error", "t value", "Pr(>|t|)")
   rownames(summarydf) <- names(RCcoef)
   out <- c(object, list(summarydf = summarydf))

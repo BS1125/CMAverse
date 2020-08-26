@@ -493,10 +493,12 @@ est.gformula <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRU
   } else stop("Unsupported yreg")
 
   # progress bar
+  if (!multimp) {
   curVal <- get("counter", envir = env)
   assign("counter", curVal + 1, envir = env)
   setTxtProgressBar(get("progbar", envir = env), curVal + 1)
-
+  }
+  
   if (outReg) out$est <- est
   if (!outReg) out <- est
 

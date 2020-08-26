@@ -97,16 +97,17 @@ with error.
 library(CMAverse)
 
 # 10 boots are used for illustration
+\dontrun{
 naive <- cmest(data = cma2020, model = "rb", outcome = "contY", 
 exposure = "A", mediator = c("M1", "M2"), 
 basec = c("C1", "C2"), EMint = TRUE,
 mreg = list("logistic", "multinomial"), yreg = "linear",
 astar = 0, a = 1, mval = list(0, "M2_0"),
 estimation = "imputation", inference = "bootstrap", nboot = 10)
+}
 
+\dontrun{
 exp1 <- cmsens(object = naive, sens = "uc")
-exp1
-
 exp2 <- cmsens(object = naive, sens = "me", MEmethod = "rc", 
 MEvariable = "C1", MEvartype = "con",
 MEerror = c(0.1, 0.2))
@@ -118,6 +119,7 @@ MEvariable = "M1", MEvartype = "cat",
 MEerror = list(matrix(c(0.95,0.05,0.05,0.95), nrow = 2), 
 matrix(c(0.9,0.1,0.1,0.9), nrow = 2)), B = 10)
 summary(exp3)
+}
 
 }
 \references{

@@ -6,7 +6,8 @@
 #' @param exposure the variable name of the exposure
 #' @param mediator a character or vector of variable name(s) of the mediator(s)
 #' @param basec (optional) a character or vector of variable name(s) of the baseline confounder(s)
-#' @param postc (optional) a character or vector of variable name(s) of the post-exposure confounder(s)
+#' @param postc (optional) a character or vector of variable name(s) of the post-exposure 
+#' confounder(s) affected by the exposure
 #' @param x.outcome x coordinate of the outcome. Default is \code{4}.
 #' @param x.exposure x coordinate of the exposure. Default is \code{0}.
 #' @param x.mediator x coordinate of the mediator. Default is \code{2}.
