@@ -63,10 +63,10 @@ MEvariable = "C1", MEvartype = "con",
 MEerror = c(0.1, 0.2))
 
 ggcmsens(x) +
-theme(axis.text.x = element_text(angle = 45))
+ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45))
 
 ggcmsens(x) +
-coord_flip(xlim = NULL, ylim = NULL, expand = TRUE, clip = "on")
+ggplot2::coord_flip(xlim = NULL, ylim = NULL, expand = TRUE, clip = "on")
 
 }
 \seealso{

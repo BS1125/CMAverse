@@ -136,6 +136,7 @@ corrected by \code{simexreg}
 
 \examples{
 
+\dontrun{
 rm(list=ls())
 library(CMAverse)
 
@@ -186,7 +187,8 @@ reg_naive <- glm(y ~ x1 + x2_error + x3, data = data, family = binomial("logit")
 reg_true <- glm(y ~ x1 + x2_true + x3, data = data, family = binomial("logit"))
 reg_simex <- simexreg(reg = reg_naive, data = data, MEvariable = "x2_error",
                       MEerror = MEerror, variance = TRUE, MEvartype = "cat")
-                      
+}
+                  
 }
 \references{
 Carrol RJ, Ruppert D, Stefanski LA, Crainiceanu C. Measurement Error in Nonlinear Models: 

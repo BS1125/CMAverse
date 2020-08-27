@@ -94,19 +94,17 @@ with error.
 
 \examples{
 
+\dontrun{
 library(CMAverse)
 
 # 10 boots are used for illustration
-\dontrun{
 naive <- cmest(data = cma2020, model = "rb", outcome = "contY", 
 exposure = "A", mediator = c("M1", "M2"), 
 basec = c("C1", "C2"), EMint = TRUE,
 mreg = list("logistic", "multinomial"), yreg = "linear",
 astar = 0, a = 1, mval = list(0, "M2_0"),
 estimation = "imputation", inference = "bootstrap", nboot = 10)
-}
 
-\dontrun{
 exp1 <- cmsens(object = naive, sens = "uc")
 exp2 <- cmsens(object = naive, sens = "me", MEmethod = "rc", 
 MEvariable = "C1", MEvartype = "con",

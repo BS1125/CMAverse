@@ -127,6 +127,7 @@ corrected by \code{rcreg}
 
 \examples{
 
+\dontrun{
 rm(list=ls())
 library(CMAverse)
 
@@ -191,7 +192,7 @@ reg_naive <- nnet::multinom(factor(y) ~ x1 + x2_error + x3, data = data)
 reg_true <- nnet::multinom(factor(y) ~ x1 + x2_true + x3, data = data)
 reg_rc <- rcreg(reg = reg_naive, data = data, MEvariable = "x2_error",
                 MEerror = 0.5, variance = TRUE, nboot = 2)
-                
+}                
 
 }
 \references{

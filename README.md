@@ -1,7 +1,7 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-CMAverse: your causal mediation analysis helper<img src="man/figures/logo.png" align="right" width="240" />
-============================================================================================================
+CMAverse: a suite of functions for causal mediation analysis<img src="man/figures/logo.png" align="right" width="240" />
+========================================================================================================================
 
 [![Project Status:
 Active](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
@@ -398,7 +398,7 @@ imputation (2018). Statistics in Medicine. 37(14): 2252 - 2266.
 
 VanderWeele TJ, Ding P. Sensitivity analysis in observational research:
 introducing the E-Value (2017). Annals of Internal Medicine. 167(4): 
-268 - 274.
+268- 274.
 
 Smith LH, VanderWeele TJ. Mediational E-values: Approximate sensitivity
 analysis for unmeasured mediator-outcome confounding (2019).

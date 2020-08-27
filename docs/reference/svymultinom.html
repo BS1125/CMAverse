@@ -46,7 +46,7 @@
 <meta property="og:title" content="Multinomial Regression with Survey Data — svymultinom" />
 
 <meta property="og:description" content="svymultinom uses the withReplicates function to compute the replicate-based 
-estimate of variance-covariance matrix of coefficients for a multinomial regression fitted by 
+estimate of the variance-covariance matrix of coefficients for a multinomial regression fitted by 
 multinom." />
 
 <meta property="og:image" content="https://bs1125.github.io/CMAverse/logo.png" />
@@ -156,7 +156,7 @@ multinom." />
     <div class="ref-description">
     
     <p><code>svymultinom</code> uses the <a href='https://rdrr.io/pkg/survey/man/withReplicates.html'>withReplicates</a> function to compute the replicate-based 
-estimate of variance-covariance matrix of coefficients for a multinomial regression fitted by 
+estimate of the variance-covariance matrix of coefficients for a multinomial regression fitted by 
 <a href='https://rdrr.io/pkg/nnet/man/multinom.html'>multinom</a>.</p>
     
     </div>
@@ -233,7 +233,7 @@ is <code>TRUE</code>.</p></td>
     <p>An object of class 'svymultinom' is returned:</p>
 <dt>call</dt><dd><p>the function call,</p></dd>
 <dt>NAIVEreg</dt><dd><p>the naive multinomial regression object,</p></dd>
-<dt>vcov</dt><dd><p>the replicate-based estimate of variance-covariance matrix of coefficients,</p></dd>
+<dt>vcov</dt><dd><p>the replicate-based estimate of the variance-covariance matrix of coefficients,</p></dd>
 ...
 
     
@@ -259,6 +259,7 @@ is <code>TRUE</code>.</p></td>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
+<span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
 <span class='fu'><a href='https://rdrr.io/r/base/rm.html'>rm</a></span>(<span class='kw'>list</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/ls.html'>ls</a></span>())
 <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>CMAverse</span>)
 
@@ -276,41 +277,15 @@ is <code>TRUE</code>.</p></td>
 <span class='no'>w</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/ifelse.html'>ifelse</a></span>(<span class='no'>x3</span> <span class='kw'>==</span> <span class='fl'>0</span>, <span class='fl'>0.4</span>, <span class='fl'>0.6</span>)
 <span class='no'>data</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span>(<span class='kw'>x1</span> <span class='kw'>=</span> <span class='no'>x1</span>, <span class='kw'>x2</span> <span class='kw'>=</span> <span class='no'>x2</span>, <span class='kw'>x3</span> <span class='kw'>=</span> <span class='no'>x3</span>, <span class='kw'>y</span> <span class='kw'>=</span> <span class='no'>y</span>)
 
-<span class='fu'>svymultinom</span>(<span class='no'>y</span> ~ <span class='no'>x1</span> + <span class='no'>x2</span> + <span class='no'>x3</span>, <span class='kw'>weights</span> <span class='kw'>=</span> <span class='no'>w</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>data</span>)</div><div class='output co'>#&gt; Call:
-#&gt; svymultinom(formula = y ~ x1 + x2 + x3, weights = w, data = data)
-#&gt; 
-#&gt; # Naive regression object: 
-#&gt; Call:
-#&gt; multinom(formula = formula, data = data, weights = weights, trace = FALSE)
-#&gt; 
-#&gt; Coefficients:
-#&gt;   (Intercept)       x1         x2         x3
-#&gt; 2   0.7971271 0.374271 -0.4238631  0.0804887
-#&gt; 3   1.6724573 1.092656 -1.6984549 -0.8482822
-#&gt; 
-#&gt; Residual Deviance: 861.6201 
-#&gt; AIC: 877.6201 
-#&gt; 
-#&gt; # Var-cov matrix of coefficients:
-#&gt;               2:(Intercept)          2:x1         2:x2          2:x3
-#&gt; 2:(Intercept)   0.027520390  0.0034703584 -0.011860847 -0.0123503620
-#&gt; 2:x1            0.003470358  0.0073557499 -0.001594450 -0.0009374165
-#&gt; 2:x2           -0.011860847 -0.0015944503  0.008522038  0.0010320307
-#&gt; 2:x3           -0.012350362 -0.0009374165  0.001032031  0.0252579958
-#&gt; 3:(Intercept)   0.018337380  0.0025550576 -0.007741988 -0.0086146813
-#&gt; 3:x1            0.003037413  0.0048264755 -0.001295673 -0.0006851203
-#&gt; 3:x2           -0.007863854 -0.0011057399  0.005091453  0.0015732712
-#&gt; 3:x3           -0.008920660 -0.0004209580  0.001236589  0.0166368705
-#&gt;               3:(Intercept)          3:x1         3:x2         3:x3
-#&gt; 2:(Intercept)   0.018337380  0.0030374130 -0.007863854 -0.008920660
-#&gt; 2:x1            0.002555058  0.0048264755 -0.001105740 -0.000420958
-#&gt; 2:x2           -0.007741988 -0.0012956726  0.005091453  0.001236589
-#&gt; 2:x3           -0.008614681 -0.0006851203  0.001573271  0.016636871
-#&gt; 3:(Intercept)   0.031432924  0.0032249227 -0.015330664 -0.020887292
-#&gt; 3:x1            0.003224923  0.0122215394 -0.004317878 -0.002661907
-#&gt; 3:x2           -0.015330664 -0.0043178776  0.015782695  0.006683250
-#&gt; 3:x3           -0.020887292 -0.0026619067  0.006683250  0.045217636</div><div class='input'> 
-</div></pre>
+<span class='no'>reg</span> <span class='kw'>&lt;-</span> <span class='fu'>svymultinom</span>(<span class='no'>y</span> ~ <span class='no'>x1</span> + <span class='no'>x2</span> + <span class='no'>x3</span>, <span class='kw'>weights</span> <span class='kw'>=</span> <span class='no'>w</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>data</span>)
+<span class='fu'><a href='https://rdrr.io/r/stats/coef.html'>coef</a></span>(<span class='no'>reg</span>)
+<span class='fu'><a href='https://rdrr.io/r/stats/vcov.html'>vcov</a></span>(<span class='no'>reg</span>)
+<span class='fu'><a href='https://rdrr.io/r/stats/formula.html'>formula</a></span>(<span class='no'>reg</span>)
+<span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span>(<span class='no'>reg</span>, <span class='kw'>newdata</span> <span class='kw'>=</span> <span class='no'>data</span>[<span class='fl'>1</span>, ], <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"probs"</span>)
+<span class='fu'><a href='https://rdrr.io/r/stats/model.frame.html'>model.frame</a></span>(<span class='no'>reg</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span>(<span class='no'>reg</span>)
+<span class='fu'><a href='https://rdrr.io/r/stats/update.html'>update</a></span>(<span class='no'>reg</span>, <span class='kw'>weights</span> <span class='kw'>=</span> <span class='no'>w</span>[<span class='fl'>1</span>:<span class='fl'>500</span>], <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>data</span>[<span class='fl'>1</span>:<span class='fl'>500</span>, ])
+}</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

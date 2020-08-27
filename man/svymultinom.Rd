@@ -55,12 +55,12 @@ is \code{TRUE}.}
 An object of class 'svymultinom' is returned:
 \item{call}{the function call,}
 \item{NAIVEreg}{the naive multinomial regression object,}
-\item{vcov}{the replicate-based estimate of variance-covariance matrix of coefficients,}
+\item{vcov}{the replicate-based estimate of the variance-covariance matrix of coefficients,}
 ...
 }
 \description{
 \code{svymultinom} uses the \link[survey]{withReplicates} function to compute the replicate-based 
-estimate of variance-covariance matrix of coefficients for a multinomial regression fitted by 
+estimate of the variance-covariance matrix of coefficients for a multinomial regression fitted by 
 \link[nnet]{multinom}.
 }
 \section{Methods (by generic)}{
@@ -86,6 +86,7 @@ estimate of variance-covariance matrix of coefficients for a multinomial regress
 
 \examples{
 
+\dontrun{
 rm(list=ls())
 library(CMAverse)
 
@@ -103,7 +104,15 @@ y <- sapply(1:n, function(x) sample(size = 1, c(1:3), prob = c(py1[x], py2[x], p
 w <- ifelse(x3 == 0, 0.4, 0.6)
 data <- data.frame(x1 = x1, x2 = x2, x3 = x3, y = y)
 
-svymultinom(y ~ x1 + x2 + x3, weights = w, data = data)
+reg <- svymultinom(y ~ x1 + x2 + x3, weights = w, data = data)
+coef(reg)
+vcov(reg)
+formula(reg)
+predict(reg, newdata = data[1, ], type = "probs")
+model.frame(reg)
+summary(reg)
+update(reg, weights = w[1:500], data = data[1:500, ])
+}
  
 }
 \seealso{

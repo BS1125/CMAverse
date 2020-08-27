@@ -333,6 +333,7 @@ Journal of the American Statistical Association. 90(432): 1247 - 56.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
+<span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
 <span class='fu'><a href='https://rdrr.io/r/base/rm.html'>rm</a></span>(<span class='kw'>list</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/ls.html'>ls</a></span>())
 <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>CMAverse</span>)
 
@@ -350,17 +351,13 @@ Journal of the American Statistical Association. 90(432): 1247 - 56.</p>
 <span class='no'>reg_true</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span>(<span class='no'>y</span> ~ <span class='no'>x1</span> + <span class='no'>x2_true</span> + <span class='no'>x3</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>data</span>)
 <span class='no'>reg_simex</span> <span class='kw'>&lt;-</span> <span class='fu'>simexreg</span>(<span class='kw'>reg</span> <span class='kw'>=</span> <span class='no'>reg_naive</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>data</span>, <span class='kw'>MEvariable</span> <span class='kw'>=</span> <span class='st'>"x2_error"</span>,
 <span class='kw'>MEvartype</span> <span class='kw'>=</span> <span class='st'>"con"</span>, <span class='kw'>MEerror</span> <span class='kw'>=</span> <span class='fl'>0.5</span>, <span class='kw'>variance</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
-<span class='fu'><a href='https://rdrr.io/r/stats/coef.html'>coef</a></span>(<span class='no'>reg_simex</span>)</div><div class='output co'>#&gt; (Intercept)          x1    x2_error          x3 
-#&gt;    1.463795    2.011952    3.739330    1.829996 </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/stats/vcov.html'>vcov</a></span>(<span class='no'>reg_simex</span>)</div><div class='output co'>#&gt;              (Intercept)            x1      x2_error            x3
-#&gt; (Intercept)  0.065618460 -3.734863e-03 -1.745874e-02 -0.0095670899
-#&gt; x1          -0.003734863  8.292981e-04 -8.761452e-06 -0.0005634011
-#&gt; x2_error    -0.017458740 -8.761452e-06  8.238698e-03  0.0004507399
-#&gt; x3          -0.009567090 -5.634011e-04  4.507399e-04  0.0296799678</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/stats/sigma.html'>sigma</a></span>(<span class='no'>reg_simex</span>)</div><div class='output co'>#&gt; [1] 2.058372</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/stats/formula.html'>formula</a></span>(<span class='no'>reg_simex</span>)</div><div class='output co'>#&gt; y ~ x1 + x2_error + x3
-#&gt; &lt;environment: 0x000000002efa30c0&gt;</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/stats/family.html'>family</a></span>(<span class='no'>reg_simex</span>)</div><div class='output co'>#&gt; 
-#&gt; Family: gaussian 
-#&gt; Link function: identity 
-#&gt; </div><div class='input'><span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span>(<span class='no'>reg_simex</span>, <span class='kw'>newdata</span> <span class='kw'>=</span> <span class='no'>data</span>[<span class='fl'>1</span>, ])</div><div class='output co'>#&gt;        1 
-#&gt; 25.00893 </div><div class='input'><span class='no'>reg_simex_model</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/model.frame.html'>model.frame</a></span>(<span class='no'>reg_simex</span>)
+<span class='fu'><a href='https://rdrr.io/r/stats/coef.html'>coef</a></span>(<span class='no'>reg_simex</span>)
+<span class='fu'><a href='https://rdrr.io/r/stats/vcov.html'>vcov</a></span>(<span class='no'>reg_simex</span>)
+<span class='fu'><a href='https://rdrr.io/r/stats/sigma.html'>sigma</a></span>(<span class='no'>reg_simex</span>)
+<span class='fu'><a href='https://rdrr.io/r/stats/formula.html'>formula</a></span>(<span class='no'>reg_simex</span>)
+<span class='fu'><a href='https://rdrr.io/r/stats/family.html'>family</a></span>(<span class='no'>reg_simex</span>)
+<span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span>(<span class='no'>reg_simex</span>, <span class='kw'>newdata</span> <span class='kw'>=</span> <span class='no'>data</span>[<span class='fl'>1</span>, ])
+<span class='no'>reg_simex_model</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/model.frame.html'>model.frame</a></span>(<span class='no'>reg_simex</span>)
 <span class='no'>reg_simex_update</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/update.html'>update</a></span>(<span class='no'>reg_simex</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>data</span>, <span class='kw'>weights</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>1</span>, <span class='no'>n</span>))
 <span class='no'>reg_simex_summ</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span>(<span class='no'>reg_simex</span>)
 
@@ -386,7 +383,8 @@ Journal of the American Statistical Association. 90(432): 1247 - 56.</p>
 <span class='no'>reg_naive</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/glm.html'>glm</a></span>(<span class='no'>y</span> ~ <span class='no'>x1</span> + <span class='no'>x2_error</span> + <span class='no'>x3</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>data</span>, <span class='kw'>family</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/family.html'>binomial</a></span>(<span class='st'>"logit"</span>))
 <span class='no'>reg_true</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/glm.html'>glm</a></span>(<span class='no'>y</span> ~ <span class='no'>x1</span> + <span class='no'>x2_true</span> + <span class='no'>x3</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>data</span>, <span class='kw'>family</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/family.html'>binomial</a></span>(<span class='st'>"logit"</span>))
 <span class='no'>reg_simex</span> <span class='kw'>&lt;-</span> <span class='fu'>simexreg</span>(<span class='kw'>reg</span> <span class='kw'>=</span> <span class='no'>reg_naive</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>data</span>, <span class='kw'>MEvariable</span> <span class='kw'>=</span> <span class='st'>"x2_error"</span>,
-                      <span class='kw'>MEerror</span> <span class='kw'>=</span> <span class='no'>MEerror</span>, <span class='kw'>variance</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>MEvartype</span> <span class='kw'>=</span> <span class='st'>"cat"</span>)</div></pre>
+                      <span class='kw'>MEerror</span> <span class='kw'>=</span> <span class='no'>MEerror</span>, <span class='kw'>variance</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>MEvartype</span> <span class='kw'>=</span> <span class='st'>"cat"</span>)
+}</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

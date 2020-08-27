@@ -623,41 +623,35 @@ imputation (2018). Statistics in Medicine. 37(14): 2252 - 2266.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
+<span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
 <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>CMAverse</span>)
 
 <span class='co'># single-mediator case with rb</span>
-<span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
 <span class='no'>exp1</span> <span class='kw'>&lt;-</span> <span class='fu'>cmest</span>(<span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>cma2020</span>, <span class='kw'>model</span> <span class='kw'>=</span> <span class='st'>"rb"</span>, <span class='kw'>outcome</span> <span class='kw'>=</span> <span class='st'>"contY"</span>,
 <span class='kw'>exposure</span> <span class='kw'>=</span> <span class='st'>"A"</span>, <span class='kw'>mediator</span> <span class='kw'>=</span> <span class='st'>"M2"</span>, <span class='kw'>basec</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"C1"</span>, <span class='st'>"C2"</span>),
 <span class='kw'>EMint</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>mreg</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='st'>"multinomial"</span>), <span class='kw'>yreg</span> <span class='kw'>=</span> <span class='st'>"linear"</span>,
 <span class='kw'>astar</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>a</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>mval</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='st'>"M2_0"</span>), <span class='kw'>estimation</span> <span class='kw'>=</span> <span class='st'>"paramfunc"</span>,
 <span class='kw'>inference</span> <span class='kw'>=</span> <span class='st'>"delta"</span>)
 <span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span>(<span class='no'>exp1</span>)
-}
 
 <span class='co'># multiple-mediator case with rb</span>
 <span class='co'># 10 boots are used for illustration</span>
-<span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
 <span class='no'>exp2</span> <span class='kw'>&lt;-</span> <span class='fu'>cmest</span>(<span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>cma2020</span>, <span class='kw'>model</span> <span class='kw'>=</span> <span class='st'>"rb"</span>, <span class='kw'>outcome</span> <span class='kw'>=</span> <span class='st'>"contY"</span>,
 <span class='kw'>exposure</span> <span class='kw'>=</span> <span class='st'>"A"</span>, <span class='kw'>mediator</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"M1"</span>, <span class='st'>"M2"</span>), <span class='kw'>basec</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"C1"</span>, <span class='st'>"C2"</span>),
 <span class='kw'>EMint</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>mreg</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='st'>"logistic"</span>, <span class='st'>"multinomial"</span>),
 <span class='kw'>yreg</span> <span class='kw'>=</span> <span class='st'>"linear"</span>, <span class='kw'>astar</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>a</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>mval</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fl'>0</span>, <span class='st'>"M2_0"</span>),
 <span class='kw'>estimation</span> <span class='kw'>=</span> <span class='st'>"imputation"</span>, <span class='kw'>inference</span> <span class='kw'>=</span> <span class='st'>"bootstrap"</span>, <span class='kw'>nboot</span> <span class='kw'>=</span> <span class='fl'>10</span>)
-}
 
 <span class='co'># multiple-mediator case with ne</span>
 <span class='co'># 10 boots are used for illustration</span>
-<span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
 <span class='no'>exp3</span> <span class='kw'>&lt;-</span> <span class='fu'>cmest</span>(<span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>cma2020</span>, <span class='kw'>model</span> <span class='kw'>=</span> <span class='st'>"ne"</span>, <span class='kw'>outcome</span> <span class='kw'>=</span> <span class='st'>"contY"</span>,
 <span class='kw'>exposure</span> <span class='kw'>=</span> <span class='st'>"A"</span>, <span class='kw'>mediator</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"M1"</span>, <span class='st'>"M2"</span>), <span class='kw'>basec</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"C1"</span>, <span class='st'>"C2"</span>),
 <span class='kw'>yreg</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/glm.html'>glm</a></span>(<span class='no'>contY</span> ~ <span class='no'>A</span> + <span class='no'>M1</span> + <span class='no'>M2</span> + <span class='no'>A</span>*<span class='no'>M1</span> + <span class='no'>A</span>*<span class='no'>M2</span> + <span class='no'>C1</span> + <span class='no'>C2</span>, <span class='kw'>family</span> <span class='kw'>=</span> <span class='no'>gaussian</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>cma2020</span>),
 <span class='kw'>astar</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>a</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>mval</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fl'>0</span>, <span class='st'>"M2_0"</span>), <span class='kw'>estimation</span> <span class='kw'>=</span> <span class='st'>"imputation"</span>,
 <span class='kw'>inference</span> <span class='kw'>=</span> <span class='st'>"bootstrap"</span>, <span class='kw'>nboot</span> <span class='kw'>=</span> <span class='fl'>10</span>)
-}
 
 <span class='co'># case control study with msm</span>
 <span class='co'># 10 boots are used for illustration</span>
-<span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
 <span class='no'>exp4</span> <span class='kw'>&lt;-</span> <span class='fu'>cmest</span>(<span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>cma2020</span>, <span class='kw'>model</span> <span class='kw'>=</span> <span class='st'>"msm"</span>, <span class='kw'>casecontrol</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
 <span class='kw'>yrare</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>outcome</span> <span class='kw'>=</span> <span class='st'>"binY"</span>, <span class='kw'>exposure</span> <span class='kw'>=</span> <span class='st'>"A"</span>,
 <span class='kw'>mediator</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"M1"</span>, <span class='st'>"M2"</span>), <span class='kw'>EMint</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>basec</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"C1"</span>, <span class='st'>"C2"</span>), <span class='kw'>yreg</span> <span class='kw'>=</span> <span class='st'>"logistic"</span>,
