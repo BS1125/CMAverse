@@ -62,7 +62,8 @@
 #' each observation unit (used when \code{model} is \code{ne}). See \link[medflex]{neImpute.default}
 #' for details. Default is \code{5}.
 #' @param multimp a logical value (used when \code{data} contains missing values). If 
-#' \code{TRUE}, conduct multiple imputation using the \code{mice} package. Default is \code{FALSE}.
+#' \code{TRUE}, conduct multiple imputation using the \link[mice]{mice} function. Default is 
+#' \code{FALSE}.
 #' @param x an object of class 'cmest'
 #' @param object an object of class 'cmest'
 #' @param digits minimal number of significant digits. See \link{print.default}.
@@ -439,18 +440,18 @@ cmest <- function(data = NULL, model = NULL,
   
   # casecontrol, yrare, yprevalence
   if (!is.logical(casecontrol)) stop("casecontrol should be TRUE or FALSE")
-    out$methods$casecontrol <- casecontrol
-    if (!casecontrol) {
-      if (!is.null(yrare)) warning("When casecontrol is FALSE, yrare is ignored")
-      if (!is.null(yprevalence)) warning("When casecontrol is FALSE, yprevalence is ignored ")
-    } else {
-      if (is.null(yprevalence) && !yrare == TRUE) stop("When casecontrol is TRUE, specify yprevalence or set yrare to be TRUE")
-      if (!is.null(yprevalence)) {
-        if (!is.numeric(yprevalence)) stop("yprevalence should be numeric")
-        if (!is.null(yrare)) out$methods$yrare <- yrare
-        out$methods$yprevalence <- yprevalence
-      } else out$methods$yrare <- yrare
-    }
+  out$methods$casecontrol <- casecontrol
+  if (!casecontrol) {
+    if (!is.null(yrare)) warning("When casecontrol is FALSE, yrare is ignored")
+    if (!is.null(yprevalence)) warning("When casecontrol is FALSE, yprevalence is ignored ")
+  } else {
+    if (is.null(yprevalence) && !yrare == TRUE) stop("When casecontrol is TRUE, specify yprevalence or set yrare to be TRUE")
+    if (!is.null(yprevalence)) {
+      if (!is.numeric(yprevalence)) stop("yprevalence should be numeric")
+      if (!is.null(yrare)) out$methods$yrare <- yrare
+      out$methods$yprevalence <- yprevalence
+    } else out$methods$yrare <- yrare
+  }
   
   # outcome
   if (length(outcome) == 0) stop("Unspecified outcome")
@@ -762,7 +763,7 @@ print.cmest <- function(x, ...) {
         if (!is.null(x$reg.output$yreg)) {
           cat("# Outcome Regression: \n")
           x$reg.output$yreg$call <- update(x$reg.output$yreg,data=getCall(x$reg.output$yreg)$data,
-                                      weights=getCall(x$reg.output$yreg)$weights, evaluate = FALSE)
+                                           weights=getCall(x$reg.output$yreg)$weights, evaluate = FALSE)
           print(x$reg.output$yreg)
         }
       }
@@ -779,9 +780,9 @@ print.cmest <- function(x, ...) {
           cat("# Mediator Regression: \n")
           for (i in 1:length(x$reg.output$mreg)) {
             x$reg.output$mreg[[i]]$call <- eval(bquote(update(x$reg.output$mreg[[i]], 
-                                     data=getCall(x$reg.output$mreg[[.(i)]])$data, 
-                                     weights=getCall(x$reg.output$mreg[[.(i)]])$weights,
-                                     evaluate = FALSE)))
+                                                              data=getCall(x$reg.output$mreg[[.(i)]])$data, 
+                                                              weights=getCall(x$reg.output$mreg[[.(i)]])$weights,
+                                                              evaluate = FALSE)))
             print(x$reg.output$mreg[[i]])
             if (i < length(x$reg.output$mreg)) cat("\n")
           }
@@ -792,9 +793,9 @@ print.cmest <- function(x, ...) {
           cat("# Mediator Regression for Weighting: \n")
           for (i in 1:length(x$reg.output$wmreg)) {
             x$reg.output$wmreg[[i]]$call <- eval(bquote(update(x$reg.output$wmreg[[i]], 
-                                                              data=getCall(x$reg.output$wmreg[[.(i)]])$data, 
-                                                              weights=getCall(x$reg.output$wmreg[[.(i)]])$weights,
-                                                              evaluate = FALSE)))
+                                                               data=getCall(x$reg.output$wmreg[[.(i)]])$data, 
+                                                               weights=getCall(x$reg.output$wmreg[[.(i)]])$weights,
+                                                               evaluate = FALSE)))
             print(x$reg.output$wmreg[[i]])
             if (i < length(x$reg.output$wmreg)) cat("\n")
           }
@@ -805,9 +806,9 @@ print.cmest <- function(x, ...) {
           cat("# Post-exposure Confounder Regression: \n")
           for (i in 1:length(x$reg.output$postcreg)) {
             x$reg.output$postcreg[[i]]$call <- eval(bquote(update(x$reg.output$postcreg[[i]], 
-                                                              data=getCall(x$reg.output$postcreg[[.(i)]])$data, 
-                                                              weights=getCall(x$reg.output$postcreg[[.(i)]])$weights,
-                                                              evaluate = FALSE)))
+                                                                  data=getCall(x$reg.output$postcreg[[.(i)]])$data, 
+                                                                  weights=getCall(x$reg.output$postcreg[[.(i)]])$weights,
+                                                                  evaluate = FALSE)))
             print(x$reg.output$postcreg[[i]])
             if (i < length(x$reg.output$postcreg)) cat("\n")
           }
@@ -824,9 +825,9 @@ print.cmest <- function(x, ...) {
           if (!is.null(x$reg.output[[m]]$yreg)) {
             cat("## Outcome Regression: \n")
             x$reg.output[[m]]$yreg$call <- eval(bquote(update(x$reg.output[[.(m)]]$yreg,
-                                     data=getCall(x$reg.output[[.(m)]]$yreg)$data,
-                                     weights=getCall(x$reg.output[[.(m)]]$yreg)$weights, 
-                                     evaluate = FALSE)))
+                                                              data=getCall(x$reg.output[[.(m)]]$yreg)$data,
+                                                              weights=getCall(x$reg.output[[.(m)]]$yreg)$weights, 
+                                                              evaluate = FALSE)))
             print(x$reg.output[[m]]$yreg)
           }
         }
@@ -834,9 +835,9 @@ print.cmest <- function(x, ...) {
           if (!is.null(x$reg.output[[m]]$ereg)) {
             cat("## Exposure Regression for Weighting: \n")
             x$reg.output[[m]]$ereg$call <- eval(bquote(update(x$reg.output[[.(m)]]$ereg,
-                                     data=getCall(x$reg.output[[.(m)]]$ereg)$data,
-                                     weights=getCall(x$reg.output[[.(m)]]$ereg)$weights, 
-                                     evaluate = FALSE)))
+                                                              data=getCall(x$reg.output[[.(m)]]$ereg)$data,
+                                                              weights=getCall(x$reg.output[[.(m)]]$ereg)$weights, 
+                                                              evaluate = FALSE)))
             print(x$reg.output[[m]]$ereg)
           }
         }
@@ -845,9 +846,9 @@ print.cmest <- function(x, ...) {
             cat("## Mediator Regression: \n")
             for (i in 1:length(x$reg.output[[m]]$mreg)) {
               x$reg.output[[m]]$mreg[[i]]$call <- eval(bquote(update(x$reg.output[[.(m)]]$mreg[[i]], 
-                                       data=getCall(x$reg.output[[.(m)]]$mreg[[.(i)]])$data, 
-                                       weights=getCall(x$reg.output[[.(m)]]$mreg[[.(i)]])$weights, 
-                                       evaluate = FALSE)))
+                                                                     data=getCall(x$reg.output[[.(m)]]$mreg[[.(i)]])$data, 
+                                                                     weights=getCall(x$reg.output[[.(m)]]$mreg[[.(i)]])$weights, 
+                                                                     evaluate = FALSE)))
               print(x$reg.output[[m]]$mreg[[i]])
               if (i < length(x$reg.output[[m]]$mreg)) cat("\n")
             }
@@ -858,9 +859,9 @@ print.cmest <- function(x, ...) {
             cat("## Mediator Regression for Weighting: \n")
             for (i in 1:length(x$reg.output[[m]]$wmreg)) {
               x$reg.output[[m]]$wmreg[[i]]$call <- eval(bquote(update(x$reg.output[[.(m)]]$wmreg[[i]], 
-                                       data=getCall(x$reg.output[[.(m)]]$wmreg[[.(i)]])$data, 
-                                       weights=getCall(x$reg.output[[.(m)]]$wmreg[[.(i)]])$weights, 
-                                       evaluate = FALSE)))
+                                                                      data=getCall(x$reg.output[[.(m)]]$wmreg[[.(i)]])$data, 
+                                                                      weights=getCall(x$reg.output[[.(m)]]$wmreg[[.(i)]])$weights, 
+                                                                      evaluate = FALSE)))
               print(x$reg.output[[m]]$wmreg[[i]])
               if (i < length(x$reg.output[[m]]$wmreg)) cat("\n")
             }
@@ -871,9 +872,9 @@ print.cmest <- function(x, ...) {
             cat("## Post-exposure Confounder Regression: \n")
             for (i in 1:length(x$reg.output[[m]]$postcreg)) {
               x$reg.output[[m]]$postcreg[[i]]$call <- eval(bquote(update(x$reg.output[[.(m)]]$postcreg[[i]], 
-                                       data=getCall(x$reg.output[[.(m)]]$postcreg[[.(i)]])$data, 
-                                       weights=getCall(x$reg.output[[.(m)]]$postcreg[[.(i)]])$weights, 
-                                       evaluate = FALSE)))
+                                                                         data=getCall(x$reg.output[[.(m)]]$postcreg[[.(i)]])$data, 
+                                                                         weights=getCall(x$reg.output[[.(m)]]$postcreg[[.(i)]])$weights, 
+                                                                         evaluate = FALSE)))
               print(x$reg.output[[m]]$postcreg[[i]])
               if (i < length(x$reg.output[[m]]$postcreg)) cat("\n")
             }
@@ -883,208 +884,209 @@ print.cmest <- function(x, ...) {
       }
     }
   }
-    # print causal mediation analysis results
-    if (x$methods$model == "rb") model_str <- "Regression-based Approach"
-    if (x$methods$model == "wb") model_str <- "Weighting-based Approach"
-    if (x$methods$model == "ne") model_str <- "Natural Effect Model"
-    if (x$methods$model == "iorw") model_str <- "Inverse Odds Ratio Weighting Approach"
-    if (x$methods$model == "msm") model_str <- "Marginal Structural Model"
-    if (x$methods$model == "gformula") model_str <- "G-formula Approach"
-    if (x$methods$estimation == "paramfunc") est_str <- "Closed-form parameter function estimation"
-    if (x$methods$estimation == "imputation") est_str <- "Direct counterfactual imputation estimation"
-    if (x$methods$inference == "delta") inf_str <- "delta method standard errors, confidence intervals and p-values"
-    if (x$methods$inference == "bootstrap") inf_str <- "bootstrap standard errors, percentile confidence intervals and p-values"
-    if (x$methods$model != "ne" && (x$methods$casecontrol)) cat("# Causal Mediation Analysis for a Case Control Study via the ")
-    if (!(x$methods$model != "ne" && (x$methods$casecontrol))) cat("# Causal Mediation Analysis via the ")
-    cat(model_str)
-    cat("\n \n")
-    cat(est_str)
-    cat(paste(" with \n", inf_str, "\n \n"))
-    print(x$effect.pe)
-    cat("\n")
-    cat("Reference values: \n")
-    print(x$ref)
-  }
-  
-  
-  #' @describeIn cmest Summarize the results of cmest nicely
-  #' @export
-  summary.cmest <- function(object, ...) {
-    # summarize regression models used
-        regsumm <- list()  
-    if (!object$multimp$multimp) {
-      regnames <- names(object$reg.output)
+  # print causal mediation analysis results
+  if (x$methods$model == "rb") model_str <- "Regression-based Approach"
+  if (x$methods$model == "wb") model_str <- "Weighting-based Approach"
+  if (x$methods$model == "ne") model_str <- "Natural Effect Model"
+  if (x$methods$model == "iorw") model_str <- "Inverse Odds Ratio Weighting Approach"
+  if (x$methods$model == "msm") model_str <- "Marginal Structural Model"
+  if (x$methods$model == "gformula") model_str <- "G-formula Approach"
+  if (x$multimp$multimp) model_str <- paste(model_str, "with Multiple Imputation")
+  if (x$methods$estimation == "paramfunc") est_str <- "Closed-form parameter function estimation"
+  if (x$methods$estimation == "imputation") est_str <- "Direct counterfactual imputation estimation"
+  if (x$methods$inference == "delta") inf_str <- "delta method standard errors, confidence intervals and p-values"
+  if (x$methods$inference == "bootstrap") inf_str <- "bootstrap standard errors, percentile confidence intervals and p-values"
+  if (x$methods$model != "ne" && (x$methods$casecontrol)) cat("# Causal Mediation Analysis for a Case Control Study via the ")
+  if (!(x$methods$model != "ne" && (x$methods$casecontrol))) cat("# Causal Mediation Analysis via the ")
+  cat(model_str)
+  cat("\n \n")
+  cat(est_str)
+  cat(paste(" with \n", inf_str, "\n \n"))
+  print(x$effect.pe)
+  cat("\n")
+  cat("Reference values: \n")
+  print(x$ref)
+}
+
+
+#' @describeIn cmest Summarize the results of cmest nicely
+#' @export
+summary.cmest <- function(object, ...) {
+  # summarize regression models used
+  regsumm <- list()  
+  if (!object$multimp$multimp) {
+    regnames <- names(object$reg.output)
+    for (name in regnames) {
+      if (name == "yreg") {
+        if (!is.null(object$reg.output$yreg)) {
+          regsumm$yreg <- summary(object$reg.output$yreg)
+        }
+      }
+      if (name == "ereg") {
+        if (!is.null(object$reg.output$ereg)) {
+          regsumm$ereg <- summary(object$reg.output$ereg)
+        }
+      }
+      if (name == "mreg") {
+        if (!is.null(object$reg.output$mreg)) {
+          regsumm$mreg <- lapply(1:length(object$reg.output$mreg), function(i)
+            summary(object$reg.output$mreg[[i]]))
+        }
+      }
+      if (name == "wmreg") {
+        if (!is.null(object$reg.output$wmreg)) {
+          regsumm$wmreg <- lapply(1:length(object$reg.output$wmreg), function(i)
+            summary(object$reg.output$wmreg[[i]]))
+        }
+      }
+      if (name == "postcreg") {
+        if (!is.null(object$reg.output$postcreg)) {
+          regsumm$postcreg <- lapply(1:length(object$reg.output$postcreg), function(i)
+            summary(object$reg.output$postcreg[[i]]))
+        }
+      }
+    }
+  } else {
+    for (m in 1:length(object$reg.output)){ 
+      regsumm[[m]] <- list()
+      regnames <- names(object$reg.output[[m]])
       for (name in regnames) {
         if (name == "yreg") {
-          if (!is.null(object$reg.output$yreg)) {
-            regsumm$yreg <- summary(object$reg.output$yreg)
+          if (!is.null(object$reg.output[[m]]$yreg)) {
+            regsumm[[m]]$yreg <- summary(object$reg.output[[m]]$yreg)
           }
         }
         if (name == "ereg") {
-          if (!is.null(object$reg.output$ereg)) {
-            regsumm$ereg <- summary(object$reg.output$ereg)
+          if (!is.null(object$reg.output[[m]]$ereg)) {
+            regsumm[[m]]$ereg <- summary(object$reg.output[[m]]$ereg)
           }
         }
         if (name == "mreg") {
-          if (!is.null(object$reg.output$mreg)) {
-            regsumm$mreg <- lapply(1:length(object$reg.output$mreg), function(i)
-              summary(object$reg.output$mreg[[i]]))
+          if (!is.null(object$reg.output[[m]]$mreg)) {
+            regsumm[[m]]$mreg <- lapply(1:length(object$reg.output[[m]]$mreg), function(i)
+              summary(object$reg.output[[m]]$mreg[[i]]))
           }
         }
         if (name == "wmreg") {
-          if (!is.null(object$reg.output$wmreg)) {
-            regsumm$wmreg <- lapply(1:length(object$reg.output$wmreg), function(i)
-              summary(object$reg.output$wmreg[[i]]))
+          if (!is.null(object$reg.output[[m]]$wmreg)) {
+            regsumm[[m]]$wmreg <- lapply(1:length(object$reg.output[[m]]$wmreg), function(i)
+              summary(object$reg.output[[m]]$wmreg[[i]]))
           }
         }
         if (name == "postcreg") {
-          if (!is.null(object$reg.output$postcreg)) {
-            regsumm$postcreg <- lapply(1:length(object$reg.output$postcreg), function(i)
-              summary(object$reg.output$postcreg[[i]]))
-          }
-        }
-      }
-    } else {
-      for (m in 1:length(object$reg.output)){ 
-        regsumm[[m]] <- list()
-        regnames <- names(object$reg.output[[m]])
-        for (name in regnames) {
-          if (name == "yreg") {
-            if (!is.null(object$reg.output[[m]]$yreg)) {
-              regsumm[[m]]$yreg <- summary(object$reg.output[[m]]$yreg)
-            }
-          }
-          if (name == "ereg") {
-            if (!is.null(object$reg.output[[m]]$ereg)) {
-              regsumm[[m]]$ereg <- summary(object$reg.output[[m]]$ereg)
-            }
-          }
-          if (name == "mreg") {
-            if (!is.null(object$reg.output[[m]]$mreg)) {
-              regsumm[[m]]$mreg <- lapply(1:length(object$reg.output[[m]]$mreg), function(i)
-                summary(object$reg.output[[m]]$mreg[[i]]))
-            }
-          }
-          if (name == "wmreg") {
-            if (!is.null(object$reg.output[[m]]$wmreg)) {
-              regsumm[[m]]$wmreg <- lapply(1:length(object$reg.output[[m]]$wmreg), function(i)
-                summary(object$reg.output[[m]]$wmreg[[i]]))
-            }
-          }
-          if (name == "postcreg") {
-            if (!is.null(object$reg.output[[m]]$postcreg)) {
-              regsumm[[m]]$postcreg <- lapply(1:length(object$reg.output[[m]]$postcreg), function(i)
-                summary(object$reg.output[[m]]$postcreg[[i]]))
-            }
+          if (!is.null(object$reg.output[[m]]$postcreg)) {
+            regsumm[[m]]$postcreg <- lapply(1:length(object$reg.output[[m]]$postcreg), function(i)
+              summary(object$reg.output[[m]]$postcreg[[i]]))
           }
         }
       }
     }
-    # summarize causal mediation analysis results
-    summarydf <- data.frame(object$effect.pe, object$effect.se, object$effect.ci.low, 
-                            object$effect.ci.high, object$effect.pval)
-    colnames(summarydf) <- c("Estimate", "Std.error", "95% CIL", "95% CIU", "P.val")
-    out <- list(call = object$call, data = object$data, methods = object$methods,
-                variables = object$variables, multimp = object$multimp, ref = object$ref, 
-                regsumm = regsumm, summarydf = summarydf)
-    class(out) <- c("summary.cmest")
-    return(out)
   }
-  
-  #' @describeIn cmest Print the summary of cmest nicely
-  #' @export
-  print.summary.cmest <- function(x, digits = 4, ...) {
-    # print summary of causal mediation analysis results
-    if (x$methods$model == "rb") model_str <- "Regression-based Approach"
-    if (x$methods$model == "wb") model_str <- "Weighting-based Approach"
-    if (x$methods$model == "ne") model_str <- "Natural Effect Model"
-    if (x$methods$model == "iorw") model_str <- "Inverse Odds Ratio Weighting Approach"
-    if (x$methods$model == "msm") model_str <- "Marginal Structural Model"
-    if (x$methods$model == "gformula") model_str <- "G-formula Approach"
-    if (x$methods$estimation == "paramfunc") est_str <- "Closed-form parameter function estimation"
-    if (x$methods$estimation == "imputation") est_str <- "Direct counterfactual imputation estimation"
-    if (x$methods$inference == "delta") inf_str <- "delta method standard errors, confidence intervals and p-values"
-    if (x$methods$inference == "bootstrap") inf_str <- "bootstrap standard errors, percentile confidence intervals and p-values"
-    if (x$methods$model != "ne" && (x$methods$casecontrol)) cat("# Causal Mediation Analysis for a Case Control Study via the ")
-    if (!(x$methods$model != "ne" && (x$methods$casecontrol))) cat("# Causal Mediation Analysis via the ")
-    cat(model_str)
-    cat("\n \n")
-    cat(est_str)
-    cat(paste(" with \n", inf_str, "\n \n"))
-    printCoefmat(x$summarydf, digits = digits, has.Pvalue = TRUE)
-    cat("\n")
-    cat("Reference values: \n")
-    print(x$ref)
-  }
-  
-  #' Plotting Point Estimates and Confidence IntervalsCausal of Causal Effect Estimates
-  #' 
-  #' This function is used to plot the results of \code{cmest} nicely via plotting functions
-  #' in the \code{ggplot2} package. Additional layers can be added to this plot using other 
-  #' plotting functions in the \code{ggplot2} package.
-  #' 
-  #' @param x an object of class \code{cmest}
-  #' @param errorbar.width width of errorbars for confidence intervals. Default is \code{0.3}.
-  #' @param errorbar.size size of errorbars for confidence intervals. Default is \code{0.3}.
-  #' @param errorbar.colour colour of errorbars for confidence intervals. Default is \code{black}.
-  #' @param point.size size of points for point estimates. Default is \code{1}.
-  #' @param point.colour colour of points for point estimates. Default is \code{black}.
-  #' @param refline a logical value. If \code{true}, include a reference line at 
-  #' \code{y = 0} when effects are on the difference scale and include a reference line at 
-  #' \code{y = 1} when effects are on the ratio scale. Default is \code{TRUE}.
-  #' @param refline.colour colour of the reference line. Default is \code{red}.
-  #' @param refline.size size of the reference line. Default is \code{0.3}.
-  #' 
-  #' @seealso \code{\link{cmest}}, \code{\link{ggplot2}}.
-  #' 
-  #' @examples
-  #' 
-  #' library(CMAverse)
-  #' library(ggplot2)
-  #' 
-  #' x <- cmest(data = cma2020, model = "rb", outcome = "contY", 
-  #' exposure = "A", mediator = "M2", basec = c("C1", "C2"), 
-  #' EMint = TRUE, mreg = list("multinomial"), yreg = "linear", 
-  #' astar = 0, a = 1, mval = list("M2_0"), estimation = "paramfunc", 
-  #' inference = "delta")
-  #' 
-  #' ggcmest(x) +
-  #' theme(axis.text.x = element_text(angle = 45))
-  #' 
-  #' ggcmest(x) +
-  #' coord_flip(xlim = NULL, ylim = NULL, expand = TRUE, clip = "on")
-  #' 
-  #' @export
-  #' 
-  ggcmest <- function(x, errorbar.width = 0.3, errorbar.size = 0.3, errorbar.colour = "black",
-                      point.size = 1, point.colour = "blue", 
-                      refline = TRUE, refline.colour = "red", refline.size = 0.3) {
-    # create a data frame for results of cmest
-    effect_df <- data.frame(Effect = factor(names(x$effect.pe), levels = names(x$effect.pe)),
-                            PE = x$effect.pe, CIlower = x$effect.ci.low,
-                            CIupper = x$effect.ci.high)
-    # reference line
-    if (refline) {
-      if (!x$multimp$multimp) {
-        if ((inherits(x$reg.output$yreg, "lm") | inherits(x$reg.output$yreg, "glm")) &&
-            (family(x$reg.output$yreg)$family %in% c("gaussian","Gamma","inverse.gaussian","quasi"))) {
-          ref <- 0
-        } else ref <- 1
-      } else {
-        if ((inherits(x$reg.output[[1]]$yreg, "lm") | inherits(x$reg.output[[1]]$yreg, "glm")) &&
-            (family(x$reg.output[[1]]$yreg)$family %in% c("gaussian","Gamma","inverse.gaussian","quasi"))) {
-          ref <- 0
-        } else ref <- 1
-      }
-    } else ref <- NULL
-    # plot
-    ggplot() +
-      geom_errorbar(aes(x = Effect, ymin = CIlower, ymax = CIupper),
-                    width = errorbar.width, size = errorbar.size, colour = errorbar.colour,
-                    data = effect_df) +
-      geom_point(aes(x = Effect, y = PE),
-                 size = point.size, colour = point.colour, data = effect_df) +
-      ylab("Point Estimate and 95% CI") +
-      geom_hline(yintercept = ref, color = refline.colour, size = refline.size)
-  }
-  
+  # summarize causal mediation analysis results
+  summarydf <- data.frame(object$effect.pe, object$effect.se, object$effect.ci.low, 
+                          object$effect.ci.high, object$effect.pval)
+  colnames(summarydf) <- c("Estimate", "Std.error", "95% CIL", "95% CIU", "P.val")
+  out <- list(call = object$call, data = object$data, methods = object$methods,
+              variables = object$variables, multimp = object$multimp, ref = object$ref, 
+              regsumm = regsumm, summarydf = summarydf)
+  class(out) <- c("summary.cmest")
+  return(out)
+}
+
+#' @describeIn cmest Print the summary of cmest nicely
+#' @export
+print.summary.cmest <- function(x, digits = 4, ...) {
+  # print summary of causal mediation analysis results
+  if (x$methods$model == "rb") model_str <- "Regression-based Approach"
+  if (x$methods$model == "wb") model_str <- "Weighting-based Approach"
+  if (x$methods$model == "ne") model_str <- "Natural Effect Model"
+  if (x$methods$model == "iorw") model_str <- "Inverse Odds Ratio Weighting Approach"
+  if (x$methods$model == "msm") model_str <- "Marginal Structural Model"
+  if (x$methods$model == "gformula") model_str <- "G-formula Approach"
+  if (x$multimp$multimp) model_str <- paste(model_str, "with Multiple Imputation")
+  if (x$methods$estimation == "paramfunc") est_str <- "Closed-form parameter function estimation"
+  if (x$methods$estimation == "imputation") est_str <- "Direct counterfactual imputation estimation"
+  if (x$methods$inference == "delta") inf_str <- "delta method standard errors, confidence intervals and p-values"
+  if (x$methods$inference == "bootstrap") inf_str <- "bootstrap standard errors, percentile confidence intervals and p-values"
+  if (x$methods$model != "ne" && (x$methods$casecontrol)) cat("# Causal Mediation Analysis for a Case Control Study via the ")
+  if (!(x$methods$model != "ne" && (x$methods$casecontrol))) cat("# Causal Mediation Analysis via the ")
+  cat(model_str)
+  cat("\n \n")
+  cat(est_str)
+  cat(paste(" with \n", inf_str, "\n \n"))
+  printCoefmat(x$summarydf, digits = digits, has.Pvalue = TRUE)
+  cat("\n")
+  cat("Reference values: \n")
+  print(x$ref)
+}
+
+#' Plotting Point Estimates and Confidence IntervalsCausal of Causal Effect Estimates
+#' 
+#' This function is used to plot the results of \code{cmest} nicely via plotting functions
+#' in the \code{ggplot2} package. Additional layers can be added to this plot using other 
+#' plotting functions in the \code{ggplot2} package.
+#' 
+#' @param x an object of class \code{cmest}
+#' @param errorbar.width width of errorbars for confidence intervals. Default is \code{0.3}.
+#' @param errorbar.size size of errorbars for confidence intervals. Default is \code{0.3}.
+#' @param errorbar.colour colour of errorbars for confidence intervals. Default is \code{black}.
+#' @param point.size size of points for point estimates. Default is \code{1}.
+#' @param point.colour colour of points for point estimates. Default is \code{black}.
+#' @param refline a logical value. If \code{true}, include a reference line at 
+#' \code{y = 0} when effects are on the difference scale and include a reference line at 
+#' \code{y = 1} when effects are on the ratio scale. Default is \code{TRUE}.
+#' @param refline.colour colour of the reference line. Default is \code{red}.
+#' @param refline.size size of the reference line. Default is \code{0.3}.
+#' 
+#' @seealso \code{\link{cmest}}, \code{\link{ggplot2}}.
+#' 
+#' @examples
+#' 
+#' library(CMAverse)
+#' library(ggplot2)
+#' 
+#' x <- cmest(data = cma2020, model = "rb", outcome = "contY", 
+#' exposure = "A", mediator = "M2", basec = c("C1", "C2"), 
+#' EMint = TRUE, mreg = list("multinomial"), yreg = "linear", 
+#' astar = 0, a = 1, mval = list("M2_0"), estimation = "paramfunc", 
+#' inference = "delta")
+#' 
+#' ggcmest(x) +
+#' theme(axis.text.x = element_text(angle = 45))
+#' 
+#' ggcmest(x) +
+#' coord_flip(xlim = NULL, ylim = NULL, expand = TRUE, clip = "on")
+#' 
+#' @export
+#' 
+ggcmest <- function(x, errorbar.width = 0.3, errorbar.size = 0.3, errorbar.colour = "black",
+                    point.size = 1, point.colour = "blue", 
+                    refline = TRUE, refline.colour = "red", refline.size = 0.3) {
+  # create a data frame for results of cmest
+  effect_df <- data.frame(Effect = factor(names(x$effect.pe), levels = names(x$effect.pe)),
+                          PE = x$effect.pe, CIlower = x$effect.ci.low,
+                          CIupper = x$effect.ci.high)
+  # reference line
+  if (refline) {
+    if (!x$multimp$multimp) {
+      if ((inherits(x$reg.output$yreg, "lm") | inherits(x$reg.output$yreg, "glm")) &&
+          (family(x$reg.output$yreg)$family %in% c("gaussian","Gamma","inverse.gaussian","quasi"))) {
+        ref <- 0
+      } else ref <- 1
+    } else {
+      if ((inherits(x$reg.output[[1]]$yreg, "lm") | inherits(x$reg.output[[1]]$yreg, "glm")) &&
+          (family(x$reg.output[[1]]$yreg)$family %in% c("gaussian","Gamma","inverse.gaussian","quasi"))) {
+        ref <- 0
+      } else ref <- 1
+    }
+  } else ref <- NULL
+  # plot
+  ggplot() +
+    geom_errorbar(aes(x = Effect, ymin = CIlower, ymax = CIupper),
+                  width = errorbar.width, size = errorbar.size, colour = errorbar.colour,
+                  data = effect_df) +
+    geom_point(aes(x = Effect, y = PE),
+               size = point.size, colour = point.colour, data = effect_df) +
+    ylab("Point Estimate and 95% CI") +
+    geom_hline(yintercept = ref, color = refline.colour, size = refline.size)
+}

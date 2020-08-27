@@ -26,6 +26,12 @@ navbar:
          href: articles/multiple_mediators.html
       -  text: Statistical Modeling for a Case Control Study
          href: articles/case_control.html
+      -  text: Statistical Modeling with Missing Data
+         href: articles/multiple_imputation.html
+      -  text: Statistical Modeling with Post-exposure Confounding
+         href: articles/post_exposure_confounding.html
+      -  text: Sensitivity Analysis for Measurement Error
+         href: articles/measurement_error.html
   right:
     - icon: fa-file-code-o 
       text: "Functions"

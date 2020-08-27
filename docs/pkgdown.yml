@@ -3,11 +3,14 @@ pkgdown: 1.5.1
 pkgdown_sha: ~
 articles:
   case_control: case_control.html
+  measurement_error: measurement_error.html
+  multiple_imputation: multiple_imputation.html
   multiple_mediators: multiple_mediators.html
   overview: overview.html
+  post_exposure_confounding: post_exposure_confounding.html
   quickstart: quickstart.html
   single_mediator: single_mediator.html
-last_built: 2020-08-27T05:09Z
+last_built: 2020-08-27T07:01Z
 urls:
   reference: https://bs1125.github.io/CMAverse//reference
   article: https://bs1125.github.io/CMAverse//articles

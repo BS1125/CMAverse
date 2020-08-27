@@ -72,6 +72,15 @@
     <li>
       <a href="../articles/case_control.html">Statistical Modeling for a Case Control Study</a>
     </li>
+    <li>
+      <a href="../articles/multiple_imputation.html">Statistical Modeling with Missing Data</a>
+    </li>
+    <li>
+      <a href="../articles/post_exposure_confounding.html">Statistical Modeling with Post-exposure Confounding</a>
+    </li>
+    <li>
+      <a href="../articles/measurement_error.html">Sensitivity Analysis for Measurement Error</a>
+    </li>
   </ul>
 </li>
       </ul>
@@ -115,7 +124,7 @@
     
     
 <p>This document describes how the six causal mediation analysis approaches including <em>the regression-based approach</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3659198/">Valeri et al. (2013)</a> and <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/">VanderWeele et al. (2014)</a>, <em>the weighting-based approach</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/">VanderWeele et al. (2014)</a>, <em>the inverse odd-ratio weighting approach</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3954805/">Tchetgen Tchetgen (2013)</a>, <em>the natural effect model</em> by <a href="https://www.degruyter.com/view/journals/em/1/1/article-p131.xml?language=en">Vansteelandt et al. (2012)</a>, <em>the marginal structural model</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5560424/">VanderWeele et al. (2017)</a>, and <em>the <span class="math inline">\(g\)</span>-formula approach</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5285457/">Lin et al. (2017)</a> are implemented by the <code>cmest</code> function in the <code>CMAverse</code> package. See publications of these approaches for methodological details .</p>
-<p>We categorize the approaches based on whether the approach deals with post-exposure confounding. <em>The regression-based approach</em>, <em>the weighting-based approach</em>, <em>the inverse odd-ratio weighting approach</em> and <em>the natural effect model</em> only deal with pre-exposure confounding. <em>The marginal structural model</em> and <em>the <span class="math inline">\(g\)</span>-formula approach</em> deal with both pre-exposure confounding and post-exposure confounding.</p>
+<p>We categorize the approaches based on whether the approach deals with post-exposure confounding, i.e., there are mediator-outcome confounders affect by the exposure. <em>The regression-based approach</em>, <em>the weighting-based approach</em>, <em>the inverse odd-ratio weighting approach</em> and <em>the natural effect model</em> only deal with pre-exposure confounding. <em>The marginal structural model</em> and <em>the <span class="math inline">\(g\)</span>-formula approach</em> deal with both pre-exposure confounding and post-exposure confounding.</p>
 <p>The outcome, the exposure and the set of pre-exposure confounder(s) are denoted as <span class="math inline">\(Y\)</span>, <span class="math inline">\(A\)</span> and <span class="math inline">\(C\)</span> respectively. The set of mediator(s) <span class="math inline">\(\{M_p\}_{p=1,...,k}\)</span> is denoted as <span class="math inline">\(M\)</span> and <span class="math inline">\(M=(M_1,...,M_k)\)</span> follows the temporal order of the mediator(s). The set of post-exposure confounder(s) <span class="math inline">\(\{L_q\}_{q=1,...,s}\)</span> is denoted as <span class="math inline">\(L\)</span> and <span class="math inline">\(L=(L_1,...,L_s)\)</span> follows the temporal order of the post-exposure confounder(s).</p>
 <div id="pre-exposure-confounding" class="section level1">
 <h1 class="hasAnchor">

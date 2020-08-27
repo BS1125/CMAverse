@@ -51,17 +51,6 @@ estinf <- function() {
     }
   }
   
-  n_regs <- c()
-  for (reg_name in c("yreg", "ereg", "mreg", "wmreg", "postcreg")) {
-    reg <- get(reg_name)
-    if (!is.null(reg)) {
-      if (reg_name %in% c("yreg", "ereg")) n_regs <- c(n_regs, nrow(model.frame(reg)))
-      if (reg_name %in% c("mreg", "wmreg", "postcreg")) n_regs <- c(n_regs, sapply(1:length(reg), function(x)
-        nrow(model.frame(reg[[x]]))))
-    }
-  }
-  if (length(unique(n_regs)) != 1) stop("Regressions fitted with different data sets")
-  
   # reference values of the exposure
   if (is.factor(data[, exposure]) | is.character(data[, exposure])) {
     a_lev <- levels(as.factor(data[, exposure]))
