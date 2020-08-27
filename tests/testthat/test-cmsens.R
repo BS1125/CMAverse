@@ -257,7 +257,7 @@ test_that("sensitivity analysis for unmeasured confounding works correctly for c
   d <- unname(effect.pe / outcome.se)
   sd <- unname(effect.se / outcome.se)
   for (i in 1:6) {
-    evalues <- rbind(evalues, evalues.RR(est = exp(0.91 * d[i]), lo = exp(0.91 * d[i] - 1.78 * sd[i]),
+    evalues <- rbind(evalues, EValue::evalues.RR(est = exp(0.91 * d[i]), lo = exp(0.91 * d[i] - 1.78 * sd[i]),
                               hi = exp(0.91 * d[i] + 1.78 * sd[i]))[2, ])
   }
   
