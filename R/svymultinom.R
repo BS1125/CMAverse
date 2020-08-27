@@ -25,6 +25,7 @@
 #' 
 #' @examples
 #' 
+#' \dontrun{
 #' rm(list=ls())
 #' library(CMAverse)
 #' 
@@ -50,6 +51,7 @@
 #' model.frame(reg)
 #' summary(reg)
 #' update(reg, weights = w[1:500], data = data[1:500, ])
+#' }
 #'  
 #' @importFrom stats model.frame family coef predict model.matrix getCall cov 
 #' formula vcov pt

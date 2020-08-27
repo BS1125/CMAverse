@@ -1,10 +1,9 @@
 ---
-title: "Overview of Statistical Approaches for Causal Mediation Analysis"
-author: "Baoyi Shi"
+title: "Overview of Modeling Approaches for Causal Mediation Analysis"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Overview of Causal Mediation Analysis Approaches and Sensitivity Analysis Approaches}
+  %\VignetteIndexEntry{Overview of Modeling Approaches for Causal Mediation Analysis}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

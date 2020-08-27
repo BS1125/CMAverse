@@ -12,14 +12,14 @@
 <link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/sandstone/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><meta property="og:title" content="CMAverse Quickstart Guide">
 <meta property="og:description" content="CMAverse">
-<meta property="og:image" content="/logo.png">
+<meta property="og:image" content="https://bs1125.github.io/CMAverse/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -46,34 +46,48 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fa fa-home"></span>
      
   </a>
 </li>
 <li>
-  <a href="../reference/index.html">Reference</a>
+  <a href="../articles/overview.html">Overview of Modeling Approaches</a>
+</li>
+<li>
+  <a href="../articles/quickstart.html">Quickstart</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
+    Examples
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/overview.html">Overview of Statistical Approaches for Causal Mediation Analysis</a>
+      <a href="../articles/single_mediator.html">Statistical Modeling with a Single Mediator</a>
     </li>
     <li>
-      <a href="../articles/quickstart.html">CMAverse Quickstart Guide</a>
+      <a href="../articles/multiple_mediators.html">Statistical Modeling with Multiple Mediators</a>
+    </li>
+    <li>
+      <a href="../articles/case_control.html">Statistical Modeling for a Case Control Study</a>
     </li>
   </ul>
 </li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/BS1125/CMAverse/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+  <a href="../reference/index.html">
+    <span class="fa fa-file-code-o"></span>
      
+    Functions
+  </a>
+</li>
+<li>
+  <a href="https://github.com/BS1125/CMAverse/">
+    <span class="fa fa-github fa-lg"></span>
+     
+    GitHub
   </a>
 </li>
       </ul>
@@ -91,7 +105,7 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>CMAverse Quickstart Guide</h1>
             
-            <h4 class="date">2020-08-24</h4>
+            <h4 class="date">2020-08-27</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BS1125/CMAverse/blob/master/vignettes/quickstart.Rmd"><code>vignettes/quickstart.Rmd</code></a></small>
       <div class="hidden name"><code>quickstart.Rmd</code></div>
@@ -100,312 +114,16 @@
 
     
     
-<div id="about-the-package" class="section level2">
-<h2 class="hasAnchor">
-<a href="#about-the-package" class="anchor"></a>About the Package</h2>
-<p>The R package <code>CMAverse</code> provides a suite of functions for reproducible causal mediation analysis including <code>cmdag</code> for DAG visualization, <code>cmest</code> for statistical modeling and <code>cmsens</code> for sensitivity analysis. See the <a href="https://bs1125.github.io/CMAverse/">package website</a> for details.</p>
-<div id="dag-visualization" class="section level3">
-<h3 class="hasAnchor">
-<a href="#dag-visualization" class="anchor"></a>DAG Visualization</h3>
-<p><code>cmdag</code> visualizes the scientific setting via a DAG.</p>
-</div>
-<div id="statistical-modeling" class="section level3">
-<h3 class="hasAnchor">
-<a href="#statistical-modeling" class="anchor"></a>Statistical Modeling</h3>
-<p><code>cmest</code> implements six causal mediation analysis approaches including <em>the regression-based approach</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3659198/">Valeri et al. (2013)</a> and <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/">VanderWeele et al. (2014)</a>, <em>the weighting-based approach</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/">VanderWeele et al. (2014)</a>, <em>the inverse odd-ratio weighting approach</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3954805/">Tchetgen Tchetgen (2013)</a>, <em>the natural effect model</em> by <a href="https://www.degruyter.com/view/journals/em/1/1/article-p131.xml?language=en">Vansteelandt et al. (2012)</a>, <em>the marginal structural model</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5560424/">VanderWeele et al. (2017)</a>, and <em>the g-formula approach</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5285457/">Lin et al. (2017)</a>.</p>
-<table class="table">
-<caption>Table: Supported Data Types and Functionalities of <code>cmest</code>
-</caption>
-<thead><tr class="header">
-<th></th>
-<th align="center">rb</th>
-<th align="center">wb</th>
-<th align="center">iorw</th>
-<th align="center">ne</th>
-<th align="center">msm</th>
-<th align="center">gformula<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a>
-</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td>Continuous Y<a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a>
-</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-</tr>
-<tr class="even">
-<td>Binary Y</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-</tr>
-<tr class="odd">
-<td>Count Y</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-</tr>
-<tr class="even">
-<td>Nominal Y</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">×</td>
-<td align="center">√</td>
-<td align="center">√</td>
-</tr>
-<tr class="odd">
-<td>Ordinal Y</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">×</td>
-<td align="center">√</td>
-<td align="center">√</td>
-</tr>
-<tr class="even">
-<td>Survival Y</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">×</td>
-<td align="center">√</td>
-<td align="center">√</td>
-</tr>
-<tr class="odd">
-<td>Continuous M</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">×</td>
-<td align="center">√</td>
-</tr>
-<tr class="even">
-<td>Binary M</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-</tr>
-<tr class="odd">
-<td>Nominal M</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-</tr>
-<tr class="even">
-<td>Ordinal M</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-</tr>
-<tr class="odd">
-<td>Count M</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">×</td>
-<td align="center">√</td>
-</tr>
-<tr class="even">
-<td>M of Any Type</td>
-<td align="center">×</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">×</td>
-<td align="center">×</td>
-</tr>
-<tr class="odd">
-<td>Continuous A</td>
-<td align="center">√</td>
-<td align="center">×<a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a>
-</td>
-<td align="center">×</td>
-<td align="center">√</td>
-<td align="center">×<a href="#fn4" class="footnote-ref" id="fnref4"><sup>4</sup></a>
-</td>
-<td align="center">√</td>
-</tr>
-<tr class="even">
-<td>Binary A</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-</tr>
-<tr class="odd">
-<td>Nominal A</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-</tr>
-<tr class="even">
-<td>Ordinal A</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-</tr>
-<tr class="odd">
-<td>Count A</td>
-<td align="center">√</td>
-<td align="center">×<a href="#fn5" class="footnote-ref" id="fnref5"><sup>5</sup></a>
-</td>
-<td align="center">×</td>
-<td align="center">√</td>
-<td align="center">×<a href="#fn6" class="footnote-ref" id="fnref6"><sup>6</sup></a>
-</td>
-<td align="center">√</td>
-</tr>
-<tr class="even">
-<td>Multiple Mediators</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-</tr>
-<tr class="odd">
-<td>Post-exposure Confounding</td>
-<td align="center">×</td>
-<td align="center">×</td>
-<td align="center">×</td>
-<td align="center">×</td>
-<td align="center">√</td>
-<td align="center">√</td>
-</tr>
-<tr class="even">
-<td>2-way Decomposition</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-</tr>
-<tr class="odd">
-<td>4-way Decomposition</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">×</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-</tr>
-<tr class="even">
-<td>Estimation: Closed-form Parameter Function</td>
-<td align="center">√<a href="#fn7" class="footnote-ref" id="fnref7"><sup>7</sup></a>
-</td>
-<td align="center">×</td>
-<td align="center">×</td>
-<td align="center">×</td>
-<td align="center">×</td>
-<td align="center">×</td>
-</tr>
-<tr class="odd">
-<td>Estimation: Direct Counterfactual Imputation</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-</tr>
-<tr class="even">
-<td>Inference: Delta Method</td>
-<td align="center">√<a href="#fn8" class="footnote-ref" id="fnref8"><sup>8</sup></a>
-</td>
-<td align="center">×</td>
-<td align="center">×</td>
-<td align="center">×</td>
-<td align="center">×</td>
-<td align="center">×</td>
-</tr>
-<tr class="odd">
-<td>Inference: Bootstrapping</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-</tr>
-<tr class="even">
-<td>Marginal Effects</td>
-<td align="center">√<a href="#fn9" class="footnote-ref" id="fnref9"><sup>9</sup></a>
-</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-<td align="center">√</td>
-</tr>
-<tr class="odd">
-<td>Effects Conditional On C</td>
-<td align="center">√<a href="#fn10" class="footnote-ref" id="fnref10"><sup>10</sup></a>
-</td>
-<td align="center">×</td>
-<td align="center">×</td>
-<td align="center">×</td>
-<td align="center">×</td>
-<td align="center">×</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="multiple-imputation" class="section level3">
-<h3 class="hasAnchor">
-<a href="#multiple-imputation" class="anchor"></a>Multiple Imputation</h3>
-<p><code>cmest</code> provides options to perform multiple imputation for a dataset with missing values via the <code>mice</code> package, estimate the causal effects with each of the imputed datasets and pool the results together.</p>
-</div>
-<div id="sensitivity-analysis" class="section level3">
-<h3 class="hasAnchor">
-<a href="#sensitivity-analysis" class="anchor"></a>Sensitivity Analysis</h3>
-<p><code>cmsens</code> conducts sensitivity analysis for unmeasured confounding via the <em>E-value</em> approach by <a href="https://pubmed.ncbi.nlm.nih.gov/28693043/">VanderWeele et al. (2017)</a> and <a href="https://pubmed.ncbi.nlm.nih.gov/31348008/">Smith et al. (2019)</a>, and sensitivity analysis for measurement error via <em>regression calibration</em> by <a href="https://www.taylorfrancis.com/books/9780429139635">Carroll et al. (1995)</a> and <em>SIMEX</em> by <a href="https://www.jstor.org/stable/2290994?seq=1#metadata_info_tab_contents">Cook et al. (1994)</a> and <a href="https://pubmed.ncbi.nlm.nih.gov/16542233/">Küchenhoff et al. (2006)</a>. The sensitivity analysis for measurement error is currently available for <em>the regression-based approach</em> and <em>the g-formula approach</em>.</p>
-</div>
-</div>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
-<p>The latest version can be installed via:</p>
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="kw pkg">devtools</span><span class="kw ns">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/remote-reexports.html">install_github</a></span>(<span class="st">"BS1125/CMAverse"</span>)</pre></body></html></div>
-<p>Load <code>CMAverse</code>:</p>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">CMAverse</span>)</pre></body></html></div>
-</div>
-<div id="quickstart-guide" class="section level2">
-<h2 class="hasAnchor">
-<a href="#quickstart-guide" class="anchor"></a>Quickstart Guide</h2>
-<p>We illustrate the general workflow of the <code>CMAverse</code> package by a quick example. Firstly, let’s simulate some data and plot the DAG of the scientific setting. The simulated dataset contains a binary exposure, a binary mediator, a continuous mediator, a continuous outcome and two pre-exposure confounders.</p>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="no">n</span> <span class="kw">&lt;-</span> <span class="fl">1000</span>
+<p>We illustrate the general workflow of the <code>CMAverse</code> package by a quick example. The general workflow is:</p>
+<ol style="list-style-type: decimal">
+<li><p>Plot the DAG of the scientific setting using the <code>cmdag</code> function.</p></li>
+<li><p>Estimate the causal effects and make inferences using the <code>cmest</code> function.</p></li>
+<li><p>Conduct sensitivity analysis for unmeasured confounding and measurement error using the <code>cmsens</code> function.</p></li>
+</ol>
+<p>Firstly, let’s load the package.</p>
+<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">CMAverse</span>)</pre></body></html></div>
+<p>Next, we simulate some data and plot the DAG of the scientific setting. The simulated dataset contains a binary exposure, a binary mediator, a continuous mediator, a continuous outcome and two pre-exposure confounders.</p>
+<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="no">n</span> <span class="kw">&lt;-</span> <span class="fl">100</span>
 <span class="no">C1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="no">n</span>, <span class="kw">mean</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">sd</span> <span class="kw">=</span> <span class="fl">1</span>)
 <span class="no">C2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html">rbinom</a></span>(<span class="no">n</span>, <span class="fl">1</span>, <span class="fl">0.6</span>)
 <span class="no">C2</span>[<span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span>(<span class="no">C2</span> <span class="kw">==</span> <span class="fl">0</span>)] <span class="kw">&lt;-</span> <span class="st">"C2_0"</span>
@@ -422,124 +140,39 @@
              <span class="fl">0.2</span>*(<span class="no">A</span> <span class="kw">==</span> <span class="st">"treat"</span>)*<span class="no">M2</span> - <span class="fl">0.3</span>*<span class="no">C1</span> + <span class="fl">2</span>*(<span class="no">C2</span><span class="kw">==</span><span class="st">"C2_1"</span>), <span class="kw">sd</span> <span class="kw">=</span> <span class="fl">1</span>)
 <span class="no">data</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="no">A</span>, <span class="no">M1</span>, <span class="no">M2</span>, <span class="no">Y</span>, <span class="no">C1</span>, <span class="no">C2</span>)</pre></body></html></div>
 <p>The DAG can be plotted using the <code>cmdag</code> function.</p>
-<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="fu"><a href="../reference/cmdag.html">cmdag</a></span>(<span class="kw">outcome</span> <span class="kw">=</span> <span class="st">"Y"</span>, <span class="kw">exposure</span> <span class="kw">=</span> <span class="st">"A"</span>, <span class="kw">mediator</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"M1"</span>, <span class="st">"M2"</span>),
+<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="fu"><a href="../reference/cmdag.html">cmdag</a></span>(<span class="kw">outcome</span> <span class="kw">=</span> <span class="st">"Y"</span>, <span class="kw">exposure</span> <span class="kw">=</span> <span class="st">"A"</span>, <span class="kw">mediator</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"M1"</span>, <span class="st">"M2"</span>),
       <span class="kw">basec</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"C1"</span>, <span class="st">"C2"</span>, <span class="st">"C3"</span>), <span class="kw">postc</span> <span class="kw">=</span> <span class="kw">NULL</span>,
       <span class="kw">node</span> <span class="kw">=</span> <span class="fl">FALSE</span>, <span class="kw">text_col</span> <span class="kw">=</span> <span class="st">"black"</span>)</pre></body></html></div>
 <p><img src="quickstart_files/figure-html/plot_dag-1.png" width="700"></p>
 <p>Then, we estimate the causal effects using the <code>cmest</code> function. We use the regression-based approach for illustration. The reference values for the exposure are set to be 0 and 1. The reference values for the two mediators are set to be 0.</p>
-<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="no">est</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span>(<span class="kw">data</span> <span class="kw">=</span> <span class="no">data</span>, <span class="kw">model</span> <span class="kw">=</span> <span class="st">"rb"</span>, <span class="kw">outcome</span> <span class="kw">=</span> <span class="st">"Y"</span>, <span class="kw">exposure</span> <span class="kw">=</span> <span class="st">"A"</span>,
+<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="no">est</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span>(<span class="kw">data</span> <span class="kw">=</span> <span class="no">data</span>, <span class="kw">model</span> <span class="kw">=</span> <span class="st">"rb"</span>, <span class="kw">outcome</span> <span class="kw">=</span> <span class="st">"Y"</span>, <span class="kw">exposure</span> <span class="kw">=</span> <span class="st">"A"</span>,
                 <span class="kw">mediator</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"M1"</span>, <span class="st">"M2"</span>), <span class="kw">basec</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"C1"</span>, <span class="st">"C2"</span>), <span class="kw">EMint</span> <span class="kw">=</span> <span class="fl">TRUE</span>,
                 <span class="kw">mreg</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="st">"logistic"</span>, <span class="st">"linear"</span>), <span class="kw">yreg</span> <span class="kw">=</span> <span class="st">"linear"</span>,
                 <span class="kw">astar</span> <span class="kw">=</span> <span class="fl">0</span>, <span class="kw">a</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">mval</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fl">0</span>, <span class="fl">0</span>),
-                <span class="kw">estimation</span> <span class="kw">=</span> <span class="st">"imputation"</span>, <span class="kw">inference</span> <span class="kw">=</span> <span class="st">"bootstrap"</span>, <span class="kw">nboot</span> <span class="kw">=</span> <span class="fl">300</span>)</pre></body></html></div>
+                <span class="kw">estimation</span> <span class="kw">=</span> <span class="st">"imputation"</span>, <span class="kw">inference</span> <span class="kw">=</span> <span class="st">"bootstrap"</span>, <span class="kw">nboot</span> <span class="kw">=</span> <span class="fl">20</span>)</pre></body></html></div>
 <p>Summarizing and plotting the results:</p>
-<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">est</span>)</pre></body></html></div>
-<pre><code>## # Outcome Regression: 
-## 
-## Call:
-## glm(formula = Y ~ A + M1 + M2 + A * M1 + A * M2 + C1 + C2, family = gaussian(), 
-##     data = getCall(x$regsumm$yreg)$data, weights = getCall(x$regsumm$yreg)$weights)
-## 
-## Deviance Residuals: 
-##     Min       1Q   Median       3Q      Max  
-## -2.9156  -0.7298  -0.0337   0.7219   3.5595  
-## 
-## Coefficients:
-##             Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)  0.38491    0.13998   2.750  0.00607 ** 
-## Atreat       0.71856    0.21871   3.285  0.00105 ** 
-## M1           0.55699    0.10591   5.259 1.77e-07 ***
-## M2           0.62701    0.03907  16.047  &lt; 2e-16 ***
-## C1          -0.27727    0.04211  -6.585 7.39e-11 ***
-## C2C2_1       1.89264    0.09245  20.472  &lt; 2e-16 ***
-## Atreat:M1    0.05773    0.14680   0.393  0.69418    
-## Atreat:M2    0.13285    0.04632   2.868  0.00421 ** 
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## (Dispersion parameter for gaussian family taken to be 1.042538)
-## 
-##     Null deviance: 4627.7  on 999  degrees of freedom
-## Residual deviance: 1034.2  on 992  degrees of freedom
-## AIC: 2889.5
-## 
-## Number of Fisher Scoring iterations: 2
-## 
-## # Mediator Regression: 
-## 
-## Call:
-## glm(formula = M1 ~ A + C1 + C2, family = binomial(), data = getCall(x$regsumm$mreg[[1L]])$data, 
-##     weights = getCall(x$regsumm$mreg[[1L]])$weights)
-## 
-## Deviance Residuals: 
-##     Min       1Q   Median       3Q      Max  
-## -2.4327  -0.8576  -0.2524   0.8640   2.2458  
-## 
-## Coefficients:
-##             Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)   1.0117     0.1703   5.940 2.86e-09 ***
-## Atreat        0.3945     0.1546   2.551   0.0107 *  
-## C1           -1.4707     0.1053 -13.967  &lt; 2e-16 ***
-## C2C2_1        0.3646     0.1537   2.372   0.0177 *  
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## (Dispersion parameter for binomial family taken to be 1)
-## 
-##     Null deviance: 1385.5  on 999  degrees of freedom
-## Residual deviance: 1046.9  on 996  degrees of freedom
-## AIC: 1054.9
-## 
-## Number of Fisher Scoring iterations: 4
-## 
-## 
-## Call:
-## glm(formula = M2 ~ A + M1 + C1 + C2, family = gaussian(), data = getCall(x$regsumm$mreg[[2L]])$data, 
-##     weights = getCall(x$regsumm$mreg[[2L]])$weights)
-## 
-## Deviance Residuals: 
-##      Min        1Q    Median        3Q       Max  
-## -2.93156  -0.64094   0.02198   0.63712   3.09231  
-## 
-## Coefficients:
-##             Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)  2.06623    0.08307   24.87   &lt;2e-16 ***
-## Atreat       0.79399    0.06379   12.45   &lt;2e-16 ***
-## M1          -1.06135    0.07238  -14.66   &lt;2e-16 ***
-## C1           0.46580    0.03697   12.60   &lt;2e-16 ***
-## C2C2_1       1.93642    0.06227   31.09   &lt;2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## (Dispersion parameter for gaussian family taken to be 0.9327588)
-## 
-##     Null deviance: 2453.45  on 999  degrees of freedom
-## Residual deviance:  928.09  on 995  degrees of freedom
-## AIC: 2775.3
-## 
-## Number of Fisher Scoring iterations: 2
-## 
-## # Causal Mediation Analysis via the Regression-based Approach
+<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">est</span>)</pre></body></html></div>
+<pre><code>## # Causal Mediation Analysis via the Regression-based Approach
 ##  
 ## Direct counterfactual imputation estimation with 
 ##  bootstrap standard errors, percentile confidence intervals and p-values 
 ##  
-##              Estimate Std.error 95% CIL 95% CIU   P.val    
-## cde           0.71856   0.22468 0.31072   1.154 0.00667 ** 
-## pnde          1.16881   0.07931 1.02182   1.332 &lt; 2e-16 ***
-## tnde          1.26779   0.08026 1.12130   1.417 &lt; 2e-16 ***
-## pnie          0.48937   0.05183 0.40070   0.611 &lt; 2e-16 ***
-## tnie          0.58836   0.05911 0.48663   0.723 &lt; 2e-16 ***
-## te            1.75717   0.08614 1.60690   1.930 &lt; 2e-16 ***
-## intref        0.45025   0.19123 0.07719   0.829 0.02667 *  
-## intmed        0.09898   0.04100 0.01608   0.180 0.02000 *  
-## cde(prop)     0.40893   0.12388 0.18167   0.655 0.00667 ** 
-## intref(prop)  0.25624   0.10970 0.04392   0.458 0.02667 *  
-## intmed(prop)  0.05633   0.02303 0.00895   0.100 0.02000 *  
-## pnie(prop)    0.27850   0.02683 0.23019   0.337 &lt; 2e-16 ***
-## pm            0.33483   0.02987 0.28201   0.403 &lt; 2e-16 ***
-## int           0.31257   0.13185 0.05402   0.549 0.02000 *  
-## pe            0.59107   0.12388 0.34541   0.818 &lt; 2e-16 ***
+##               Estimate Std.error   95% CIL 95% CIU  P.val    
+## cde           0.423506  0.556861 -0.578666   1.254    0.8    
+## pnde          1.393924  0.232758  0.962289   1.824 &lt;2e-16 ***
+## tnde          1.508110  0.246699  1.131468   1.965 &lt;2e-16 ***
+## pnie          0.387577  0.102855  0.189816   0.481 &lt;2e-16 ***
+## tnie          0.501763  0.144696  0.293357   0.744 &lt;2e-16 ***
+## te            1.895687  0.238952  1.495774   2.273 &lt;2e-16 ***
+## intref        0.970418  0.565324  0.033158   1.994    0.1 .  
+## intmed        0.114186  0.090071 -0.021481   0.296    0.1 .  
+## cde(prop)     0.223405  0.305506 -0.319885   0.734    0.8    
+## intref(prop)  0.511908  0.297612  0.019452   1.103    0.1 .  
+## intmed(prop)  0.060235  0.046181 -0.012592   0.152    0.1 .  
+## pnie(prop)    0.204452  0.060217  0.105361   0.295 &lt;2e-16 ***
+## pm            0.264687  0.075801  0.182727   0.413 &lt;2e-16 ***
+## int           0.572143  0.329252  0.009457   1.187    0.1 .  
+## pe            0.776595  0.305506  0.266479   1.320 &lt;2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
@@ -556,109 +189,112 @@
 ## 
 ## $mval[[2]]
 ## [1] 0</code></pre>
-<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="fu"><a href="../reference/ggcmest.html">ggcmest</a></span>(<span class="no">est</span>) +
+<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="fu"><a href="../reference/ggcmest.html">ggcmest</a></span>(<span class="no">est</span>) +
   <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="kw">axis.text.x</span> <span class="kw">=</span> <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span>(<span class="kw">angle</span> <span class="kw">=</span> <span class="fl">30</span>, <span class="kw">vjust</span> <span class="kw">=</span> <span class="fl">0.8</span>))</pre></body></html></div>
 <p><img src="quickstart_files/figure-html/plot_cmest-1.png" width="768"></p>
 <p>Lastly, let’s conduct sensitivity analysis for the results. Sensitivity analysis for unmeasured confounding:</p>
-<div class="sourceCode" id="cb9"><html><body><pre class="r"><span class="fu"><a href="../reference/cmsens.html">cmsens</a></span>(<span class="kw">object</span> <span class="kw">=</span> <span class="no">est</span>, <span class="kw">sens</span> <span class="kw">=</span> <span class="st">"uc"</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="fu"><a href="../reference/cmsens.html">cmsens</a></span>(<span class="kw">object</span> <span class="kw">=</span> <span class="no">est</span>, <span class="kw">sens</span> <span class="kw">=</span> <span class="st">"uc"</span>)</pre></body></html></div>
 <pre><code>## Sensitivity Analysis For Unmeasured Confounding 
 ## 
 ## Evalues on the ratio scale: 
-##         estRR  lowerRR  upperRR Evalue.estRR Evalue.lowerRR Evalue.upperRR
-## cde  1.355014 1.125237 1.631713     2.048591       1.500631             NA
-## pnde 1.639156 1.535084 1.750283     2.662716       2.441395             NA
-## tnde 1.709212 1.599438 1.826520     2.810208       2.578602             NA
-## pnie 1.229873 1.178269 1.283738     1.761583       1.636580             NA
-## tnie 1.282437 1.221248 1.346692     1.884274       1.741054             NA
-## te   2.102114 1.957572 2.257329     3.624208       3.326702             NA</code></pre>
+##         estRR   lowerRR  upperRR Evalue.estRR Evalue.lowerRR Evalue.upperRR
+## cde  1.186537 0.7642442 1.842173     1.656998       1.000000             NA
+## pnde 1.755856 1.4609443 2.110299     2.907885       2.281562             NA
+## tnde 1.838724 1.5131384 2.234367     3.080570       2.394302             NA
+## pnie 1.169444 1.0781816 1.268432     1.614591       1.368516             NA
+## tnie 1.224637 1.0923568 1.372935     1.749135       1.409983             NA
+## te   2.150285 1.7803927 2.597026     3.723003       2.959123             NA</code></pre>
 <p>Assume that the continuous pre-exposure confounder was measured with error. Sensitivity analysis for measurement error using regression calibration with a set of assumed standard deviations of the measurement error 0.1, 0.2 and 0.3:</p>
-<div class="sourceCode" id="cb11"><html><body><pre class="r"><span class="no">me1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/cmsens.html">cmsens</a></span>(<span class="kw">object</span> <span class="kw">=</span> <span class="no">est</span>, <span class="kw">sens</span> <span class="kw">=</span> <span class="st">"me"</span>, <span class="kw">MEmethod</span> <span class="kw">=</span> <span class="st">"rc"</span>,
+<div class="sourceCode" id="cb10"><html><body><pre class="r"><span class="no">me1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/cmsens.html">cmsens</a></span>(<span class="kw">object</span> <span class="kw">=</span> <span class="no">est</span>, <span class="kw">sens</span> <span class="kw">=</span> <span class="st">"me"</span>, <span class="kw">MEmethod</span> <span class="kw">=</span> <span class="st">"rc"</span>,
               <span class="kw">MEvariable</span> <span class="kw">=</span> <span class="st">"C1"</span>, <span class="kw">MEvartype</span> <span class="kw">=</span> <span class="st">"con"</span>, <span class="kw">MEerror</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.1</span>, <span class="fl">0.2</span>, <span class="fl">0.3</span>))</pre></body></html></div>
 <p>Summarizing and plotting the results:</p>
-<div class="sourceCode" id="cb12"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">me1</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb11"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">me1</span>)</pre></body></html></div>
 <pre><code>## Sensitivity Analysis For Measurement Error 
 ##  
 ## The variable measured with error: C1
 ## Type of the variable measured with error: continuous
 ## 
 ## Measurement error 1: 
-## 0.1
+## [1] 0.1
+## 
 ## Measurement error correction for measurement error 1: 
-##              Estimate Std.error 95% CIL 95% CIU  P.val    
-## cde           0.71636   0.20016 0.28279   1.084 &lt;2e-16 ***
-## pnde          1.16728   0.07435 1.00999   1.312 &lt;2e-16 ***
-## tnde          1.26591   0.08067 1.10873   1.440 &lt;2e-16 ***
-## pnie          0.49078   0.04831 0.39808   0.592 &lt;2e-16 ***
-## tnie          0.58941   0.05740 0.47598   0.711 &lt;2e-16 ***
-## te            1.75669   0.08454 1.59413   1.933 &lt;2e-16 ***
-## intref        0.45092   0.17583 0.12435   0.803 0.0133 *  
-## intmed        0.09863   0.03943 0.02903   0.188 0.0133 *  
-## cde(prop)     0.40779   0.11314 0.17940   0.610 &lt;2e-16 ***
-## intref(prop)  0.25669   0.09938 0.07193   0.457 0.0133 *  
-## intmed(prop)  0.05615   0.02174 0.01648   0.102 0.0133 *  
-## pnie(prop)    0.27938   0.02580 0.22633   0.333 &lt;2e-16 ***
-## pm            0.33552   0.02829 0.27965   0.396 &lt;2e-16 ***
-## int           0.31283   0.12033 0.08834   0.553 0.0133 *  
-## pe            0.59221   0.11314 0.38957   0.821 &lt;2e-16 ***
+##              Estimate Std.error  95% CIL 95% CIU  P.val    
+## cde           0.42111   0.73486 -0.75908   1.771    0.7    
+## pnde          1.38859   0.18994  1.16447   1.764 &lt;2e-16 ***
+## tnde          1.49999   0.19201  1.24363   1.931 &lt;2e-16 ***
+## pnie          0.38896   0.18272  0.13922   0.803 &lt;2e-16 ***
+## tnie          0.50037   0.18091  0.20813   0.870 &lt;2e-16 ***
+## te            1.88895   0.21092  1.72272   2.394 &lt;2e-16 ***
+## intref        0.96747   0.63796 -0.11820   2.109    0.1 .  
+## intmed        0.11140   0.11360 -0.06185   0.345    0.2    
+## cde(prop)     0.22294   0.36957 -0.38428   0.885    0.7    
+## intref(prop)  0.51217   0.32884 -0.07366   1.057    0.1 .  
+## intmed(prop)  0.05898   0.05811 -0.03276   0.169    0.2    
+## pnie(prop)    0.20591   0.08288  0.07759   0.382 &lt;2e-16 ***
+## pm            0.26489   0.08213  0.11769   0.425 &lt;2e-16 ***
+## int           0.57115   0.38072 -0.08992   1.206    0.1 .  
+## pe            0.77706   0.36957  0.11468   1.384    0.1 .  
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## ----------------------------------------------------------------
 ## 
 ## Measurement error 2: 
-## 0.2
+## [1] 0.2
+## 
 ## Measurement error correction for measurement error 2: 
-##              Estimate Std.error 95% CIL 95% CIU   P.val    
-## cde           0.70929   0.21569 0.27786   1.118 &lt; 2e-16 ***
-## pnde          1.16158   0.07783 1.01815   1.309 &lt; 2e-16 ***
-## tnde          1.26083   0.07925 1.09086   1.410 &lt; 2e-16 ***
-## pnie          0.49755   0.05126 0.40479   0.606 &lt; 2e-16 ***
-## tnie          0.59680   0.06278 0.48234   0.732 &lt; 2e-16 ***
-## te            1.75838   0.07877 1.61509   1.921 &lt; 2e-16 ***
-## intref        0.45229   0.18649 0.09699   0.832 0.02667 *  
-## intmed        0.09925   0.04121 0.02657   0.194 0.00667 ** 
-## cde(prop)     0.40338   0.12107 0.15416   0.632 &lt; 2e-16 ***
-## intref(prop)  0.25722   0.10456 0.05497   0.464 0.02667 *  
-## intmed(prop)  0.05644   0.02284 0.01484   0.106 0.00667 ** 
-## pnie(prop)    0.28296   0.02790 0.23259   0.343 &lt; 2e-16 ***
-## pm            0.33940   0.03246 0.28136   0.408 &lt; 2e-16 ***
-## int           0.31366   0.12660 0.07521   0.572 0.02000 *  
-## pe            0.59662   0.12107 0.36756   0.846 &lt; 2e-16 ***
+##              Estimate Std.error  95% CIL 95% CIU  P.val    
+## cde           0.41340   0.64894 -0.61297   1.430    0.8    
+## pnde          1.37471   0.20997  1.07158   1.786 &lt;2e-16 ***
+## tnde          1.50263   0.22628  1.18654   2.014 &lt;2e-16 ***
+## pnie          0.39468   0.17597  0.02705   0.642 &lt;2e-16 ***
+## tnie          0.52261   0.20334  0.11507   0.732 &lt;2e-16 ***
+## te            1.89731   0.26139  1.52771   2.435 &lt;2e-16 ***
+## intref        0.96130   0.60601  0.23813   1.958 &lt;2e-16 ***
+## intmed        0.12792   0.10458 -0.05139   0.319    0.1 .  
+## cde(prop)     0.21789   0.35173 -0.34034   0.777    0.8    
+## intref(prop)  0.50667   0.33436  0.11719   1.079 &lt;2e-16 ***
+## intmed(prop)  0.06742   0.05264 -0.02535   0.159    0.1 .  
+## pnie(prop)    0.20802   0.08440  0.01462   0.315 &lt;2e-16 ***
+## pm            0.27545   0.09408  0.06064   0.382 &lt;2e-16 ***
+## int           0.57409   0.37653  0.09768   1.189 &lt;2e-16 ***
+## pe            0.78211   0.35173  0.22313   1.340 &lt;2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## ----------------------------------------------------------------
 ## 
 ## Measurement error 3: 
-## 0.3
+## [1] 0.3
+## 
 ## Measurement error correction for measurement error 3: 
-##              Estimate Std.error 95% CIL 95% CIU   P.val    
-## cde           0.69563   0.21061 0.25298   1.123 &lt; 2e-16 ***
-## pnde          1.14836   0.07771 0.99681   1.279 &lt; 2e-16 ***
-## tnde          1.25095   0.07986 1.07960   1.385 &lt; 2e-16 ***
-## pnie          0.51370   0.05379 0.41398   0.630 &lt; 2e-16 ***
-## tnie          0.61629   0.06386 0.49869   0.737 &lt; 2e-16 ***
-## te            1.76466   0.08314 1.60040   1.923 &lt; 2e-16 ***
-## intref        0.45274   0.18248 0.07700   0.846 0.00667 ** 
-## intmed        0.10259   0.04007 0.02338   0.186 0.00667 ** 
-## cde(prop)     0.39420   0.11863 0.14643   0.634 &lt; 2e-16 ***
-## intref(prop)  0.25656   0.10332 0.04480   0.460 0.00667 ** 
-## intmed(prop)  0.05814   0.02232 0.01306   0.101 0.00667 ** 
-## pnie(prop)    0.29111   0.02840 0.24410   0.357 &lt; 2e-16 ***
-## pm            0.34924   0.03224 0.29191   0.417 &lt; 2e-16 ***
-## int           0.31470   0.12480 0.05789   0.561 0.00667 ** 
-## pe            0.60580   0.11863 0.36649   0.854 &lt; 2e-16 ***
+##               Estimate Std.error   95% CIL 95% CIU  P.val    
+## cde           0.398435  0.668214 -0.598701   1.499    0.7    
+## pnde          1.351480  0.211130  1.043961   1.744 &lt;2e-16 ***
+## tnde          1.477483  0.197400  1.131420   1.777 &lt;2e-16 ***
+## pnie          0.404105  0.234283  0.087312   0.886 &lt;2e-16 ***
+## tnie          0.530107  0.231335  0.151966   0.995 &lt;2e-16 ***
+## te            1.881588  0.290616  1.564649   2.542 &lt;2e-16 ***
+## intref        0.953046  0.606930  0.024188   1.808    0.1 .  
+## intmed        0.126003  0.110436 -0.089632   0.310    0.3    
+## cde(prop)     0.211754  0.336035 -0.346251   0.717    0.7    
+## intref(prop)  0.506511  0.363515  0.010838   1.048    0.1 .  
+## intmed(prop)  0.066966  0.056945 -0.040814   0.159    0.3    
+## pnie(prop)    0.214768  0.099904  0.053531   0.383 &lt;2e-16 ***
+## pm            0.281734  0.095776  0.095335   0.446 &lt;2e-16 ***
+## int           0.573478  0.404551 -0.009475   1.205    0.1 .  
+## pe            0.788246  0.336035  0.282689   1.346 &lt;2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## ----------------------------------------------------------------</code></pre>
-<div class="sourceCode" id="cb14"><html><body><pre class="r"><span class="fu"><a href="../reference/ggcmsens.html">ggcmsens</a></span>(<span class="no">me1</span>) +
+<div class="sourceCode" id="cb13"><html><body><pre class="r"><span class="fu"><a href="../reference/ggcmsens.html">ggcmsens</a></span>(<span class="no">me1</span>) +
   <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="kw">axis.text.x</span> <span class="kw">=</span> <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span>(<span class="kw">angle</span> <span class="kw">=</span> <span class="fl">30</span>, <span class="kw">vjust</span> <span class="kw">=</span> <span class="fl">0.8</span>))</pre></body></html></div>
 <p><img src="quickstart_files/figure-html/plot_cmsens_me_con-1.png" width="768"></p>
 <p>Then, assume that the exposure was measured with error. Sensitivity analysis for measurement error using SIMEX with two assumed misclassification matrices:</p>
-<div class="sourceCode" id="cb15"><html><body><pre class="r"><span class="no">me2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/cmsens.html">cmsens</a></span>(<span class="kw">object</span> <span class="kw">=</span> <span class="no">est</span>, <span class="kw">sens</span> <span class="kw">=</span> <span class="st">"me"</span>, <span class="kw">MEmethod</span> <span class="kw">=</span> <span class="st">"simex"</span>, <span class="kw">MEvariable</span> <span class="kw">=</span> <span class="st">"A"</span>,
-              <span class="kw">MEvartype</span> <span class="kw">=</span> <span class="st">"cat"</span>, <span class="kw">B</span> <span class="kw">=</span> <span class="fl">200</span>,
+<div class="sourceCode" id="cb14"><html><body><pre class="r"><span class="no">me2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/cmsens.html">cmsens</a></span>(<span class="kw">object</span> <span class="kw">=</span> <span class="no">est</span>, <span class="kw">sens</span> <span class="kw">=</span> <span class="st">"me"</span>, <span class="kw">MEmethod</span> <span class="kw">=</span> <span class="st">"simex"</span>, <span class="kw">MEvariable</span> <span class="kw">=</span> <span class="st">"A"</span>,
+              <span class="kw">MEvartype</span> <span class="kw">=</span> <span class="st">"cat"</span>, <span class="kw">B</span> <span class="kw">=</span> <span class="fl">5</span>,
               <span class="kw">MEerror</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.95</span>, <span class="fl">0.05</span>, <span class="fl">0.05</span>, <span class="fl">0.95</span>), <span class="kw">nrow</span> <span class="kw">=</span> <span class="fl">2</span>),
                              <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.9</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>, <span class="fl">0.9</span>), <span class="kw">nrow</span> <span class="kw">=</span> <span class="fl">2</span>)))</pre></body></html></div>
 <p>Summarizing and plotting the results:</p>
-<div class="sourceCode" id="cb16"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">me2</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb15"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">me2</span>)</pre></body></html></div>
 <pre><code>## Sensitivity Analysis For Measurement Error 
 ##  
 ## The variable measured with error: A
@@ -670,22 +306,22 @@
 ## [2,] 0.05 0.95
 ## 
 ## Measurement error correction for measurement error 1: 
-##                Estimate  Std.error    95% CIL 95% CIU  P.val    
-## cde           0.9097916  0.2649419  0.4269731   1.499 &lt;2e-16 ***
-## pnde          1.3736902  0.0955105  1.1929239   1.548 &lt;2e-16 ***
-## tnde          1.4875131  0.0965330  1.3004629   1.666 &lt;2e-16 ***
-## pnie          0.4912946  0.0564960  0.3933602   0.619 &lt;2e-16 ***
-## tnie          0.6051175  0.0620059  0.5037783   0.732 &lt;2e-16 ***
-## te            1.9788078  0.0945820  1.8091005   2.179 &lt;2e-16 ***
-## intref        0.4638986  0.2219868 -0.0090293   0.858 0.0600 .  
-## intmed        0.1138229  0.0543161  0.0015765   0.217 0.0467 *  
-## cde(prop)     0.4597676  0.1283062  0.2239478   0.734 &lt;2e-16 ***
-## intref(prop)  0.2344334  0.1124846 -0.0044720   0.442 0.0600 .  
-## intmed(prop)  0.0575209  0.0271032  0.0007703   0.112 0.0467 *  
-## pnie(prop)    0.2482781  0.0278071  0.1972117   0.305 &lt;2e-16 ***
-## pm            0.3057990  0.0300596  0.2541311   0.368 &lt;2e-16 ***
-## int           0.2919543  0.1388378 -0.0049821   0.544 0.0533 .  
-## pe            0.5402324  0.1283062  0.2661969   0.776 &lt;2e-16 ***
+##              Estimate Std.error  95% CIL 95% CIU  P.val    
+## cde           1.33486   1.10826 -0.88648   2.846    0.6    
+## pnde          2.08238   0.31068  1.14341   2.106 &lt;2e-16 ***
+## tnde          2.16236   0.39007  1.03569   2.453 &lt;2e-16 ***
+## pnie          0.39217   0.26518 -0.03289   0.880    0.1 .  
+## tnie          0.47215   0.26806  0.02355   0.913 &lt;2e-16 ***
+## te            2.55453   0.40005  1.36543   2.764 &lt;2e-16 ***
+## intref        0.74752   1.16059 -1.40174   2.424    0.4    
+## intmed        0.07998   0.21673 -0.24583   0.430    0.8    
+## cde(prop)     0.52255   0.69096 -0.43792   1.936    0.6    
+## intref(prop)  0.29262   0.64746 -1.07789   1.130    0.4    
+## intmed(prop)  0.03131   0.10570 -0.14057   0.216    0.8    
+## pnie(prop)    0.15352   0.12339 -0.02150   0.407    0.1 .  
+## pm            0.18483   0.11558  0.01520   0.425 &lt;2e-16 ***
+## int           0.32393   0.74060 -1.17842   1.309    0.4    
+## pe            0.47745   0.69096 -0.93613   1.438    0.3    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## ----------------------------------------------------------------
@@ -696,72 +332,32 @@
 ## [2,]  0.1  0.9
 ## 
 ## Measurement error correction for measurement error 2: 
-##               Estimate Std.error   95% CIL 95% CIU  P.val    
-## cde           1.129487  0.304255  0.519847   1.708 &lt;2e-16 ***
-## pnde          1.581602  0.116062  1.340146   1.786 &lt;2e-16 ***
-## tnde          1.712267  0.114922  1.454878   1.905 &lt;2e-16 ***
-## pnie          0.501184  0.058940  0.383207   0.626 &lt;2e-16 ***
-## tnie          0.631849  0.066831  0.507925   0.762 &lt;2e-16 ***
-## te            2.213451  0.104383  1.977073   2.395 &lt;2e-16 ***
-## intref        0.452115  0.246162 -0.044717   0.911   0.06 .  
-## intmed        0.130665  0.064190  0.007868   0.258   0.04 *  
-## cde(prop)     0.510283  0.131735  0.249717   0.755 &lt;2e-16 ***
-## intref(prop)  0.204258  0.113081 -0.020596   0.430   0.06 .  
-## intmed(prop)  0.059032  0.029188  0.003508   0.116   0.04 *  
-## pnie(prop)    0.226427  0.027878  0.168662   0.286 &lt;2e-16 ***
-## pm            0.285459  0.031584  0.224628   0.351 &lt;2e-16 ***
-## int           0.263290  0.141453 -0.012998   0.545   0.06 .  
-## pe            0.489717  0.131735  0.244620   0.750 &lt;2e-16 ***
+##              Estimate Std.error  95% CIL 95% CIU  P.val    
+## cde           0.63443   0.82038 -0.15359   2.368    0.1 .  
+## pnde          1.80636   0.30024  1.39174   2.364 &lt;2e-16 ***
+## tnde          2.09235   0.30749  1.46866   2.530 &lt;2e-16 ***
+## pnie          0.51947   0.20384  0.11455   0.706 &lt;2e-16 ***
+## tnie          0.80546   0.28506  0.17703   1.052 &lt;2e-16 ***
+## te            2.61182   0.35757  1.69676   2.972 &lt;2e-16 ***
+## intref        1.17192   0.67317 -0.31695   1.684    0.3    
+## intmed        0.28600   0.17598 -0.14523   0.510    0.4    
+## cde(prop)     0.24291   0.33980 -0.11993   0.929    0.1 .  
+## intref(prop)  0.44870   0.32414 -0.13013   0.980    0.3    
+## intmed(prop)  0.10950   0.06483 -0.05749   0.183    0.4    
+## pnie(prop)    0.19889   0.07382  0.06066   0.279 &lt;2e-16 ***
+## pm            0.30839   0.09628  0.09054   0.380 &lt;2e-16 ***
+## int           0.55820   0.36390 -0.15306   1.052    0.3    
+## pe            0.75709   0.33980  0.07112   1.120 &lt;2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## ----------------------------------------------------------------</code></pre>
-<div class="sourceCode" id="cb18"><html><body><pre class="r"><span class="fu"><a href="../reference/ggcmsens.html">ggcmsens</a></span>(<span class="no">me2</span>) +
+<div class="sourceCode" id="cb17"><html><body><pre class="r"><span class="fu"><a href="../reference/ggcmsens.html">ggcmsens</a></span>(<span class="no">me2</span>) +
   <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="kw">axis.text.x</span> <span class="kw">=</span> <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span>(<span class="kw">angle</span> <span class="kw">=</span> <span class="fl">30</span>, <span class="kw">vjust</span> <span class="kw">=</span> <span class="fl">0.8</span>))</pre></body></html></div>
 <p><img src="quickstart_files/figure-html/plot_cmsens_me_cat-1.png" width="768"></p>
-</div>
-<div id="references" class="section level2">
-<h2 class="hasAnchor">
-<a href="#references" class="anchor"></a>References</h2>
-<p>Valeri L, Vanderweele TJ (2013). Mediation analysis allowing for exposure-mediator interactions and causal interpretation: theoretical assumptions and implementation with SAS and SPSS macros. Psychological Methods. 18(2): 137 - 150.</p>
-<p>VanderWeele TJ, Vansteelandt S (2014). Mediation analysis with multiple mediators. Epidemiologic Methods. 2(1): 95 - 115.</p>
-<p>Tchetgen Tchetgen EJ (2013). Inverse odds ratio-weighted estimation for causal mediation analysis. Statistics in medicine. 32: 4567 - 4580.</p>
-<p>Nguyen QC, Osypuk TL, Schmidt NM, Glymour MM, Tchetgen Tchetgen EJ. Practical guidance for conducting mediation analysis with multiple mediators using inverse odds ratio weighting (2015). American Journal of Epidemiology. 181(5): 349 - 356.</p>
-<p>VanderWeele TJ, Tchetgen Tchetgen EJ (2017). Mediation analysis with time varying exposures and mediators. Journal of the Royal Statistical Society: Series B (Statistical Methodology). 79(3): 917 - 938.</p>
-<p>Lin SH, Young J, Logan R, Tchetgen Tchetgen EJ, VanderWeele TJ (2017). Parametric mediational g-formula approach to mediation analysis with time-varying exposures, mediators, and confounders. Epidemiology. 28: 266 - 274.</p>
-<p>Vansteelandt S, Bekaert M, Lange T. (2012). Imputation Strategies for the Estimation of Natural Direct and Indirect Effects. Epidemiologic Methods. 1(1): 131 - 158.</p>
-<p>Steen J, Loeys T, Moerkerke B, Vansteelandt S (2017). Medflex: an R package for flexible mediation analysis using natural effect models. Journal of Statistical Software. 76(11).</p>
-<p>VanderWeele TJ. A unification of mediation and interaction: a 4-way decomposition (2014). Epidemiology. 25(5): 749 - 61.</p>
-<p>Imai K, Keele L, Tingley D. A general approach to causal mediation analysis (2010). Psychological Methods. 15(4): 309 - 334.</p>
-<p>Schomaker M, Heumann C. Bootstrap inference when using multiple imputation (2018). Statistics in Medicine. 37(14): 2252 - 2266.</p>
-<p>VanderWeele TJ, Ding P. Sensitivity analysis in observational research: introducing the E-Value (2017). Annals of Internal Medicine. 167(4): 268 - 274.</p>
-<p>Smith LH, VanderWeele TJ. Mediational E-values: Approximate sensitivity analysis for unmeasured mediator-outcome confounding (2019). Epidemiology. 30(6): 835 - 837.</p>
-<p>Carrol RJ, Ruppert D, Stefanski LA, Crainiceanu C. Measurement Error in Nonlinear Models: A Modern Perspective, Second Edition (2006). London: Chapman &amp; Hall.</p>
-<p>Cook JR, Stefanski LA. Simulation-extrapolation estimation in parametric measurement error models (1994). Journal of the American Statistical Association, 89(428): 1314 - 1328.</p>
-<p>Küchenhoff H, Mwalili SM, Lesaffre E. A general method for dealing with misclassification in regression: the misclassification SIMEX (2006). Biometrics. 62(1): 85 - 96.</p>
-<p>Stefanski LA, Cook JR. Simulation-extrapolation: the measurement error jackknife (1995). Journal of the American Statistical Association. 90(432): 1247 - 56.</p>
-<p>Valeri L, Lin X, VanderWeele TJ. Mediation analysis when a continuous mediator is measured with error and the outcome follows a generalized linear model (2014). Statistics in medicine, 33(28): 4875–4890.</p>
-</div>
-<div class="footnotes">
-<hr>
-<ol>
-<li id="fn1"><p>rb: the regression-based approach; wb: the weighting-based approach; iorw: the inverse odds ratio weighting approach; ne: the natural effect model; msm: the marginal structural model; gformula: the g-formula approach.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
-<li id="fn2"><p>Y denotes the outcome, A denotes the exposure, M denotes the mediator(s) and C denotes the pre-exposure confounder(s).<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
-<li id="fn3"><p>continuous A is not supported when C is not empty; otherwise, it is supported.<a href="#fnref3" class="footnote-back">↩︎</a></p></li>
-<li id="fn4"><p>continuous A is not supported when C is not empty; otherwise, it is supported.<a href="#fnref4" class="footnote-back">↩︎</a></p></li>
-<li id="fn5"><p>count A is not supported when C is not empty; otherwise, it is supported.<a href="#fnref5" class="footnote-back">↩︎</a></p></li>
-<li id="fn6"><p>count A is not supported when C is not empty; otherwise, it is supported.<a href="#fnref6" class="footnote-back">↩︎</a></p></li>
-<li id="fn7"><p>closed-form parameter function estimation only supports the regression-based approach and a single mediator.<a href="#fnref7" class="footnote-back">↩︎</a></p></li>
-<li id="fn8"><p>delta method inference is available only when closed-form parameter function estimation is used.<a href="#fnref8" class="footnote-back">↩︎</a></p></li>
-<li id="fn9"><p>marginal effects are estimated when direct counterfactual imputation estimation is used.<a href="#fnref9" class="footnote-back">↩︎</a></p></li>
-<li id="fn10"><p>conditional effects are estimated when closed-form parameter function estimation is used.<a href="#fnref10" class="footnote-back">↩︎</a></p></li>
-</ol>
-</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
-        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
-    </nav>
-</div>
+      </div>
 
 </div>
 

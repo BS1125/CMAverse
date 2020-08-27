@@ -78,19 +78,17 @@
 #'
 #' @examples
 #' 
+#' \dontrun{
 #' library(CMAverse)
 #' 
 #' # 10 boots are used for illustration
-#' \dontrun{
 #' naive <- cmest(data = cma2020, model = "rb", outcome = "contY", 
 #' exposure = "A", mediator = c("M1", "M2"), 
 #' basec = c("C1", "C2"), EMint = TRUE,
 #' mreg = list("logistic", "multinomial"), yreg = "linear",
 #' astar = 0, a = 1, mval = list(0, "M2_0"),
 #' estimation = "imputation", inference = "bootstrap", nboot = 10)
-#' }
 #' 
-#' \dontrun{
 #' exp1 <- cmsens(object = naive, sens = "uc")
 #' exp2 <- cmsens(object = naive, sens = "me", MEmethod = "rc", 
 #' MEvariable = "C1", MEvartype = "con",
@@ -334,7 +332,7 @@ print.cmsens.me <- function(x, ...) {
   cat("\n")
   for (i in 1:length(x$sens)) {
     cat(paste0("\nMeasurement error ", i, ": \n"))
-    if (x$ME$MEvartype == "continuous") cat(x$ME$MEerror[i])
+    if (x$ME$MEvartype == "continuous") print(x$ME$MEerror[i])
     if (x$ME$MEvartype == "categorical") print(x$ME$MEerror[[i]])
     cat(paste0("\nMeasurement error correction for measurement error ", i, ": \n"))
     out <- data.frame(x$sens[[i]]$effect.pe, x$sens[[i]]$effect.se, 
@@ -372,7 +370,7 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
   cat("\n")
   for (i in 1:length(x$sens)) {
     cat(paste0("\nMeasurement error ", i, ": \n"))
-    if (x$ME$MEvartype == "continuous") cat(x$ME$MEerror[i])
+    if (x$ME$MEvartype == "continuous") print(x$ME$MEerror[i])
     if (x$ME$MEvartype == "categorical") print(x$ME$MEerror[[i]])
     cat(paste0("\nMeasurement error correction for measurement error ", i, ": \n"))
     printCoefmat(x$summarydf[[i]], digits = digits, has.Pvalue = TRUE)

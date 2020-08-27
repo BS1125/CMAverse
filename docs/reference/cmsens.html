@@ -18,8 +18,8 @@
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/sandstone/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
 
 <!-- bootstrap-toc -->
@@ -50,7 +50,7 @@ the E-value approach by Vanderweele et al. (2017) and Smith et al. (2019), and
 sensitivity analysis for measurement error via regression calibration by Carroll 
 et al. (1995) and SIMEX by Cook et al. (1994) and Küchenhoff et al. (2006)." />
 
-<meta property="og:image" content="/logo.png" />
+<meta property="og:image" content="https://bs1125.github.io/CMAverse/logo.png" />
 
 
 
@@ -91,25 +91,31 @@ et al. (1995) and SIMEX by Cook et al. (1994) and Küchenhoff et al. (2006)." />
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fa fa-home"></span>
      
   </a>
 </li>
 <li>
-  <a href="../reference/index.html">Reference</a>
+  <a href="../articles/overview.html">Overview of Modeling Approaches</a>
+</li>
+<li>
+  <a href="../articles/quickstart.html">Quickstart</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
+    Examples
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/overview.html">Overview of Statistical Approaches for Causal Mediation Analysis</a>
+      <a href="../articles/single_mediator.html">Statistical Modeling with a Single Mediator</a>
     </li>
     <li>
-      <a href="../articles/quickstart.html">CMAverse Quickstart Guide</a>
+      <a href="../articles/multiple_mediators.html">Statistical Modeling with Multiple Mediators</a>
+    </li>
+    <li>
+      <a href="../articles/case_control.html">Statistical Modeling for a Case Control Study</a>
     </li>
   </ul>
 </li>
@@ -117,9 +123,17 @@ et al. (1995) and SIMEX by Cook et al. (1994) and Küchenhoff et al. (2006)." />
       
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/BS1125/CMAverse/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+  <a href="../reference/index.html">
+    <span class="fa fa-file-code-o"></span>
      
+    Functions
+  </a>
+</li>
+<li>
+  <a href="https://github.com/BS1125/CMAverse/">
+    <span class="fa fa-github fa-lg"></span>
+     
+    GitHub
   </a>
 </li>
       </ul>
@@ -290,135 +304,29 @@ medicine, 33(28): 4875–4890.</p>
 <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>CMAverse</span>)
 
 <span class='co'># 10 boots are used for illustration</span>
+<span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
 <span class='no'>naive</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='cmest.html'>cmest</a></span>(<span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>cma2020</span>, <span class='kw'>model</span> <span class='kw'>=</span> <span class='st'>"rb"</span>, <span class='kw'>outcome</span> <span class='kw'>=</span> <span class='st'>"contY"</span>,
 <span class='kw'>exposure</span> <span class='kw'>=</span> <span class='st'>"A"</span>, <span class='kw'>mediator</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"M1"</span>, <span class='st'>"M2"</span>),
 <span class='kw'>basec</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"C1"</span>, <span class='st'>"C2"</span>), <span class='kw'>EMint</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
 <span class='kw'>mreg</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='st'>"logistic"</span>, <span class='st'>"multinomial"</span>), <span class='kw'>yreg</span> <span class='kw'>=</span> <span class='st'>"linear"</span>,
 <span class='kw'>astar</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>a</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>mval</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fl'>0</span>, <span class='st'>"M2_0"</span>),
-<span class='kw'>estimation</span> <span class='kw'>=</span> <span class='st'>"imputation"</span>, <span class='kw'>inference</span> <span class='kw'>=</span> <span class='st'>"bootstrap"</span>, <span class='kw'>nboot</span> <span class='kw'>=</span> <span class='fl'>10</span>)</div><div class='output co'>#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |=======                                                               |  10%  |                                                                              |==============                                                        |  20%  |                                                                              |=====================                                                 |  30%  |                                                                              |============================                                          |  40%  |                                                                              |===================================                                   |  50%  |                                                                              |==========================================                            |  60%  |                                                                              |=================================================                     |  70%  |                                                                              |========================================================              |  80%  |                                                                              |===============================================================       |  90%  |                                                                              |======================================================================| 100%</div><div class='input'>
-<span class='no'>exp1</span> <span class='kw'>&lt;-</span> <span class='fu'>cmsens</span>(<span class='kw'>object</span> <span class='kw'>=</span> <span class='no'>naive</span>, <span class='kw'>sens</span> <span class='kw'>=</span> <span class='st'>"uc"</span>)</div><div class='output co'>#&gt; <span class='message'>Confidence interval crosses the true value, so its E-value is 1.</span></div><div class='output co'>#&gt; <span class='message'>Confidence interval crosses the true value, so its E-value is 1.</span></div><div class='input'><span class='no'>exp1</span></div><div class='output co'>#&gt; Sensitivity Analysis For Unmeasured Confounding 
-#&gt; 
-#&gt; Evalues on the ratio scale: 
-#&gt;          estRR   lowerRR  upperRR Evalue.estRR Evalue.lowerRR Evalue.upperRR
-#&gt; cde  1.3342334 1.1803354 1.508197     2.002025       1.641699             NA
-#&gt; pnde 1.3559970 1.2036659 1.527606     2.050785       1.698788             NA
-#&gt; tnde 1.3573488 1.2061233 1.527535     2.053802       1.704731             NA
-#&gt; pnie 0.9920052 0.9654144 1.019328     1.098193             NA              1
-#&gt; tnie 0.9929941 0.9690422 1.017538     1.091347             NA              1
-#&gt; te   1.3464971 1.1984925 1.512779     2.029547       1.686234             NA</div><div class='input'>
+<span class='kw'>estimation</span> <span class='kw'>=</span> <span class='st'>"imputation"</span>, <span class='kw'>inference</span> <span class='kw'>=</span> <span class='st'>"bootstrap"</span>, <span class='kw'>nboot</span> <span class='kw'>=</span> <span class='fl'>10</span>)
+}
+
+<span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='no'>exp1</span> <span class='kw'>&lt;-</span> <span class='fu'>cmsens</span>(<span class='kw'>object</span> <span class='kw'>=</span> <span class='no'>naive</span>, <span class='kw'>sens</span> <span class='kw'>=</span> <span class='st'>"uc"</span>)
 <span class='no'>exp2</span> <span class='kw'>&lt;-</span> <span class='fu'>cmsens</span>(<span class='kw'>object</span> <span class='kw'>=</span> <span class='no'>naive</span>, <span class='kw'>sens</span> <span class='kw'>=</span> <span class='st'>"me"</span>, <span class='kw'>MEmethod</span> <span class='kw'>=</span> <span class='st'>"rc"</span>,
 <span class='kw'>MEvariable</span> <span class='kw'>=</span> <span class='st'>"C1"</span>, <span class='kw'>MEvartype</span> <span class='kw'>=</span> <span class='st'>"con"</span>,
-<span class='kw'>MEerror</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.1</span>, <span class='fl'>0.2</span>))</div><div class='output co'>#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |=======                                                               |  10%  |                                                                              |==============                                                        |  20%  |                                                                              |=====================                                                 |  30%  |                                                                              |============================                                          |  40%  |                                                                              |===================================                                   |  50%  |                                                                              |==========================================                            |  60%  |                                                                              |=================================================                     |  70%  |                                                                              |========================================================              |  80%  |                                                                              |===============================================================       |  90%  |                                                                              |======================================================================| 100%  |                                                                              |                                                                      |   0%  |                                                                              |=======                                                               |  10%  |                                                                              |==============                                                        |  20%  |                                                                              |=====================                                                 |  30%  |                                                                              |============================                                          |  40%  |                                                                              |===================================                                   |  50%  |                                                                              |==========================================                            |  60%  |                                                                              |=================================================                     |  70%  |                                                                              |========================================================              |  80%  |                                                                              |===============================================================       |  90%  |                                                                              |======================================================================| 100%</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span>(<span class='no'>exp2</span>)</div><div class='output co'>#&gt; Sensitivity Analysis For Measurement Error 
-#&gt;  
-#&gt; The variable measured with error: C1
-#&gt; Type of the variable measured with error: continuous
-#&gt; 
-#&gt; Measurement error 1: 
-#&gt; 0.1
-#&gt; Measurement error correction for measurement error 1: 
-#&gt;               Estimate Std.error   95% CIL 95% CIU  P.val    
-#&gt; cde           0.474545  0.125614  0.230738   0.614 &lt;2e-16 ***
-#&gt; pnde          0.498397  0.056430  0.419450   0.597 &lt;2e-16 ***
-#&gt; tnde          0.500371  0.053850  0.429145   0.598 &lt;2e-16 ***
-#&gt; pnie         -0.006455  0.029218 -0.076137   0.008    0.4    
-#&gt; tnie         -0.004481  0.025636 -0.059453   0.013    0.4    
-#&gt; te            0.493915  0.053901  0.407496   0.577 &lt;2e-16 ***
-#&gt; intref        0.023852  0.083390 -0.061277   0.196    0.4    
-#&gt; intmed        0.001974  0.012393 -0.004809   0.028    0.6    
-#&gt; cde(prop)     0.960781  0.215977  0.549592   1.226 &lt;2e-16 ***
-#&gt; intref(prop)  0.048292  0.186599 -0.130716   0.463    0.4    
-#&gt; intmed(prop)  0.003997  0.025841 -0.008298   0.060    0.6    
-#&gt; pnie(prop)   -0.013070  0.062621 -0.167605   0.015    0.4    
-#&gt; pm           -0.009073  0.055581 -0.130833   0.028    0.4    
-#&gt; int           0.052289  0.192795 -0.115070   0.492    0.4    
-#&gt; pe            0.039219  0.215977 -0.225614   0.450    0.4    
-#&gt; ---
-#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-#&gt; ----------------------------------------------------------------
-#&gt; 
-#&gt; Measurement error 2: 
-#&gt; 0.2
-#&gt; Measurement error correction for measurement error 2: 
-#&gt;               Estimate Std.error   95% CIL 95% CIU  P.val    
-#&gt; cde           0.470178  0.104086  0.301607   0.620 &lt;2e-16 ***
-#&gt; pnde          0.496936  0.070020  0.376826   0.570 &lt;2e-16 ***
-#&gt; tnde          0.498531  0.064445  0.393144   0.567 &lt;2e-16 ***
-#&gt; pnie         -0.024337  0.029676 -0.075636   0.009    0.4    
-#&gt; tnie         -0.022742  0.028417 -0.069851   0.016    0.2    
-#&gt; te            0.474195  0.074146  0.350205   0.555 &lt;2e-16 ***
-#&gt; intref        0.026758  0.066291 -0.102106   0.101    0.8    
-#&gt; intmed        0.001595  0.013379 -0.014694   0.023    1.0    
-#&gt; cde(prop)     0.991531  0.182504  0.729282   1.301 &lt;2e-16 ***
-#&gt; intref(prop)  0.056428  0.145135 -0.202840   0.235    0.8    
-#&gt; intmed(prop)  0.003363  0.033727 -0.036322   0.063    1.0    
-#&gt; pnie(prop)   -0.051322  0.074237 -0.185400   0.022    0.4    
-#&gt; pm           -0.047959  0.070267 -0.164846   0.039    0.2    
-#&gt; int           0.059791  0.158976 -0.219371   0.259    0.8    
-#&gt; pe            0.008469  0.182504 -0.301375   0.271    0.8    
-#&gt; ---
-#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-#&gt; ----------------------------------------------------------------</div><div class='input'>
+<span class='kw'>MEerror</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.1</span>, <span class='fl'>0.2</span>))
+<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span>(<span class='no'>exp2</span>)
+
 <span class='co'># B = 10 is used for illustration</span>
 <span class='no'>exp3</span> <span class='kw'>&lt;-</span> <span class='fu'>cmsens</span>(<span class='kw'>object</span> <span class='kw'>=</span> <span class='no'>naive</span>, <span class='kw'>sens</span> <span class='kw'>=</span> <span class='st'>"me"</span>, <span class='kw'>MEmethod</span> <span class='kw'>=</span> <span class='st'>"simex"</span>,
 <span class='kw'>MEvariable</span> <span class='kw'>=</span> <span class='st'>"M1"</span>, <span class='kw'>MEvartype</span> <span class='kw'>=</span> <span class='st'>"cat"</span>,
 <span class='kw'>MEerror</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.95</span>,<span class='fl'>0.05</span>,<span class='fl'>0.05</span>,<span class='fl'>0.95</span>), <span class='kw'>nrow</span> <span class='kw'>=</span> <span class='fl'>2</span>),
-<span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.9</span>,<span class='fl'>0.1</span>,<span class='fl'>0.1</span>,<span class='fl'>0.9</span>), <span class='kw'>nrow</span> <span class='kw'>=</span> <span class='fl'>2</span>)), <span class='kw'>B</span> <span class='kw'>=</span> <span class='fl'>10</span>)</div><div class='output co'>#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |=======                                                               |  10%  |                                                                              |==============                                                        |  20%  |                                                                              |=====================                                                 |  30%  |                                                                              |============================                                          |  40%  |                                                                              |===================================                                   |  50%  |                                                                              |==========================================                            |  60%  |                                                                              |=================================================                     |  70%  |                                                                              |========================================================              |  80%  |                                                                              |===============================================================       |  90%  |                                                                              |======================================================================| 100%  |                                                                              |                                                                      |   0%  |                                                                              |=======                                                               |  10%  |                                                                              |==============                                                        |  20%  |                                                                              |=====================                                                 |  30%  |                                                                              |============================                                          |  40%  |                                                                              |===================================                                   |  50%  |                                                                              |==========================================                            |  60%  |                                                                              |=================================================                     |  70%  |                                                                              |========================================================              |  80%  |                                                                              |===============================================================       |  90%  |                                                                              |======================================================================| 100%</div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span>(<span class='no'>exp3</span>)</div><div class='output co'>#&gt; Sensitivity Analysis For Measurement Error 
-#&gt;  
-#&gt; The variable measured with error: M1
-#&gt; Type of the variable measured with error: categorical
-#&gt; 
-#&gt; Measurement error 1: 
-#&gt;      [,1] [,2]
-#&gt; [1,] 0.95 0.05
-#&gt; [2,] 0.05 0.95
-#&gt; 
-#&gt; Measurement error correction for measurement error 1: 
-#&gt;               Estimate Std.error   95% CIL 95% CIU  P.val    
-#&gt; cde           0.433308  0.128220  0.197651   0.614 &lt;2e-16 ***
-#&gt; pnde          0.499658  0.088979  0.307128   0.581 &lt;2e-16 ***
-#&gt; tnde          0.503208  0.083965  0.322858   0.572 &lt;2e-16 ***
-#&gt; pnie         -0.036063  0.023834 -0.067435  -0.005 &lt;2e-16 ***
-#&gt; tnie         -0.032513  0.031200 -0.069106   0.028    0.4    
-#&gt; te            0.467145  0.095631  0.293392   0.560 &lt;2e-16 ***
-#&gt; intref        0.066350  0.065402 -0.043809   0.146    0.6    
-#&gt; intmed        0.003550  0.021847 -0.020333   0.042    0.6    
-#&gt; cde(prop)     0.927567  0.208112  0.592237   1.173 &lt;2e-16 ***
-#&gt; intref(prop)  0.142032  0.172813 -0.094527   0.424    0.6    
-#&gt; intmed(prop)  0.007599  0.052521 -0.048560   0.112    0.6    
-#&gt; pnie(prop)   -0.077199  0.064037 -0.177691  -0.009 &lt;2e-16 ***
-#&gt; pm           -0.069600  0.073101 -0.178648   0.051    0.4    
-#&gt; int           0.149631  0.216912 -0.101056   0.536    0.8    
-#&gt; pe            0.072433  0.208112 -0.172908   0.408    1.0    
-#&gt; ---
-#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-#&gt; ----------------------------------------------------------------
-#&gt; 
-#&gt; Measurement error 2: 
-#&gt;      [,1] [,2]
-#&gt; [1,]  0.9  0.1
-#&gt; [2,]  0.1  0.9
-#&gt; 
-#&gt; Measurement error correction for measurement error 2: 
-#&gt;               Estimate Std.error   95% CIL 95% CIU  P.val    
-#&gt; cde           0.393833  0.157102  0.212986   0.649 &lt;2e-16 ***
-#&gt; pnde          0.482123  0.069240  0.395993   0.577 &lt;2e-16 ***
-#&gt; tnde          0.484488  0.067371  0.396774   0.587 &lt;2e-16 ***
-#&gt; pnie         -0.025896  0.036707 -0.063537   0.045    0.2    
-#&gt; tnie         -0.023531  0.030661 -0.065210   0.029    0.2    
-#&gt; te            0.458592  0.080764  0.343113   0.571 &lt;2e-16 ***
-#&gt; intref        0.088290  0.119234 -0.143716   0.236    1.0    
-#&gt; intmed        0.002365  0.015364 -0.023556   0.023    0.8    
-#&gt; cde(prop)     0.858787  0.289258  0.493377   1.411 &lt;2e-16 ***
-#&gt; intref(prop)  0.192524  0.266778 -0.318749   0.529    1.0    
-#&gt; intmed(prop)  0.005157  0.032580 -0.042315   0.055    0.8    
-#&gt; pnie(prop)   -0.056469  0.078774 -0.165026   0.078    0.2    
-#&gt; pm           -0.051311  0.069405 -0.159278   0.051    0.2    
-#&gt; int           0.197681  0.280764 -0.334629   0.576    0.8    
-#&gt; pe            0.141213  0.289258 -0.411197   0.507    1.0    
-#&gt; ---
-#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-#&gt; ----------------------------------------------------------------</div><div class='input'>
-</div></pre>
+<span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.9</span>,<span class='fl'>0.1</span>,<span class='fl'>0.1</span>,<span class='fl'>0.9</span>), <span class='kw'>nrow</span> <span class='kw'>=</span> <span class='fl'>2</span>)), <span class='kw'>B</span> <span class='kw'>=</span> <span class='fl'>10</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span>(<span class='no'>exp3</span>)
+}</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

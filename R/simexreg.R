@@ -62,6 +62,7 @@
 #' 
 #' @examples
 #' 
+#' \dontrun{
 #' rm(list=ls())
 #' library(CMAverse)
 #' 
@@ -112,7 +113,8 @@
 #' reg_true <- glm(y ~ x1 + x2_true + x3, data = data, family = binomial("logit"))
 #' reg_simex <- simexreg(reg = reg_naive, data = data, MEvariable = "x2_error",
 #'                       MEerror = MEerror, variance = TRUE, MEvartype = "cat")
-#'                       
+#' }
+#'                   
 #' @importFrom stats as.formula model.frame family coef predict model.matrix getCall cov 
 #' formula vcov pt
 #' @importFrom boot boot

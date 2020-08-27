@@ -18,8 +18,8 @@
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/sandstone/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
 
 <!-- bootstrap-toc -->
@@ -47,7 +47,7 @@
 
 <meta property="og:description" content="Plot the directed acyclic graph (DAG) for causal mediation analysis." />
 
-<meta property="og:image" content="/logo.png" />
+<meta property="og:image" content="https://bs1125.github.io/CMAverse/logo.png" />
 
 
 
@@ -88,25 +88,31 @@
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fa fa-home"></span>
      
   </a>
 </li>
 <li>
-  <a href="../reference/index.html">Reference</a>
+  <a href="../articles/overview.html">Overview of Modeling Approaches</a>
+</li>
+<li>
+  <a href="../articles/quickstart.html">Quickstart</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
+    Examples
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/overview.html">Overview of Statistical Approaches for Causal Mediation Analysis</a>
+      <a href="../articles/single_mediator.html">Statistical Modeling with a Single Mediator</a>
     </li>
     <li>
-      <a href="../articles/quickstart.html">CMAverse Quickstart Guide</a>
+      <a href="../articles/multiple_mediators.html">Statistical Modeling with Multiple Mediators</a>
+    </li>
+    <li>
+      <a href="../articles/case_control.html">Statistical Modeling for a Case Control Study</a>
     </li>
   </ul>
 </li>
@@ -114,9 +120,17 @@
       
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/BS1125/CMAverse/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+  <a href="../reference/index.html">
+    <span class="fa fa-file-code-o"></span>
      
+    Functions
+  </a>
+</li>
+<li>
+  <a href="https://github.com/BS1125/CMAverse/">
+    <span class="fa fa-github fa-lg"></span>
+     
+    GitHub
   </a>
 </li>
       </ul>
@@ -185,7 +199,8 @@
     </tr>
     <tr>
       <th>postc</th>
-      <td><p>(optional) a character or vector of variable name(s) of the post-exposure confounder(s)</p></td>
+      <td><p>(optional) a character or vector of variable name(s) of the post-exposure 
+confounder(s) affected by the exposure</p></td>
     </tr>
     <tr>
       <th>x.outcome</th>

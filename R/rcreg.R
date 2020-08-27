@@ -49,6 +49,7 @@
 #'
 #' @examples
 #' 
+#' \dontrun{
 #' rm(list=ls())
 #' library(CMAverse)
 #' 
@@ -113,7 +114,7 @@
 #' reg_true <- nnet::multinom(factor(y) ~ x1 + x2_true + x3, data = data)
 #' reg_rc <- rcreg(reg = reg_naive, data = data, MEvariable = "x2_error",
 #'                 MEerror = 0.5, variance = TRUE, nboot = 2)
-#'                 
+#' }                
 #'
 #' @importFrom stats as.formula model.frame family coef predict model.matrix getCall cov 
 #' formula vcov pt

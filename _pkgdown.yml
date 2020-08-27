@@ -3,3 +3,33 @@ authors:
     href: "https://scholar.harvard.edu/cchoirat"
   Linda Valeri:
     href: "https://www.lindavaleri.com/"
+    
+title: CMAverse
+url: https://bs1125.github.io/CMAverse/
+template:
+  params:
+    bootswatch: sandstone
+navbar:
+  type: default
+  left:
+    - icon: fa-home
+      href: index.html
+    - text: "Overview of Modeling Approaches"  
+      href: articles/overview.html
+    - text: "Quickstart"  
+      href: articles/quickstart.html
+    - text: "Examples"
+      menu: 
+      -  text: Statistical Modeling with a Single Mediator
+         href: articles/single_mediator.html
+      -  text: Statistical Modeling with Multiple Mediators
+         href: articles/multiple_mediators.html
+      -  text: Statistical Modeling for a Case Control Study
+         href: articles/case_control.html
+  right:
+    - icon: fa-file-code-o 
+      text: "Functions"
+      href: reference/index.html
+    - icon: fa-github fa-lg
+      text: "GitHub"
+      href: https://github.com/BS1125/CMAverse/ 

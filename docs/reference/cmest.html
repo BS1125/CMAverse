@@ -18,8 +18,8 @@
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/sandstone/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
 
 <!-- bootstrap-toc -->
@@ -52,7 +52,7 @@ the inverse odd-ratio weighting approach by Tchetgen Tchetgen (2013),
 the natural effect model by Vansteelandt et al. (2012), the marginal structural 
 model by VanderWeele et al. (2017), and the g-formula approach by Lin et al. (2017)." />
 
-<meta property="og:image" content="/logo.png" />
+<meta property="og:image" content="https://bs1125.github.io/CMAverse/logo.png" />
 
 
 
@@ -93,25 +93,31 @@ model by VanderWeele et al. (2017), and the g-formula approach by Lin et al. (20
       <ul class="nav navbar-nav">
         <li>
   <a href="../index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
+    <span class="fa fa-home"></span>
      
   </a>
 </li>
 <li>
-  <a href="../reference/index.html">Reference</a>
+  <a href="../articles/overview.html">Overview of Modeling Approaches</a>
+</li>
+<li>
+  <a href="../articles/quickstart.html">Quickstart</a>
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-    Articles
+    Examples
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/overview.html">Overview of Statistical Approaches for Causal Mediation Analysis</a>
+      <a href="../articles/single_mediator.html">Statistical Modeling with a Single Mediator</a>
     </li>
     <li>
-      <a href="../articles/quickstart.html">CMAverse Quickstart Guide</a>
+      <a href="../articles/multiple_mediators.html">Statistical Modeling with Multiple Mediators</a>
+    </li>
+    <li>
+      <a href="../articles/case_control.html">Statistical Modeling for a Case Control Study</a>
     </li>
   </ul>
 </li>
@@ -119,9 +125,17 @@ model by VanderWeele et al. (2017), and the g-formula approach by Lin et al. (20
       
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/BS1125/CMAverse/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+  <a href="../reference/index.html">
+    <span class="fa fa-file-code-o"></span>
      
+    Functions
+  </a>
+</li>
+<li>
+  <a href="https://github.com/BS1125/CMAverse/">
+    <span class="fa fa-github fa-lg"></span>
+     
+    GitHub
   </a>
 </li>
       </ul>
@@ -180,6 +194,7 @@ model</em> by VanderWeele et al. (2017), and <em>the g-formula approach</em> by 
   <span class='kw'>yref</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>basecval</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
   <span class='kw'>nboot</span> <span class='kw'>=</span> <span class='fl'>200</span>,
+  <span class='kw'>nRep</span> <span class='kw'>=</span> <span class='fl'>5</span>,
   <span class='kw'>multimp</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='no'>...</span>
 )
@@ -332,6 +347,12 @@ confounder(s) for estimating conditional causal effects (used when <code>estimat
 Default is 200.</p></td>
     </tr>
     <tr>
+      <th>nRep</th>
+      <td><p>number of replications or hypothetical values of the exposure to sample for 
+each observation unit (used when <code>model</code> is <code>ne</code>). See <a href='https://rdrr.io/pkg/medflex/man/neImpute.default.html'>neImpute.default</a>
+for details. Default is <code>5</code>.</p></td>
+    </tr>
+    <tr>
       <th>multimp</th>
       <td><p>a logical value (used when <code>data</code> contains missing values). If 
 <code>TRUE</code>, conduct multiple imputation using the <code>mice</code> package. Default is <code>FALSE</code>.</p></td>
@@ -441,7 +462,7 @@ variables in <code>basec</code>, <code>L=(L_1,...,L_s)^T</code> denote the set o
     should regress <code>Y</code> on <code>A</code>, <code>M</code> and <code>C</code>. The variables in the 
     formula of <code>yreg</code> should follow the order of <code>A</code>, <code>M</code> and <code>C</code>, i.e., 
     the first variable needs to point to the exposure, the variable(s) right after the 
-    exposure need to point to the mediator(s), e.g., \(Y ~ A + M_1 + M_2 + A*M_1 + C\).</p></li>
+    exposure need to point to the mediator(s), e.g., <code>Y ~ A + M_1 + M_2 + A*M_1 + C</code>.</p></li>
 <li><p><code>msm</code>: <em>the marginal structural model</em> by VanderWeele et al. (2017).
     <code>yreg</code>, <code>mreg</code> and <code>wmreg</code> are required and all 
     mediators must be categorical. When <code>basec</code> is not empty, <code>ereg</code> is also 
@@ -605,119 +626,38 @@ imputation (2018). Statistics in Medicine. 37(14): 2252 - 2266.</p>
 <span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>CMAverse</span>)
 
 <span class='co'># single-mediator case with rb</span>
+<span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
 <span class='no'>exp1</span> <span class='kw'>&lt;-</span> <span class='fu'>cmest</span>(<span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>cma2020</span>, <span class='kw'>model</span> <span class='kw'>=</span> <span class='st'>"rb"</span>, <span class='kw'>outcome</span> <span class='kw'>=</span> <span class='st'>"contY"</span>,
 <span class='kw'>exposure</span> <span class='kw'>=</span> <span class='st'>"A"</span>, <span class='kw'>mediator</span> <span class='kw'>=</span> <span class='st'>"M2"</span>, <span class='kw'>basec</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"C1"</span>, <span class='st'>"C2"</span>),
 <span class='kw'>EMint</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>mreg</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='st'>"multinomial"</span>), <span class='kw'>yreg</span> <span class='kw'>=</span> <span class='st'>"linear"</span>,
 <span class='kw'>astar</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>a</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>mval</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='st'>"M2_0"</span>), <span class='kw'>estimation</span> <span class='kw'>=</span> <span class='st'>"paramfunc"</span>,
 <span class='kw'>inference</span> <span class='kw'>=</span> <span class='st'>"delta"</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span>(<span class='no'>exp1</span>)</div><div class='output co'>#&gt; # Outcome Regression: 
-#&gt; 
-#&gt; Call:
-#&gt; glm(formula = contY ~ A + M2 + A * M2 + C1 + C2, family = gaussian(), 
-#&gt;     data = getCall(x$regsumm$yreg)$data, weights = getCall(x$regsumm$yreg)$weights)
-#&gt; 
-#&gt; Deviance Residuals: 
-#&gt;     Min       1Q   Median       3Q      Max  
-#&gt; -2.9902  -0.6637  -0.0240   0.6702   4.0089  
-#&gt; 
-#&gt; Coefficients:
-#&gt;             Estimate Std. Error t value Pr(&gt;|t|)    
-#&gt; (Intercept)  0.63876    0.08526   7.492 1.50e-13 ***
-#&gt; A            0.50230    0.10687   4.700 2.96e-06 ***
-#&gt; M2M2_1       0.48145    0.10091   4.771 2.11e-06 ***
-#&gt; M2M2_2      -0.37129    0.11418  -3.252  0.00118 ** 
-#&gt; C1          -0.34973    0.03583  -9.761  &lt; 2e-16 ***
-#&gt; C2C2_1      -1.92831    0.06697 -28.792  &lt; 2e-16 ***
-#&gt; A:M2M2_1    -0.04765    0.16143  -0.295  0.76792    
-#&gt; A:M2M2_2     0.05151    0.16208   0.318  0.75070    
-#&gt; ---
-#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-#&gt; 
-#&gt; (Dispersion parameter for gaussian family taken to be 1.066118)
-#&gt; 
-#&gt;     Null deviance: 2253.6  on 999  degrees of freedom
-#&gt; Residual deviance: 1057.6  on 992  degrees of freedom
-#&gt; AIC: 2911.9
-#&gt; 
-#&gt; Number of Fisher Scoring iterations: 2
-#&gt; 
-#&gt; # Mediator Regression: 
-#&gt; Call:
-#&gt; nnet::multinom(formula = M2 ~ A + C1 + C2, data = getCall(x$regsumm$mreg[[1]])$data, 
-#&gt;     trace = FALSE, weights = getCall(x$regsumm$mreg[[1]])$weights)
-#&gt; 
-#&gt; Coefficients:
-#&gt;      (Intercept)         A         C1     C2C2_1
-#&gt; M2_1  0.01916313 0.1132470 -0.3479648 0.03827061
-#&gt; M2_2  0.04901653 0.4611664 -0.9631694 0.56143039
-#&gt; 
-#&gt; Std. Errors:
-#&gt;      (Intercept)         A         C1    C2C2_1
-#&gt; M2_1   0.1559379 0.1602610 0.08444115 0.1585984
-#&gt; M2_2   0.1619075 0.1690683 0.09713226 0.1682700
-#&gt; 
-#&gt; Residual Deviance: 2013.111 
-#&gt; AIC: 2029.111 
-#&gt; # Causal Mediation Analysis via the Regression-based Approach
-#&gt;  
-#&gt; Closed-form parameter function estimation with 
-#&gt;  delta method standard errors, confidence intervals and p-values 
-#&gt;  
-#&gt;               Estimate Std.error   95% CIL 95% CIU    P.val    
-#&gt; cde           0.502300  0.106866  0.292846   0.712 2.60e-06 ***
-#&gt; pnde          0.498322  0.068869  0.363342   0.633 4.63e-13 ***
-#&gt; tnde          0.503115  0.068076  0.369689   0.637 1.46e-13 ***
-#&gt; pnie         -0.036526  0.023491 -0.082567   0.010  0.11997    
-#&gt; tnie         -0.031733  0.021331 -0.073542   0.010  0.13685    
-#&gt; te            0.466589  0.070883  0.327661   0.606 4.63e-11 ***
-#&gt; intref       -0.003978  0.049264 -0.100534   0.093  0.93564    
-#&gt; intmed        0.004793  0.076006 -0.144177   0.154  0.94972    
-#&gt; cde(prop)     1.076536  0.012379  1.052273   1.101  &lt; 2e-16 ***
-#&gt; intref(prop) -0.008526  0.179563 -0.360463   0.343  0.96213    
-#&gt; intmed(prop)  0.010272  0.162880 -0.308968   0.330  0.94971    
-#&gt; pnie(prop)   -0.078283  0.026759 -0.130730  -0.026  0.00344 ** 
-#&gt; pm           -0.068011  0.054907 -0.175627   0.040  0.21547    
-#&gt; int           0.001747  0.181082 -0.353168   0.357  0.99230    
-#&gt; pe           -0.076536  0.179563 -0.428474   0.275  0.66994    
-#&gt; ---
-#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-#&gt; 
-#&gt; Reference values: 
-#&gt; $a
-#&gt; [1] 1
-#&gt; 
-#&gt; $astar
-#&gt; [1] 0
-#&gt; 
-#&gt; $mval
-#&gt; $mval[[1]]
-#&gt; [1] "M2_0"
-#&gt; 
-#&gt; 
-#&gt; $basecval
-#&gt; $basecval[[1]]
-#&gt; [1] 1.001125
-#&gt; 
-#&gt; $basecval[[2]]
-#&gt; [1] 0.408
-#&gt; 
-#&gt; </div><div class='input'>
+<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span>(<span class='no'>exp1</span>)
+}
+
 <span class='co'># multiple-mediator case with rb</span>
 <span class='co'># 10 boots are used for illustration</span>
+<span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
 <span class='no'>exp2</span> <span class='kw'>&lt;-</span> <span class='fu'>cmest</span>(<span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>cma2020</span>, <span class='kw'>model</span> <span class='kw'>=</span> <span class='st'>"rb"</span>, <span class='kw'>outcome</span> <span class='kw'>=</span> <span class='st'>"contY"</span>,
 <span class='kw'>exposure</span> <span class='kw'>=</span> <span class='st'>"A"</span>, <span class='kw'>mediator</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"M1"</span>, <span class='st'>"M2"</span>), <span class='kw'>basec</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"C1"</span>, <span class='st'>"C2"</span>),
 <span class='kw'>EMint</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>mreg</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='st'>"logistic"</span>, <span class='st'>"multinomial"</span>),
 <span class='kw'>yreg</span> <span class='kw'>=</span> <span class='st'>"linear"</span>, <span class='kw'>astar</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>a</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>mval</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fl'>0</span>, <span class='st'>"M2_0"</span>),
-<span class='kw'>estimation</span> <span class='kw'>=</span> <span class='st'>"imputation"</span>, <span class='kw'>inference</span> <span class='kw'>=</span> <span class='st'>"bootstrap"</span>, <span class='kw'>nboot</span> <span class='kw'>=</span> <span class='fl'>10</span>)</div><div class='output co'>#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |=======                                                               |  10%  |                                                                              |==============                                                        |  20%  |                                                                              |=====================                                                 |  30%  |                                                                              |============================                                          |  40%  |                                                                              |===================================                                   |  50%  |                                                                              |==========================================                            |  60%  |                                                                              |=================================================                     |  70%  |                                                                              |========================================================              |  80%  |                                                                              |===============================================================       |  90%  |                                                                              |======================================================================| 100%</div><div class='input'>
+<span class='kw'>estimation</span> <span class='kw'>=</span> <span class='st'>"imputation"</span>, <span class='kw'>inference</span> <span class='kw'>=</span> <span class='st'>"bootstrap"</span>, <span class='kw'>nboot</span> <span class='kw'>=</span> <span class='fl'>10</span>)
+}
+
 <span class='co'># multiple-mediator case with ne</span>
 <span class='co'># 10 boots are used for illustration</span>
+<span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
 <span class='no'>exp3</span> <span class='kw'>&lt;-</span> <span class='fu'>cmest</span>(<span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>cma2020</span>, <span class='kw'>model</span> <span class='kw'>=</span> <span class='st'>"ne"</span>, <span class='kw'>outcome</span> <span class='kw'>=</span> <span class='st'>"contY"</span>,
 <span class='kw'>exposure</span> <span class='kw'>=</span> <span class='st'>"A"</span>, <span class='kw'>mediator</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"M1"</span>, <span class='st'>"M2"</span>), <span class='kw'>basec</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"C1"</span>, <span class='st'>"C2"</span>),
 <span class='kw'>yreg</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/glm.html'>glm</a></span>(<span class='no'>contY</span> ~ <span class='no'>A</span> + <span class='no'>M1</span> + <span class='no'>M2</span> + <span class='no'>A</span>*<span class='no'>M1</span> + <span class='no'>A</span>*<span class='no'>M2</span> + <span class='no'>C1</span> + <span class='no'>C2</span>, <span class='kw'>family</span> <span class='kw'>=</span> <span class='no'>gaussian</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>cma2020</span>),
 <span class='kw'>astar</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>a</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>mval</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fl'>0</span>, <span class='st'>"M2_0"</span>), <span class='kw'>estimation</span> <span class='kw'>=</span> <span class='st'>"imputation"</span>,
-<span class='kw'>inference</span> <span class='kw'>=</span> <span class='st'>"bootstrap"</span>, <span class='kw'>nboot</span> <span class='kw'>=</span> <span class='fl'>10</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: casecontrol is ignored when model = 'ne'</span></div><div class='output co'>#&gt;   |                                                                              |                                                                      |   0%  |                                                                              |=======                                                               |  10%  |                                                                              |==============                                                        |  20%  |                                                                              |=====================                                                 |  30%  |                                                                              |============================                                          |  40%  |                                                                              |===================================                                   |  50%  |                                                                              |==========================================                            |  60%  |                                                                              |=================================================                     |  70%  |                                                                              |========================================================              |  80%  |                                                                              |===============================================================       |  90%  |                                                                              |======================================================================| 100%</div><div class='input'>
+<span class='kw'>inference</span> <span class='kw'>=</span> <span class='st'>"bootstrap"</span>, <span class='kw'>nboot</span> <span class='kw'>=</span> <span class='fl'>10</span>)
+}
+
 <span class='co'># case control study with msm</span>
 <span class='co'># 10 boots are used for illustration</span>
+<span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
 <span class='no'>exp4</span> <span class='kw'>&lt;-</span> <span class='fu'>cmest</span>(<span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>cma2020</span>, <span class='kw'>model</span> <span class='kw'>=</span> <span class='st'>"msm"</span>, <span class='kw'>casecontrol</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
 <span class='kw'>yrare</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>outcome</span> <span class='kw'>=</span> <span class='st'>"binY"</span>, <span class='kw'>exposure</span> <span class='kw'>=</span> <span class='st'>"A"</span>,
 <span class='kw'>mediator</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"M1"</span>, <span class='st'>"M2"</span>), <span class='kw'>EMint</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>basec</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"C1"</span>, <span class='st'>"C2"</span>), <span class='kw'>yreg</span> <span class='kw'>=</span> <span class='st'>"logistic"</span>,
@@ -726,8 +666,8 @@ imputation (2018). Statistics in Medicine. 37(14): 2252 - 2266.</p>
 <span class='kw'>wmreg</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/glm.html'>glm</a></span>(<span class='no'>M1</span> ~ <span class='no'>A</span> + <span class='no'>C1</span> + <span class='no'>C2</span>, <span class='kw'>family</span> <span class='kw'>=</span> <span class='no'>binomial</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>cma2020</span>),
 <span class='kw pkg'>nnet</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/nnet/man/multinom.html'>multinom</a></span>(<span class='no'>M2</span> ~ <span class='no'>A</span> + <span class='no'>M1</span> + <span class='no'>C1</span> + <span class='no'>C2</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>cma2020</span>, <span class='kw'>trace</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)), <span class='kw'>astar</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>a</span> <span class='kw'>=</span> <span class='fl'>1</span>,
 <span class='kw'>mval</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fl'>0</span>, <span class='st'>"M2_0"</span>), <span class='kw'>estimation</span> <span class='kw'>=</span> <span class='st'>"imputation"</span>,
-<span class='kw'>inference</span> <span class='kw'>=</span> <span class='st'>"bootstrap"</span>, <span class='kw'>nboot</span> <span class='kw'>=</span> <span class='fl'>10</span>)</div><div class='output co'>#&gt;   |                                                                              |                                                                      |   0%</div><div class='output co'>#&gt; <span class='warning'>Warning: yref is not specified; 1 is used</span></div><div class='output co'>#&gt; <span class='warning'>Warning: non-integer #successes in a binomial glm!</span></div><div class='output co'>#&gt; <span class='warning'>Warning: non-integer #successes in a binomial glm!</span></div><div class='output co'>#&gt;   |                                                                              |=======                                                               |  10%</div><div class='output co'>#&gt; <span class='warning'>Warning: non-integer #successes in a binomial glm!</span></div><div class='output co'>#&gt; <span class='warning'>Warning: non-integer #successes in a binomial glm!</span></div><div class='output co'>#&gt;   |                                                                              |==============                                                        |  20%</div><div class='output co'>#&gt; <span class='warning'>Warning: non-integer #successes in a binomial glm!</span></div><div class='output co'>#&gt; <span class='warning'>Warning: non-integer #successes in a binomial glm!</span></div><div class='output co'>#&gt; <span class='warning'>Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</span></div><div class='output co'>#&gt;   |                                                                              |=====================                                                 |  30%</div><div class='output co'>#&gt; <span class='warning'>Warning: non-integer #successes in a binomial glm!</span></div><div class='output co'>#&gt; <span class='warning'>Warning: non-integer #successes in a binomial glm!</span></div><div class='output co'>#&gt; <span class='warning'>Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</span></div><div class='output co'>#&gt;   |                                                                              |============================                                          |  40%</div><div class='output co'>#&gt; <span class='warning'>Warning: non-integer #successes in a binomial glm!</span></div><div class='output co'>#&gt; <span class='warning'>Warning: non-integer #successes in a binomial glm!</span></div><div class='output co'>#&gt;   |                                                                              |===================================                                   |  50%</div><div class='output co'>#&gt; <span class='warning'>Warning: non-integer #successes in a binomial glm!</span></div><div class='output co'>#&gt; <span class='warning'>Warning: non-integer #successes in a binomial glm!</span></div><div class='output co'>#&gt; <span class='warning'>Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</span></div><div class='output co'>#&gt;   |                                                                              |==========================================                            |  60%</div><div class='output co'>#&gt; <span class='warning'>Warning: non-integer #successes in a binomial glm!</span></div><div class='output co'>#&gt; <span class='warning'>Warning: non-integer #successes in a binomial glm!</span></div><div class='output co'>#&gt; <span class='warning'>Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</span></div><div class='output co'>#&gt;   |                                                                              |=================================================                     |  70%</div><div class='output co'>#&gt; <span class='warning'>Warning: non-integer #successes in a binomial glm!</span></div><div class='output co'>#&gt; <span class='warning'>Warning: non-integer #successes in a binomial glm!</span></div><div class='output co'>#&gt; <span class='warning'>Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</span></div><div class='output co'>#&gt;   |                                                                              |========================================================              |  80%</div><div class='output co'>#&gt; <span class='warning'>Warning: non-integer #successes in a binomial glm!</span></div><div class='output co'>#&gt; <span class='warning'>Warning: non-integer #successes in a binomial glm!</span></div><div class='output co'>#&gt; <span class='warning'>Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</span></div><div class='output co'>#&gt;   |                                                                              |===============================================================       |  90%</div><div class='output co'>#&gt; <span class='warning'>Warning: non-integer #successes in a binomial glm!</span></div><div class='output co'>#&gt; <span class='warning'>Warning: non-integer #successes in a binomial glm!</span></div><div class='output co'>#&gt; <span class='warning'>Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</span></div><div class='output co'>#&gt;   |                                                                              |======================================================================| 100%</div><div class='output co'>#&gt; <span class='warning'>Warning: non-integer #successes in a binomial glm!</span></div><div class='output co'>#&gt; <span class='warning'>Warning: non-integer #successes in a binomial glm!</span></div><div class='output co'>#&gt; <span class='warning'>Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</span></div><div class='output co'>#&gt; <span class='warning'>Warning: non-integer #successes in a binomial glm!</span></div><div class='output co'>#&gt; <span class='warning'>Warning: non-integer #successes in a binomial glm!</span></div><div class='output co'>#&gt; <span class='warning'>Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</span></div><div class='input'>
-</div></pre>
+<span class='kw'>inference</span> <span class='kw'>=</span> <span class='st'>"bootstrap"</span>, <span class='kw'>nboot</span> <span class='kw'>=</span> <span class='fl'>10</span>)
+}</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

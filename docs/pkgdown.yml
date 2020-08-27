@@ -2,7 +2,13 @@ pandoc: 2.7.3
 pkgdown: 1.5.1
 pkgdown_sha: ~
 articles:
+  case_control: case_control.html
+  multiple_mediators: multiple_mediators.html
   overview: overview.html
   quickstart: quickstart.html
-last_built: 2020-08-24T08:38Z
+  single_mediator: single_mediator.html
+last_built: 2020-08-27T04:21Z
+urls:
+  reference: https://bs1125.github.io/CMAverse//reference
+  article: https://bs1125.github.io/CMAverse//articles
 

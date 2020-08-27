@@ -86,6 +86,10 @@ test_that("sensitivity analysis for measurement error works correctly for binary
   expect_equal(summary(res_binbin_cmsens_simex)$summarydf[[1]]$Estimate, ref, tolerance = 0.1)
   expect_equal(class(ggcmsens(res_binbin_cmsens_rc)), c("gg", "ggplot"))
   expect_equal(class(ggcmsens(res_binbin_cmsens_simex)), c("gg", "ggplot"))
+  expect_equal(print(res_binbin_cmsens_rc), NULL)
+  expect_equal(print(res_binbin_cmsens_simex), NULL)
+  expect_equal(print(summary(res_binbin_cmsens_rc)), NULL)
+  expect_equal(print(summary(res_binbin_cmsens_simex)), NULL)
   
   # a categorical variable measured with error
   set.seed(1)
@@ -172,6 +176,7 @@ test_that("sensitivity analysis for measurement error works correctly for binary
   # test
   expect_equal(summary(res_binbin_cmsens_simex)$summarydf[[1]]$Estimate, ref, tolerance = 0.1)
   expect_equal(class(ggcmsens(res_binbin_cmsens_simex)), c("gg", "ggplot"))
+  expect_equal(print(res_binbin_cmsens_simex), NULL)
   
 })
 
@@ -258,5 +263,5 @@ test_that("sensitivity analysis for unmeasured confounding works correctly for c
   
   # test
   expect_equal(as.vector(res_contbin_cmsens_uc$evalues[,4:6]), as.vector(evalues))
-
+  expect_equal(class(print(res_contbin_cmsens_uc)), "matrix")
 })
