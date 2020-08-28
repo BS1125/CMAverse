@@ -52,6 +52,8 @@ Suggests:
     dagitty,
     rmarkdown,
     testthat,
+    EValue,
+    nnet,
     covr
 VignetteBuilder: knitr
 Depends: R (>= 2.10)
