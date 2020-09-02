@@ -118,7 +118,7 @@ With the regression-based approach, all causal effects are estimated through eit
 
 ### Closed-form Parameter Function Estimation
 
-Closed-form parameter function estimation is available when there is only a single mediator, i.e., $M=M_1$. Also, `yreg` must be chosen from `linear`, `logistic`, `loglinear`, `poisson`, `quasipoisson`, `negbin`, `coxph`, `aft_exp`, and `aft_weibull`. `mreg` must be chosen from `linear`, `logistic` and `multinomial`. The causal effects estimated through closed-form parameter function estimation are conditional on values of pre-exposure confounders specified by the `precval` argument. Closed-form parameter functions are summarized below.
+Closed-form parameter function estimation is available when there is only a single mediator, i.e., $M=M_1$. Also, `yreg` must be chosen from `linear`, `logistic`, `loglinear`, `poisson`, `quasipoisson`, `negbin`, `coxph`, `aft_exp`, and `aft_weibull`. `mreg` must be chosen from `linear`, `logistic` and `multinomial`. To use `yreg = "logistic"` in closed-form parameter function estimation, the outcome must be rare. To use `yreg = "coxph"` in closed-form parameter function estimation, the outcome at the end of follow-up must be rare. Additionally, the causal effects estimated through closed-form parameter function estimation are conditional on values of pre-exposure confounders specified by the `precval` argument. Closed-form parameter functions are summarized below.
 
 #### Linear `yreg`, Linear `mreg` and Noncategorical Exposure
 

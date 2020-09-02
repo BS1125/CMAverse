@@ -189,9 +189,9 @@
 #' \code{negbin}, \code{coxph}, \code{aft_exp} and \code{aft_weibull}. \code{mreg} can be 
 #' chosen from \code{linear}, \code{logistic} and \code{multinomial}.
 #' 
-#' To use \code{yreg = "logistic"} in closed-form parameter function estimation, the binary 
-#' outcome must be rare. For common binary outcomes, use \code{yreg = "loglinear"}.
-#' 
+#' To use \code{yreg = "logistic"} in closed-form parameter function estimation, the outcome 
+#' must be rare. To use \code{yreg = "coxph"} in closed-form parameter function estimation, 
+#' the outcome at the end of follow-up must be rare.
 #' 
 #' \strong{Inference Methods}
 #' 
