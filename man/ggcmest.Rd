@@ -2,7 +2,7 @@
 % Please edit documentation in R/cmest.R
 \name{ggcmest}
 \alias{ggcmest}
-\title{Plotting Point Estimates and Confidence IntervalsCausal of Causal Effect Estimates}
+\title{Plotting Point Estimates and Confidence Intervals of Causal Effects}
 \usage{
 ggcmest(
   x,
@@ -27,7 +27,7 @@ ggcmest(
 
 \item{point.size}{size of points for point estimates. Default is \code{1}.}
 
-\item{point.colour}{colour of points for point estimates. Default is \code{black}.}
+\item{point.colour}{colour of points for point estimates. Default is \code{blue}.}
 
 \item{refline}{a logical value. If \code{true}, include a reference line at 
 \code{y = 0} when effects are on the difference scale and include a reference line at 
@@ -38,9 +38,9 @@ ggcmest(
 \item{refline.size}{size of the reference line. Default is \code{0.3}.}
 }
 \description{
-This function is used to plot the results of \code{cmest} nicely via plotting functions
-in the \code{ggplot2} package. Additional layers can be added to this plot using other 
-plotting functions in the \code{ggplot2} package.
+This function is used to plot the results of \code{cmest} nicely with plotting functions
+in the \link{ggplot2} package. Additional layers can be added to this plot using other 
+plotting functions in the \link{ggplot2} package.
 }
 \examples{
 

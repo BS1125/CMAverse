@@ -169,9 +169,12 @@ et al. (2014), \emph{the weighting-based approach} by VanderWeele et al. (2014),
 \emph{the inverse odd-ratio weighting approach} by Tchetgen Tchetgen (2013), 
 \emph{the natural effect model} by Vansteelandt et al. (2012), \emph{the marginal structural 
 model} by VanderWeele et al. (2017), and \emph{the g-formula approach} by Lin et al. (2017).
-When there are multiple mediators, the joint effect of them is studied.
 }
 \details{
+When there are multiple mediators, the joint effect of them is studied.
+
+
+
 \strong{Regressions}
 
 Each regression in \code{yreg}, \code{mreg}, \code{wmreg},
@@ -306,7 +309,7 @@ causal effects are obtained by percentiles of bootstrapped results.}
 
 For a continuous outcome, the causal effects on the difference scale are estimated. For a 
 categorical, count or survival outcome, the causal effects on the ratio scale are estimated. The 
-interpretation of the ratio depends on the actual data type of the outcome and it can be risk 
+interpretation of the ratio depends on the type of the outcome and it can be risk 
 ratio for a categorical outcome, rate ratio for a count outcome, hazard ratio for a survival 
 outcome fitted by \link[survival]{coxph}, mean survival ratio for a survival outcome fitted 
 by \link[survival]{survreg}, etc.
@@ -441,6 +444,5 @@ Schomaker M, Heumann C. Bootstrap inference when using multiple
 imputation (2018). Statistics in Medicine. 37(14): 2252 - 2266.
 }
 \seealso{
-\code{\link{ggcmest}}, \code{\link{cmdag}}, 
-\code{\link{cmsens}}.
+\link{ggcmest}, \link{cmdag}, \link{cmsens}, \link{svymultinom}.
 }
