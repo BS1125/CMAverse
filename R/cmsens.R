@@ -109,7 +109,7 @@
 #' @importFrom nnet multinom 
 #' @importFrom MASS polr glm.nb gamma.shape rnegbin
 #' @importFrom survival survreg coxph
-#' @importFrom survey svyglm svydesign svysurvreg svycoxph as.svrepdesign withReplicates
+#' @importFrom survey svyglm svydesign as.svrepdesign withReplicates
 #' @importFrom utils txtProgressBar setTxtProgressBar
 #' @importFrom EValue evalues.RR
 #' @importFrom Matrix bdiag

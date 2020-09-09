@@ -112,11 +112,7 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
   #################################Closed-form Parameter Function Estimation#########################
   ###################################################################################################
   if (estimation == "paramfunc") {
-
-    if (length(mediator) != 1) stop("estimation can be paramfunc for model = 'rb' when length(mediator) = 1")
-
     mreg <- mreg[[1]]
-
     # for categorical exposure, create indicator vectors for a and astar
     if (is.factor(data[, exposure]) | is.character(data[, exposure])) {
       a_lev <- levels(droplevels(as.factor(data[, exposure])))
@@ -519,10 +515,7 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
 
     # output causal effects in additive scale for continuous Y
     if ((is_lm_yreg | is_glm_yreg) &&
-        (family_yreg$family %in% c("gaussian", "inverse.gaussian", "Gamma", "quasi", "gaulss", "gevlss") |
-         startsWith(family_yreg$family, "Tweedie") |
-         startsWith(family_yreg$family, "Beta regression") |
-         startsWith(family_yreg$family, "Scaled t"))) {
+        (family_yreg$family %in% c("gaussian", "inverse.gaussian", "Gamma", "quasi"))) {
 
       cde <- EY1m - EY0m
       pnde <- EY10 - EY00

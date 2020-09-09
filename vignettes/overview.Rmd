@@ -104,7 +104,7 @@ tb2 <- data.frame(c("Controlled Direct Effect", "Pure Natural Direct Effect",
              "$(err^{INT_{ref}}+err^{INT_{med}}+err^{PNIE})/(rr^{TE}-1)$"))
 colnames(tb2) <- c("Full Name", "Abbreviation", "Formula")
 knitr::kable(tb2, escape = FALSE, caption = "Table 2: Causal Effects on the Ratio Scale") %>%
-  footnote(general = "$a$ and $a^*$ are two reference values for $A$. $m$ is the reference value for $M$. $M_a$ denotes the counterfactual value of $M$ that would have been observed had $A$ been set to be $a$. $Y_{am}$ denotes the counterfactual value of $Y$ that would have been observed had $A$ been set to be $a$, and $M$ to be $m$. $Y_{aMa*}$ denotes the counterfactual value of $Y$ that would have been observed had $A$ been set to be $a$, and $M$ to be $M_{a*}$. $RR$ represents risk or rate ratio.") %>%
+  footnote(general = "$a$ and $a^*$ are two reference values for $A$. $m$ is the reference value for $M$. $M_a$ denotes the counterfactual value of $M$ that would have been observed had $A$ been set to be $a$. $Y_{am}$ denotes the counterfactual value of $Y$ that would have been observed had $A$ been set to be $a$, and $M$ to be $m$. $Y_{aMa*}$ denotes the counterfactual value of $Y$ that would have been observed had $A$ been set to be $a$, and $M$ to be $M_{a*}$. $RR$ represents risk or rate ratio. If $Y$ is categorical, a reference value of $Y$, denoted as $y$, is needed and E[Y] represents the probability of $Y=y$.") %>%
   column_spec(1, width = "20em") %>%
   column_spec(2, width = "8em") %>%
   column_spec(3, width = "10em") %>%
