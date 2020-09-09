@@ -2,6 +2,8 @@
 % Please edit documentation in R/cmsens.R
 \name{cmsens}
 \alias{cmsens}
+\alias{print.cmsens.uc}
+\alias{print.cmsens.me}
 \alias{summary.cmsens.me}
 \alias{print.summary.cmsens.me}
 \title{Sensitivity Analysis For Unmeasured Confounding and Measurement Error}
@@ -18,12 +20,16 @@ cmsens(
   nboot.rc = 400
 )
 
+\method{print}{cmsens.uc}(x, ...)
+
+\method{print}{cmsens.me}(x, ...)
+
 \method{summary}{cmsens.me}(object, ...)
 
 \method{print}{summary.cmsens.me}(x, digits = 4, ...)
 }
 \arguments{
-\item{object}{an object of class \code{cmest}.}
+\item{object}{an object of class \code{cmsens}.}
 
 \item{sens}{sensitivity analysis for unmeasured confounding or measurement error. 
 \code{uc} represents unmeasured confounding and \code{me} represents measurement error.
@@ -48,19 +54,19 @@ is \code{categorical}).}
 \item{nboot.rc}{number of boots for estimating the var-cov matrix of coefficients 
 with regression calibration. Default is \code{400}.}
 
-\item{...}{other arguments.}
-
 \item{x}{an object of class \code{cmsens}}
+
+\item{...}{other arguments.}
 
 \item{digits}{minimal number of significant digits. See \link{print.default}.}
 }
 \value{
-If \code{sens} is \code{uc}, an object of class 'cmest.uc' is returned:
+If \code{sens} is \code{uc}, an object of class 'cmsens.uc' is returned:
 \item{call}{the function call,}
 \item{evalues}{the data frame in which the first three columns are the point estimates, 
 lower limits of confidence intervals, upper limits of confidence intervals of causal effects on 
 the ratio scale and the last three columns are the E-values on the ratio scale for them,}
-If \code{sens} is \code{me}, an object of class 'cmest.me' is returned:
+If \code{sens} is \code{me}, an object of class 'cmsens.me' is returned:
 \item{call}{the function call,}
 \item{ME}{a list which might contain MEvariable, MEvartype, MEerror, reliability ratio, lambda and B,}
 \item{naive}{naive causal mediation analysis results}
@@ -87,6 +93,10 @@ with error.
 }
 \section{Methods (by generic)}{
 \itemize{
+\item \code{print}: Print the results of cmsens.uc nicely
+
+\item \code{print}: Print the results of cmsens.me nicely
+
 \item \code{summary}: Summarize the results of cmsens.me nicely
 
 \item \code{print}: Print the summary of cmsens.me nicely

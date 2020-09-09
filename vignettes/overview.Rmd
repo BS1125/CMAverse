@@ -43,7 +43,7 @@ plot(g1)
 
 ## Estimands
 
-For a continuous outcome, causal effects are estimated on the difference scale (summarized in table 1). For a categorical, count, or survival outcome, causal effects are estimated on the (risk or rate) ratio scale (summarized in table 2). See [Valeri et al. (2013)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3659198/) and [VanderWeele (2015)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4220271/) for details about these effects.
+For a continuous outcome, causal effects are estimated on the difference scale (summarized in table 1). For a categorical, count, or survival outcome, causal effects are estimated on the ratio scale (summarized in table 2). See [Valeri et al. (2013)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3659198/) and [VanderWeele (2015)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4220271/) for details about these effects.
 
 ```{r echo=F,warning=F,message=F}
 library(knitr)
@@ -468,7 +468,7 @@ plot(g2)
 
 ## Estimands
 
-For a continuous outcome, causal effects are estimated on the difference scale (summarized in table 3). For a categorical, count, or survival outcome, causal effects are estimated on the (risk or rate) ratio scale (summarized in table 4). Because of the existence of $L$, some causal effects in table 1 and table 2 are not identifiable. However, their randomized analogues are identifiable. See [VanderWeele et al. (2014)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4214081/) for details about randomized analogues of causal effects.
+For a continuous outcome, causal effects are estimated on the difference scale (summarized in table 3). For a categorical, count, or survival outcome, causal effects are estimated on the ratio scale (summarized in table 4). Because of the existence of $L$, some causal effects in table 1 and table 2 are not identifiable. However, their randomized analogues are identifiable. See [VanderWeele et al. (2014)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4214081/) for details about randomized analogues of causal effects.
 
 ```{r echo=F,warning=F,message=F}
 library(knitr)

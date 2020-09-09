@@ -373,20 +373,16 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       # design matrices for simulating mediator[p]
       mdesign_a <- cbind(mdesign_a, m_a[, p - 1, drop = FALSE])
       mdesign_astar <- cbind(mdesign_astar, m_astar[, p - 1, drop = FALSE])
-
       # predict mediator[p]
       type <- ifelse(is_multinom_mreg[p] | is_polr_mreg[p], "probs", "response")
       mpred_a <- predict(mreg[[p]], newdata = mdesign_a, type = type)
       mpred_astar <- predict(mreg[[p]], newdata = mdesign_astar, type = type)
-
       # categorical M
       if ((is_glm_mreg[p] && ((family_mreg[[p]]$family %in% c("binomial", "multinom")) |
                               startsWith(family_mreg[[p]]$family, "Ordered Categorical")))|
           is_multinom_mreg[p] | is_polr_mreg[p]) {
-
         prob_a <- as.matrix(mpred_a)
         prob_astar <- as.matrix(mpred_astar)
-
         if (dim(prob_a)[2] == 1) {
           # simulate mediator[p] for exposure=a
           msim_a <- rbinom(n, size = 1, prob = prob_a[, 1]) + 1
@@ -396,7 +392,6 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
           msim_a <- apply(prob_a, 1, FUN = function(x) apply(t(rmultinom(1, 1, prob = x)), 1, which.max))
           msim_astar <- apply(prob_astar, 1, FUN = function(x) apply(t(rmultinom(1, 1, prob = x)), 1, which.max))
         }
-
         m_lev <- levels(droplevels(as.factor(model.frame(mreg[[p]])[, mediator[p]])))
         # mid_a: simulated mediator[p] for exposure = a
         # mid_astar: simulated mediator[p] for exposure = astar
@@ -413,58 +408,45 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
           mid_a <- as.logical(m_lev[msim_a])
           mid_astar <- as.logical(m_lev[msim_astar])
         } else stop("The mediator[", p, "] variable should be numeric, logical, factor or character")
-
         rm(prob_a, prob_astar, msim_a, msim_astar, m_lev)
-
         # linear M
       } else if ((is_lm_mreg[p] | is_glm_mreg[p]) && family_mreg[[p]]$family == "gaussian") {
-
         error <- rnorm(n, mean = 0, sd = sigma(mreg[[p]]))
         mid_a <- mpred_a + error
         mid_astar <- mpred_astar + error
-
         rm(error)
-
         # gamma M
       } else if ((is_lm_mreg[p] | is_glm_mreg[p]) && family_mreg[[p]]$family == "Gamma") {
-
-        shape_mreg <- gamma.shape(mreg[[p]])$alpha
+        shape_mreg <- MASS::gamma.shape(mreg[[p]])$alpha
         mid_a <- rgamma(n, shape = shape_mreg, scale = mpred_a/shape_mreg)
         mid_astar <- rgamma(n, shape = shape_mreg, scale = mpred_astar/shape_mreg)
-
         rm(shape_mreg)
-
         # inverse gaussian M
       } else if ((is_lm_mreg[p] | is_glm_mreg[p]) && family_mreg[[p]]$family == "inverse.gaussian") {
-
         lambda <- 1/summary(mreg[[p]])$dispersion
         mid_a <- rinvGauss(n, nu = mpred_a, lambda = lambda)
         mid_astar <- rinvGauss(n, nu = mpred_astar, lambda = lambda)
-
         rm(lambda)
-
         # poisson M
       } else if ((is_lm_mreg[p] | is_glm_mreg[p]) && family_mreg[[p]]$family == "poisson") {
-
         mid_a <- rpois(n, lambda = mpred_a)
         mid_astar <- rpois(n, lambda = mpred_astar)
-
+        # quasipoisson M
+      } else if ((is_lm_mreg[p] | is_glm_mreg[p]) && family_mreg[[p]]$family == "quasipoisson") {
+        phi <- summary(mreg[[p]])$dispersion
+        mid_a <- rqpois(n, lambda = mpred_a, phi = phi)
+        mid_astar <- rqpois(n, lambda = mpred_astar, phi = phi)
+        rm(phi)
         # negative binomial M
-      } else if ((is_lm_mreg[p] | is_glm_mreg[p]) && startsWith(family_reg[[p]]$family, "Negative Binomial")) {
-
+      } else if ((is_lm_mreg[p] | is_glm_mreg[p]) && startsWith(family_mreg[[p]]$family, "Negative Binomial")) {
         theta <- summary(mreg[[p]])$theta
-        mid_a <- rnegbin(n, mu = mpred_a, theta = theta)
-        mid_astar <- rnegbin(n, mu = mpred_astar, theta = theta)
-
+        mid_a <- MASS::rnegbin(n, mu = mpred_a, theta = theta)
+        mid_astar <- MASS::rnegbin(n, mu = mpred_astar, theta = theta)
         rm(theta)
-
       } else stop(paste0("Unsupported mreg[[", p, "]]"))
-
       m_a[, p] <- mid_a
       m_astar[, p] <- mid_astar
-
     }
-
     rm(mdesign_a, mdesign_astar, type, mpred_a, mpred_astar, mid_a, mid_astar)
 
     # simulate mstar for cde

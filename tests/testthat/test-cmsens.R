@@ -1,7 +1,7 @@
 context("cmsens corrects causal effects correctly")
 
 test_that("sensitivity analysis for measurement error works correctly for binary Y and binary M", {
-  
+
   # a continuous variable measured with error
   set.seed(1)
   # data simulation
@@ -18,18 +18,18 @@ test_that("sensitivity analysis for measurement error works correctly for binary
   py <- expit(-3 + 0.8*A + 1.8*M + 0.5*A*M + 0.3*C1 - 0.6*C2)
   Y <- rbinom(n, 1, py)
   data <- data.frame(A, M, Y, C1, C1_error, C2)
-  
+
   # naive results
   res_binbin_naive <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
                       mediator = "M", basec = c("C1_error", "C2"), EMint = TRUE,
                       mreg = list("logistic"), yreg = "logistic",
                       astar = 0, a = 1, mval = list(1),
                       estimation = "paramfunc", inference = "delta")
-  
+
   # cmsens-corrected results
-  res_binbin_cmsens_rc <- cmsens(object = res_binbin_naive, sens = "me", MEmethod = "rc", 
+  res_binbin_cmsens_rc <- cmsens(object = res_binbin_naive, sens = "me", MEmethod = "rc",
                               MEvariable = "C1_error", MEvartype = "con", MEerror = 0.1)
-  res_binbin_cmsens_simex <- cmsens(object = res_binbin_naive, sens = "me", MEmethod = "simex", 
+  res_binbin_cmsens_simex <- cmsens(object = res_binbin_naive, sens = "me", MEmethod = "simex",
                                  MEvariable = "C1_error", MEvartype = "con", MEerror = 0.1)
 
   # reference results
@@ -76,10 +76,10 @@ test_that("sensitivity analysis for measurement error works correctly for binary
   pm_binbin <- (pnie_err_binbin+intmed_err_binbin)/total_err_binbin
   int_binbin <- (intref_err_binbin+intmed_err_binbin)/total_err_binbin
   pe_binbin <- (intref_err_binbin+intmed_err_binbin+pnie_err_binbin)/total_err_binbin
-  
+
   ref <- c(cde_binbin, pnde_binbin, tnde_binbin, pnie_binbin, tnie_binbin, te_binbin, cde_err_binbin,
-           intref_err_binbin, intmed_err_binbin, pnie_err_binbin, cde_err_prop_binbin, 
-           intref_err_prop_binbin, intmed_err_prop_binbin, pnie_err_prop_binbin, 
+           intref_err_binbin, intmed_err_binbin, pnie_err_binbin, cde_err_prop_binbin,
+           intref_err_prop_binbin, intmed_err_prop_binbin, pnie_err_prop_binbin,
            pm_binbin, int_binbin, pe_binbin)
   # test
   expect_equal(summary(res_binbin_cmsens_rc)$summarydf[[1]]$Estimate, ref, tolerance = 0.1)
@@ -90,7 +90,7 @@ test_that("sensitivity analysis for measurement error works correctly for binary
   expect_equal(print(res_binbin_cmsens_simex), NULL)
   expect_equal(print(summary(res_binbin_cmsens_rc)), NULL)
   expect_equal(print(summary(res_binbin_cmsens_simex)), NULL)
-  
+
   # a categorical variable measured with error
   set.seed(1)
   # data simulation
@@ -112,18 +112,18 @@ test_that("sensitivity analysis for measurement error works correctly for binary
   py <- expit(-3 + 0.8*A + 1.8*M + 0.5*A*M + 0.3*C1 - 0.6*C2)
   Y <- rbinom(n, 1, py)
   data <- data.frame(A, M, Y, C1, C2, C2_error)
-  
+
   # naive results
   res_binbin_naive <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
                             mediator = "M", basec = c("C1", "C2_error"), EMint = TRUE,
                             mreg = list("logistic"), yreg = "logistic",
                             astar = 0, a = 1, mval = list(1),
                             estimation = "paramfunc", inference = "delta")
-  
+
   # cmsens-corrected results
-  res_binbin_cmsens_simex <- cmsens(object = res_binbin_naive, sens = "me", MEmethod = "simex", 
+  res_binbin_cmsens_simex <- cmsens(object = res_binbin_naive, sens = "me", MEmethod = "simex",
                                     MEvariable = "C2_error", MEvartype = "cat", MEerror = list(MEerror))
-  
+
   # reference results
   yreg <- glm(Y ~ A*M + C1 + C2, family = binomial, data = data)
   mreg <- glm(M ~ A + C1 + C2, family = binomial, data = data)
@@ -168,20 +168,20 @@ test_that("sensitivity analysis for measurement error works correctly for binary
   pm_binbin <- (pnie_err_binbin+intmed_err_binbin)/total_err_binbin
   int_binbin <- (intref_err_binbin+intmed_err_binbin)/total_err_binbin
   pe_binbin <- (intref_err_binbin+intmed_err_binbin+pnie_err_binbin)/total_err_binbin
-  
+
   ref <- c(cde_binbin, pnde_binbin, tnde_binbin, pnie_binbin, tnie_binbin, te_binbin, cde_err_binbin,
-           intref_err_binbin, intmed_err_binbin, pnie_err_binbin, cde_err_prop_binbin, 
-           intref_err_prop_binbin, intmed_err_prop_binbin, pnie_err_prop_binbin, 
+           intref_err_binbin, intmed_err_binbin, pnie_err_binbin, cde_err_prop_binbin,
+           intref_err_prop_binbin, intmed_err_prop_binbin, pnie_err_prop_binbin,
            pm_binbin, int_binbin, pe_binbin)
   # test
   expect_equal(summary(res_binbin_cmsens_simex)$summarydf[[1]]$Estimate, ref, tolerance = 0.1)
   expect_equal(class(ggcmsens(res_binbin_cmsens_simex)), c("gg", "ggplot"))
   expect_equal(print(res_binbin_cmsens_simex), NULL)
-  
+
 })
 
 test_that("sensitivity analysis for unmeasured confounding works correctly for binary Y and binary M", {
-  
+
   set.seed(1)
   # data simulation
   expit <- function(x) exp(x)/(1+exp(x))
@@ -197,17 +197,17 @@ test_that("sensitivity analysis for unmeasured confounding works correctly for b
   py <- expit(-3 + 0.8*A + 1.8*M + 0.5*A*M + 0.3*C1 - 0.6*C2)
   Y <- rbinom(n, 1, py)
   data <- data.frame(A, M, Y, C1, C1_error, C2)
-  
+
   # naive results
   res_binbin_naive <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
                             mediator = "M", basec = c("C1_error", "C2"), EMint = TRUE,
                             mreg = list("logistic"), yreg = "logistic",
                             astar = 0, a = 1, mval = list(1),
                             estimation = "paramfunc", inference = "delta")
-  
+
   # cmsens results
   res_binbin_cmsens_uc <- cmsens(object = res_binbin_naive, sens = "uc")
-  
+
   # evalue
   effect.pe <- res_binbin_naive$effect.pe[1:6]
   ci.lo <- res_binbin_naive$effect.ci.low[1:6]
@@ -216,14 +216,14 @@ test_that("sensitivity analysis for unmeasured confounding works correctly for b
   for (i in 1:6) {
     evalues <- rbind(evalues, evalues.RR(est = effect.pe[i], lo = ci.lo[i], hi = ci.up[i])[2, ])
   }
-  
+
   # test
   expect_equal(as.vector(res_binbin_cmsens_uc$evalues[,4:6]), as.vector(evalues))
-  
+
 })
 
 test_that("sensitivity analysis for unmeasured confounding works correctly for continuous Y and binary M", {
-  
+
   set.seed(1)
   # data simulation
   expit <- function(x) exp(x)/(1+exp(x))
@@ -236,17 +236,17 @@ test_that("sensitivity analysis for unmeasured confounding works correctly for c
   M <- rbinom(n, 1, pm)
   Y <- rnorm(n, -1 + 0.8*A + 0.5*M + 0.5*A*M + 0.3*C1 - 0.6*C2, 1)
   data <- data.frame(A, M, Y, C1, C2)
-  
+
   # naive results
   res_contbin_naive <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
                                       mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                                       mreg = list("logistic"), yreg = "linear",
                                       astar = 0, a = 1, mval = list(1),
                                       estimation = "paramfunc", inference = "delta")
-  
+
   # cmsens results
   res_contbin_cmsens_uc <- cmsens(object = res_contbin_naive, sens = "uc")
-  
+
   # evalue
   effect.pe <- res_contbin_naive$effect.pe[1:6]
   effect.se <- res_contbin_naive$effect.se[1:6]
@@ -260,8 +260,8 @@ test_that("sensitivity analysis for unmeasured confounding works correctly for c
     evalues <- rbind(evalues, EValue::evalues.RR(est = exp(0.91 * d[i]), lo = exp(0.91 * d[i] - 1.78 * sd[i]),
                               hi = exp(0.91 * d[i] + 1.78 * sd[i]))[2, ])
   }
-  
+
   # test
   expect_equal(as.vector(res_contbin_cmsens_uc$evalues[,4:6]), as.vector(evalues))
-  # expect_equal(class(print(res_contbin_cmsens_uc)), "matrix")
+
 })

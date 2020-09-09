@@ -51,6 +51,53 @@ estinf <- function() {
     }
   }
   
+  # restrict classes and families of regression objects
+  if (!(((is_lm_yreg | is_glm_yreg) && 
+         (family_yreg$family %in% 
+          c("gaussian", "inverse.gaussian", "quasi", "poisson", "quasipoisson", 
+            "Gamma", "binomial", "quasibinomial", "multinom", "ziplss") |
+          startsWith(family_yreg$family, "Negative Binomial") |
+          startsWith(family_yreg$family, "Zero inflated Poisson") |
+          startsWith(family_yreg$family, "Ordered Categorical"))) |
+        is_multinom_yreg | is_polr_yreg | is_survreg_yreg | is_coxph_yreg |
+        inference == "delta")) stop("Unsupported yreg")
+  if (!is.null(ereg) && !(
+        (((is_lm_ereg | is_glm_ereg) && 
+          (family_ereg$family %in% c("binomial", "quasibinomial", "multinom") |
+           startsWith(family_ereg$family, "Ordered Categorical"))) |
+         is_multinom_ereg | is_polr_ereg))) stop("Unsupported ereg")
+  if (!is.null(mreg) && inference == "bootstrap") {
+    for (p in 1:length(mreg)) {
+      if (!((((is_lm_mreg[[p]] | is_glm_mreg[[p]]) && 
+              (family_mreg[[p]]$family %in% 
+               c("gaussian", "inverse.gaussian", "poisson", "quasipoisson", 
+                 "Gamma", "binomial", "multinom") |
+               startsWith(family_mreg[[p]]$family, "Negative Binomial") |
+               startsWith(family_mreg[[p]]$family, "Ordered Categorical"))) |
+             is_multinom_mreg[[p]] | is_polr_mreg[[p]]))) stop(paste0("Unsupported mreg[[", p, "]]"))
+    }
+  }
+  if (!is.null(wmreg)) {
+    for (p in 1:length(wmreg)) {
+      if (!((((is_lm_wmreg[[p]] | is_glm_wmreg[[p]]) && 
+              (family_wmreg[[p]]$family %in% 
+               c("binomial", "quasibinomial", "multinom") |
+               startsWith(family_wmreg[[p]]$family, "Ordered Categorical"))) |
+             is_multinom_wmreg[[p]] | is_polr_wmreg[[p]]))) stop(paste0("Unsupported wmreg[[", p, "]]"))
+    }
+  }
+  if (!is.null(postcreg)) {
+    for (p in 1:length(postcreg)) {
+      if (!((((is_lm_postcreg[[p]] | is_glm_postcreg[[p]]) && 
+              (family_postcreg[[p]]$family %in% 
+               c("gaussian", "inverse.gaussian", "poisson", "quasipoisson", 
+                 "Gamma", "binomial", "multinom") |
+               startsWith(family_postcreg[[p]]$family, "Negative Binomial") |
+               startsWith(family_postcreg[[p]]$family, "Ordered Categorical"))) |
+             is_multinom_postcreg[[p]] | is_polr_postcreg[[p]]))) stop(paste0("Unsupported postcreg[[", p, "]]"))
+    }
+  }
+  
   # reference values of the exposure
   if (is.factor(data[, exposure]) | is.character(data[, exposure])) {
     a_lev <- levels(as.factor(data[, exposure]))
@@ -107,7 +154,7 @@ estinf <- function() {
     
     out$ref$mval <- mval
     
-    if(estimation == "paramfunc") {
+    if (estimation == "paramfunc") {
       
       # create a list of covariate values to calculate conditional causal effects
       if (length(basec) != 0) {
@@ -127,7 +174,7 @@ estinf <- function() {
               c_data[, basec[i]] <- factor(c_data[, basec[i]], levels = c_lev)
               # set basecval[[i]] to be the mean values of dummy variables
               basecval[[i]] <- unname(colMeans(as.matrix(model.matrix(as.formula(paste0("~", basec[i])),
-                                                                     data = c_data)[, -1]), na.rm = TRUE))
+                                                                      data = c_data)[, -1]), na.rm = TRUE))
               rm(c_data)
             } else basecval[[i]] <- as.numeric(c_lev == basecval[[i]])[-1]
             rm(c_lev)
@@ -221,7 +268,7 @@ estinf <- function() {
         # standard errors by the delta method
         se_imp <- do.call(rbind, lapply(1:m, function(x)
           inf.delta(data = data_imp[[x]], yreg = est_imp[[x]]$reg.output$yreg,
-                      mreg = est_imp[[x]]$reg.output$mreg[[1]])))
+                    mreg = est_imp[[x]]$reg.output$mreg[[1]])))
         # pool the results by Rubin's rule
         var_within <- colMeans(se_imp ^ 2)
         var_between <- colSums((est_imp_df - t(replicate(m, effect.pe)))^2)/(m - 1)
@@ -409,10 +456,10 @@ estinf <- function() {
     if (is.null(yreg)) stop("yreg is required")
     if (length(basec) != 0 && is.null(ereg)) stop("ereg is required for model = 'wb' when length(basec) != 0")
     if (length(basec) != 0 && (!((is_glm_ereg && (family_ereg$family %in% c("binomial", "quasibinomial", "multinom") |
-                                                 startsWith(family_ereg$family, "Ordered Categorical"))) |
-                                is_multinom_ereg | is_polr_ereg))) stop(
-                                  "model = 'wb' only supports categorical exposure when length(basec) != 0")
-    
+                                                  startsWith(family_ereg$family, "Ordered Categorical"))) |
+                                 is_multinom_ereg | is_polr_ereg))) stop(
+                                   "model = 'wb' only supports categorical exposure when length(basec) != 0")
+    if (is_survreg_yreg | is_coxph_yreg) stop("model = 'wb' doesn't support survival outcomes")
     out$ref$mval <- mval
     
     environment(est.wb) <- environment()
@@ -529,7 +576,7 @@ estinf <- function() {
       
       # bootstrap results
       boots <- boot(data = data, statistic = est.iorw, R = nboot, outReg = FALSE,
-                          full = full)
+                    full = full)
       # bootstrap percentile CIs
       effect.ci.low <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = (1 - 0.95)/2, na.rm = TRUE))
       effect.ci.high <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 1 - (1 - 0.95)/2, na.rm = TRUE))
@@ -614,14 +661,20 @@ estinf <- function() {
     if (is.null(yreg)) stop("yreg is required")
     if (length(basec) != 0 && is.null(ereg)) stop("ereg is required for model = 'msm' when length(basec) != 0")
     if (length(basec) != 0 && (!((is_glm_ereg && (family_ereg$family %in% c("binomial", "quasibinomial", "multinom") |
-                                                 startsWith(family_ereg$family, "Ordered Categorical"))) |
-                                is_multinom_ereg | is_polr_ereg))) stop(
-                                  "model = 'msm' only supports categorical exposure when length(basec) != 0")
+                                                  startsWith(family_ereg$family, "Ordered Categorical"))) |
+                                 is_multinom_ereg | is_polr_ereg))) stop(
+                                   "model = 'msm' only supports categorical exposure when length(basec) != 0")
     # a regression is required for each mediator
     if (is.null(mreg)) stop("mreg is required for model = 'msm'")
     if (!is.list(mreg)) stop("mreg should be a list")
     if (length(mreg) != length(mediator)) stop("length(mreg) != length(mediator)")
-    for (p in 1:length(mediator)) if (is.null(mreg[[p]])) stop(paste0("Unspecified mreg[[", p, "]]"))
+    for (p in 1:length(mediator)) {
+      if (is.null(mreg[[p]])) stop(paste0("Unspecified mreg[[", p, "]]"))
+      if (!((is_glm_mreg[p] && (family_mreg[[p]]$family %in% c("binomial", "multinom") |
+                                 startsWith(family_mreg[[p]]$family, "Ordered Categorical"))) |
+            is_multinom_mreg[p] | is_polr_mreg[p])) stop(
+              "model = 'msm' only supports categorical mediators")
+    }
     # a regression for calculating weights is required for each mediator
     if (is.null(wmreg)) stop("wmreg is required for model = 'msm'")
     if (!is.list(wmreg)) stop("wmreg should be a list")
@@ -845,9 +898,14 @@ estinf <- function() {
 
 
 boot.pval <- function(boots, pe){
-  
   if (pe == 0) out <- 1
   if (pe != 0) out <- 2 * min(sum(boots > 0), sum(boots < 0)) / length(boots)
-  out
-  
+  return(out)
 }
+
+
+rqpois = function(n, lambda, phi) {
+  r = stats::rnbinom(n, mu = lambda, size = lambda/(phi-1))
+  return(r)
+}
+

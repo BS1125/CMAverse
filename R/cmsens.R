@@ -5,7 +5,7 @@
 #' sensitivity analysis for measurement error via \emph{regression calibration} by Carroll 
 #' et al. (1995) and \emph{SIMEX} by Cook et al. (1994) and Küchenhoff et al. (2006).
 #'
-#' @param object an object of class \code{cmest}.
+#' @param object an object of class \code{cmsens}.
 #' @param sens sensitivity analysis for unmeasured confounding or measurement error. 
 #' \code{uc} represents unmeasured confounding and \code{me} represents measurement error.
 #' See \code{Details}.
@@ -37,12 +37,12 @@
 #' with error.
 #' 
 #' @return
-#' If \code{sens} is \code{uc}, an object of class 'cmest.uc' is returned:
+#' If \code{sens} is \code{uc}, an object of class 'cmsens.uc' is returned:
 #' \item{call}{the function call,}
 #' \item{evalues}{the data frame in which the first three columns are the point estimates, 
 #' lower limits of confidence intervals, upper limits of confidence intervals of causal effects on 
 #' the ratio scale and the last three columns are the E-values on the ratio scale for them,}
-#' If \code{sens} is \code{me}, an object of class 'cmest.me' is returned:
+#' If \code{sens} is \code{me}, an object of class 'cmsens.me' is returned:
 #' \item{call}{the function call,}
 #' \item{ME}{a list which might contain MEvariable, MEvartype, MEerror, reliability ratio, lambda and B,}
 #' \item{naive}{naive causal mediation analysis results}
@@ -313,7 +313,7 @@ cmsens <- function(object = NULL, sens = "uc", MEmethod = "simex",
   
 }
 
-#' @describeIn cmest Print the results of cmsens.uc nicely
+#' @describeIn cmsens Print the results of cmsens.uc nicely
 #' @export
 print.cmsens.uc <- function(x, ...) {
   cat("Sensitivity Analysis For Unmeasured Confounding \n")
@@ -321,7 +321,7 @@ print.cmsens.uc <- function(x, ...) {
   print(x$evalues)
 }
 
-#' @describeIn cmest Print the results of cmsens.me nicely
+#' @describeIn cmsens Print the results of cmsens.me nicely
 #' @export
 print.cmsens.me <- function(x, ...) {
   cat("Sensitivity Analysis For Measurement Error \n \n")

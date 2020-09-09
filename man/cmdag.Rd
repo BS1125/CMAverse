@@ -2,7 +2,7 @@
 % Please edit documentation in R/cmdag.R
 \name{cmdag}
 \alias{cmdag}
-\title{DAG For Causal Mediation Analysis}
+\title{DAG Visualization}
 \usage{
 cmdag(
   outcome = NULL,
@@ -30,32 +30,34 @@ cmdag(
 
 \item{exposure}{the variable name of the exposure}
 
-\item{mediator}{a character or vector of variable name(s) of the mediator(s)}
+\item{mediator}{a vector of variable name(s) of the mediator(s)}
 
-\item{basec}{(optional) a character or vector of variable name(s) of the baseline confounder(s)}
+\item{basec}{(optional) a vector of variable name(s) of the exposure-outcome
+confounder(s), exposure-mediator confounder(s) and mediator-outcome 
+confounder(s) not affected by the exposure}
 
-\item{postc}{(optional) a character or vector of variable name(s) of the post-exposure 
+\item{postc}{(optional) a vector of variable name(s) of the mediator-outcome 
 confounder(s) affected by the exposure}
 
-\item{x.outcome}{x coordinate of the outcome. Default is \code{4}.}
+\item{x.outcome}{x coordinate of \code{outcome}. Default is \code{4}.}
 
-\item{x.exposure}{x coordinate of the exposure. Default is \code{0}.}
+\item{x.exposure}{x coordinate of \code{exposure}. Default is \code{0}.}
 
-\item{x.mediator}{x coordinate of the mediator. Default is \code{2}.}
+\item{x.mediator}{x coordinate of \code{mediator}. Default is \code{2}.}
 
-\item{x.basec}{x coordinate of the pre-exposure confounder. Default is \code{2}.}
+\item{x.basec}{x coordinate of \code{basec}. Default is \code{2}.}
 
-\item{x.postc}{x coordinate of the post-exposure confounder. Default is \code{2}.}
+\item{x.postc}{x coordinate of \code{postc}. Default is \code{2}.}
 
-\item{y.outcome}{y coordinate of the outcome. Default is \code{0}.}
+\item{y.outcome}{y coordinate of \code{outcome}. Default is \code{0}.}
 
-\item{y.exposure}{y coordinate of the exposure. Default is \code{0}.}
+\item{y.exposure}{y coordinate of \code{exposure}. Default is \code{0}.}
 
-\item{y.mediator}{y coordinate of the mediator. Default is \code{1}.}
+\item{y.mediator}{y coordinate of \code{mediator}. Default is \code{1}.}
 
-\item{y.basec}{y coordinate of the baseline confounder. Default is \code{2}.}
+\item{y.basec}{y coordinate of \code{basec}. Default is \code{2}.}
 
-\item{y.postc}{y coordinate of the post-exposure confounder. Default is \code{-0.5}.}
+\item{y.postc}{y coordinate of \code{postc}. Default is \code{-0.5}.}
 
 \item{caption.width}{line width in characters for the caption. Default is \code{50}.}
 
@@ -67,11 +69,12 @@ confounder(s) affected by the exposure}
 Plot the directed acyclic graph (DAG) for causal mediation analysis.
 }
 \examples{
+
 ## basec and postc are empty
 cmdag(outcome = "Y", exposure = "A", mediator = c("M1", "M2"),
      basec = NULL, postc = NULL, node = TRUE, text_col = "white")
 
-#' ## postc is empty
+## postc is empty
 cmdag(outcome = "Y", exposure = "A", mediator = c("M1", "M2"),
      basec = c("C1", "C2", "C3"), postc = NULL, node = FALSE, text_col = "black")
      

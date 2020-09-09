@@ -1,15 +1,16 @@
 #' Causal Mediation Analysis
 #'
-#' \code{cmest} is used to conduct causal mediation analysis via six statistical approaches 
+#' \code{cmest} is used to implement six statistical approaches for causal mediation analysis
 #' including \emph{the regression-based approach} by Valeri et al. (2013) and VanderWeele 
 #' et al. (2014), \emph{the weighting-based approach} by VanderWeele et al. (2014), 
 #' \emph{the inverse odd-ratio weighting approach} by Tchetgen Tchetgen (2013), 
 #' \emph{the natural effect model} by Vansteelandt et al. (2012), \emph{the marginal structural 
 #' model} by VanderWeele et al. (2017), and \emph{the g-formula approach} by Lin et al. (2017).
 #'
-#' @param data dataset for causal mediation analysis.
-#' @param model causal mediation analysis approach. "\code{rb}", "\code{wb}", "\code{iorw}", 
-#' "\code{ne}", "\code{msm}", "\code{gformula}" are implemented. See \code{Details}.
+#' @param data dataset
+#' @param model causal mediation analysis approach. \code{rb}, \code{wb}, \code{iorw}, 
+#' \code{ne}, \code{msm} and \code{gformula} are implemented. Default is \code{rb}. 
+#' See \code{Details}.
 #' @param full a logical value. If \code{TRUE}, output a full list of causal effects; if 
 #' \code{FALSE}, output a reduced list of causal effects. Default is \code{TRUE}. See 
 #' \code{Details}.
@@ -19,12 +20,12 @@
 #' @param yrare a logical value (used when \code{casecontrol} is \code{TRUE}). \code{TRUE} 
 #' indicates the case is rare.
 #' @param yprevalence the prevalence of the case (used when \code{casecontrol} is \code{TRUE}).
-#' @param estimation estimation method for causal effects. \code{paramfunc} and 
+#' @param estimation method for estimating causal effects. \code{paramfunc} and 
 #' \code{imputation} are implemented (the first 4 letters are enough). Default is \code{imputation}. 
 #' See \code{Details}. 
-#' @param inference inference method for causal effects. \code{delta} and \code{bootstrap} are 
-#' implemented (the first 4 letters are enough). Default is \code{bootstrap}. See 
-#' \code{Details}.
+#' @param inference method for estimating standard errors of causal effects. \code{delta} and 
+#' \code{bootstrap} are implemented (the first 4 letters are enough). Default is \code{bootstrap}. 
+#' See \code{Details}.
 #' @param outcome variable name of the outcome.
 #' @param event variable name of the event (used when \code{yreg} is \code{coxph}, \code{aft_exp},
 #' or \code{aft_weibull}).
@@ -389,7 +390,7 @@
 #' model.matrix getCall quantile qnorm pnorm lm cov formula update
 #' @importFrom nnet multinom
 #' @importFrom MASS polr glm.nb gamma.shape rnegbin
-#' @importFrom survival survreg coxph
+#' @importFrom survival survreg coxph Surv
 #' @importFrom survey svyglm svydesign svysurvreg svycoxph as.svrepdesign withReplicates
 #' @importFrom utils txtProgressBar setTxtProgressBar
 #' @importFrom EValue evalues.RR
@@ -406,7 +407,7 @@
 #'
 #' @export
 
-cmest <- function(data = NULL, model = NULL,
+cmest <- function(data = NULL, model = "rb",
                   full = TRUE, casecontrol = FALSE, yrare = NULL, yprevalence = NULL,
                   estimation = "imputation", inference = "bootstrap",
                   outcome = NULL, event = NULL,
@@ -501,6 +502,10 @@ cmest <- function(data = NULL, model = NULL,
   if (!(model == "rb" && estimation == "paramfunc" && length(basec) != 0) && !is.null(basecval)) warning("basecval is ignored")
   
   # estimation and inference
+  if (estimation == "para") estimation <- "paramfunc"
+  if (estimation == "impu") estimation <- "imputation"
+  if (inference == "delt") inference <- "delta"
+  if (inference == "boot") inference <- "bootstrap"
   if (model == "rb" && !estimation %in% c("paramfunc", "imputation")) stop("When model = 'rb', select estimation from 'paramfunc', 'imputation'")
   if (model != "rb" && !estimation == "imputation") stop("Use estimation = 'imputation'")
   if (estimation == "paramfunc") {
@@ -550,7 +555,7 @@ cmest <- function(data = NULL, model = NULL,
              logistic = ereg <- eval(bquote(glm(.(as.formula(exposure_formula)), family = binomial(), data = .(data)))),
              loglinear = ereg <- eval(bquote(glm(.(as.formula(exposure_formula)), family = poisson(), data = .(data)))),
              multinomial = ereg <- eval(bquote(nnet::multinom(.(as.formula(exposure_formula)), data = .(data), trace = FALSE))),
-             ordinal = ereg <- eval(bquote(polr(.(as.formula(exposure_formula)), data = .(data)))))
+             ordinal = ereg <- eval(bquote(MASS::polr(.(as.formula(exposure_formula)), data = .(data)))))
     }
   } else {
     if (!is.null(ereg)) warning("ereg is ignored when model is 'wb' or 'msm' with length(basec) = 0 or model is 'rb', 'ne' or 'gformula'")
@@ -575,7 +580,7 @@ cmest <- function(data = NULL, model = NULL,
                logistic = wmreg[[p]] <- eval(bquote(glm(.(as.formula(wmreg_formula)), family = binomial(), data = .(data)))),
                loglinear = wmreg[[p]] <- eval(bquote(glm(.(as.formula(wmreg_formula)), family = poisson(), data = .(data)))),
                multinomial = wmreg[[p]] <- eval(bquote(nnet::multinom(.(as.formula(wmreg_formula)), data = .(data), trace = FALSE))),
-               ordinal = wmreg[[p]] <- eval(bquote(polr(.(as.formula(wmreg_formula)), data = .(data)))))
+               ordinal = wmreg[[p]] <- eval(bquote(MASS::polr(.(as.formula(wmreg_formula)), data = .(data)))))
       }
     }
   } else {
@@ -613,9 +618,9 @@ cmest <- function(data = NULL, model = NULL,
                loglinear = mreg[[p]] <- eval(bquote(glm(.(as.formula(mediator_formula)), family = poisson(), data = .(data)))),
                poisson = mreg[[p]]  <- eval(bquote(glm(.(as.formula(mediator_formula)), family = poisson(), data = .(data)))),
                quasipoisson = mreg[[p]] <- eval(bquote(glm(.(as.formula(mediator_formula)), family = quasipoisson(), data = .(data)))),
-               negbin = mreg[[p]] <- eval(bquote(glm.nb(.(as.formula(mediator_formula)), data = .(data)))),
+               negbin = mreg[[p]] <- eval(bquote(MASS::glm.nb(.(as.formula(mediator_formula)), data = .(data)))),
                multinomial = mreg[[p]] <- eval(bquote(nnet::multinom(.(as.formula(mediator_formula)), data = .(data), trace = FALSE))),
-               ordinal = mreg[[p]] <- eval(bquote(polr(.(as.formula(mediator_formula)), data = .(data)))))
+               ordinal = mreg[[p]] <- eval(bquote(MASS::polr(.(as.formula(mediator_formula)), data = .(data)))))
       }
     }
   } else {
@@ -645,9 +650,9 @@ cmest <- function(data = NULL, model = NULL,
                loglinear = postcreg[[p]] <- eval(bquote(glm(.(as.formula(postc_formula)), family = poisson(), data = .(data)))),
                poisson = postcreg[[p]]  <- eval(bquote(glm(.(as.formula(postc_formula)), family = poisson(), data = .(data)))),
                quasipoisson = postcreg[[p]] <- eval(bquote(glm(.(as.formula(postc_formula)), family = quasipoisson(), data = .(data)))),
-               negbin = postcreg[[p]] <- eval(bquote(glm.nb(.(as.formula(postc_formula)), data = .(data)))),
+               negbin = postcreg[[p]] <- eval(bquote(MASS::glm.nb(.(as.formula(postc_formula)), data = .(data)))),
                multinomial = postcreg[[p]] <- eval(bquote(nnet::multinom(.(as.formula(postc_formula)), data = .(data), trace = FALSE))),
-               ordinal = postcreg[[p]] <- eval(bquote(polr(.(as.formula(postc_formula)), data = .(data)))))
+               ordinal = postcreg[[p]] <- eval(bquote(MASS::polr(.(as.formula(postc_formula)), data = .(data)))))
       }
     }
   } else {
@@ -704,17 +709,17 @@ cmest <- function(data = NULL, model = NULL,
                                               family = poisson(), data = .(data)))),
            quasipoisson = yreg <- eval(bquote(glm(formula = .(as.formula(outcome_formula)),
                                                   family = quasipoisson(), data = .(data)))),
-           negbin = yreg <- eval(bquote(glm.nb(formula = .(as.formula(outcome_formula)),
+           negbin = yreg <- eval(bquote(MASS::glm.nb(formula = .(as.formula(outcome_formula)),
                                                data = .(data)))),
            multinomial = yreg <- eval(bquote(nnet::multinom(formula = .(as.formula(outcome_formula)),
                                                             data = .(data), trace = FALSE))),
-           ordinal = yreg <- eval(bquote(polr(formula = .(as.formula(outcome_formula)),
+           ordinal = yreg <- eval(bquote(MASS::polr(formula = .(as.formula(outcome_formula)),
                                               data = .(data)))),
-           coxph = yreg <- eval(bquote(coxph(formula = .(as.formula(outcome_formula)),
+           coxph = yreg <- eval(bquote(survival::coxph(formula = .(as.formula(outcome_formula)),
                                              data = .(data)))),
-           aft_exp = yreg <- eval(bquote(survreg(formula = .(as.formula(outcome_formula)),
+           aft_exp = yreg <- eval(bquote(survival::survreg(formula = .(as.formula(outcome_formula)),
                                                  dist = "exponential", data = .(data)))),
-           aft_weibull = yreg <- eval(bquote(survreg(formula = .(as.formula(outcome_formula)),
+           aft_weibull = yreg <- eval(bquote(survival::survreg(formula = .(as.formula(outcome_formula)),
                                                      dist = "weibull", data = .(data)))))
   }
   

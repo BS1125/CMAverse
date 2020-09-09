@@ -16,8 +16,8 @@ est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     w4casecon <- ifelse(data[, outcome] == y_case, yprevalence / prob1, (1 - yprevalence) / (1 - prob1))
 
     # weights for ereg
-    if (!is.null(weights_ereg)) weights_ereg <- weights_ereg[indices] * w4casecon
-    if (is.null(weights_ereg)) weights_ereg <- w4casecon
+    if (!is.null(weights_ereg)) weights_ereg <- as.vector(weights_ereg[indices] * w4casecon)
+    if (is.null(weights_ereg)) weights_ereg <- as.vector(w4casecon)
     # update ereg
     call_ereg$weights <- weights_ereg
     call_ereg$data <- data
@@ -41,15 +41,15 @@ est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     rm(weights_ereg, wadenom_prob, a_lev, wa_data, category, wanom, wadenom)
 
     # weights for yreg
-    if (!is.null(weights_yreg)) weights_yreg <- weights_yreg[indices] * w4casecon
-    if (is.null(weights_yreg)) weights_yreg <- w4casecon
+    if (!is.null(weights_yreg)) weights_yreg <- as.vector(weights_yreg[indices] * w4casecon)
+    if (is.null(weights_yreg)) weights_yreg <- as.vector(w4casecon)
     # update yreg
     call_yreg_tot <- call_yreg
     call_yreg_tot$weights <- weights_yreg
     call_yreg_tot$data <- data
     yreg_tot <- eval.parent(call_yreg_tot)
     call_yreg_dir <- call_yreg
-    call_yreg_dir$weights <- weights_yreg * wa
+    call_yreg_dir$weights <- as.vector(weights_yreg * wa)
     call_yreg_dir$data <- data
     yreg_dir <- eval.parent(call_yreg_dir)
 
@@ -62,7 +62,7 @@ est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     control_indices <- which(data[, outcome] == y_control)
 
     # update ereg
-    call_ereg$weights <- weights_ereg[indices][control_indices]
+    call_ereg$weights <- as.vector(weights_ereg[indices][control_indices])
     call_ereg$data <- data[control_indices, ]
     ereg <- eval.parent(call_ereg)
     # calculate w_{a,i}=P(A=0|M_i,C_i)/P(A=A_i|M_i,C_i)
@@ -85,12 +85,12 @@ est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
 
     # update yreg
     call_yreg_tot <- call_yreg
-    call_yreg_tot$weights <- weights_yreg[indices]
+    call_yreg_tot$weights <- as.vector(weights_yreg[indices])
     call_yreg_tot$data <- data
     yreg_tot <- eval.parent(call_yreg_tot)
     call_yreg_dir <- call_yreg
-    if (!is.null(weights_yreg)) call_yreg_dir$weights <- weights_yreg[indices] * wa
-    if (is.null(weights_yreg)) call_yreg_dir$weights <- wa
+    if (!is.null(weights_yreg)) call_yreg_dir$weights <- as.vector(weights_yreg[indices] * wa)
+    if (is.null(weights_yreg)) call_yreg_dir$weights <- as.vector(wa)
     call_yreg_dir$data <- data
     yreg_dir <- eval.parent(call_yreg_dir)
 
@@ -100,7 +100,7 @@ est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
 
     # not a case control design
     # update ereg
-    call_ereg$weights <- weights_ereg[indices]
+    call_ereg$weights <- as.vector(weights_ereg[indices])
     call_ereg$data <- data
     ereg <- eval.parent(call_ereg)
     # calculate w_{a,i}=P(A=0|M_i,C_i)/P(A=A_i|M_i,C_i)
@@ -123,12 +123,12 @@ est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
 
     # update yreg
     call_yreg_tot <- call_yreg
-    call_yreg_tot$weights <- weights_yreg[indices]
+    call_yreg_tot$weights <- as.vector(weights_yreg[indices])
     call_yreg_tot$data <- data
     yreg_tot <- eval.parent(call_yreg_tot)
     call_yreg_dir <- call_yreg
-    if (!is.null(weights_yreg)) call_yreg_dir$weights <- weights_yreg[indices] * wa
-    if (is.null(weights_yreg)) call_yreg_dir$weights <- wa
+    if (!is.null(weights_yreg)) call_yreg_dir$weights <- as.vector(weights_yreg[indices] * wa)
+    if (is.null(weights_yreg)) call_yreg_dir$weights <- as.vector(wa)
     call_yreg_dir$data <- data
     yreg_dir <- eval.parent(call_yreg_dir)
 
@@ -218,10 +218,7 @@ est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
 
   # output causal effects in additive scale for continuous Y
   if ((is_lm_yreg | is_glm_yreg) &&
-      (family_yreg$family %in% c("gaussian", "inverse.gaussian", "Gamma", "quasi", "gaulss", "gevlss") |
-       startsWith(family_yreg$family, "Tweedie") |
-       startsWith(family_yreg$family, "Beta regression") |
-       startsWith(family_yreg$family, "Scaled t"))) {
+      (family_yreg$family %in% c("gaussian", "inverse.gaussian", "Gamma", "quasi"))) {
 
     tot <- EYtot1 - EYtot0
     dir <- EYdir1 - EYdir0
