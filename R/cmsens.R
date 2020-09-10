@@ -173,7 +173,7 @@ cmsens <- function(object = NULL, sens = "uc", MEmethod = "simex",
       sd <- unname(effect.se / outcome.se)
       for (i in out.index) {
         evalues_mid <- evalues.RR(est = exp(0.91 * d[i]), lo = exp(0.91 * d[i] - 1.78 * sd[i]),
-                                          hi = exp(0.91 * d[i] + 1.78 * sd[i]))
+                                  hi = exp(0.91 * d[i] + 1.78 * sd[i]))
         evalues_mid <- c(evalues_mid[1, ], evalues_mid[2, ])
         names(evalues_mid) <- c("estRR", "lowerRR", "upperRR", "Evalue.estRR", "Evalue.lowerRR", "Evalue.upperRR")
         evalues <- rbind(evalues, evalues_mid)
@@ -219,12 +219,12 @@ cmsens <- function(object = NULL, sens = "uc", MEmethod = "simex",
     out$naive <- object
     
     n <- nrow(data)
-    estimation <- object$methods$estimation
-    inference <- object$methods$inference
+    full <- object$methods$full   
     casecontrol <- object$methods$casecontrol
     yrare <- object$methods$yrare
-    yprevalence <- object$methods$yprevalence
-    full <- object$methods$full
+    yprevalence <- object$methods$yprevalence    
+    estimation <- object$methods$estimation
+    inference <- object$methods$inference
     outcome <- object$variables$outcome
     event <- object$variables$event
     exposure <- object$variables$exposure
@@ -232,64 +232,79 @@ cmsens <- function(object = NULL, sens = "uc", MEmethod = "simex",
     EMint <- object$variables$EMint
     basec <- object$variables$basec
     postc <- object$variables$postc
-    multimp <- object$multimp$multimp
+    yreg <- object$reg.input$yreg
+    ereg <- object$reg.input$ereg
+    mreg <- object$reg.input$mreg
+    wmreg <- object$reg.input$wmreg
+    postcreg <- object$reg.input$postcreg
     a <- object$ref$a
-    astar <- object$ref$asta
+    astar <- object$ref$astar
     mval <- object$ref$mval
     yref <- object$ref$yref
     basecval <- object$ref$basecval
     nboot <- object$methods$nboot
-    nRep <- object$methods$nRep
+    nRep <- object$methods$nRep    
+    multimp <- object$multimp$multimp
     args_mice <- object$multimp$args_mice
+    
+    # run regressions
+    environment(regrun) <- environment()
+    regs <- regrun()
     
     if (inference == "delta") variance <- TRUE
     if (inference == "bootstrap") variance <- FALSE
-    sens <- list()
     
+    sens <- list()
     for (i in 1:length(MEerror)) {
-      
-      reg.output.mid <- reg.output
-      
+      regs_mid <- regs
       if (MEmethod == "rc") {
         if (MEvartype != "continuous") stop("Regression calibration only supports a continuous variable measured with error")
-        for (r in 1:length(reg.output.mid)) {
-          if (inherits(reg.output.mid[[r]], "list")) {
-            reg.output.mid[[r]] <- lapply(1:length(reg.output.mid[[r]]), function(x)
-              eval(bquote(rcreg(reg = .(reg.output.mid[[r]][[x]]), data = .(data), 
-                                MEvariable = .(MEvariable), MEerror = .(MEerror[[i]]), 
-                                variance = .(variance), nboot = .(nboot.rc)))))
-          } else {
-            reg.output.mid[[r]] <- eval(bquote(rcreg(reg = .(reg.output.mid[[r]]), 
-                                                          data = .(data),
-                                                          MEvariable = .(MEvariable), 
-                                                          MEerror = .(MEerror[[i]]), 
-                                                          variance = .(variance), 
-                                                          nboot = .(nboot.rc))))
+        for (r in 1:length(regs_mid)) {
+          if (!is.null(regs_mid[[r]])) {
+            if (inherits(regs_mid[[r]], "list")) {
+              regs_mid[[r]] <- lapply(1:length(regs_mid[[r]]), function(x)
+                eval(bquote(rcreg(reg = .(regs_mid[[r]][[x]]), data = .(data), 
+                                  weights = .(model.frame(regs_mid[[r]][[x]])$'(weights)'),
+                                  MEvariable = .(MEvariable), MEerror = .(MEerror[[i]]), 
+                                  variance = .(variance), nboot = .(nboot.rc)))))
+            } else {
+              regs_mid[[r]] <- eval(bquote(rcreg(reg = .(regs_mid[[r]]), 
+                                                 data = .(data),
+                                                 weights = .(model.frame(regs_mid[[r]])$'(weights)'),
+                                                 MEvariable = .(MEvariable), 
+                                                 MEerror = .(MEerror[[i]]), 
+                                                 variance = .(variance), 
+                                                 nboot = .(nboot.rc))))
+            }
           }
         }
       } else if (MEmethod == "simex") {
-        for (r in 1:length(reg.output.mid)) {
-          if (inherits(reg.output.mid[[r]], "list")) {
-            reg.output.mid[[r]] <- lapply(1:length(reg.output.mid[[r]]), function(x)
-              eval(bquote(simexreg(reg = .(reg.output.mid[[r]][[x]]), data = .(data), 
-                                   MEvariable = .(MEvariable), MEvartype = .(MEvartype), 
-                                   MEerror = .(MEerror[[i]]), variance = .(variance), 
-                                   lambda = .(lambda), B = .(B)))))
-          } else reg.output.mid[[r]] <- eval(bquote(simexreg(reg = .(reg.output.mid[[r]]), 
-                                                             data = .(data), 
+        for (r in 1:length(regs_mid)) {
+          if (!is.null(regs_mid[[r]])) {
+            if (inherits(regs_mid[[r]], "list")) {
+              regs_mid[[r]] <- lapply(1:length(regs_mid[[r]]), function(x)
+                eval(bquote(simexreg(reg = .(regs_mid[[r]][[x]]), data = .(data), 
+                                     weights = .(model.frame(regs_mid[[r]][[x]])$'(weights)'),
+                                     MEvariable = .(MEvariable), MEvartype = .(MEvartype), 
+                                     MEerror = .(MEerror[[i]]), variance = .(variance), 
+                                     lambda = .(lambda), B = .(B)))))
+            } else regs_mid[[r]] <- eval(bquote(simexreg(reg = .(regs_mid[[r]]), 
+                                                         data = .(data), 
+                                                         weights = .(model.frame(regs_mid[[r]])$'(weights)'),
                                                          MEvariable = .(MEvariable), 
                                                          MEvartype = .(MEvartype), 
                                                          MEerror = .(MEerror[[i]]), 
                                                          variance = .(variance), 
                                                          lambda = .(lambda), B = .(B))))
+          }
         }
       } else stop("Unsupported MEmethod; use 'rc' or 'simex'")
       
-      yreg <- reg.output.mid$yreg
-      mreg <- reg.output.mid$mreg
-      ereg <- reg.output.mid$ereg
-      wmreg <- reg.output.mid$wmreg
-      postcreg <- reg.output.mid$postcreg
+      yreg <- regs_mid$yreg
+      mreg <- regs_mid$mreg
+      ereg <- regs_mid$ereg
+      wmreg <- regs_mid$wmreg
+      postcreg <- regs_mid$postcreg
       
       # add a progress bar for bootstrap inference
       if (inference == "bootstrap") {
@@ -298,9 +313,10 @@ cmsens <- function(object = NULL, sens = "uc", MEmethod = "simex",
         progbar <- txtProgressBar(min = 0, max = nboot, style = 3)
       }
       environment(estinf) <- environment()
-      sens[[i]] <- estinf()[c("effect.pe", "effect.se", "effect.ci.low", 
-                               "effect.ci.high", "effect.pval")]
-      sens[[i]]$reg.output <- reg.output.mid
+      estinf_res <- estinf()
+      sens[[i]] <- estinf_res[c("effect.pe", "effect.se", "effect.ci.low", 
+                              "effect.ci.high", "effect.pval")]
+      sens[[i]]$reg.output <- estinf_res$reg.output
       
     }
     
@@ -350,8 +366,8 @@ summary.cmsens.me <- function(object, ...) {
   summarydf <- list()
   for (i in 1:length(object$sens)) {
     summarydf[[i]] <- data.frame(object$sens[[i]]$effect.pe, object$sens[[i]]$effect.se, 
-                                  object$sens[[i]]$effect.ci.low, object$sens[[i]]$effect.ci.high, 
-                                  object$sens[[i]]$effect.pval)
+                                 object$sens[[i]]$effect.ci.low, object$sens[[i]]$effect.ci.high, 
+                                 object$sens[[i]]$effect.pval)
     colnames(summarydf[[i]]) <- c("Estimate", "Std.error", "95% CIL", "95% CIU", "P.val")
   }
   out <- c(object, list(summarydf = summarydf))

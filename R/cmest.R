@@ -495,195 +495,14 @@ cmest <- function(data = NULL, model = "rb",
   args_mice <- list(...)
   args_mice$print <- FALSE
   
-  ###################################################################################################
-  ##########################################Run Regressions##########################################
-  ###################################################################################################
-  # Y: outcome; M: mediator; A: exposure; C: basec; L: postc
-  # the variable used to calculate weights is required to be categorical
-  
-  ####################################Exposure Regression For Weighting##############################
-  # for wb and msm, the exposure regression is required for calculating weights if basec is not empty, w_{a,i}=P(A=A_i)/P(A=A_i|C_i)
-  # for iorw, the exposure regression is required for calculating weights, w_{a,i}=P(A=0|M_i,C_i)/P(A=A_i|M_i,C_i)
-  if ((model %in% c("wb", "msm") && length(basec) > 0) | model == "iorw") {
-    if (is.null(ereg)) stop("ereg is required when model is 'wb' or 'msm' with length(basec) > 0 and when model is 'iorw'")
-    if (is.character(ereg)) {
-      # fit glm with family = poisson() rather than family = binomial("log") for "loglinear"
-      if (ereg == "loglinear" && length(unique(data[, exposure])) != 2) stop("When ereg is 'loglinear', exposure should be binary")
-      if (!ereg %in% c("logistic", "loglinear", "multinomial", "ordinal")) stop("Select character ereg from 'logistic', 'loglinear', 'multinomial', 'ordinal'")
-      exposure_formula <- switch((model == "iorw") + 1, "1" = paste0(exposure, "~", paste0(basec, collapse = "+")),
-                                 "2" = paste0(exposure, "~", paste0(c(mediator, basec), collapse = "+")))
-      switch(ereg,
-             logistic = ereg <- eval(bquote(glm(.(as.formula(exposure_formula)), family = binomial(), data = .(data)))),
-             loglinear = ereg <- eval(bquote(glm(.(as.formula(exposure_formula)), family = poisson(), data = .(data)))),
-             multinomial = ereg <- eval(bquote(nnet::multinom(.(as.formula(exposure_formula)), data = .(data), trace = FALSE))),
-             ordinal = ereg <- eval(bquote(MASS::polr(.(as.formula(exposure_formula)), data = .(data)))))
-    }
-  } else {
-    if (!is.null(ereg)) warning("ereg is ignored when model is 'wb' or 'msm' with length(basec) = 0 or model is 'rb', 'ne' or 'gformula'")
-    ereg <- NULL
-  }
-  
-  ####################################Mediator Regression For Weighting##############################
-  # for msm, a mediator regression for weighting is required for each mediator
-  if (model == "msm") {
-    if (!is.list(wmreg)) stop("wmreg should be a list")
-    if (length(wmreg) != length(mediator)) stop("length(wmreg) != length(mediator)")
-    for (p in 1:length(wmreg)) {
-      if (is.null(wmreg[[p]])) stop(paste0("Unspecified wmreg[[", p, "]]"))
-      if (is.character(wmreg[[p]])) {
-        if (wmreg[[p]] == "loglinear" && length(unique(data[, mediator[p]])) != 2) stop(paste0("When wmreg[[", p, "]] is 'loglinear', mediator[[", p, "]] should be binary"))
-        if (!wmreg[[p]] %in% c("logistic", "loglinear", "multinomial", "ordinal")) stop(paste0("Select character wmreg[[", p, "]] from 'logistic', 'loglinear', 'multinomial', 'ordinal'"))
-        # w_{m_p,i}=P(M_p=M_{p,i}|A=A_i,M_1=M_{1,i},...,M_{p-1}=M_{p-1,i})/P(M_p=M_{p,i}|A=A_i,C=C_i,L=L_i,M_1=M_{1,i},...,M_{p-1}=M_{p-1,i})
-        wmreg_formula <- paste0(mediator[p], "~", paste(c(exposure, mediator[0:(p-1)], basec, postc), collapse = "+"))
-        # regression for the denominator of w_{m_p,i}
-        switch(wmreg[[p]],
-               logistic = wmreg[[p]] <- eval(bquote(glm(.(as.formula(wmreg_formula)), family = binomial(), data = .(data)))),
-               loglinear = wmreg[[p]] <- eval(bquote(glm(.(as.formula(wmreg_formula)), family = poisson(), data = .(data)))),
-               multinomial = wmreg[[p]] <- eval(bquote(nnet::multinom(.(as.formula(wmreg_formula)), data = .(data), trace = FALSE))),
-               ordinal = wmreg[[p]] <- eval(bquote(MASS::polr(.(as.formula(wmreg_formula)), data = .(data)))))
-      }
-    }
-  } else {
-    if (!is.null(wmreg)) warning("wmreg is ignored when model is not 'msm'")
-    wmreg <- NULL
-  }
-  
-  ###########################################Mediator Regression#####################################
-  # for rb, msm and gformula, a mediator regression is required for each mediator
-  if (model %in% c("rb", "msm", "gformula")) {
-    if (!is.list(mreg)) stop("mreg should be a list")
-    if (length(mreg) != length(mediator)) stop("length(mreg) != length(mediator)")
-    for (p in 1:length(mreg)) {
-      if (is.null(mreg[[p]])) stop(paste0("Unspecified mreg[[", p, "]]"))
-      if (is.character(mreg[[p]])) {
-        if (mreg[[p]] == "loglinear" && length(unique(data[, mediator[p]])) != 2) stop(paste0("When mreg[[", p, "]] is 'loglinear', mediator[[", p, "]] should be binary"))
-        if (!mreg[[p]] %in% c("linear", "logistic", "loglinear", "poisson", "quasipoisson",
-                              "negbin", "multinomial", "ordinal")) stop(
-                                paste0("Select character mreg[[", p, "]] from 'linear', 'logistic',
-'loglinear', 'poisson', 'quasipoisson', 'negbin', 'multinomial', 'ordinal'"))
-        # for rb, regress each mediator on A, C and previous mediators
-        # for msm, regress each mediator on A and previous mediators
-        # for gformula, regress each mediator on A, C, L and previous mediators
-        switch(model,
-               rb = mediator_formula <- paste0(mediator[p], "~", paste(c(exposure, mediator[0:(p-1)], basec), collapse = "+")),
-               msm = mediator_formula <- paste0(mediator[p], "~", paste(c(exposure, mediator[0:(p-1)]), collapse = "+")),
-               gformula = mediator_formula <- paste0(mediator[p], "~", paste(c(exposure, mediator[0:(p-1)], basec, postc), collapse = "+")))
-        switch(mreg[[p]],
-               linear = mreg[[p]] <- eval(bquote(glm(.(as.formula(mediator_formula)), family = gaussian(), data = .(data)))),
-               logistic = mreg[[p]] <- eval(bquote(glm(.(as.formula(mediator_formula)), family = binomial(), data = .(data)))),
-               loglinear = mreg[[p]] <- eval(bquote(glm(.(as.formula(mediator_formula)), family = poisson(), data = .(data)))),
-               poisson = mreg[[p]]  <- eval(bquote(glm(.(as.formula(mediator_formula)), family = poisson(), data = .(data)))),
-               quasipoisson = mreg[[p]] <- eval(bquote(glm(.(as.formula(mediator_formula)), family = quasipoisson(), data = .(data)))),
-               negbin = mreg[[p]] <- eval(bquote(MASS::glm.nb(.(as.formula(mediator_formula)), data = .(data)))),
-               multinomial = mreg[[p]] <- eval(bquote(nnet::multinom(.(as.formula(mediator_formula)), data = .(data), trace = FALSE))),
-               ordinal = mreg[[p]] <- eval(bquote(MASS::polr(.(as.formula(mediator_formula)), data = .(data)))))
-      }
-    }
-  } else {
-    if (!is.null(mreg)) warning("mreg is ignored when model is 'wb', 'iorw' or 'ne'")
-    mreg <- NULL
-  }
-  
-  ####################################postc Regression############################
-  # for gformula, a regression is required for each L
-  if (model == "gformula" && length(postc) > 0) {
-    if (!is.list(postcreg)) stop("postcreg should be a list")
-    if (length(postcreg) != length(postc)) stop("length(postcreg) != length(postc)")
-    for (p in 1:length(postcreg)) {
-      if (is.null(postcreg[[p]])) stop(paste0("Unspecified postcreg[[", p, "]]"))
-      if (is.character(postcreg[[p]])) {
-        if (postcreg[[p]] == "loglinear" && length(unique(data[, postc[p]])) != 2) stop(paste0("When postcreg[[", p, "]] is 'loglinear', postc[[", p, "]] should be binary"))
-        if (!postcreg[[p]] %in% c("linear", "logistic", "loglinear", "poisson", "quasipoisson",
-                                  "negbin", "multinomial", "ordinal"))  stop(
-                                    paste0("Select character postcreg[[", p, "]] from 'linear', 'logistic',
-                                           'loglinear', 'poisson', 'quasipoisson', 'negbin', 'multinomial', 'ordinal'"))
-        # regress each L on A, C and previous Ls
-        postc_formula <- paste0(postc[p], "~", paste(c(exposure, basec, postc[0:(p-1)]), collapse = "+"))
-        switch(postcreg[[p]],
-               linear = postcreg[[p]] <- eval(bquote(glm(.(as.formula(postc_formula)), family = gaussian(), data = .(data)))),
-               logistic = postcreg[[p]] <- eval(bquote(glm(.(as.formula(postc_formula)), family = binomial(), data = .(data)))),
-               loglinear = postcreg[[p]] <- eval(bquote(glm(.(as.formula(postc_formula)), family = poisson(), data = .(data)))),
-               poisson = postcreg[[p]]  <- eval(bquote(glm(.(as.formula(postc_formula)), family = poisson(), data = .(data)))),
-               quasipoisson = postcreg[[p]] <- eval(bquote(glm(.(as.formula(postc_formula)), family = quasipoisson(), data = .(data)))),
-               negbin = postcreg[[p]] <- eval(bquote(MASS::glm.nb(.(as.formula(postc_formula)), data = .(data)))),
-               multinomial = postcreg[[p]] <- eval(bquote(nnet::multinom(.(as.formula(postc_formula)), data = .(data), trace = FALSE))),
-               ordinal = postcreg[[p]] <- eval(bquote(MASS::polr(.(as.formula(postc_formula)), data = .(data)))))
-      }
-    }
-  } else {
-    if (!is.null(postcreg)) warning("postcreg is ignored when model is not 'gformula' and when length(postc) = 0")
-    postcreg <- NULL
-  }
-  
-  ###########################################Outcome Regression######################################
-  if (is.null(yreg)) stop("yreg is required")
-  if (is.character(yreg)) {
-    if (yreg == "loglinear" && length(unique(data[, outcome])) != 2) stop("When yreg is 'loglinear', outcome should be binary")
-    if (!yreg %in% c("linear", "logistic", "loglinear", "poisson", "quasipoisson",
-                     "negbin", "multinomial", "ordinal", "coxph", "aft_exp",
-                     "aft_weibull")) stop(
-                       paste0("Select character yreg from 'linear', 'logistic',
-                              'loglinear', 'poisson', 'quasipoisson', 'negbin', 'multinomial', 'ordinal',
-                              'coxph', 'aft_exp', 'aft_weibull'"))
-    if (model != "iorw") {
-      out$variables$EMint <- EMint
-      int.terms <- switch(EMint + 1, "1" = NULL, "2" = paste(exposure, mediator, sep = "*"))
-    }
-    # for rb, wb and ne, regress Y on A, M and C
-    # for iorw, regress Y on A and C
-    # for msm, regress Y on A and M
-    # for gformula, regress Y on A, M, C and L
-    switch(model,
-           rb = outcome_formula <- paste0(outcome, "~", paste(c(exposure, mediator, int.terms, basec), collapse = "+")),
-           wb = outcome_formula <- paste0(outcome, "~", paste(c(exposure, mediator, int.terms, basec), collapse = "+")),
-           ne = outcome_formula <- paste0(outcome, "~", paste(c(exposure, mediator, int.terms, basec), collapse = "+")),
-           iorw = outcome_formula <- paste0(outcome, "~", paste(c(exposure, basec), collapse = "+")),
-           msm = outcome_formula <- paste0(outcome, "~", paste(c(exposure, mediator, int.terms), collapse = "+")),
-           gformula = outcome_formula <- paste0(outcome, "~", paste(c(exposure, mediator, int.terms, basec, postc), collapse = "+")))
-    if (yreg %in% c("coxph","aft_exp","aft_weibull")) {
-      if (!is.null(event)) {
-        outcome_formula <- paste(paste0("Surv(", outcome, ", ", event, ")"),
-                                 strsplit(outcome_formula, split = "~")[[1]][2], sep = " ~ ")
-      } else outcome_formula <- paste(paste0("Surv(", outcome, ")"),
-                                      strsplit(outcome_formula, split = "~")[[1]][2], sep = " ~ ")
-    }
-    switch(yreg,
-           linear = yreg <- eval(bquote(glm(formula = .(as.formula(outcome_formula)),
-                                            family = gaussian(), data = .(data)))),
-           logistic = yreg <- eval(bquote(glm(formula = .(as.formula(outcome_formula)),
-                                              family = binomial(), data = .(data)))),
-           loglinear = yreg <- eval(bquote(glm(formula = .(as.formula(outcome_formula)),
-                                               family = poisson(), data = .(data)))),
-           poisson = yreg  <- eval(bquote(glm(formula = .(as.formula(outcome_formula)),
-                                              family = poisson(), data = .(data)))),
-           quasipoisson = yreg <- eval(bquote(glm(formula = .(as.formula(outcome_formula)),
-                                                  family = quasipoisson(), data = .(data)))),
-           negbin = yreg <- eval(bquote(MASS::glm.nb(formula = .(as.formula(outcome_formula)),
-                                                     data = .(data)))),
-           multinomial = yreg <- eval(bquote(nnet::multinom(formula = .(as.formula(outcome_formula)),
-                                                            data = .(data), trace = FALSE))),
-           ordinal = yreg <- eval(bquote(MASS::polr(formula = .(as.formula(outcome_formula)),
-                                                    data = .(data)))),
-           coxph = yreg <- eval(bquote(survival::coxph(formula = .(as.formula(outcome_formula)),
-                                                       data = .(data)))),
-           aft_exp = yreg <- eval(bquote(survival::survreg(formula = .(as.formula(outcome_formula)),
-                                                           dist = "exponential", data = .(data)))),
-           aft_weibull = yreg <- eval(bquote(survival::survreg(formula = .(as.formula(outcome_formula)),
-                                                               dist = "weibull", data = .(data)))))
-  }
-  
-  # for delta method inference, use survey regressions for yreg and mreg when weights are applied
-  if (inference == "delta" && casecontrol && !is.null(yprevalence)) {
-    yreg <- eval(bquote(svyglm(formula = .(formula(yreg)), family = .(family(yreg)),
-                               design = svydesign(~ 1, data = .(data)))))
-  }
-  if (inference == "delta" && casecontrol && !is.null(yprevalence)) {
-    if (inherits(mreg[[1]], "glm")) mreg[[1]] <- eval(bquote(svyglm(formula = .(formula(mreg[[1]])), 
-                                                                    family = .(family(mreg[[1]])),
-                                                                    design = svydesign(~ 1, data = .(data)))))
-    if (inherits(mreg[[1]], "multinom")) mreg[[1]] <- eval(bquote(svymultinom(formula = .(formula(mreg[[1]])), 
-                                                                              data = .(data))))
-  }
+  # run regressions
+  environment(regrun) <- environment()
+  regs <- regrun()
+  yreg <- regs$yreg
+  ereg <- regs$ereg
+  mreg <- regs$mreg
+  wmreg <- regs$wmreg
+  postcreg <- regs$postcreg
   
   ###################################################################################################
   ############################################Estimation and Inference###############################
@@ -709,15 +528,25 @@ print.cmest <- function(x, ...) {
     regnames <- names(x$reg.output)
     for (name in regnames) {
       if (name == "yreg") {
-        cat("# Outcome Regression: \n")
-        x$reg.output$yreg$call <- update(x$reg.output$yreg,data=getCall(x$reg.output$yreg)$data,
-                                         weights=getCall(x$reg.output$yreg)$weights, evaluate = FALSE)
-        print(x$reg.output$yreg)
+        cat("# Outcome Regression:\n")
+        if (inherits(x$reg.output$yreg, "svyglm")) {
+          cat("\nCall:\n")
+          print(update(x$reg.output$yreg,design = getCall(x$reg.output$yreg)$design,
+                       family = getCall(x$reg.output$yreg)$family, evaluate = FALSE))
+          cat("\nCoefficients:\n")
+          print(x$reg.output$yreg$coefficients)
+          cat("\nVar-cov matrix of coefficients:\n")
+          print(vcov(x$reg.output$yreg))
+        } else {
+          x$reg.output$yreg$call <- update(x$reg.output$yreg,data=getCall(x$reg.output$yreg)$data,
+                                           weights=getCall(x$reg.output$yreg)$weights, evaluate = FALSE)
+          print(x$reg.output$yreg)
+        }
       }
       if (name == "yregTot") {
         cat("# Outcome Regression for the Total Effect: \n")
         x$reg.output$yregTot$call <- update(x$reg.output$yregTot,data=getCall(x$reg.output$yregTot)$data,
-                                         weights=getCall(x$reg.output$yregTot)$weights, evaluate = FALSE)
+                                            weights=getCall(x$reg.output$yregTot)$weights, evaluate = FALSE)
         print(x$reg.output$yregTot)
       }
       if (name == "yregDir") {
@@ -735,11 +564,22 @@ print.cmest <- function(x, ...) {
       if (name == "mreg") {
         cat("# Mediator Regressions: \n")
         for (i in 1:length(x$reg.output$mreg)) {
-          x$reg.output$mreg[[i]]$call <- eval(bquote(update(x$reg.output$mreg[[i]], 
-                                                            data=getCall(x$reg.output$mreg[[.(i)]])$data, 
-                                                            weights=getCall(x$reg.output$mreg[[.(i)]])$weights,
-                                                            evaluate = FALSE)))
-          print(x$reg.output$mreg[[i]])
+          if (inherits(x$reg.output$mreg[[i]], "svyglm")) {
+            cat("\nCall:\n")
+            print(eval(bquote(update(x$reg.output$mreg[[.(i)]],
+                                     design = getCall(x$reg.output$mreg[[.(i)]])$design,
+                                     family = getCall(x$reg.output$mreg[[.(i)]])$family, evaluate = FALSE))))
+            cat("\nCoefficients:\n")
+            print(x$reg.output$mreg[[i]]$coefficients)
+            cat("\nVar-cov matrix of coefficients:\n")
+            print(vcov(x$reg.output$mreg[[i]]))
+          } else {
+            x$reg.output$mreg[[i]]$call <- eval(bquote(update(x$reg.output$mreg[[.(i)]], 
+                                                              data=getCall(x$reg.output$mreg[[.(i)]])$data, 
+                                                              weights=getCall(x$reg.output$mreg[[.(i)]])$weights,
+                                                              evaluate = FALSE)))
+            print(x$reg.output$mreg[[i]])
+          }
           if (i < length(x$reg.output$mreg)) cat("\n")
         }
       }
@@ -747,9 +587,9 @@ print.cmest <- function(x, ...) {
         cat("# Mediator Regressions for Weighting (Denominator): \n")
         for (i in 1:length(x$reg.output$wmdenomreg)) {
           x$reg.output$wmdenomreg[[i]]$call <- eval(bquote(update(x$reg.output$wmdenomreg[[i]], 
-                                                             data=getCall(x$reg.output$wmdenomreg[[.(i)]])$data, 
-                                                             weights=getCall(x$reg.output$wmdenomreg[[.(i)]])$weights,
-                                                             evaluate = FALSE)))
+                                                                  data=getCall(x$reg.output$wmdenomreg[[.(i)]])$data, 
+                                                                  weights=getCall(x$reg.output$wmdenomreg[[.(i)]])$weights,
+                                                                  evaluate = FALSE)))
           print(x$reg.output$wmdenomreg[[i]])
           if (i < length(x$reg.output$wmdenomreg)) cat("\n")
         }
@@ -758,9 +598,9 @@ print.cmest <- function(x, ...) {
         cat("# Mediator Regressions for Weighting (Nominator): \n")
         for (i in 1:length(x$reg.output$wmnomreg)) {
           x$reg.output$wmnomreg[[i]]$call <- eval(bquote(update(x$reg.output$wmnomreg[[i]], 
-                                                                  data=getCall(x$reg.output$wmnomreg[[.(i)]])$data, 
-                                                                  weights=getCall(x$reg.output$wmnomreg[[.(i)]])$weights,
-                                                                  evaluate = FALSE)))
+                                                                data=getCall(x$reg.output$wmnomreg[[.(i)]])$data, 
+                                                                weights=getCall(x$reg.output$wmnomreg[[.(i)]])$weights,
+                                                                evaluate = FALSE)))
           print(x$reg.output$wmnomreg[[i]])
           if (i < length(x$reg.output$wmnomreg)) cat("\n")
         }
@@ -785,18 +625,29 @@ print.cmest <- function(x, ...) {
       for (name in regnames) {
         if (name == "yreg") {
           cat("## Outcome Regression: \n")
+          if (inherits(x$reg.output[[m]]$yreg, "svyglm")) {
+            cat("\nCall:\n")
+            print(eval(bquote(update(x$reg.output[[.(m)]]$yreg,
+                                     design = getCall(x$reg.output[[.(m)]]$yreg)$design,
+                                     family = getCall(x$reg.output[[.(m)]]$yreg)$family, evaluate = FALSE))))
+            cat("\nCoefficients:\n")
+            print(x$reg.output[[m]]$yreg$coefficients)
+            cat("\nVar-cov matrix of coefficients:\n")
+            print(vcov(x$reg.output[[m]]$yreg))
+          } else {
             x$reg.output[[m]]$yreg$call <- eval(bquote(update(x$reg.output[[.(m)]]$yreg,
-                                                              data=getCall(x$reg.output[[.(m)]]$yreg)$data,
-                                                              weights=getCall(x$reg.output[[.(m)]]$yreg)$weights, 
+                                                              data = getCall(x$reg.output[[.(m)]]$yreg)$data,
+                                                              weights = getCall(x$reg.output[[.(m)]]$yreg)$weights, 
                                                               evaluate = FALSE)))
             print(x$reg.output[[m]]$yreg)
+          }
         }
         if (name == "yregTot") {
           cat("## Outcome Regression for the Total Effect: \n")
           x$reg.output[[m]]$yregTot$call <- eval(bquote(update(x$reg.output[[.(m)]]$yregTot,
-                                                            data=getCall(x$reg.output[[.(m)]]$yregTot)$data,
-                                                            weights=getCall(x$reg.output[[.(m)]]$yregTot)$weights, 
-                                                            evaluate = FALSE)))
+                                                               data=getCall(x$reg.output[[.(m)]]$yregTot)$data,
+                                                               weights=getCall(x$reg.output[[.(m)]]$yregTot)$weights, 
+                                                               evaluate = FALSE)))
           print(x$reg.output[[m]]$yregTot)
         }
         if (name == "yregDir") {
@@ -809,31 +660,43 @@ print.cmest <- function(x, ...) {
         }
         if (name == "ereg") {
           cat("## Exposure Regression for Weighting: \n")
-            x$reg.output[[m]]$ereg$call <- eval(bquote(update(x$reg.output[[.(m)]]$ereg,
-                                                              data=getCall(x$reg.output[[.(m)]]$ereg)$data,
-                                                              weights=getCall(x$reg.output[[.(m)]]$ereg)$weights, 
-                                                              evaluate = FALSE)))
-            print(x$reg.output[[m]]$ereg)
+          x$reg.output[[m]]$ereg$call <- eval(bquote(update(x$reg.output[[.(m)]]$ereg,
+                                                            data=getCall(x$reg.output[[.(m)]]$ereg)$data,
+                                                            weights=getCall(x$reg.output[[.(m)]]$ereg)$weights, 
+                                                            evaluate = FALSE)))
+          print(x$reg.output[[m]]$ereg)
         }
         if (name == "mreg") {
           cat("## Mediator Regressions: \n")
-            for (i in 1:length(x$reg.output[[m]]$mreg)) {
-              x$reg.output[[m]]$mreg[[i]]$call <- eval(bquote(update(x$reg.output[[.(m)]]$mreg[[i]], 
+          for (i in 1:length(x$reg.output[[m]]$mreg)) {
+            if (inherits(x$reg.output[[m]]$mreg[[i]], "svyglm")) {
+              cat("\nCall:\n")
+              print(eval(bquote(update(x$reg.output[[.(m)]]$mreg[[.(i)]],
+                                       design = getCall(x$reg.output[[.(m)]]$mreg[[.(i)]])$design,
+                                       family = getCall(x$reg.output[[.(m)]]$mreg[[.(i)]])$family, 
+                                       evaluate = FALSE))))
+              cat("\nCoefficients:\n")
+              print(x$reg.output[[m]]$mreg[[i]]$coefficients)
+              cat("\nVar-cov matrix of coefficients:\n")
+              print(vcov(x$reg.output[[m]]$mreg[[i]]))
+            } else {
+              x$reg.output[[m]]$mreg[[i]]$call <- eval(bquote(update(x$reg.output[[.(m)]]$mreg[[.(i)]], 
                                                                      data=getCall(x$reg.output[[.(m)]]$mreg[[.(i)]])$data, 
                                                                      weights=getCall(x$reg.output[[.(m)]]$mreg[[.(i)]])$weights, 
                                                                      evaluate = FALSE)))
               print(x$reg.output[[m]]$mreg[[i]])
-              if (i < length(x$reg.output[[m]]$mreg)) cat("\n")
             }
+            if (i < length(x$reg.output[[m]]$mreg)) cat("\n")
+          }
         }
         if (name == "wmdenomreg") {
           if (!is.null(x$reg.output[[m]]$wmdenomreg)) {
             cat("## Mediator Regressions for Weighting (Denominator): \n")
             for (i in 1:length(x$reg.output[[m]]$wmdenomreg)) {
               x$reg.output[[m]]$wmdenomreg[[i]]$call <- eval(bquote(update(x$reg.output[[.(m)]]$wmdenomreg[[i]], 
-                                                                      data=getCall(x$reg.output[[.(m)]]$wmdenomreg[[.(i)]])$data, 
-                                                                      weights=getCall(x$reg.output[[.(m)]]$wmdenomreg[[.(i)]])$weights, 
-                                                                      evaluate = FALSE)))
+                                                                           data=getCall(x$reg.output[[.(m)]]$wmdenomreg[[.(i)]])$data, 
+                                                                           weights=getCall(x$reg.output[[.(m)]]$wmdenomreg[[.(i)]])$weights, 
+                                                                           evaluate = FALSE)))
               print(x$reg.output[[m]]$wmdenomreg[[i]])
               if (i < length(x$reg.output[[m]]$wmdenomreg)) cat("\n")
             }
@@ -844,9 +707,9 @@ print.cmest <- function(x, ...) {
             cat("## Mediator Regressions for Weighting (Nominator): \n")
             for (i in 1:length(x$reg.output[[m]]$wmnomreg)) {
               x$reg.output[[m]]$wmnomreg[[i]]$call <- eval(bquote(update(x$reg.output[[.(m)]]$wmnomreg[[i]], 
-                                                                           data=getCall(x$reg.output[[.(m)]]$wmnomreg[[.(i)]])$data, 
-                                                                           weights=getCall(x$reg.output[[.(m)]]$wmnomreg[[.(i)]])$weights, 
-                                                                           evaluate = FALSE)))
+                                                                         data=getCall(x$reg.output[[.(m)]]$wmnomreg[[.(i)]])$data, 
+                                                                         weights=getCall(x$reg.output[[.(m)]]$wmnomreg[[.(i)]])$weights, 
+                                                                         evaluate = FALSE)))
               print(x$reg.output[[m]]$wmnomreg[[i]])
               if (i < length(x$reg.output[[m]]$wmnomreg)) cat("\n")
             }

@@ -28,6 +28,8 @@ test_that("simexreg works correctly for lm", {
   expect_equal(model.frame(reg_simex), model.frame(reg_naive))
   expect_equal(update(reg_simex, data = data)$SIMEXcoef, coef(reg_simex), tolerance = 0.1)
   expect_equal(summary(reg_simex)$summarydf$Estimate, as.numeric(coef(reg_simex)))
+  expect_equal(class(print(reg_simex)), "numeric")
+  expect_equal(class(print(summary(reg_simex))), "data.frame")
   
   # a categorical variable measured with error
   set.seed(1)

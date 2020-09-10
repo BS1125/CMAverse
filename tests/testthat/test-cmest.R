@@ -801,7 +801,8 @@ test_that("cmest works correctly for binary Y and binary M in a case control stu
                                               mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                                               mreg = list("multinomial"), yreg = "loglinear",
                                               astar = 0, a = 1, mval = list(1),
-                                              estimation = "paramfunc", inference = "delta")
+                                              estimation = "paramfunc", inference = "delta", 
+                                              multimp = TRUE, m = 1)
   res_binbin_rb_param_bootstrap <- cmest(data = data, model = "rb",
                                          casecontrol = TRUE, yprevalence = yprevalence,
                                          outcome = "Y", exposure = "A",
@@ -898,6 +899,8 @@ test_that("cmest works correctly for binary Y and binary M in a case control stu
   # test
   expect_equal(unname(res_binbin_rb_param_delta$effect.pe), ref)
   expect_equal(unname(res_binbin_rb_param_delta_multinom$effect.pe), ref, tolerance = 0.001)
+  expect_equal(class(print(res_binbin_rb_param_delta)), "list")
+  expect_equal(class(print(res_binbin_rb_param_delta_multinom)), "list")
   expect_equal(unname(res_binbin_rb_param_bootstrap$effect.pe), ref)
   expect_equal(unname(res_binbin_rb_impu_bootstrap$effect.pe), ref, tolerance = 0.1)
   expect_equal(unname(res_binbin_wb$effect.pe), ref, tolerance = 0.1)
@@ -1019,6 +1022,7 @@ test_that("multiple imputation works correctly for binary Y and binary M ", {
            pm_binbin, int_binbin, pe_binbin)
   # test
   expect_equal(summary(res_binbin_rb_param_delta)$summarydf$Estimate, ref)
+  expect_equal(class(ggcmest(res_binbin_rb_param_delta)), c("gg", "ggplot"))
   expect_equal(summary(res_binbin_rb_param_bootstrap)$summarydf$Estimate, ref)
   expect_equal(summary(res_binbin_rb_impu_bootstrap)$summarydf$Estimate, ref, tolerance = 0.1)
   expect_equal(summary(res_binbin_wb)$summarydf$Estimate, ref, tolerance = 0.1)
@@ -1145,4 +1149,60 @@ test_that("cmest works correctly for binary Y and binary M with postc", {
   expect_equal(class(print(summary(res_binbin_msm))), "list")
   expect_equal(class(print(summary(res_binbin_gformula))), "list")
 
+})
+
+test_that("cmest works correctly for multiple mediators", {
+  
+  set.seed(1)
+  # data simulation
+  expit <- function(x) exp(x)/(1+exp(x))
+  n <- 10000
+  C1 <- rnorm(n, mean = 1, sd = 0.1)
+  C2 <- rbinom(n, 1, 0.6)
+  pa <- expit(0.2 + 0.5*C1 + 0.1*C2)
+  A <- rbinom(n, 1, pa)
+  pm <- expit(1 + 2*A + 1.5*C1 + 0.8*C2)
+  M1 <- rbinom(n, 1, expit(1 + 2*A + 1.5*C1 + 0.8*C2))
+  M2 <- rpois(n, exp(1 + 0.2*A + 0.3*M1 + 0.2*C1 + 0.1*C2))
+  Y <- rnorm(n, -3 + 0.8*A - 1.8*M1 + 0.6*M2 + 0.5*A*M1 + 0.8*A*M2 + 0.3*C1 - 0.6*C2, 0.5)
+  data <- data.frame(A, M1, M2, Y, C1, C2)
+  
+  # results of cmest
+  res_multipleM_rb <- cmest(data = data, model = "rb", outcome = "Y", 
+                            exposure = "A", mediator = c("M1", "M2"), basec = c("C1", "C2"), 
+                            EMint = TRUE,
+                            mreg = list("logistic", "poisson"), yreg = "linear",
+                            astar = 0, a = 1, mval = list(1, 5),
+                            estimation = "imputation", inference = "bootstrap")
+  res_multipleM_wb <- cmest(data = data, model = "wb", outcome = "Y", 
+                            exposure = "A", mediator = c("M1", "M2"), basec = c("C1", "C2"), 
+                            EMint = TRUE,
+                            ereg = "logistic", yreg = "linear",
+                            astar = 0, a = 1, mval = list(1, 5),
+                            estimation = "imputation", inference = "bootstrap")
+  res_multipleM_iorw <- cmest(data = data, model = "iorw", outcome = "Y", exposure = "A",
+                              mediator = c("M1", "M2"), basec = c("C1", "C2"), EMint = TRUE, 
+                              ereg = "logistic", yreg = "linear",
+                              astar = 0, a = 1, 
+                              estimation = "imputation", inference = "bootstrap")
+  res_multipleM_ne <- cmest(data = data, model = "ne", outcome = "Y", exposure = "A",
+                              mediator = c("M1", "M2"), basec = c("C1", "C2"), EMint = TRUE, 
+                              yreg = "linear",
+                              astar = 0, a = 1, mval = list(1, 5),
+                              estimation = "imputation", inference = "bootstrap")
+  res_multipleM_gformula <- cmest(data = data, model = "gformula", outcome = "Y", exposure = "A",
+                                  mediator = c("M1", "M2"), basec = c("C1", "C2"), EMint = TRUE, 
+                                  mreg = list("logistic", "poisson"), yreg = "linear",
+                                  astar = 0, a = 1, mval = list(1, 5),
+                                  estimation = "imputation", inference = "bootstrap")
+  # test
+  expect_equal(unname(res_multipleM_rb$effect.pe), 
+               unname(res_multipleM_wb$effect.pe), tolerance = 0.1)
+  expect_equal(unname(res_multipleM_rb$effect.pe)[c(6,2,5,15)], 
+               unname(res_multipleM_iorw$effect.pe), tolerance = 0.1)
+  expect_equal(unname(res_multipleM_rb$effect.pe), 
+               unname(res_multipleM_ne$effect.pe), tolerance = 0.1)
+  expect_equal(unname(res_multipleM_rb$effect.pe), 
+               unname(res_multipleM_gformula$effect.pe), tolerance = 0.1)
+  
 })

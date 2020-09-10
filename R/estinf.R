@@ -1,53 +1,48 @@
 estinf <- function() {
-  
   # restrict data types of variables
   allvar <- c(outcome, exposure, mediator, postc, basec)
   for (i in 1:length(allvar))
     if (!(is.numeric(data[, allvar[i]]) | is.factor(data[, allvar[i]]) |
           is.character(data[, allvar[i]]))) stop(paste0("The variable ", allvar[i], " should be numeric, factor or character"))
-  
   # output list
   out <- list()
   out$multimp <- list(multimp = multimp)
-  
   # obtain calls, weights, classes, and families of regs
   for (reg_name in c("yreg", "ereg", "mreg", "wmreg", "postcreg")) {
     reg <- get(reg_name)
     if (!is.null(reg)) {
       if (reg_name %in% c("yreg", "ereg")) {
         assign(paste0("call_", reg_name), getCall(reg))
-        assign("reg.mid", switch(("rcreg" %in% class(reg) | "simexreg" %in% class(reg)) + 1, "1" = reg, "2" = reg$NAIVEreg))
-        assign(paste0("is_lm_", reg_name), inherits(reg.mid, "lm"))
-        assign(paste0("is_glm_", reg_name), inherits(reg.mid, "glm"))
-        assign(paste0("is_svyglm_", reg_name), inherits(reg.mid, "svyglm"))
-        assign(paste0("is_gam_", reg_name), inherits(reg.mid, "gam"))
-        if (get(paste0("is_lm_", reg_name)) | get(paste0("is_glm_", reg_name))) assign(paste0("family_", reg_name), family(reg.mid))
-        assign(paste0("is_multinom_", reg_name), inherits(reg.mid, "multinom"))
-        assign(paste0("is_svymultinom_", reg_name), inherits(reg.mid, "svymultinom"))
-        assign(paste0("is_polr_", reg_name), inherits(reg.mid, "polr"))
+        assign("reg_mid", switch(("rcreg" %in% class(reg) | "simexreg" %in% class(reg)) + 1, "1" = reg, "2" = reg$NAIVEreg))
+        assign(paste0("is_lm_", reg_name), inherits(reg_mid, "lm"))
+        assign(paste0("is_glm_", reg_name), inherits(reg_mid, "glm"))
+        assign(paste0("is_svyglm_", reg_name), inherits(reg_mid, "svyglm"))
+        assign(paste0("is_gam_", reg_name), inherits(reg_mid, "gam"))
+        if (get(paste0("is_lm_", reg_name)) | get(paste0("is_glm_", reg_name))) assign(paste0("family_", reg_name), family(reg_mid))
+        assign(paste0("is_multinom_", reg_name), inherits(reg_mid, "multinom"))
+        assign(paste0("is_svymultinom_", reg_name), inherits(reg_mid, "svymultinom"))
+        assign(paste0("is_polr_", reg_name), inherits(reg_mid, "polr"))
         if (reg_name == "yreg") {
-          assign(paste0("is_survreg_", reg_name), inherits(reg.mid, "survreg"))
-          assign(paste0("is_svysurvreg_", reg_name), inherits(reg.mid, "svysurvreg"))
-          assign(paste0("is_coxph_", reg_name), inherits(reg.mid, "coxph"))
-          assign(paste0("is_svycoxph_", reg_name), inherits(reg.mid, "svycoxph"))
+          assign(paste0("is_survreg_", reg_name), inherits(reg_mid, "survreg"))
+          assign(paste0("is_coxph_", reg_name), inherits(reg_mid, "coxph"))
         }
         assign(paste0("weights_", reg_name), model.frame(get(reg_name))$'(weights)')   
       } else {
         assign(paste0("call_", reg_name), lapply(1:length(reg), function(x) getCall(reg[[x]])))
-        assign("reg.mid", lapply(1:length(reg), function(x)
+        assign("reg_mid", lapply(1:length(reg), function(x)
           switch(("rcreg" %in% class(reg[[x]]) | "simexreg" %in% class(reg[[x]])) + 1, "1" = reg[[x]], "2" = reg[[x]]$NAIVEreg)))
-        assign(paste0("is_lm_", reg_name), sapply(1:length(reg.mid), function(x) inherits(reg.mid[[x]], "lm")))
-        assign(paste0("is_glm_", reg_name), sapply(1:length(reg.mid), function(x) inherits(reg.mid[[x]], "glm")))
-        assign(paste0("is_svyglm_", reg_name), sapply(1:length(reg.mid), function(x) inherits(reg.mid[[x]], "svyglm")))
-        assign(paste0("is_gam_", reg_name), sapply(1:length(reg.mid), function(x) inherits(reg.mid[[x]], "gam")))
-        assign(paste0("family_", reg_name), lapply(1:length(reg.mid), function(x)
-          if (get(paste0("is_lm_", reg_name))[x] | get(paste0("is_glm_", reg_name))[x]) family(reg.mid[[x]])))
-        assign(paste0("is_multinom_", reg_name), sapply(1:length(reg.mid), function(x) inherits(reg.mid[[x]], "multinom")))
-        assign(paste0("is_svymultinom_", reg_name), sapply(1:length(reg.mid), function(x) inherits(reg.mid[[x]], "svymultinom")))
-        assign(paste0("is_polr_", reg_name), sapply(1:length(reg.mid), function(x) inherits(reg.mid[[x]], "polr")))
+        assign(paste0("is_lm_", reg_name), sapply(1:length(reg_mid), function(x) inherits(reg_mid[[x]], "lm")))
+        assign(paste0("is_glm_", reg_name), sapply(1:length(reg_mid), function(x) inherits(reg_mid[[x]], "glm")))
+        assign(paste0("is_svyglm_", reg_name), sapply(1:length(reg_mid), function(x) inherits(reg_mid[[x]], "svyglm")))
+        assign(paste0("is_gam_", reg_name), sapply(1:length(reg_mid), function(x) inherits(reg_mid[[x]], "gam")))
+        assign(paste0("family_", reg_name), lapply(1:length(reg_mid), function(x)
+          if (get(paste0("is_lm_", reg_name))[x] | get(paste0("is_glm_", reg_name))[x]) family(reg_mid[[x]])))
+        assign(paste0("is_multinom_", reg_name), sapply(1:length(reg_mid), function(x) inherits(reg_mid[[x]], "multinom")))
+        assign(paste0("is_svymultinom_", reg_name), sapply(1:length(reg_mid), function(x) inherits(reg_mid[[x]], "svymultinom")))
+        assign(paste0("is_polr_", reg_name), sapply(1:length(reg_mid), function(x) inherits(reg_mid[[x]], "polr")))
         assign(paste0("weights_", reg_name), lapply(1:length(reg), function(x) model.frame(get(reg_name)[[x]])$'(weights)'))
       }
-      rm(reg.mid)
+      rm(reg_mid)
     }
   }
   

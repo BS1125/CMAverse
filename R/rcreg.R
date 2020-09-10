@@ -167,20 +167,20 @@ rcreg <- function(reg = NULL, data = NULL, weights = NULL,
     # code categorical variables into dummy variables
     ind_data <- model.matrix(as.formula(paste0("~", paste(c(MEvariable, ind_var[-MEvar_index]),
                                                           collapse = "+"))),
-                             data = data[, ind_var])[, -1]
+                             model.frame(~., data = data[, ind_var], na.action = na.pass))[, -1]
 
     rc_step <- function(data = NULL, ind_data = NULL, indices = NULL, outreg = FALSE) {
       data <- data[indices, ]
       ind_data <- ind_data[indices, ]
       n <- nrow(ind_data)
       # mean values of independent variables in the regression formula
-      mean <- colMeans(ind_data)
+      mean <- colMeans(ind_data, na.rm = TRUE)
       W <- ind_data - t(mean)[rep(1, n), ]
       # var-cov matrix of variables measured with error with all independent variables
-      covmat <- cov(ind_data[, MEvariable], ind_data)
+      covmat <- cov(ind_data[, MEvariable], ind_data, use = "complete.obs")
       # true var-cov matrix of variables measured with error with all independent variables
       covmat[1, 1] <- covmat[1, 1] - MEerror ^ 2
-      EX <- as.vector(rep(mean[1], n) + W %*% t(covmat %*% solve(cov(ind_data))))
+      EX <- as.vector(rep(mean[1], n) + W %*% t(covmat %*% solve(cov(ind_data, use = "complete.obs"))))
       rcdata <- data
       rcdata[, MEvariable] <- EX
       # error-corrected regression object

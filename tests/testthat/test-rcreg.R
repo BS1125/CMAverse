@@ -27,7 +27,8 @@ test_that("rcreg works correctly for lm", {
   expect_equal(model.frame(reg_rc), model.frame(reg_naive))
   expect_equal(update(reg_rc, data = data)$RCcoef, coef(reg_rc))
   expect_equal(summary(reg_rc)$summarydf$Estimate, as.numeric(coef(reg_rc)))
-  
+  expect_equal(class(print(reg_rc)), "numeric")
+  expect_equal(class(print(summary(reg_rc))), "data.frame")
 })
 
 test_that("rcreg works correctly for glm", {

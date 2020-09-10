@@ -117,14 +117,14 @@ model.frame.svymultinom <- function(formula, ...) {
   return(model.frame(formula$NAIVEreg, ...))
 }
 
-#' @describeIn svymultinom Print the results of \code{svymultinom} nicely
+#' @describeIn svymultinom Print results of \code{svymultinom} nicely
 #' @export
 print.svymultinom <- function(x, ...) {
-  cat("Call:\n")
+  cat("\nCall:\n")
   print(x$call)
-  cat(paste("\n# Naive regression object: \n"))
-  print(x$NAIVEreg)
-  cat("\n# Var-cov matrix of coefficients:\n")
+  cat(paste("\nCoefficients: \n"))
+  print(coef(x))
+  cat("\nVar-cov matrix of coefficients:\n")
   print(x$vcov)
 }
 
