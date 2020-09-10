@@ -104,7 +104,6 @@ estinf <- function() {
       astar <- a_lev[1]
       warning(paste0("astar is not a value of the exposure; ", astar, " is used"))
     }
-    rm(a_lev)
   }
   out$ref$a <- a
   out$ref$astar <- astar

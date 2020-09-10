@@ -8,4 +8,4 @@ globalVariables(c("data", "CIlower", "CIupper", "EMint", "Effect", "MC", "PE", "
                   "is_polr_postcreg", "is_polr_wmreg", "is_polr_yreg", "is_survreg_yreg",
                   "is_svymultinom_mreg", "mediator", "model", "multimp", "mval", "n", "nboot", "outcome", "postc",
                   "postcreg", "basec", "basecval", "event", "weights_wmreg", "weights_yreg", "wmreg", "y_case",
-                  "y_control", "yprevalence", "yrare", "yref", "nRep"))
+                  "y_control", "yprevalence", "yrare", "yref", "nRep", "a_lev"))
