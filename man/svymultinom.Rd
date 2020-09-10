@@ -52,7 +52,7 @@ svymultinom(formula = NULL, weights = NULL, data = NULL)
 is \code{TRUE}.}
 }
 \value{
-An object of class 'svymultinom' is returned:
+An object of class \code{svymultinom} is returned:
 \item{call}{the function call,}
 \item{NAIVEreg}{the naive multinomial regression object,}
 \item{vcov}{the replicate-based estimate of the variance-covariance matrix of coefficients,}
@@ -75,7 +75,7 @@ estimate of the variance-covariance matrix of coefficients for a multinomial reg
 
 \item \code{model.frame}: Extract the model frame
 
-\item \code{print}: Print the results of \code{svymultinom} nicely
+\item \code{print}: Print results of \code{svymultinom} nicely
 
 \item \code{summary}: Summarize results of \code{svymultinom} nicely
 

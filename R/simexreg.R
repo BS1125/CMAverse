@@ -332,7 +332,9 @@ print.simexreg <- function(x, ...) {
   cat("Call:\n")
   print(x$call)
   cat(paste("\nNaive regression object: \n"))
-  print(x$NAIVEreg, ...)
+  x$NAIVEreg$call <- update(x$NAIVEreg,data=getCall(x$NAIVEreg)$data,
+                            weights=getCall(x$NAIVEreg)$weights, evaluate = FALSE)
+  print(x$NAIVEreg)
   cat("\nVariable measured with error:\n")
   cat(x$ME$MEvariable)
   cat("\nMeasurement error:\n")
@@ -364,6 +366,8 @@ print.summary.simexreg <- function(x, digits = 4, ...) {
   cat("Call:\n")
   print(x$call)
   cat(paste("\nNaive regression object: \n"))
+  x$NAIVEreg$call <- update(x$NAIVEreg,data=getCall(x$NAIVEreg)$data,
+                            weights=getCall(x$NAIVEreg)$weights, evaluate = FALSE)
   print(x$NAIVEreg)
   cat("\nVariable measured with error:\n")
   cat(x$ME$MEvariable)

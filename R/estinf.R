@@ -56,20 +56,20 @@ estinf <- function() {
           startsWith(family_yreg$family, "Ordered Categorical"))) |
         is_multinom_yreg | is_polr_yreg | is_survreg_yreg | is_coxph_yreg |
         inference == "delta")) stop("Unsupported yreg")
-  if (!is.null(ereg) && !(
-        (((is_lm_ereg | is_glm_ereg) && 
+  if (!is.null(ereg) && 
+      !(((is_lm_ereg | is_glm_ereg) && 
           (family_ereg$family %in% c("binomial", "quasibinomial", "multinom") |
            startsWith(family_ereg$family, "Ordered Categorical"))) |
-         is_multinom_ereg | is_polr_ereg))) stop("Unsupported ereg")
+         is_multinom_ereg | is_polr_ereg)) stop("Unsupported ereg")
   if (!is.null(mreg) && inference == "bootstrap") {
     for (p in 1:length(mreg)) {
-      if (!((((is_lm_mreg[[p]] | is_glm_mreg[[p]]) && 
+      if (!(((is_lm_mreg[[p]] | is_glm_mreg[[p]]) && 
               (family_mreg[[p]]$family %in% 
                c("gaussian", "inverse.gaussian", "poisson", "quasipoisson", 
                  "Gamma", "binomial", "multinom") |
                startsWith(family_mreg[[p]]$family, "Negative Binomial") |
                startsWith(family_mreg[[p]]$family, "Ordered Categorical"))) |
-             is_multinom_mreg[[p]] | is_polr_mreg[[p]]))) stop(paste0("Unsupported mreg[[", p, "]]"))
+             is_multinom_mreg[[p]] | is_polr_mreg[[p]])) stop(paste0("Unsupported mreg[[", p, "]]"))
     }
   }
   if (!is.null(wmreg)) {
@@ -83,27 +83,28 @@ estinf <- function() {
   }
   if (!is.null(postcreg)) {
     for (p in 1:length(postcreg)) {
-      if (!((((is_lm_postcreg[[p]] | is_glm_postcreg[[p]]) && 
+      if (!(((is_lm_postcreg[[p]] | is_glm_postcreg[[p]]) && 
               (family_postcreg[[p]]$family %in% 
                c("gaussian", "inverse.gaussian", "poisson", "quasipoisson", 
                  "Gamma", "binomial", "multinom") |
                startsWith(family_postcreg[[p]]$family, "Negative Binomial") |
                startsWith(family_postcreg[[p]]$family, "Ordered Categorical"))) |
-             is_multinom_postcreg[[p]] | is_polr_postcreg[[p]]))) stop(paste0("Unsupported postcreg[[", p, "]]"))
+             is_multinom_postcreg[[p]] | is_polr_postcreg[[p]])) stop(paste0("Unsupported postcreg[[", p, "]]"))
     }
   }
   
   # reference values of the exposure
   if (is.factor(data[, exposure]) | is.character(data[, exposure])) {
-    a_lev <- levels(as.factor(data[, exposure]))
+    a_lev <- levels(droplevels(as.factor(data[, exposure])))
     if (!a %in% a_lev) {
       a <- a_lev[length(a_lev)]
-      warning(paste0("a is not a level of the exposure; ", a, " is used"))
+      warning(paste0("a is not a value of the exposure; ", a, " is used"))
     }
     if (!astar %in% a_lev) {
       astar <- a_lev[1]
-      warning(paste0("astar is not a level of the exposure; ", astar, " is used"))
+      warning(paste0("astar is not a value of the exposure; ", astar, " is used"))
     }
+    rm(a_lev)
   }
   out$ref$a <- a
   out$ref$astar <- astar
@@ -133,7 +134,7 @@ estinf <- function() {
     y_control <- y_lev[1]
     y_case <- y_lev[2]
   }
-  
+
   if (model == "rb") {
     
     ###################################################################################################

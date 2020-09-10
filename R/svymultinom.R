@@ -15,7 +15,7 @@
 #' @param ... additional arguments
 #' 
 #' @return
-#' An object of class 'svymultinom' is returned:
+#' An object of class \code{svymultinom} is returned:
 #' \item{call}{the function call,}
 #' \item{NAIVEreg}{the naive multinomial regression object,}
 #' \item{vcov}{the replicate-based estimate of the variance-covariance matrix of coefficients,}
@@ -65,7 +65,7 @@ svymultinom <- function(formula = NULL, weights = NULL, data = NULL) {
   out <- list()  
   out$call <- cl
   environment(formula) <- environment()
-  reg <- multinom(formula = formula, data = data, weights = weights, trace = FALSE)
+  reg <- nnet::multinom(formula = formula, data = data, weights = weights, trace = FALSE)
   out$NAIVEreg <- reg
   coefnames <- dimnames(coef(reg))
   coefnames <- switch((!is.null(coefnames[[1]])) + 1, "1" =  coefnames[[2]],
@@ -73,8 +73,7 @@ svymultinom <- function(formula = NULL, weights = NULL, data = NULL) {
                         paste(name1, name2, sep = ":"))))
   # survey design
   if (is.null(weights)) svydes <- as.svrepdesign(svydesign(~1, data = data), type = "JK1")
-  if (!is.null(weights)) svydes <- as.svrepdesign(svydesign(~1, weights = ~weights, 
-                                                            data = data), type = "JK1")
+  if (!is.null(weights)) svydes <- as.svrepdesign(svydesign(~1, weights = ~weights, data = data), type = "JK1")
   # survey vcov
   out$vcov <- vcov(withReplicates(svydes, function(w, data) {
     environment(formula) <- environment()
@@ -124,7 +123,7 @@ print.svymultinom <- function(x, ...) {
   print(x$call)
   cat(paste("\nCoefficients: \n"))
   print(coef(x))
-  cat("\nVar-cov matrix of coefficients:\n")
+  cat("\nThe var-cov matrix of coefficients:\n")
   print(x$vcov)
 }
 
@@ -147,7 +146,7 @@ summary.svymultinom <- function(object, ...) {
 #' @describeIn svymultinom Print summary of \code{svymultinom} nicely
 #' @export
 print.summary.svymultinom <- function(x, digits = 4, ...) {
-  cat("Call:\n")
+  cat("\nCall:\n")
   print(x$call)
   cat("\n")
   printCoefmat(x$summarydf, digits = digits)

@@ -117,7 +117,7 @@
 #' }                
 #'
 #' @importFrom stats as.formula model.frame family coef predict model.matrix getCall cov 
-#' formula vcov pt
+#' formula vcov pt na.pass
 #' @importFrom boot boot
 #' 
 #' @export
@@ -298,6 +298,8 @@ print.rcreg <- function(x, ...) {
   cat("Call:\n")
   print(x$call)
   cat(paste("\nNaive regression object: \n"))
+  x$NAIVEreg$call <- update(x$NAIVEreg,data=getCall(x$NAIVEreg)$data,
+                                   weights=getCall(x$NAIVEreg)$weights, evaluate = FALSE)
   print(x$NAIVEreg)
   cat("\nVariable measured with error:\n")
   cat(x$ME$MEvariable)
@@ -330,6 +332,8 @@ print.summary.rcreg <- function(x, digits = 4, ...) {
   cat("Call:\n")
   print(x$call)
   cat(paste("\nNaive regression object: \n"))
+  x$NAIVEreg$call <- update(x$NAIVEreg,data=getCall(x$NAIVEreg)$data,
+                            weights=getCall(x$NAIVEreg)$weights, evaluate = FALSE)
   print(x$NAIVEreg)
   cat("\nVariable measured with error:\n")
   cat(x$ME$MEvariable)

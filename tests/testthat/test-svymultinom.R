@@ -44,7 +44,7 @@ test_that("svymultinom works correctly", {
   expect_equal(reg_summ$summarydf[, 1], as.vector(t(reg_coef)))
   expect_equal(reg_summ$summarydf[, 2], sqrt(diag(reg_vcov)))
   expect_equal(reg, reg_update)
-  expect_equal(class(print(reg)), "numeric")
+  expect_equal(class(print(reg)), "matrix")
   expect_equal(class(print(summary(reg))), "data.frame")
   
 })
