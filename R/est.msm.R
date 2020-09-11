@@ -12,7 +12,7 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
   if (casecontrol && !is.null(yprevalence)) {
     # method 1 for a case control design
     prob1 <- mean(data[, outcome] == y_case, na.rm = TRUE)
-    w4casecon <- ifelse(data[, outcome] == y_case, yprevalence / prob1, (1 - yprevalence) / (1 - prob1))
+    w4casecon <- as.vector(ifelse(data[, outcome] == y_case, yprevalence / prob1, (1 - yprevalence) / (1 - prob1)))
     if (length(basec) != 0) {
       # weights for ereg
       if (!is.null(weights_ereg)) weights_ereg <- weights_ereg[indices] * w4casecon
@@ -32,11 +32,10 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
         category <- as.numeric(wa_data[, 1]) - 1
         wadenom <-  wadenom_prob[, 1] ^ category * (1 - wadenom_prob[, 1]) ^ (1 - category)
       } else {
-        category <- model.matrix(as.formula(paste("~0+", exposure, sep = "")), 
-                                 data = model.frame(~., data = wa_data, na.action = na.pass))
+        category <- model.matrix(as.formula(paste("~0+", exposure, sep = "")), data = wa_data)
         wadenom <- rowSums(category * wadenom_prob)
       }
-      wa <- wanom / wadenom
+      wa <- as.vector(wanom / wadenom)
       rm(a_lev, wa_data, wanom, wadenom_prob, category, wadenom)
     } else wa <- rep(1, n)
 
@@ -74,13 +73,12 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
         wmdenom[, p] <-  wmdenom_prob[, 1] ^ category * (1 - wmdenom_prob[, 1]) ^ (1 - category)
         wmnom[, p] <-  wmnom_prob[, 1] ^ category * (1 - wmnom_prob[, 1]) ^ (1 - category)
       } else {
-        category <- model.matrix(as.formula(paste("~0+", mediator[p], sep = "")), 
-                                 data = model.frame(~., data = wm_data, na.action = na.pass))
+        category <- model.matrix(as.formula(paste("~0+", mediator[p], sep = "")), data = wm_data)
         wmdenom[, p] <- rowSums(category * wmdenom_prob)
         wmnom[, p] <- rowSums(category * wmnom_prob)
       }
     }
-    wm <- wmnom / wmdenom
+    wm <- as.vector(wmnom / wmdenom)
     rm(call_wmdenomreg, call_wmnomreg, weights_wmdenomreg, weights_wmnomreg, m_lev, wm_data, 
        wmdenom_prob, wmnom_prob, category, wmdenom, wmnom)
     
@@ -125,11 +123,10 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
         category <- as.numeric(wa_data[, 1]) - 1
         wadenom <-  wadenom_prob[, 1] ^ category * (1 - wadenom_prob[, 1]) ^ (1 - category)
       } else {
-        category <- model.matrix(as.formula(paste("~0+", exposure, sep = "")), 
-                     data = model.frame(~., data = wa_data, na.action = na.pass))
+        category <- model.matrix(as.formula(paste("~0+", exposure, sep = "")), data = wa_data)
         wadenom <- rowSums(category * wadenom_prob)
       }
-      wa <- wanom / wadenom
+      wa <- as.vector(wanom / wadenom)
       rm(a_lev, wa_data, wanom, wadenom_prob, category, wadenom)
     } else wa <- rep(1, n)
 
@@ -159,13 +156,12 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
         wmdenom[, p] <-  wmdenom_prob[, 1] ^ category * (1 - wmdenom_prob[, 1]) ^ (1 - category)
         wmnom[, p] <-  wmnom_prob[, 1] ^ category * (1 - wmnom_prob[, 1]) ^ (1 - category)
       } else {
-        category <- model.matrix(as.formula(paste("~0+", mediator[p], sep = "")), 
-                     data = model.frame(~., data = wm_data, na.action = na.pass))
+        category <- model.matrix(as.formula(paste("~0+", mediator[p], sep = "")), data = wm_data)
         wmdenom[, p] <- rowSums(category * wmdenom_prob)
         wmnom[, p] <- rowSums(category * wmnom_prob)
       }
     }
-    wm <- wmnom / wmdenom
+    wm <- as.vector(wmnom / wmdenom)
     rm(call_wmdenomreg, call_wmnomreg, m_lev, wm_data, wmdenom_prob, wmnom_prob, category, wmdenom, wmnom)
     
     # weights for yreg
@@ -206,11 +202,10 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
         category <- as.numeric(wa_data[, 1]) - 1
         wadenom <-  wadenom_prob[, 1] ^ category * (1 - wadenom_prob[, 1]) ^ (1 - category)
       } else {
-        category <- model.matrix(as.formula(paste("~0+", exposure, sep = "")), 
-                     data = model.frame(~., data = wa_data, na.action = na.pass))
+        category <- model.matrix(as.formula(paste("~0+", exposure, sep = "")), data = wa_data)
         wadenom <- rowSums(category * wadenom_prob)
       }
-      wa <- wanom / wadenom
+      wa <- as.vector(wanom / wadenom)
       rm(a_lev, wa_data, wanom, wadenom_prob, category, wadenom)
     } else wa <- rep(1, n)
 
@@ -240,13 +235,12 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
         wmdenom[, p] <-  wmdenom_prob[, 1] ^ category * (1 - wmdenom_prob[, 1]) ^ (1 - category)
         wmnom[, p] <-  wmnom_prob[, 1] ^ category * (1 - wmnom_prob[, 1]) ^ (1 - category)
       } else {
-        category <- model.matrix(as.formula(paste("~0+", mediator[p], sep = "")), 
-                     data = model.frame(~., data = wm_data, na.action = na.pass))
+        category <- model.matrix(as.formula(paste("~0+", mediator[p], sep = "")), data = wm_data)
         wmdenom[, p] <- rowSums(category * wmdenom_prob)
         wmnom[, p] <- rowSums(category * wmnom_prob)
       }
     }
-    wm <- wmnom / wmdenom
+    wm <- as.vector(wmnom / wmdenom)
     rm(call_wmdenomreg, call_wmnomreg, m_lev, wm_data, wmdenom_prob, wmnom_prob, category, wmdenom, wmnom)
     
     # weights for outcome regression
@@ -374,7 +368,7 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
   rm(type, ydesign0m, ydesign1m, ydesign00, ydesign01, ydesign10, ydesign11)
 
   # weights of yreg
-  weightsEY <- model.frame(yreg)$'(weights)'
+  weightsEY <- as.vector(model.frame(yreg)$'(weights)')
   if (is.null(weightsEY)) weightsEY <- rep(1, n)
 
   # categorical Y

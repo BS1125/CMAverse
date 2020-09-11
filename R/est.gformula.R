@@ -11,7 +11,7 @@ est.gformula <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRU
   if (casecontrol && !is.null(yprevalence)) {
     # method 1 for a case control design
     prob1 <- mean(data[, outcome] == y_case, na.rm = TRUE)
-    w4casecon <- ifelse(data[, outcome] == y_case, yprevalence / prob1, (1 - yprevalence) / (1 - prob1))
+    w4casecon <- as.vector(ifelse(data[, outcome] == y_case, yprevalence / prob1, (1 - yprevalence) / (1 - prob1)))
     # weights for yreg
     if (!is.null(weights_yreg)) weights_yreg <- weights_yreg[indices] * w4casecon
     if (is.null(weights_yreg)) weights_yreg <- w4casecon
@@ -315,7 +315,7 @@ est.gformula <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRU
   rm(type, ydesign0m, ydesign1m, ydesign00, ydesign01, ydesign10, ydesign11)
   
   # weights of yreg
-  weightsEY <- model.frame(yreg)$'(weights)'
+  weightsEY <- as.vector(model.frame(yreg)$'(weights)')
   if (is.null(weightsEY)) weightsEY <- rep(1, n)
   
   # categorical Y

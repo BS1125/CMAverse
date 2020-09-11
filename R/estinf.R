@@ -57,18 +57,18 @@ estinf <- function() {
         inference == "delta")) stop("Unsupported yreg")
   if (!is.null(ereg) && 
       !(((is_lm_ereg | is_glm_ereg) && 
-          (family_ereg$family %in% c("binomial", "quasibinomial", "multinom") |
-           startsWith(family_ereg$family, "Ordered Categorical"))) |
-         is_multinom_ereg | is_polr_ereg)) stop("Unsupported ereg")
+         (family_ereg$family %in% c("binomial", "quasibinomial", "multinom") |
+          startsWith(family_ereg$family, "Ordered Categorical"))) |
+        is_multinom_ereg | is_polr_ereg)) stop("Unsupported ereg")
   if (!is.null(mreg) && inference == "bootstrap") {
     for (p in 1:length(mreg)) {
       if (!(((is_lm_mreg[[p]] | is_glm_mreg[[p]]) && 
-              (family_mreg[[p]]$family %in% 
-               c("gaussian", "inverse.gaussian", "poisson", "quasipoisson", 
-                 "Gamma", "binomial", "multinom") |
-               startsWith(family_mreg[[p]]$family, "Negative Binomial") |
-               startsWith(family_mreg[[p]]$family, "Ordered Categorical"))) |
-             is_multinom_mreg[[p]] | is_polr_mreg[[p]])) stop(paste0("Unsupported mreg[[", p, "]]"))
+             (family_mreg[[p]]$family %in% 
+              c("gaussian", "inverse.gaussian", "poisson", "quasipoisson", 
+                "Gamma", "binomial", "multinom") |
+              startsWith(family_mreg[[p]]$family, "Negative Binomial") |
+              startsWith(family_mreg[[p]]$family, "Ordered Categorical"))) |
+            is_multinom_mreg[[p]] | is_polr_mreg[[p]])) stop(paste0("Unsupported mreg[[", p, "]]"))
     }
   }
   if (!is.null(wmreg)) {
@@ -83,12 +83,12 @@ estinf <- function() {
   if (!is.null(postcreg)) {
     for (p in 1:length(postcreg)) {
       if (!(((is_lm_postcreg[[p]] | is_glm_postcreg[[p]]) && 
-              (family_postcreg[[p]]$family %in% 
-               c("gaussian", "inverse.gaussian", "poisson", "quasipoisson", 
-                 "Gamma", "binomial", "multinom") |
-               startsWith(family_postcreg[[p]]$family, "Negative Binomial") |
-               startsWith(family_postcreg[[p]]$family, "Ordered Categorical"))) |
-             is_multinom_postcreg[[p]] | is_polr_postcreg[[p]])) stop(paste0("Unsupported postcreg[[", p, "]]"))
+             (family_postcreg[[p]]$family %in% 
+              c("gaussian", "inverse.gaussian", "poisson", "quasipoisson", 
+                "Gamma", "binomial", "multinom") |
+              startsWith(family_postcreg[[p]]$family, "Negative Binomial") |
+              startsWith(family_postcreg[[p]]$family, "Ordered Categorical"))) |
+            is_multinom_postcreg[[p]] | is_polr_postcreg[[p]])) stop(paste0("Unsupported postcreg[[", p, "]]"))
     }
   }
   
@@ -134,7 +134,7 @@ estinf <- function() {
     y_control <- y_lev[1]
     y_case <- y_lev[2]
   }
-
+  
   if (model == "rb") {
     ###################################################################################################
     ############################################Regression-based Approach##############################
@@ -318,7 +318,7 @@ estinf <- function() {
       effect.pe <- colMeans(est_imp_df)
       n_effect <- length(effect.pe)
       out$reg.output <- lapply(1:m, function(x) est_imp[[x]]$reg.output)
-     
+      
       boot.step <- function(data = NULL, indices = NULL) {
         data_boot <- data[indices, ]
         args_mice$data <- data_boot
@@ -381,22 +381,19 @@ estinf <- function() {
     ###################################################################################################
     ############################################Weighting-based Approach##############################
     ###################################################################################################
-    if (length(basec) != 0 && is.null(ereg)) stop("ereg is required for model = 'wb' when length(basec) != 0")
     if (length(basec) != 0 && (!((is_glm_ereg && (family_ereg$family %in% c("binomial", "quasibinomial", "multinom") |
                                                   startsWith(family_ereg$family, "Ordered Categorical"))) |
                                  is_multinom_ereg | is_polr_ereg))) stop(
                                    "model = 'wb' only supports categorical exposure when length(basec) != 0")
     if (is_survreg_yreg | is_coxph_yreg) stop("model = 'wb' doesn't support survival outcomes")
-    
+
     environment(est.wb) <- environment()
     if (!multimp) {
-      
       # point estimates of causal effects
       est <- est.wb(data = data, indices = NULL, outReg = TRUE, full = full)
       effect.pe <- est$est
       n_effect <- length(effect.pe)
       out$reg.output <- est$reg.output
-      
       # bootstrap results
       boots <- boot(data = data, statistic = est.wb, R = nboot, outReg = FALSE, full = full)
       # bootstrap percentile CIs
@@ -404,14 +401,7 @@ estinf <- function() {
       effect.ci.high <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 1 - (1 - 0.95)/2, na.rm = TRUE))
       # bootstrap p-values
       effect.pval <- sapply(1:n_effect, function(x) boot.pval(boots = boots$t[, x], pe = effect.pe[x]))
-      
     } else {
-      
-      # arguments for mice()
-      if (!is.null(args_mice$data)) warning("args_mice$data is overwritten by data")
-      args_mice$data <- data
-      out$multimp$args_mice <- args_mice
-      
       # imputed data sets
       data_imp <- complete(do.call(mice, args_mice), action = "all")
       m <- length(data_imp)
@@ -422,7 +412,6 @@ estinf <- function() {
       effect.pe <- colMeans(est_imp_df)
       n_effect <- length(effect.pe)
       out$reg.output <- lapply(1:m, function(x) est_imp[[x]]$reg.output)
-      
       boot.step <- function(data = NULL, indices = NULL) {
         data_boot <- data[indices, ]
         args_mice$data <- data_boot
@@ -437,18 +426,14 @@ estinf <- function() {
       # bootstrap results
       boots <- boot(data = data, statistic = boot.step, R = nboot)
       # bootstrap percentile CIs
-      effect.ci.low <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = (1 - 0.95)/2, na.rm=TRUE))
-      effect.ci.high <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 1 - (1 - 0.95)/2, na.rm=TRUE))
+      effect.ci.low <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 0.025, na.rm=TRUE))
+      effect.ci.high <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 0.975, na.rm=TRUE))
       # bootstrap p-values
       effect.pval <- sapply(1:n_effect, function(x) boot.pval(boots = boots$t[, x], pe = effect.pe[x]))
-      
     }
     
     if ((is_lm_yreg | is_glm_yreg) &&
-        (family_yreg$family %in% c("gaussian", "inverse.gaussian", "Gamma", "quasi", "gaulss", "gevlss") |
-         startsWith(family_yreg$family, "Tweedie") |
-         startsWith(family_yreg$family, "Beta regression") |
-         startsWith(family_yreg$family, "Scaled t"))) {
+        (family_yreg$family %in% c("gaussian", "inverse.gaussian", "Gamma", "quasi"))) {
       # standard errors by bootstrapping
       effect.se <- sapply(1:n_effect, function(x) sd(boots$t[, x]))
       # effect names
@@ -457,9 +442,9 @@ estinf <- function() {
                                  "pm", "int", "pe")
       if (!full) effect_name <- c("cde", "pnde", "tnde", "pnie", "tnie", "te")
     } else {
-      # transform standard errors of effects in log scale
+      # transform standard errors of effects on the log scale
       effect.se <- sapply(1:n_effect, function(x) ifelse(x <= 6, sd(exp(boots$t[, x])), sd(boots$t[, x])))
-      # transform effects in log ratio scale into effects in ratio scale
+      # transform effects on the log ratio scale into effects on the ratio scale
       effect.pe[1:6] <- exp(effect.pe[1:6])
       effect.ci.low[1:6] <- exp(effect.ci.low[1:6])
       effect.ci.high[1:6] <- exp(effect.ci.high[1:6])
@@ -480,40 +465,28 @@ estinf <- function() {
     out$effect.pval <- effect.pval
     
   } else if (model == "iorw") {
-    
     ###################################################################################################
     ###################################Inverse Odds Ratio Weighting Approach###########################
     ###################################################################################################
-    if (is.null(ereg)) stop("ereg is required for model = 'iorw'")
     if (!((is_glm_ereg && (family_ereg$family %in% c("binomial", "quasibinomial", "multinom") |
                            startsWith(family_ereg$family, "Ordered Categorical"))) |
           is_multinom_ereg | is_polr_ereg)) stop("model = 'iorw' only supports categorical exposure")
     
     environment(est.iorw) <- environment()
     if (!multimp) {
-      
       # point estimates of causal effects
       est <- est.iorw(data = data, indices = NULL, outReg = TRUE, full = full)
       effect.pe <- est$est
       n_effect <- length(effect.pe)
       out$reg.output <- est$reg.output
-      
       # bootstrap results
-      boots <- boot(data = data, statistic = est.iorw, R = nboot, outReg = FALSE,
-                    full = full)
+      boots <- boot(data = data, statistic = est.iorw, R = nboot, outReg = FALSE, full = full)
       # bootstrap percentile CIs
-      effect.ci.low <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = (1 - 0.95)/2, na.rm = TRUE))
-      effect.ci.high <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 1 - (1 - 0.95)/2, na.rm = TRUE))
+      effect.ci.low <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 0.025, na.rm = TRUE))
+      effect.ci.high <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 0.975, na.rm = TRUE))
       # bootstrap p-values
       effect.pval <- sapply(1:n_effect, function(x) boot.pval(boots = boots$t[, x], pe = effect.pe[x]))
-      
     } else {
-      
-      # arguments for mice()
-      if (!is.null(args_mice$data)) warning("args_mice$data is overwritten by data")
-      args_mice$data <- data
-      out$multimp$args_mice <- args_mice
-      
       # imputed data sets
       data_imp <- complete(do.call(mice, args_mice), action = "all")
       m <- length(data_imp)
@@ -524,7 +497,6 @@ estinf <- function() {
       effect.pe <- colMeans(est_imp_df)
       n_effect <- length(effect.pe)
       out$reg.output <- lapply(1:m, function(x) est_imp[[x]]$reg.output)
-      
       boot.step <- function(data = NULL, indices = NULL) {
         data_boot <- data[indices, ]
         args_mice$data <- data_boot
@@ -539,27 +511,23 @@ estinf <- function() {
       # bootstrap results
       boots <- boot(data = data, statistic = boot.step, R = nboot)
       # bootstrap percentile CIs
-      effect.ci.low <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = (1 - 0.95)/2, na.rm=TRUE))
-      effect.ci.high <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 1 - (1 - 0.95)/2, na.rm=TRUE))
+      effect.ci.low <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 0.025, na.rm=TRUE))
+      effect.ci.high <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 0.975, na.rm=TRUE))
       # bootstrap p-values
       effect.pval <- sapply(1:n_effect, function(x) boot.pval(boots = boots$t[, x], pe = effect.pe[x]))
-      
     }
     
     if ((is_lm_yreg | is_glm_yreg) &&
-        (family_yreg$family %in% c("gaussian", "inverse.gaussian", "Gamma", "quasi", "gaulss", "gevlss") |
-         startsWith(family_yreg$family, "Tweedie") |
-         startsWith(family_yreg$family, "Beta regression") |
-         startsWith(family_yreg$family, "Scaled t"))) {
+        (family_yreg$family %in% c("gaussian", "inverse.gaussian", "Gamma", "quasi"))) {
       # standard errors by bootstrapping
       effect.se <- sapply(1:n_effect, function(x) sd(boots$t[, x]))
       # effect names
       if (full) effect_name <- c("te", "pnde", "tnie", "pm")
       if (!full) effect_name <- c("te", "pnde", "tnie")
     } else {
-      # transform standard errors of effects in log scale
+      # transform standard errors of effects on the log scale
       effect.se <- sapply(1:n_effect, function(x) ifelse(x <= 3, sd(exp(boots$t[, x])), sd(boots$t[, x])))
-      # transform effects in log ratio scale into effects in ratio scale
+      # transform effects on thelog ratio scale into effects on the ratio scale
       effect.pe[1:3] <- exp(effect.pe[1:3])
       effect.ci.low[1:3] <- exp(effect.ci.low[1:3])
       effect.ci.high[1:3] <- exp(effect.ci.high[1:3])
@@ -575,7 +543,7 @@ estinf <- function() {
     out$effect.ci.low <- effect.ci.low
     out$effect.ci.high <- effect.ci.high
     out$effect.pval <- effect.pval
-    
+   
   } else if (model == "msm") {
     ###################################################################################################
     #########################################Marginal Structural Model#################################
@@ -586,7 +554,7 @@ estinf <- function() {
                                    "model = 'msm' only supports categorical exposure when length(basec) != 0")
     for (p in 1:length(mediator)) {
       if (!((is_glm_mreg[p] && (family_mreg[[p]]$family %in% c("binomial", "multinom") |
-                                 startsWith(family_mreg[[p]]$family, "Ordered Categorical"))) |
+                                startsWith(family_mreg[[p]]$family, "Ordered Categorical"))) |
             is_multinom_mreg[p] | is_polr_mreg[p])) stop(
               "model = 'msm' only supports categorical mediators")
       if (!((is_glm_wmreg[p] && (family_wmreg[[p]]$family %in% c("binomial", "quasibinomial", "multinom") |
@@ -602,22 +570,14 @@ estinf <- function() {
       effect.pe <- est$est
       n_effect <- length(effect.pe)
       out$reg.output <- est$reg.output
-      
       # bootstrap results
       boots <- boot(data = data, statistic = est.msm, R = nboot, outReg = FALSE, full = full)
       # bootstrap percentile CIs
-      effect.ci.low <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = (1 - 0.95)/2, na.rm = TRUE))
-      effect.ci.high <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 1 - (1 - 0.95)/2, na.rm = TRUE))
+      effect.ci.low <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 0.025, na.rm = TRUE))
+      effect.ci.high <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 0.975, na.rm = TRUE))
       # bootstrap p-values
       effect.pval <- sapply(1:n_effect, function(x) boot.pval(boots = boots$t[, x], pe = effect.pe[x]))
-      
     } else {
-      
-      # arguments for mice()
-      if (!is.null(args_mice$data)) warning("args_mice$data is overwritten by data")
-      args_mice$data <- data
-      out$multimp$args_mice <- args_mice
-      
       # imputed data sets
       data_imp <- complete(do.call(mice, args_mice), action = "all")
       m <- length(data_imp)
@@ -643,18 +603,14 @@ estinf <- function() {
       # bootstrap results
       boots <- boot(data = data, statistic = boot.step, R = nboot)
       # bootstrap percentile CIs
-      effect.ci.low <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = (1 - 0.95)/2, na.rm=TRUE))
-      effect.ci.high <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 1 - (1 - 0.95)/2, na.rm=TRUE))
+      effect.ci.low <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 0.025, na.rm=TRUE))
+      effect.ci.high <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 0.975, na.rm=TRUE))
       # bootstrap p-values
       effect.pval <- sapply(1:n_effect, function(x) boot.pval(boots = boots$t[, x], pe = effect.pe[x]))
-      
     }
     
     if ((is_lm_yreg | is_glm_yreg) &&
-        (family_yreg$family %in% c("gaussian", "inverse.gaussian", "Gamma", "quasi", "gaulss", "gevlss") |
-         startsWith(family_yreg$family, "Tweedie") |
-         startsWith(family_yreg$family, "Beta regression") |
-         startsWith(family_yreg$family, "Scaled t"))) {
+        (family_yreg$family %in% c("gaussian", "inverse.gaussian", "Gamma", "quasi"))) {
       # standard errors by bootstrapping
       effect.se <- sapply(1:n_effect, function(x) sd(boots$t[, x]))
       # effect names
@@ -669,9 +625,9 @@ estinf <- function() {
             "rpm", "rint", "rpe")
       if (length(postc) != 0 && !full) effect_name <- c("cde", "rpnde", "rtnde", "rpnie", "rtnie", "te")
     } else {
-      # transform standard errors of effects in log scale
+      # transform standard errors of effects on the log scale
       effect.se <- sapply(1:n_effect, function(x) ifelse(x <= 6, sd(exp(boots$t[, x])), sd(boots$t[, x])))
-      # transform effects in log ratio scale into effects in ratio scale
+      # transform effects on the log ratio scale into effects on the ratio scale
       effect.pe[1:6] <- exp(effect.pe[1:6])
       effect.ci.low[1:6] <- exp(effect.ci.low[1:6])
       effect.ci.high[1:6] <- exp(effect.ci.high[1:6])
@@ -688,7 +644,6 @@ estinf <- function() {
           "ERcde(prop)", "rERintref(prop)", "rERintmed(prop)", "rERpnie(prop)",
           "rpm", "rint", "rpe")
       if (length(postc) != 0 && !full) effect_name <- c("Rcde", "rRpnde", "rRtnde", "rRpnie", "rRtnie", "Rte")
-      
     }
     
     names(effect.pe) <- names(effect.se) <- names(effect.ci.low) <- names(effect.ci.high) <-
@@ -700,50 +655,36 @@ estinf <- function() {
     out$effect.pval <- effect.pval
     
   } else if (model == "ne") {
-    
     ###################################################################################################
     #########################################Natural Effect Model######################################
     ###################################################################################################
     if (!identical(class(yreg), c("glm", "lm"))) stop("model = 'ne' only supports yreg fitted via glm()")
     if (is.character(data[, exposure])) data[, exposure] <- as.factor(data[, exposure])
     
-
-    
     environment(est.ne) <- environment()
     if (!multimp) {
-      
       # point estimates of causal effects
       est <- est.ne(data = data, indices = NULL, outReg = TRUE, full = full)
       effect.pe <- est$est
       n_effect <- length(effect.pe)
       out$reg.output <- est$reg.output
-      
       # bootstrap results
       boots <- boot(data = data, statistic = est.ne, R = nboot, outReg = FALSE, full = full)
       # bootstrap percentile CIs
-      effect.ci.low <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = (1 - 0.95)/2, na.rm = TRUE))
-      effect.ci.high <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 1 - (1 - 0.95)/2, na.rm = TRUE))
+      effect.ci.low <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 0.025, na.rm = TRUE))
+      effect.ci.high <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 0.975, na.rm = TRUE))
       # bootstrap p-values
       effect.pval <- sapply(1:n_effect, function(x) boot.pval(boots = boots$t[, x], pe = effect.pe[x]))
-      
     } else {
-      
-      # arguments for mice()
-      if (!is.null(args_mice$data)) warning("args_mice$data is overwritten by data")
-      args_mice$data <- data
-      out$multimp$args_mice <- args_mice
-      
       # imputed data sets
       data_imp <- complete(do.call(mice, args_mice), action = "all")
       m <- length(data_imp)
       # estimate causal effects for each imputed data set
-      est_imp <- lapply(1:m, function(x)
-        est.ne(data = data_imp[[x]], indices = NULL, outReg = TRUE, full = full))
+      est_imp <- lapply(1:m, function(x) est.ne(data = data_imp[[x]], indices = NULL, outReg = TRUE, full = full))
       est_imp_df <- do.call(rbind, lapply(1:m, function(x) est_imp[[x]]$est))
       effect.pe <- colMeans(est_imp_df)
       n_effect <- length(effect.pe)
       out$reg.output <- lapply(1:m, function(x) est_imp[[x]]$reg.output)
-      
       boot.step <- function(data = NULL, indices = NULL) {
         data_boot <- data[indices, ]
         args_mice$data <- data_boot
@@ -758,11 +699,10 @@ estinf <- function() {
       # bootstrap results
       boots <- boot(data = data, statistic = boot.step, R = nboot)
       # bootstrap percentile CIs
-      effect.ci.low <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = (1 - 0.95)/2, na.rm=TRUE))
-      effect.ci.high <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 1 - (1 - 0.95)/2, na.rm=TRUE))
+      effect.ci.low <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 0.025, na.rm=TRUE))
+      effect.ci.high <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 0.975, na.rm=TRUE))
       # bootstrap p-values
       effect.pval <- sapply(1:n_effect, function(x) boot.pval(boots = boots$t[, x], pe = effect.pe[x]))
-      
     }
     
     if (family_yreg$family %in% c("gaussian", "inverse.gaussian", "Gamma", "quasi")) {
@@ -795,7 +735,6 @@ estinf <- function() {
     out$effect.ci.low <- effect.ci.low
     out$effect.ci.high <- effect.ci.high
     out$effect.pval <- effect.pval
-    
   }
   
   return(out)

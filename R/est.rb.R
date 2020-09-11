@@ -12,10 +12,10 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
   if (casecontrol && !is.null(yprevalence)) {
     # method 1 for a case control design
     prob1 <- mean(data[, outcome] == y_case, na.rm = TRUE)
-    w4casecon <- ifelse(data[, outcome] == y_case, yprevalence / prob1, (1 - yprevalence) / (1 - prob1))
+    w4casecon <- as.vector(ifelse(data[, outcome] == y_case, yprevalence / prob1, (1 - yprevalence) / (1 - prob1)))
     # update yreg
     if (!is.null(weights_yreg)) weights_yreg <- weights_yreg[indices] * w4casecon
-    if (is.null(weights_yreg)) weights_yreg <- w4casecon    
+    if (is.null(weights_yreg)) weights_yreg <- w4casecon
     if (inference == "delta") {
       call_yreg$design <- eval(bquote(svydesign(id=~1, weights = .(~weights_yreg), data = .(data))))
     } else {
@@ -380,7 +380,7 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     rm(type, ydesign0m, ydesign1m, ydesign00, ydesign01, ydesign10, ydesign11)
     
     # weights of yreg
-    weightsEY <- model.frame(yreg)$'(weights)'
+    weightsEY <- as.vector(model.frame(yreg)$'(weights)')
     if (is.null(weightsEY)) weightsEY <- rep(1, n)
     
     # categorical Y

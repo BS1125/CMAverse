@@ -502,7 +502,7 @@ cmest <- function(data = NULL, model = "rb",
   out$multimp$args_mice <- args_mice
   }
   if (!multimp && model %in% c("wb", "iorw", "ne", "msm")) {
-    if (sum(is.na(data)) > 0) stop("Selected model doesn't support missing values; use multiple = TRUE")
+    if (sum(is.na(data)) > 0) stop("Selected model doesn't support missing values; use multimp = TRUE")
   }
   
   # run regressions
