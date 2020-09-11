@@ -123,7 +123,6 @@ estinf <- function() {
       warning(paste0("yref is not a value of the outcome; ", yref, " is used"))
     }
     out$ref$yref <- yref
-    rm(y_lev)
   }
   
   # get the level of the case and the level of the control
@@ -135,32 +134,27 @@ estinf <- function() {
   }
 
   if (model == "rb") {
-    
     ###################################################################################################
     ############################################Regression-based Approach##############################
     ###################################################################################################
-    
     if (is.null(yreg)) stop("yreg is required")
     # a regression is required for each mediator
     if (is.null(mreg)) stop("mreg is required for model = 'rb'")
     if (!is.list(mreg)) stop("mreg should be a list")
     if (length(mreg) != length(mediator)) stop("length(mreg) != length(mediator)")
     for (p in 1:length(mediator)) if (is.null(mreg[[p]])) stop(paste0("Unspecified mreg[[", p, "]]"))
-    
     out$ref$mval <- mval
     
+    # closed-form parameter function estimation
     if (estimation == "paramfunc") {
-      
       # create a list of covariate values to calculate conditional causal effects
       if (length(basec) != 0) {
-        
         if (!is.null(basecval)) {
           if (!is.list(basecval)) stop("basecval should be a list")
           if (length(basecval) != length(basec)) stop("length(basecval) != length(basec)")
         }
-        
         if (is.null(basecval)) basecval <- rep(list(NULL), length(basec))
-        
+        # if NULL, set basecval[[i]] to be the mean value of basec[i]
         for (i in 1:length(basec)) {
           if (is.factor(data[, basec[i]]) | is.character(data[, basec[i]])) {
             c_lev <- levels(droplevels(as.factor(data[, basec[i]])))
@@ -169,26 +163,27 @@ estinf <- function() {
               c_data[, basec[i]] <- factor(c_data[, basec[i]], levels = c_lev)
               # set basecval[[i]] to be the mean values of dummy variables
               basecval[[i]] <- unname(colMeans(as.matrix(model.matrix(as.formula(paste0("~", basec[i])),
-                                                                      data = c_data)[, -1]), na.rm = TRUE))
+                                                                      data = model.frame(~., data = c_data, 
+                                                                                         na.action = na.pass))[, -1]), 
+                                               na.rm = TRUE))
               rm(c_data)
+              # dummy values of basecval[[i]]
             } else basecval[[i]] <- as.numeric(c_lev == basecval[[i]])[-1]
             rm(c_lev)
-          } else if (is.numeric(data[, basec[i]]) | is.logical(data[, basec[i]])) {
+          } else if (is.numeric(data[, basec[i]])) {
             if (is.null(basecval[[i]])) {
               # set basecval[[i]] to be the mean value of basec[i]
               basecval[[i]] <- mean(data[, basec[i]], na.rm = TRUE)
             } else basecval[[i]] <- basecval[[i]]
-          } else stop(paste0("The basec[", i, "] variable should be numeric, logical, factor or character"))
+          } 
         }
-        
         out$ref$basecval <- basecval
-        
       }
     }
     
+    # estimation and inference
     environment(est.rb) <- environment()
     if (!multimp) {
-      
       # point estimates of causal effects
       est <- est.rb(data = data, indices = NULL, outReg = TRUE, full = full)
       effect.pe <- est$est

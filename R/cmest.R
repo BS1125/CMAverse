@@ -358,7 +358,7 @@
 #' 
 #' @importFrom stats glm binomial poisson as.formula gaussian quasipoisson model.frame printCoefmat 
 #' family sd coef vcov sigma predict rbinom rmultinom rnorm rgamma rpois weighted.mean 
-#' model.matrix getCall quantile qnorm pnorm lm cov formula update
+#' model.matrix getCall quantile qnorm pnorm lm cov formula update na.pass
 #' @importFrom nnet multinom
 #' @importFrom MASS polr glm.nb gamma.shape rnegbin
 #' @importFrom survival survreg coxph Surv
