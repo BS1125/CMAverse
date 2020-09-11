@@ -1,13 +1,11 @@
 #' Causal Mediation Analysis
 #'
-#' \code{cmest} is used to implement six statistical approaches for causal mediation analysis
-#' including \emph{the regression-based approach} by Valeri et al. (2013) and VanderWeele 
+#' \code{cmest} is used to implement six causal mediation analysis approaches including 
+#' \emph{the regression-based approach} by Valeri et al. (2013) and VanderWeele 
 #' et al. (2014), \emph{the weighting-based approach} by VanderWeele et al. (2014), 
 #' \emph{the inverse odd-ratio weighting approach} by Tchetgen Tchetgen (2013), 
 #' \emph{the natural effect model} by Vansteelandt et al. (2012), \emph{the marginal structural 
 #' model} by VanderWeele et al. (2017), and \emph{the g-formula approach} by Lin et al. (2017).
-#' 
-#' When there are multiple mediators, the joint effect of them is studied.
 #'
 #' @param data dataset
 #' @param model causal mediation analysis approach. \code{rb}, \code{wb}, \code{iorw}, 
@@ -270,8 +268,8 @@
 #' \item{reg.output}{a list of regressions output,}
 #' \item{effect.pe}{point estimates of causal effects,}
 #' \item{effect.se}{standard errors of causal effects,}
-#' \item{effect.ci.low}{the lower limits of 95% confidence intervals of causal effects,}
-#' \item{effect.ci.high}{the higher limits of 95% confidence intervals of causal effects,}
+#' \item{effect.ci.low}{the lower limits of 95\% confidence intervals of causal effects,}
+#' \item{effect.ci.high}{the higher limits of 95\% confidence intervals of causal effects,}
 #' \item{effect.pval}{p-values of causal effects,}
 #' ...
 #'

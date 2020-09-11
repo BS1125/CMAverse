@@ -78,7 +78,7 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
         wmnom[, p] <- rowSums(category * wmnom_prob)
       }
     }
-    wm <- as.vector(wmnom / wmdenom)
+    wm <- wmnom / wmdenom
     rm(call_wmdenomreg, call_wmnomreg, weights_wmdenomreg, weights_wmnomreg, m_lev, wm_data, 
        wmdenom_prob, wmnom_prob, category, wmdenom, wmnom)
     
@@ -161,7 +161,7 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
         wmnom[, p] <- rowSums(category * wmnom_prob)
       }
     }
-    wm <- as.vector(wmnom / wmdenom)
+    wm <- wmnom / wmdenom
     rm(call_wmdenomreg, call_wmnomreg, m_lev, wm_data, wmdenom_prob, wmnom_prob, category, wmdenom, wmnom)
     
     # weights for yreg
@@ -240,7 +240,7 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
         wmnom[, p] <- rowSums(category * wmnom_prob)
       }
     }
-    wm <- as.vector(wmnom / wmdenom)
+    wm <- wmnom / wmdenom
     rm(call_wmdenomreg, call_wmnomreg, m_lev, wm_data, wmdenom_prob, wmnom_prob, category, wmdenom, wmnom)
     
     # weights for outcome regression
