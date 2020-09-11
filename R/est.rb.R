@@ -23,14 +23,14 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       call_yreg$data <- data
     }
     yreg <- eval.parent(call_yreg)
+    # update mreg
     for (p in 1:length(mediator)) {
-      # update mreg[[p]]      
-      if (!is.null(weights_mreg[[p]])) weights_mreg <- weights_mreg[[p]][indices] * w4casecon
-      if (is.null(weights_mreg[[p]])) weights_mreg <- w4casecon
+      if (!is.null(weights_mreg[[p]])) weights_mreg[[p]] <- weights_mreg[[p]][indices] * w4casecon
+      if (is.null(weights_mreg[[p]])) weights_mreg[[p]] <- w4casecon
       if (inference == "delta" && !is_svymultinom_mreg[p]) {
-        call_mreg[[p]]$design <- eval(bquote(svydesign(~1, weights = .(~weights_mreg), data = .(data))))
+        call_mreg[[p]]$design <- eval(bquote(svydesign(~1, weights = .(~weights_mreg[[p]]), data = .(data))))
       } else {
-        call_mreg[[p]]$weights <- weights_mreg
+        call_mreg[[p]]$weights <- weights_mreg[[p]]
         call_mreg[[p]]$data <- data
       }
       mreg[[p]] <- eval.parent(call_mreg[[p]])
@@ -46,7 +46,6 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     yreg <- eval.parent(call_yreg)
     # update mreg
     for (p in 1:length(mediator)) {
-      # update mreg[[p]]
       call_mreg[[p]]$weights <- weights_mreg[[p]][indices][control_indices]
       call_mreg[[p]]$data <- data[control_indices, ]
       mreg[[p]] <- eval.parent(call_mreg[[p]])
@@ -60,7 +59,6 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     yreg <- eval.parent(call_yreg)
     # update mreg
     for (p in 1:length(mediator)) {
-      # update mreg[[p]]
       call_mreg[[p]]$weights <- weights_mreg[[p]][indices]
       call_mreg[[p]]$data <- data
       mreg[[p]] <- eval.parent(call_mreg[[p]])
@@ -127,8 +125,7 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     theta2 <- thetas[(elevel+1):(elevel + mlevel - 1)]
     # exposure-mediator interaction coefficient for yreg
     switch(as.character(EMint),
-           "TRUE" = theta3 <- t(matrix(thetas[length(thetas) - (((elevel-1)*(mlevel-1)-1):0)],
-                                       ncol = mlevel - 1)),
+           "TRUE" = theta3 <- t(matrix(thetas[length(thetas) - (((elevel-1)*(mlevel-1)-1):0)], ncol = mlevel - 1)),
            "FALSE" = theta3 <- t(matrix(rep(0, (elevel-1)*(mlevel-1)), ncol = mlevel - 1)))
     
     # intercept coefficient for mreg

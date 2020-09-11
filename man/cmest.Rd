@@ -143,24 +143,7 @@ for details.}
 \item{digits}{minimal number of significant digits. See \link{print.default}.}
 }
 \value{
-An object of class \code{cmest} is returned:
-\item{call}{the function call,}
-\item{data}{the dataset,}
-\item{methods}{a list of methods used which may include \code{model}, \code{full}, 
-\code{casecontrol}, \code{yprevalence}, \code{yrare}, \code{estimation}, \code{inference}, 
-\code{nboot} and \code{nRep},}
-\item{variables}{a list of variables used which may include \code{outcome}, \code{event}, 
-\code{exposure}, \code{mediator}, \code{EMint}, \code{basec} and \code{postc},}
-\item{reg.input}{a list of regressions input,}
-\item{multimp}{a list of arguments used for multiple imputation,}
-\item{ref}{reference values used,}
-\item{reg.output}{a list of regressions output,}
-\item{effect.pe}{point estimates of causal effects,}
-\item{effect.se}{standard errors of causal effects,}
-\item{effect.ci.low}{the lower limits of confidence intervals of causal effects,}
-\item{effect.ci.high}{the higher limits of confidence intervals of causal effects,}
-\item{effect.pval}{p-values of causal effects,}
-...
+
 }
 \description{
 \code{cmest} is used to implement six statistical approaches for causal mediation analysis

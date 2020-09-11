@@ -270,8 +270,8 @@
 #' \item{reg.output}{a list of regressions output,}
 #' \item{effect.pe}{point estimates of causal effects,}
 #' \item{effect.se}{standard errors of causal effects,}
-#' \item{effect.ci.low}{the lower limits of confidence intervals of causal effects,}
-#' \item{effect.ci.high}{the higher limits of confidence intervals of causal effects,}
+#' \item{effect.ci.low}{the lower limits of 95% confidence intervals of causal effects,}
+#' \item{effect.ci.high}{the higher limits of 95% confidence intervals of causal effects,}
 #' \item{effect.pval}{p-values of causal effects,}
 #' ...
 #'
@@ -433,6 +433,7 @@ cmest <- function(data = NULL, model = "rb",
       "When estimation = 'paramfunc', select mreg[[1]] from 'linear', 'logistic', 'multinomial'")
   }
   out$methods$estimation <- estimation
+  if (!inference %in% c("delta", "bootstrap")) stop("Select inference from 'delta', 'bootstrap'")
   if (estimation == "imputation" && inference == "delta") stop("Use inference = 'bootstrap' when estimation = 'imputation'")
   out$methods$inference <- inference
   if (inference == "bootstrap") {
@@ -477,7 +478,7 @@ cmest <- function(data = NULL, model = "rb",
   # a, astar
   if (is.null(a) | is.null(astar)) stop("Unspecified a or astar")
   # mval
-  if (model %in% c("rb", "wb", "msm", "gformula", "ne")) {
+  if (model != "iorw") {
     if (!is.list(mval)) stop("mval should be a list")
     if (length(mval) != length(mediator)) stop("length(mval) != length(mediator)")
     for (p in 1:length(mval)) if (is.null(mval[[p]])) stop(paste0("Unspecified mval[[", p, "]]"))
@@ -490,10 +491,19 @@ cmest <- function(data = NULL, model = "rb",
     out$methods$nRep <- nRep
   }
   # multimp
+  out$multimp <- list(multimp = multimp)
   if (!is.logical(multimp)) stop("multimp should be TRUE or FALSE")
   # args_mice
+  if (multimp) {
   args_mice <- list(...)
   args_mice$print <- FALSE
+  if (!is.null(args_mice$data)) warning("args_mice$data is overwritten by data")
+  args_mice$data <- data
+  out$multimp$args_mice <- args_mice
+  }
+  if (!multimp && model %in% c("wb", "iorw", "ne", "msm")) {
+    if (sum(is.na(data)) > 0) stop("Selected model doesn't support missing values; use multiple = TRUE")
+  }
   
   # run regressions
   environment(regrun) <- environment()
