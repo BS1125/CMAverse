@@ -18,7 +18,12 @@ regrun <- function() {
              loglinear = ereg <- eval(bquote(glm(.(as.formula(exposure_formula)), family = poisson(), data = .(data)))),
              multinomial = ereg <- eval(bquote(nnet::multinom(.(as.formula(exposure_formula)), data = .(data), trace = FALSE))),
              ordinal = ereg <- eval(bquote(MASS::polr(.(as.formula(exposure_formula)), data = .(data)))))
+    } else if (!(identical(class(ereg), "lm") | identical(class(ereg), c("glm", "lm")) |
+                  identical(class(ereg), c("negbin", "glm", "lm")) | identical(class(ereg), c("multinom", "nnet")) |
+                  identical(class(ereg), c("gam", "glm", "lm")) | identical(class(ereg), "polr"))) {
+      stop("Fit ereg by lm, glm, glm.nb, gam, multinom, polr")
     }
+      
   } else {
     if (!is.null(ereg)) warning("ereg is ignored when model is 'wb' or 'msm' with length(basec) = 0 or model is 'rb', 'ne' or 'gformula'")
     ereg <- NULL
@@ -42,6 +47,10 @@ regrun <- function() {
                loglinear = wmreg[[p]] <- eval(bquote(glm(.(as.formula(wmreg_formula)), family = poisson(), data = .(data)))),
                multinomial = wmreg[[p]] <- eval(bquote(nnet::multinom(.(as.formula(wmreg_formula)), data = .(data), trace = FALSE))),
                ordinal = wmreg[[p]] <- eval(bquote(MASS::polr(.(as.formula(wmreg_formula)), data = .(data)))))
+      } else if (!(identical(class(wmreg[[p]]), "lm") | identical(class(wmreg[[p]]), c("glm", "lm")) |
+                   identical(class(wmreg[[p]]), c("negbin", "glm", "lm")) | identical(class(wmreg[[p]]), c("multinom", "nnet")) |
+                   identical(class(wmreg[[p]]), c("gam", "glm", "lm")) | identical(class(wmreg[[p]]), "polr"))) {
+        stop(paste0("Fit wmreg[[", p, "]] by lm, glm, glm.nb, gam, multinom, polr"))
       }
     }
   } else {
@@ -78,6 +87,10 @@ regrun <- function() {
                negbin = mreg[[p]] <- eval(bquote(MASS::glm.nb(.(as.formula(mediator_formula)), data = .(data)))),
                multinomial = mreg[[p]] <- eval(bquote(nnet::multinom(.(as.formula(mediator_formula)), data = .(data), trace = FALSE))),
                ordinal = mreg[[p]] <- eval(bquote(MASS::polr(.(as.formula(mediator_formula)), data = .(data)))))
+      } else if (!(identical(class(mreg[[p]]), "lm") | identical(class(mreg[[p]]), c("glm", "lm")) |
+                   identical(class(mreg[[p]]), c("negbin", "glm", "lm")) | identical(class(mreg[[p]]), c("multinom", "nnet")) |
+                   identical(class(mreg[[p]]), c("gam", "glm", "lm")) | identical(class(mreg[[p]]), "polr"))) {
+        stop(paste0("Fit mreg[[", p, "]] by lm, glm, glm.nb, gam, multinom, polr"))
       }
     }
   } else {
@@ -109,6 +122,10 @@ regrun <- function() {
                negbin = postcreg[[p]] <- eval(bquote(MASS::glm.nb(.(as.formula(postc_formula)), data = .(data)))),
                multinomial = postcreg[[p]] <- eval(bquote(nnet::multinom(.(as.formula(postc_formula)), data = .(data), trace = FALSE))),
                ordinal = postcreg[[p]] <- eval(bquote(MASS::polr(.(as.formula(postc_formula)), data = .(data)))))
+      } else if (!(identical(class(postcreg[[p]]), "lm") | identical(class(postcreg[[p]]), c("glm", "lm")) |
+                   identical(class(postcreg[[p]]), c("negbin", "glm", "lm")) | identical(class(postcreg[[p]]), c("multinom", "nnet")) |
+                   identical(class(postcreg[[p]]), c("gam", "glm", "lm")) | identical(class(postcreg[[p]]), "polr"))) {
+        stop(paste0("Fit postcreg[[", p, "]] by lm, glm, glm.nb, gam, multinom, polr"))
       }
     }
   } else {
@@ -171,17 +188,22 @@ regrun <- function() {
                                                            dist = "exponential", data = .(data)))),
            aft_weibull = yreg <- eval(bquote(survival::survreg(formula = .(as.formula(outcome_formula)),
                                                                dist = "weibull", data = .(data)))))
+  } else if (!(identical(class(yreg), "lm") | identical(class(yreg), c("glm", "lm")) |
+               identical(class(yreg), c("negbin", "glm", "lm")) | identical(class(yreg), c("multinom", "nnet")) |
+               identical(class(yreg), c("gam", "glm", "lm")) | identical(class(yreg), "polr") |
+               identical(class(yreg), "coxph") | identical(class(yreg), "survreg"))) {
+    stop("Fit yreg by lm, glm, glm.nb, gam, multinom, polr, coxph, survreg")
   }
   
   # for delta method inference, use survey regressions for yreg and mreg when weights are applied
   if (inference == "delta" && casecontrol && !is.null(yprevalence)) {
-    yreg <- eval(bquote(svyglm(formula = .(formula(yreg)), family = .(family(yreg)),
-                               design = svydesign(~ 1, data = .(data)))))
+    yreg <- eval(bquote(survey::svyglm(formula = .(formula(yreg)), family = .(family(yreg)),
+                               design = survey::svydesign(~ 1, data = .(data)))))
   }
   if (inference == "delta" && casecontrol && !is.null(yprevalence)) {
-    if (inherits(mreg[[1]], "glm")) mreg[[1]] <- eval(bquote(svyglm(formula = .(formula(mreg[[1]])), 
+    if (inherits(mreg[[1]], "glm")) mreg[[1]] <- eval(bquote(survey::svyglm(formula = .(formula(mreg[[1]])), 
                                                                     family = .(family(mreg[[1]])),
-                                                                    design = svydesign(~ 1, data = .(data)))))
+                                                                    design = survey::svydesign(~ 1, data = .(data)))))
     if (inherits(mreg[[1]], "multinom")) mreg[[1]] <- eval(bquote(svymultinom(formula = .(formula(mreg[[1]])), 
                                                                               data = .(data))))
   }

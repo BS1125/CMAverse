@@ -13,7 +13,7 @@
 \alias{summary.rcreg}
 \alias{print.summary.rcreg}
 \alias{update.rcreg}
-\title{Regression Calibration for Measurement Error}
+\title{Regression Calibration for Measurement Error Correction}
 \usage{
 rcreg(
   reg = NULL,
@@ -48,29 +48,29 @@ rcreg(
 \method{update}{rcreg}(object, ..., evaluate = TRUE)
 }
 \arguments{
-\item{reg}{the naive regression object. See \code{Details}.}
+\item{reg}{naive regression object. See \code{Details}.}
 
-\item{data}{the new dataset for \code{reg}}
+\item{data}{new dataset for \code{reg}}
 
-\item{weights}{the new weights for \code{reg}}
+\item{weights}{new weights for \code{reg}}
 
-\item{MEvariable}{variable measured with error.}
+\item{MEvariable}{variable measured with error}
 
 \item{MEerror}{standard deviation of the measurement error}
 
-\item{variance}{a logical value. If \code{TRUE}, estimate the var-cov matrix of
-coefficients though bootstrapping. Default is \code{FALSE}.}
+\item{variance}{a logical value. If \code{TRUE}, correct the var-cov matrix of
+coefficients by bootstrapping. Default is \code{FALSE}.}
 
-\item{nboot}{number of boots for estimating the var-cov matrix of coefficients. Default 
+\item{nboot}{number of boots for correcting the var-cov matrix of coefficients. Default 
 is \code{400}.}
 
-\item{object}{an object of class 'rcreg'}
+\item{object}{an object of class \code{rcreg}}
 
 \item{...}{additional arguments}
 
-\item{x}{an object of class 'rcreg'}
+\item{x}{an object of class \code{rcreg}}
 
-\item{formula}{an object of class 'rcreg'}
+\item{formula}{an object of class \code{rcreg}}
 
 \item{digits}{minimal number of significant digits. See \link{print.default}.}
 
@@ -80,14 +80,14 @@ is \code{TRUE}.}
 \value{
 If \code{MEvariable} is not in the regression formula of \code{reg}, \code{reg} is 
 returned. If \code{MEvariable} is a continuous independent variable in the regression formula of 
-\code{yeg}, an object of class 'rcreg' is returned:
+\code{yeg}, an object of class \code{rcreg} is returned:
 \item{call}{the function call,}
 \item{NAIVEreg}{the naive regression object,}
-\item{ME}{a list of \code{MEvariable}, \code{MEerror} and \code{variance},}
-\item{RCcoef}{coefficient estimates corrected by \emph{regression calibration},}
+\item{ME}{a list of \code{MEvariable}, \code{MEerror}, \code{variance} and \code{nboot},}
+\item{RCcoef}{coefficient estimates corrected by regression calibration,}
 \item{RCsigma}{the residual standard deviation of a linear regression object corrected by 
-\emph{regression calibration},}
-\item{RCvcov}{the var-cov matrix of coefficients corrected by \emph{regression calibration},}
+regression calibration,}
+\item{RCvcov}{the var-cov matrix of coefficients corrected by regression calibration,}
 ...
 }
 \description{
@@ -116,7 +116,7 @@ corrected by \code{rcreg}
 
 \item \code{model.frame}: Extract the model frame
 
-\item \code{print}: Print the results of \code{rcreg} nicely
+\item \code{print}: Print results of \code{rcreg} nicely
 
 \item \code{summary}: Summarize results of \code{rcreg} nicely
 
@@ -200,6 +200,5 @@ Carrol RJ, Ruppert D, Stefanski LA, Crainiceanu C. Measurement Error in Nonlinea
 A Modern Perspective, Second Edition (2006). London: Chapman & Hall.
 }
 \seealso{
-\code{\link{simexreg}}, \code{\link{ggcmsens}}, \code{\link{cmdag}}, 
-\code{\link{cmest}}
+\code{\link{simexreg}}, \code{cmsens}, \code{\link{cmest}}
 }

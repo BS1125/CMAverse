@@ -42,7 +42,7 @@ the result of a call to a position adjustment function. Default is
 \item{refline.size}{size of the reference line. Default is \code{0.3}.}
 }
 \description{
-This function is used to plot the results of \code{cmsens} nicely via plotting functions
+\code{ggcmsens} is used to plot results of \code{cmsens} nicely with plotting functions
 in the \code{ggplot2} package. Additional layers can be added to this plot using other 
 plotting functions in the \code{ggplot2} package.
 }

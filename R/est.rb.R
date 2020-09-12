@@ -16,8 +16,11 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     # update yreg
     if (!is.null(weights_yreg)) weights_yreg <- weights_yreg[indices] * w4casecon
     if (is.null(weights_yreg)) weights_yreg <- w4casecon
-    if (inference == "delta") {
-      call_yreg$design <- eval(bquote(svydesign(id=~1, weights = .(~weights_yreg), data = .(data))))
+    if (is_svyglm_yreg && !(inherits(yreg, "rcreg") | inherits(yreg, "simexreg"))) {
+      call_design <- getCall(yreg$survey.design)
+      call_design$weights <- weights_yreg
+      call_design$data <- data
+      call_yreg$design <- eval.parent(call_design)
     } else {
       call_yreg$weights <- weights_yreg
       call_yreg$data <- data
@@ -27,8 +30,11 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     for (p in 1:length(mediator)) {
       if (!is.null(weights_mreg[[p]])) weights_mreg[[p]] <- weights_mreg[[p]][indices] * w4casecon
       if (is.null(weights_mreg[[p]])) weights_mreg[[p]] <- w4casecon
-      if (inference == "delta" && !is_svymultinom_mreg[p]) {
-        call_mreg[[p]]$design <- eval(bquote(svydesign(~1, weights = .(~weights_mreg[[p]]), data = .(data))))
+      if (is_svyglm_mreg[p] && !(inherits(mreg[[p]], "rcreg") | inherits(mreg[[p]], "simexreg"))) {
+        call_design <- getCall(mreg[[p]]$survey.design)
+        call_design$weights <- weights_mreg[[p]]
+        call_design$data <- data
+        call_mreg[[p]]$design <- eval.parent(call_design)
       } else {
         call_mreg[[p]]$weights <- weights_mreg[[p]]
         call_mreg[[p]]$data <- data

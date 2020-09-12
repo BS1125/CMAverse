@@ -38,7 +38,7 @@ ggcmest(
 \item{refline.size}{size of the reference line. Default is \code{0.3}.}
 }
 \description{
-This function is used to plot the results of \code{cmest} nicely with plotting functions
+\code{ggcmest} is used to plot results of \code{cmest} nicely with plotting functions
 in the \link{ggplot2} package. Additional layers can be added to this plot using other 
 plotting functions in the \link{ggplot2} package.
 }

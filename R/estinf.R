@@ -12,7 +12,7 @@ estinf <- function() {
     if (!is.null(reg)) {
       if (reg_name %in% c("yreg", "ereg")) {
         assign(paste0("call_", reg_name), getCall(reg))
-        assign("reg_mid", switch(("rcreg" %in% class(reg) | "simexreg" %in% class(reg)) + 1, "1" = reg, "2" = reg$NAIVEreg))
+        assign("reg_mid", switch((inherits(reg, "rcreg") | inherits(reg, "simexreg")) + 1, "1" = reg, "2" = reg$NAIVEreg))
         assign(paste0("is_lm_", reg_name), inherits(reg_mid, "lm"))
         assign(paste0("is_glm_", reg_name), inherits(reg_mid, "glm"))
         assign(paste0("is_svyglm_", reg_name), inherits(reg_mid, "svyglm"))
@@ -29,7 +29,7 @@ estinf <- function() {
       } else {
         assign(paste0("call_", reg_name), lapply(1:length(reg), function(x) getCall(reg[[x]])))
         assign("reg_mid", lapply(1:length(reg), function(x)
-          switch(("rcreg" %in% class(reg[[x]]) | "simexreg" %in% class(reg[[x]])) + 1, "1" = reg[[x]], "2" = reg[[x]]$NAIVEreg)))
+          switch((inherits(reg[[x]], "rcreg") | inherits(reg[[x]], "simexreg")) + 1, "1" = reg[[x]], "2" = reg[[x]]$NAIVEreg)))
         assign(paste0("is_lm_", reg_name), sapply(1:length(reg_mid), function(x) inherits(reg_mid[[x]], "lm")))
         assign(paste0("is_glm_", reg_name), sapply(1:length(reg_mid), function(x) inherits(reg_mid[[x]], "glm")))
         assign(paste0("is_svyglm_", reg_name), sapply(1:length(reg_mid), function(x) inherits(reg_mid[[x]], "svyglm")))

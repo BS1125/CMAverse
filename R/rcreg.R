@@ -1,20 +1,20 @@
-#' Regression Calibration for Measurement Error
+#' Regression Calibration for Measurement Error Correction
 #'
 #' \code{rcreg} is used to correct a regression object with a continuous independent variable
 #' measured with error via \emph{regression calibration} by Carroll et al. (1995).
 #'
-#' @param reg the naive regression object. See \code{Details}.
-#' @param data the new dataset for \code{reg}
-#' @param weights the new weights for \code{reg}
-#' @param MEvariable variable measured with error.
+#' @param reg naive regression object. See \code{Details}.
+#' @param data new dataset for \code{reg}
+#' @param weights new weights for \code{reg}
+#' @param MEvariable variable measured with error
 #' @param MEerror standard deviation of the measurement error
-#' @param variance a logical value. If \code{TRUE}, estimate the var-cov matrix of
-#' coefficients though bootstrapping. Default is \code{FALSE}.
-#' @param nboot number of boots for estimating the var-cov matrix of coefficients. Default 
+#' @param variance a logical value. If \code{TRUE}, correct the var-cov matrix of
+#' coefficients by bootstrapping. Default is \code{FALSE}.
+#' @param nboot number of boots for correcting the var-cov matrix of coefficients. Default 
 #' is \code{400}.
-#' @param x an object of class 'rcreg'
-#' @param object an object of class 'rcreg'
-#' @param formula an object of class 'rcreg'
+#' @param x an object of class \code{rcreg}
+#' @param object an object of class \code{rcreg}
+#' @param formula an object of class \code{rcreg}
 #' @param digits minimal number of significant digits. See \link{print.default}.
 #' @param evaluate a logical value. If \code{TRUE}, the updated call is evaluated. Default
 #' is \code{TRUE}.
@@ -29,18 +29,17 @@
 #' @return
 #' If \code{MEvariable} is not in the regression formula of \code{reg}, \code{reg} is 
 #' returned. If \code{MEvariable} is a continuous independent variable in the regression formula of 
-#' \code{yeg}, an object of class 'rcreg' is returned:
+#' \code{yeg}, an object of class \code{rcreg} is returned:
 #' \item{call}{the function call,}
 #' \item{NAIVEreg}{the naive regression object,}
-#' \item{ME}{a list of \code{MEvariable}, \code{MEerror} and \code{variance},}
-#' \item{RCcoef}{coefficient estimates corrected by \emph{regression calibration},}
+#' \item{ME}{a list of \code{MEvariable}, \code{MEerror}, \code{variance} and \code{nboot},}
+#' \item{RCcoef}{coefficient estimates corrected by regression calibration,}
 #' \item{RCsigma}{the residual standard deviation of a linear regression object corrected by 
-#' \emph{regression calibration},}
-#' \item{RCvcov}{the var-cov matrix of coefficients corrected by \emph{regression calibration},}
+#' regression calibration,}
+#' \item{RCvcov}{the var-cov matrix of coefficients corrected by regression calibration,}
 #' ...
 #'
-#' @seealso \code{\link{simexreg}}, \code{\link{ggcmsens}}, \code{\link{cmdag}}, 
-#' \code{\link{cmest}}
+#' @seealso \code{\link{simexreg}}, \code{cmsens}, \code{\link{cmest}}
 #'
 #' @references
 #' 
@@ -141,12 +140,13 @@ rcreg <- function(reg = NULL, data = NULL, weights = NULL,
     stop("No independent variable measured without error in the regression formula")
   } else {
     if (is.null(data)) stop("Unspecified data")
-    if (length(MEvariable) > 1) stop("length(MEvariable) > 1")
+    if (length(MEvariable) > 1) stop("Currently only supports one variable measured with error")
     if (length(MEvariable) != length(MEerror)) stop("length(MEvariable) != length(MEerror)")
     if (length(MEerror) != 0 && MEerror < 0) stop("MEerror should be >= 0")
     regCall <- getCall(reg)
     regClass <- class(reg)
-    if (!(identical(regClass, "lm") | 
+    if (!(identical(regClass, c("svyglm", "glm", "lm")) | identical(regClass, c("svymultinom")) |
+          identical(regClass, "lm") | 
           (identical(regClass, c("glm", "lm")) && 
            family(reg)$family %in% c("gaussian", "binomial", "poisson")) | 
           identical(regClass, c("multinom", "nnet")) | identical(regClass, "polr") | 
@@ -154,44 +154,67 @@ rcreg <- function(reg = NULL, data = NULL, weights = NULL,
             "Regression calibration applied to unsupported regression object")
 
     # update reg with data and weights
+    if (identical(regClass, c("svyglm", "glm", "lm"))) {
+      designCall <- getCall(reg$survey.design)
+      designCall$data <- data
+      designCall$weights <- weights
+      regCall$design <- eval.parent(designCall)
+    } else {
     regCall$data <- data
     regCall$weights <- weights
     if (inherits(reg, "multinom")) regCall$trace <- FALSE
     if (inherits(reg, "polr")) regCall$Hess <- TRUE
-    
+    }
     reg <- eval.parent(regCall)
     out <- list(call = cl, NAIVEreg = reg,
                 ME = list(MEvariable = MEvariable, MEerror = MEerror, variance = variance))
 
     MEvar_index <- which(ind_var %in% MEvariable)
     # code categorical variables into dummy variables
-    ind_data <- model.matrix(as.formula(paste0("~", paste(c(MEvariable, ind_var[-MEvar_index]),
-                                                          collapse = "+"))),
+    ind_data <- model.matrix(as.formula(paste0("~", paste(c(MEvariable, ind_var[-MEvar_index]), collapse = "+"))),
                              model.frame(~., data = data[, ind_var], na.action = na.pass))[, -1]
 
     rc_step <- function(data = NULL, ind_data = NULL, indices = NULL, outreg = FALSE) {
       data <- data[indices, ]
       ind_data <- ind_data[indices, ]
-      n <- nrow(ind_data)
       # mean values of independent variables in the regression formula
       mean <- colMeans(ind_data, na.rm = TRUE)
       W <- ind_data - t(mean)[rep(1, n), ]
-      # var-cov matrix of variables measured with error with all independent variables
+      # var-cov matrix of the variable measured with error with all independent variables
       covmat <- cov(ind_data[, MEvariable], ind_data, use = "complete.obs")
-      # true var-cov matrix of variables measured with error with all independent variables
+      # true var-cov matrix of the variable measured with error with all independent variables
       covmat[1, 1] <- covmat[1, 1] - MEerror ^ 2
       EX <- as.vector(rep(mean[1], n) + W %*% t(covmat %*% solve(cov(ind_data, use = "complete.obs"))))
       rcdata <- data
       rcdata[, MEvariable] <- EX
+      
       # error-corrected regression object
       RCreg_call <- getCall(reg)
-      RCreg_call$data <- rcdata
+      if (identical(regClass, c("svyglm", "glm", "lm"))) {
+        designCall <- getCall(reg$survey.design)
+        designCall$data <- rcdata
+        RCreg_call$design <- eval.parent(designCall)
+      } else {
+        RCreg_call$data <- rcdata
+        if (inherits(reg, "multinom")) RCreg_call$trace <- FALSE
+        if (inherits(reg, "polr")) RCreg_call$Hess <- TRUE
+      }
       RCreg <- eval.parent(RCreg_call)
+      
       if (identical(class(reg), "polr")) {
         RCcoef <- c(coef(RCreg), RCreg$zeta)
       } else if (identical(class(reg), c("multinom", "nnet"))) {
         RCcoef <- coef(RCreg)
         if (length(reg$lev) > 2) {
+          coefnames <- dimnames(RCcoef)
+          RCcoef <- as.vector(t(RCcoef))
+          coefnames <- as.vector(outer(coefnames[[2]], coefnames[[1]], function(name2, name1)
+            paste(name1, name2, sep = ":")))
+          names(RCcoef) <- coefnames
+        }
+      } else if (inherits(reg, "svymultinom")) {
+        RCcoef <- coef(RCreg)
+        if (length(reg$NAIVEreg$lev) > 2) {
           coefnames <- dimnames(RCcoef)
           RCcoef <- as.vector(t(RCcoef))
           coefnames <- as.vector(outer(coefnames[[2]], coefnames[[1]], function(name2, name1)
@@ -204,25 +227,24 @@ rcreg <- function(reg = NULL, data = NULL, weights = NULL,
       return(out)
     }
 
-    RC <- rc_step(data = data, ind_data = ind_data, indices = 1:nrow(data), outreg = TRUE)
+    n <- nrow(data)
+    RC <- rc_step(data = data, ind_data = ind_data, indices = 1:n, outreg = TRUE)
     RCcoef <- RC$RCcoef
     RCreg <- RC$RCreg
     out$RCcoef <- RCcoef
-    n <- nrow(data)
     n_coef <- length(RCcoef)
     if (identical(class(reg), "lm") |
         (identical(class(reg), c("glm", "lm")) && family(reg)$family == "gaussian")) {
-      RCsigma <- sqrt(sum((model.frame(RCreg)[, 1] - predict(RCreg, newdata = data)) ^ 2) /
+      RCsigma <- sqrt(sum((model.frame(RCreg)[, 1] - predict(RCreg, newdata = data)) ^ 2, na.rm = TRUE) /
                         (n-n_coef) - (RCcoef[MEvariable]* MEerror) ^ 2 )
       out$RCsigma <- unname(RCsigma)
     }
 
     if (variance) {
       boots <- boot(data = data, ind_data = ind_data, statistic = rc_step, R = nboot)
-      mean_boots <- apply(boots$t, 2, mean)
+      mean_boots <- apply(boots$t, 2, function(x) mean(x, na.rm = TRUE))
       RCvcov <- Reduce("+", lapply(1:nboot, function(x)
-        as.matrix(boots$t[x,] - mean_boots)%*%t(as.matrix(boots$t[x,] - mean_boots)))) /
-        (nboot - 1)
+        as.matrix(boots$t[x,] - mean_boots)%*%t(as.matrix(boots$t[x,] - mean_boots)))) / (nboot - 1)
       dimnames(RCvcov) <- list(names(RCcoef), names(RCcoef))
       out$RCvcov <- RCvcov
       out$ME$nboot <- nboot
@@ -232,17 +254,20 @@ rcreg <- function(reg = NULL, data = NULL, weights = NULL,
   return(out)
 }
 
+
 #' @describeIn rcreg Extract coefficients corrected by \code{rcreg}
 #' @export
 coef.rcreg <- function(object, ...) {
   return(object$RCcoef)
 }
 
+
 #' @describeIn rcreg Extract the var-cov matrix of coefficients corrected by \code{rcreg}
 #' @export
 vcov.rcreg <- function(object, ...) {
   return(object$RCvcov)
 }
+
 
 #' @describeIn rcreg Extract the residual standard deviation of a linear regression object 
 #' corrected by \code{rcreg}
@@ -251,11 +276,13 @@ sigma.rcreg <- function(object, ...) {
   return(object$RCsigma)
 }
 
+
 #' @describeIn rcreg Extract the regression formula
 #' @export
 formula.rcreg <- function(x, ...) {
   return(formula(x$NAIVEreg, ...))
 }
+
 
 #' @describeIn rcreg Extract the family of a regression of class \code{lm} or \code{glm}
 #' @export
@@ -264,6 +291,7 @@ family.rcreg <- function(object, ...) {
     return(family(object$NAIVEreg, ...))
   } else return(NULL)
 }
+
 
 #' @describeIn rcreg Predict with new data
 #' @export
@@ -278,6 +306,15 @@ predict.rcreg <- function(object, ...) {
                                                    drop=FALSE][-1, , drop=FALSE]))
     }
     reg$wts[coef_index] <- object$RCcoef
+  } else if (inherits(reg, "svymultinom")) {
+    if(length(reg$NAIVEreg$lev) == 2) {
+      coef_index <- 1+(1:length(reg$NAIVEreg$vcoefnames))
+    } else {
+      coef_index <- as.vector(t(matrix(1:length(reg$NAIVEreg$wts), nrow = reg$NAIVEreg$n[3],
+                                       byrow=TRUE)[, 1+(1:length(reg$NAIVEreg$vcoefnames)),
+                                                   drop=FALSE][-1, , drop=FALSE]))
+    }
+    reg$NAIVEreg$wts[coef_index] <- object$RCcoef
   } else if (identical(class(reg), "polr")) {
     reg$coefficients <- object$RCcoef[1:length(coef(reg))]
     reg$zeta <- object$RCcoef[(length(coef(reg)) + 1):length(object$RCcoef)]
@@ -286,20 +323,20 @@ predict.rcreg <- function(object, ...) {
   return(out)
 }
 
+
 #' @describeIn rcreg Extract the model frame
 #' @export
 model.frame.rcreg <- function(formula, ...) {
   return(model.frame(formula$NAIVEreg, ...))
 }
 
-#' @describeIn rcreg Print the results of \code{rcreg} nicely
+
+#' @describeIn rcreg Print results of \code{rcreg} nicely
 #' @export
 print.rcreg <- function(x, ...) {
   cat("Call:\n")
   print(x$call)
   cat(paste("\nNaive regression object: \n"))
-  x$NAIVEreg$call <- update(x$NAIVEreg,data=getCall(x$NAIVEreg)$data,
-                                   weights=getCall(x$NAIVEreg)$weights, evaluate = FALSE)
   print(x$NAIVEreg)
   cat("\nVariable measured with error:\n")
   cat(x$ME$MEvariable)
@@ -326,14 +363,13 @@ summary.rcreg <- function(object, ...) {
   return(out)
 }
 
+
 #' @describeIn rcreg Print summary of \code{rcreg} nicely
 #' @export
 print.summary.rcreg <- function(x, digits = 4, ...) {
   cat("Call:\n")
   print(x$call)
   cat(paste("\nNaive regression object: \n"))
-  x$NAIVEreg$call <- update(x$NAIVEreg,data=getCall(x$NAIVEreg)$data,
-                            weights=getCall(x$NAIVEreg)$weights, evaluate = FALSE)
   print(x$NAIVEreg)
   cat("\nVariable measured with error:\n")
   cat(x$ME$MEvariable)
@@ -342,6 +378,7 @@ print.summary.rcreg <- function(x, digits = 4, ...) {
   cat("\nError-corrected results:\n")
   printCoefmat(x$summarydf, digits = digits)
 }
+
 
 #' @describeIn rcreg Update \code{rcreg}
 #' @export

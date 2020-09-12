@@ -13,7 +13,7 @@
 \alias{summary.simexreg}
 \alias{print.summary.simexreg}
 \alias{update.simexreg}
-\title{Simulation and Extrapolation for Measurement Error}
+\title{Simulation and Extrapolation for Measurement Error Correction}
 \usage{
 simexreg(
   reg = NULL,
@@ -50,13 +50,13 @@ simexreg(
 \method{update}{simexreg}(object, ..., evaluate = TRUE)
 }
 \arguments{
-\item{reg}{the naive regression object. See \code{Details}.}
+\item{reg}{naive regression object. See \code{Details}.}
 
-\item{data}{the new dataset for \code{reg}}
+\item{data}{new dataset for \code{reg}}
 
-\item{weights}{the new weights for \code{reg}}
+\item{weights}{new weights for \code{reg}}
 
-\item{MEvariable}{variable measured with error.}
+\item{MEvariable}{variable measured with error}
 
 \item{MEvartype}{type of the variable measured with error. Can be \code{continuous} or 
 \code{categorical} (first 3 letters are enough).}
@@ -65,20 +65,20 @@ simexreg(
 is \code{continuous}) or the misclassification matrix (when \code{MEvartype}
 is \code{categorical}).}
 
-\item{variance}{a logical value. If \code{TRUE}, estimate the jackknife var-cov matrix of
+\item{variance}{a logical value. If \code{TRUE}, estimate the var-cov matrix of
 coefficients through Jackknife. Default is \code{FALSE}.}
 
 \item{lambda}{a vector of lambdas for \emph{SIMEX}. Default is \code{c(0.5, 1, 1.5, 2)}.}
 
 \item{B}{number of simulations for \emph{SIMEX}. Default is \code{200}.}
 
-\item{object}{an object of class 'rcreg'}
+\item{object}{an object of class \code{simexreg}}
 
 \item{...}{additional arguments}
 
-\item{x}{an object of class 'rcreg'}
+\item{x}{an object of class \code{simexreg}}
 
-\item{formula}{an object of class 'rcreg'}
+\item{formula}{an object of class \code{simexreg}}
 
 \item{digits}{minimal number of significant digits. See \link{print.default}.}
 
@@ -88,14 +88,15 @@ is \code{TRUE}.}
 \value{
 If \code{MEvariable} is not in the regression formula of \code{reg}, \code{reg} is 
 returned. If \code{MEvariable} is in the regression formula of \code{yeg}, an object of 
-class 'simexreg' is returned:
+class \code{simexreg} is returned:
 \item{call}{the function call,}
 \item{NAIVEreg}{the naive regression object,}
-\item{ME}{a list of \code{MEvariable}, \code{MEerror} and \code{variance},}
-\item{RCcoef}{coefficient estimates corrected by \emph{SIMEX},}
+\item{ME}{a list of \code{MEvariable}, \code{MEvartype}, \code{MEerror}, \code{variance},
+\code{lambda} and \code{B},}
+\item{RCcoef}{coefficient estimates corrected by SIMEX,}
 \item{RCsigma}{the residual standard deviation of a linear regression object corrected by 
-\emph{SIMEX},}
-\item{RCvcov}{the var-cov matrix of coefficients corrected by \emph{SIMEX},}
+SIMEX,}
+\item{RCvcov}{the var-cov matrix of coefficients corrected by SIMEX,}
 ...
 }
 \description{
@@ -125,7 +126,7 @@ corrected by \code{simexreg}
 
 \item \code{model.frame}: Extract the model frame
 
-\item \code{print}: Print the results of \code{simexreg} nicely
+\item \code{print}: Print results of \code{simexreg} nicely
 
 \item \code{summary}: Summarize results of \code{simexreg} nicely
 
@@ -204,6 +205,5 @@ Stefanski LA, Cook JR. Simulation-extrapolation: the measurement error jackknife
 Journal of the American Statistical Association. 90(432): 1247 - 56.
 }
 \seealso{
-\code{\link{rcreg}}, \code{\link{ggcmsens}}, \code{\link{cmdag}}, 
-\code{\link{cmest}}
+\code{\link{rcreg}}, \code{\link{cmsens}}, \code{\link{cmest}}.
 }

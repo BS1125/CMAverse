@@ -29,7 +29,7 @@ cmsens(
 \method{print}{summary.cmsens.me}(x, digits = 4, ...)
 }
 \arguments{
-\item{object}{an object of class \code{cmsens}.}
+\item{object}{an object of class \code{cmest}.}
 
 \item{sens}{sensitivity analysis for unmeasured confounding or measurement error. 
 \code{uc} represents unmeasured confounding and \code{me} represents measurement error.
@@ -51,7 +51,7 @@ is \code{categorical}).}
 
 \item{B}{number of simulations for SIMEX. Default is \code{200}.}
 
-\item{nboot.rc}{number of boots for estimating the var-cov matrix of coefficients 
+\item{nboot.rc}{number of boots for correcting the var-cov matrix of coefficients 
 with regression calibration. Default is \code{400}.}
 
 \item{x}{an object of class \code{cmsens}}
@@ -61,18 +61,20 @@ with regression calibration. Default is \code{400}.}
 \item{digits}{minimal number of significant digits. See \link{print.default}.}
 }
 \value{
-If \code{sens} is \code{uc}, an object of class 'cmsens.uc' is returned:
+If \code{sens} is \code{uc}, an object of class \code{cmsens.uc} is returned:
 \item{call}{the function call,}
-\item{evalues}{the data frame in which the first three columns are the point estimates, 
-lower limits of confidence intervals, upper limits of confidence intervals of causal effects on 
-the ratio scale and the last three columns are the E-values on the ratio scale for them,}
-If \code{sens} is \code{me}, an object of class 'cmsens.me' is returned:
-\item{call}{the function call,}
-\item{ME}{a list which might contain MEvariable, MEvartype, MEerror, reliability ratio, lambda and B,}
-\item{naive}{naive causal mediation analysis results}
-\item{sens}{a list of causal mediation analysis results after correcting errors in 
-\code{MEerror},}
+\item{evalues}{a data frame in which the first three columns are point estimates, lower limits 
+of 95\% confidence intervals and upper limits of 95\% confidence intervals of causal effects on 
+the risk or rate ratio scale and the last three columns are E-values on the risk or rate ratio scale,}
 
+If \code{sens} is \code{me}, an object of class \code{cmsens.me} is returned:
+\item{call}{the function call,}
+\item{ME}{a list which might contain \code{MEmethod}, \code{MEvariable}, \code{MEvartype}, 
+\code{MEerror}, \code{lambda}, \code{B}, \code{nboot.rc} and reliability ratio (which is calculated 
+by \code{1 - MEerror[i]/sd(data[, MEvariable])} for \code{i=1,...,length(MEerror)} when 
+\code{MEvartype} is \code{continuous}),}
+\item{naive}{naive causal mediation analysis results,}
+\item{sens}{a list of causal mediation analysis results after correcting errors in \code{MEerror},}
 ...
 }
 \description{
@@ -82,24 +84,42 @@ sensitivity analysis for measurement error via \emph{regression calibration} by 
 et al. (1995) and \emph{SIMEX} by Cook et al. (1994) and Küchenhoff et al. (2006).
 }
 \details{
-For unmeasured confounding, all E-values are on the (risk or rate) ratio scale. If the causal 
-effects are estimated on the difference scale, the point estimates are transformed into 
+\strong{Sensitivity Analysis for Unmeasured Confounding}
+
+Currently, sensitivity analysis for unmeasured confounding are available when the outcome 
+regression model is fitted by \link{lm}, \link{glm}, \link{glm.nb}, \link[mgcv]{gam}, 
+\link[nnet]{multinom}, \link[MASS]{polr}.
+
+All E-values are reported on the risk or rate ratio scale. If the causal effects are estimated 
+on the difference scale (i.e., the outcome is continuous), they are transformed into risk
 ratios using the transformation described by Vanderweele et al. (2017).
 
+\strong{Sensitivity Analysis for Measurement Error}
+
+Currently, sensitivity analysis for measurement error are available:
+
+1) when the regression 
+model involving the variable measured with error is fitted by \link{lm}, 
+\link{glm} (with family \code{gaussian}, \code{binomial} or \code{poisson}), \link[nnet]{multinom}, 
+\link[MASS]{polr}, \link[survival]{coxph} or \link[survival]{survreg} and \code{model} is 
+\code{rb} or \code{gformula};
+2) when \code{estimation} is \code{paramfunc}.
+
 Sensitivity analysis for measurement error only supports a single variable measured with error.
-Regression calibration only supports an independent continuous variable in a regression 
-formula measured with error. SIMEX supports a continuous or categorical variable measured 
-with error.
+Regression calibration requires that the variable measured with error be an independent 
+continuous variable in the regression it's involved in. SIMEX supports a continuous or 
+categorical variable measured with error. Quadratic extrapolation method is implemented for
+SIMEX.
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{print}: Print the results of cmsens.uc nicely
+\item \code{print}: Print results of \code{cmsens.uc} nicely
 
-\item \code{print}: Print the results of cmsens.me nicely
+\item \code{print}: Print results of \code{cmsens.me} nicely
 
-\item \code{summary}: Summarize the results of cmsens.me nicely
+\item \code{summary}: Summarize results of \code{cmsens.me} nicely
 
-\item \code{print}: Print the summary of cmsens.me nicely
+\item \code{print}: Print the summary of \code{cmsens.me} nicely
 }}
 
 \examples{
@@ -151,8 +171,8 @@ Journal of the American Statistical Association. 90(432): 1247 - 56.
 
 Valeri L, Lin X, VanderWeele TJ. Mediation analysis when a continuous mediator is measured 
 with error and the outcome follows a generalized linear model (2014). Statistics in 
-medicine, 33(28): 4875–4890.
+medicine, 33(28): 4875 – 4890.
 }
 \seealso{
-\code{\link{ggcmsens}}, \code{\link{cmdag}}, \code{\link{cmest}}
+\link{ggcmsens}, \link{cmdag}, \link{cmest}, \link{rcreg}, \link{simexreg}.
 }

@@ -24,6 +24,8 @@
 #' @param caption.size text size in pts for the caption. Default is \code{10}.
 #' @param ... additional arguments passed to \code{ggdag()}. See \link[ggdag]{ggdag} for details.
 #'
+#' @seealso \link{cmest}, \link{cmsens}.
+#'
 #' @examples
 #' 
 #' ## basec and postc are empty

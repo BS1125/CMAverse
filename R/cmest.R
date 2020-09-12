@@ -528,6 +528,7 @@ cmest <- function(data = NULL, model = "rb",
   return(out)
 }
 
+
 #' @describeIn cmest Print the results of \code{cmest} nicely
 #' @export
 print.cmest <- function(x, ...) {
@@ -778,6 +779,7 @@ summary.cmest <- function(object, ...) {
   return(out)
 }
 
+
 #' @describeIn cmest Print the summary of \code{cmest} nicely
 #' @export
 print.summary.cmest <- function(x, digits = 4, ...) {
@@ -805,9 +807,10 @@ print.summary.cmest <- function(x, digits = 4, ...) {
   print(x$ref)
 }
 
+
 #' Plotting Point Estimates and Confidence Intervals of Causal Effects
 #' 
-#' This function is used to plot the results of \code{cmest} nicely with plotting functions
+#' \code{ggcmest} is used to plot results of \code{cmest} nicely with plotting functions
 #' in the \link{ggplot2} package. Additional layers can be added to this plot using other 
 #' plotting functions in the \link{ggplot2} package.
 #' 

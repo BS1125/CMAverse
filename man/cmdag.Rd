@@ -87,3 +87,6 @@ cmdag(outcome = "Y", exposure = "A", mediator = c("M1", "M2"),
      basec = c("C1", "C2", "C3"), postc = c("L1", "L2"), node = FALSE, text_col = "black")
 
 }
+\seealso{
+\link{cmest}, \link{cmsens}.
+}
