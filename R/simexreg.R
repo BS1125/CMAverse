@@ -127,6 +127,10 @@ simexreg <- function (reg = NULL, data = NULL, weights = NULL,
 
   cl <- match.call()
   
+  # assign svyglm the global environment
+  assign2glob <- function(key, val, pos) assign(key, val, envir = as.environment(pos))
+  assign2glob("svyglm", survey::svyglm, 1L)
+  
   # the vector of variable names in the regression formula
   reg_formula <- formula(reg)
   var_vec <- unique(all.vars(reg_formula))
@@ -233,8 +237,13 @@ simexreg <- function (reg = NULL, data = NULL, weights = NULL,
                        prob = SIMmcm[, j], replace = TRUE)
               }
           }
-        regCall$data <- SIMdata
+        if (identical(regClass, c("svyglm", "glm", "lm"))) {
+          designCall <- getCall(reg$survey.design)
+          designCall$data <- SIMdata
+          regCall$design <- eval.parent(designCall)
+        } else regCall$data <- SIMdata
         SIMreg <- eval.parent(regCall)
+        
         if (identical(class(SIMreg), "polr")) {
           SIMcoef_mid[b, ] <- c(coef(SIMreg), SIMreg$zeta)
         } else if (identical(class(SIMreg), c("multinom", "nnet")) | inherits(SIMreg, "svymultinom")) {
@@ -277,6 +286,10 @@ simexreg <- function (reg = NULL, data = NULL, weights = NULL,
                            (n - ncoef) - (SIMEXcoef[MEvariable] * MEerror) ^ 2)
       out$SIMEXsigma <- unname(SIMEXsigma)
     }
+    
+    # remove svyglm from the global environment
+    rm(svyglm, envir = .GlobalEnv)
+    
     class(out) <- "simexreg"
   }
   return(out)

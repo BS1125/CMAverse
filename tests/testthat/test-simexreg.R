@@ -346,3 +346,36 @@ test_that("simexreg works correctly for coxph", {
   expect_equal(summary(reg_simex)$summarydf$Estimate, as.numeric(coef(reg_simex)))
   
 })
+
+
+test_that("simexreg works correctly for svyglm", {
+  
+  set.seed(1)
+  n <- 10000
+  x1 <- rnorm(n, mean = 0, sd = 1)
+  x2_true <- rnorm(n, mean = 1, sd = 1)
+  error1 <- rnorm(n, mean = 0, sd = 0.5)
+  x2_error <- x2_true + error1
+  x3 <- rbinom(n, size = 1, prob = 0.4)
+  linearpred <- 1 + 0.3 * x1 - 0.5 * x2_true - 0.2 * x3
+  py <- exp(linearpred) / (1 + exp(linearpred))
+  y <- rbinom(n, size = 1, prob = py)
+  data <- data.frame(x1 = x1, x2_true = x2_true, x2_error = x2_error,
+                     x3 = x3, y = y)
+  reg_naive <- survey::svyglm(y ~ x1 + x2_error + x3, family = binomial("logit"),
+                              design = survey::svydesign(ids = ~1, data = data, w = rep(1,n)))
+  reg_true <- survey::svyglm(y ~ x1 + x2_true + x3, family = binomial("logit"),
+                             design = survey::svydesign(ids = ~1, data = data, w = rep(1,n)))
+  reg_simex <- simexreg(reg = reg_naive, data = data, weights = rep(1,n), MEvariable = "x2_error",
+                  MEerror = 0.5, MEvartype = "con", variance = FALSE)
+  
+  # test
+  expect_equal(unname(coef(reg_simex)), unname(coef(reg_true)), tolerance = 0.1)
+  expect_equal(formula(reg_simex), as.formula(y ~ x1 + x2_error + x3))
+  expect_equal(family(reg_simex), family(reg_true))
+  expect_equal(as.numeric(predict(reg_simex, newdata = data[1, ], type = "response")), 
+               as.numeric(exp(t(unname(coef(reg_simex))) %*% c(1, as.numeric(data[1, c(1, 3, 4)])))/
+                            (1+exp(t(unname(coef(reg_simex))) %*% c(1, as.numeric(data[1, c(1, 3, 4)]))))))
+  expect_equal(model.frame(reg_simex), model.frame(reg_naive))
+  
+})

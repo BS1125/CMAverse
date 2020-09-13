@@ -126,6 +126,10 @@ rcreg <- function(reg = NULL, data = NULL, weights = NULL,
 
   cl <- match.call()
   
+  # assign svyglm the global environment
+  assign2glob <- function(key, val, pos) assign(key, val, envir = as.environment(pos))
+  assign2glob("svyglm", survey::svyglm, 1L)
+  
   reg_formula <- formula(reg)
   # the vector of names of all variables in the regression formula 
   var_vec <- unique(all.vars(reg_formula))
@@ -249,6 +253,10 @@ rcreg <- function(reg = NULL, data = NULL, weights = NULL,
       out$RCvcov <- RCvcov
       out$ME$nboot <- nboot
     }
+    
+    # remove svyglm from the global environment
+    rm(svyglm, envir = .GlobalEnv)
+    
     class(out) <- c("rcreg")
   }
   return(out)

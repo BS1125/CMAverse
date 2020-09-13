@@ -753,8 +753,8 @@ print.cmest <- function(x, ...) {
   if (x$methods$estimation == "imputation") est_str <- "Direct counterfactual imputation estimation"
   if (x$methods$inference == "delta") inf_str <- "delta method standard errors, confidence intervals and p-values"
   if (x$methods$inference == "bootstrap") inf_str <- "bootstrap standard errors, percentile confidence intervals and p-values"
-  if (x$methods$model != "ne" && (x$methods$casecontrol)) cat("# Causal Mediation Analysis for a Case Control Study via the ")
-  if (!(x$methods$model != "ne" && (x$methods$casecontrol))) cat("# Causal Mediation Analysis via the ")
+  if (x$methods$model != "ne" && (x$methods$casecontrol)) cat("Causal Mediation Analysis for a Case Control Study via the ")
+  if (!(x$methods$model != "ne" && (x$methods$casecontrol))) cat("Causal Mediation Analysis via the ")
   cat(model_str)
   cat("\n \n")
   cat(est_str)
@@ -795,8 +795,8 @@ print.summary.cmest <- function(x, digits = 4, ...) {
   if (x$methods$estimation == "imputation") est_str <- "Direct counterfactual imputation estimation"
   if (x$methods$inference == "delta") inf_str <- "delta method standard errors, confidence intervals and p-values"
   if (x$methods$inference == "bootstrap") inf_str <- "bootstrap standard errors, percentile confidence intervals and p-values"
-  if (x$methods$model != "ne" && (x$methods$casecontrol)) cat("# Causal Mediation Analysis for a Case Control Study via the ")
-  if (!(x$methods$model != "ne" && (x$methods$casecontrol))) cat("# Causal Mediation Analysis via the ")
+  if (x$methods$model != "ne" && (x$methods$casecontrol)) cat("Causal Mediation Analysis for a Case Control Study via the ")
+  if (!(x$methods$model != "ne" && (x$methods$casecontrol))) cat("Causal Mediation Analysis via the ")
   cat(model_str)
   cat("\n \n")
   cat(est_str)
