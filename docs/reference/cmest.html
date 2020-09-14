@@ -45,8 +45,8 @@
 
 <meta property="og:title" content="Causal Mediation Analysis — cmest" />
 
-<meta property="og:description" content="cmest is used to conduct causal mediation analysis via six statistical approaches 
-including the regression-based approach by Valeri et al. (2013) and VanderWeele 
+<meta property="og:description" content="cmest is used to implement six causal mediation analysis approaches including 
+the regression-based approach by Valeri et al. (2013) and VanderWeele 
 et al. (2014), the weighting-based approach by VanderWeele et al. (2014), 
 the inverse odd-ratio weighting approach by Tchetgen Tchetgen (2013), 
 the natural effect model by Vansteelandt et al. (2012), the marginal structural 
@@ -161,14 +161,14 @@ model by VanderWeele et al. (2017), and the g-formula approach by Lin et al. (20
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Causal Mediation Analysis</h1>
-    <small class="dont-index">Source: <a href='https://github.com/BS1125/CMAverse/blob/master/R/cmest.R'><code>R/cmest.R</code></a>, <a href='https://github.com/BS1125/CMAverse/blob/master/R/cmsens.R'><code>R/cmsens.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/BS1125/CMAverse/blob/master/R/cmest.R'><code>R/cmest.R</code></a></small>
     <div class="hidden name"><code>cmest.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p><code>cmest</code> is used to conduct causal mediation analysis via six statistical approaches 
-including <em>the regression-based approach</em> by Valeri et al. (2013) and VanderWeele 
+    <p><code>cmest</code> is used to implement six causal mediation analysis approaches including 
+<em>the regression-based approach</em> by Valeri et al. (2013) and VanderWeele 
 et al. (2014), <em>the weighting-based approach</em> by VanderWeele et al. (2014), 
 <em>the inverse odd-ratio weighting approach</em> by Tchetgen Tchetgen (2013), 
 <em>the natural effect model</em> by Vansteelandt et al. (2012), <em>the marginal structural 
@@ -178,7 +178,7 @@ model</em> by VanderWeele et al. (2017), and <em>the g-formula approach</em> by 
 
     <pre class="usage"><span class='fu'>cmest</span>(
   <span class='kw'>data</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>model</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
+  <span class='kw'>model</span> <span class='kw'>=</span> <span class='st'>"rb"</span>,
   <span class='kw'>full</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>casecontrol</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>yrare</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
@@ -215,31 +215,25 @@ model</em> by VanderWeele et al. (2017), and <em>the g-formula approach</em> by 
 <span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span>(<span class='no'>object</span>, <span class='no'>...</span>)
 
 <span class='co'># S3 method for summary.cmest</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>x</span>, <span class='kw'>digits</span> <span class='kw'>=</span> <span class='fl'>4</span>, <span class='no'>...</span>)
-
-<span class='co'># S3 method for cmsens.uc</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>x</span>, <span class='no'>...</span>)
-
-<span class='co'># S3 method for cmsens.me</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>x</span>, <span class='no'>...</span>)</pre>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>x</span>, <span class='kw'>digits</span> <span class='kw'>=</span> <span class='fl'>4</span>, <span class='no'>...</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>data</th>
-      <td><p>dataset for causal mediation analysis.</p></td>
+      <td><p>dataset</p></td>
     </tr>
     <tr>
       <th>model</th>
-      <td><p>causal mediation analysis approach. "<code>rb</code>", "<code>wb</code>", "<code>iorw</code>", 
-"<code>ne</code>", "<code>msm</code>", "<code>gformula</code>" are implemented. See <code>Details</code>.</p></td>
+      <td><p>causal mediation analysis approach. <code>rb</code>, <code>wb</code>, <code>iorw</code>, 
+<code>ne</code>, <code>msm</code> and <code>gformula</code> are implemented. Default is <code>rb</code>. 
+See <code>Details</code>.</p></td>
     </tr>
     <tr>
       <th>full</th>
       <td><p>a logical value. If <code>TRUE</code>, output a full list of causal effects; if 
-<code>FALSE</code>, output a reduced list of causal effects. Default is <code>TRUE</code>. See 
-<code>Details</code>.</p></td>
+<code>FALSE</code>, output a reduced list of causal effects. Default is <code>TRUE</code>.</p></td>
     </tr>
     <tr>
       <th>casecontrol</th>
@@ -258,15 +252,15 @@ indicates the case is rare.</p></td>
     </tr>
     <tr>
       <th>estimation</th>
-      <td><p>estimation method for causal effects. <code>paramfunc</code> and 
+      <td><p>method for estimating causal effects. <code>paramfunc</code> and 
 <code>imputation</code> are implemented (the first 4 letters are enough). Default is <code>imputation</code>. 
 See <code>Details</code>.</p></td>
     </tr>
     <tr>
       <th>inference</th>
-      <td><p>inference method for causal effects. <code>delta</code> and <code>bootstrap</code> are 
-implemented (the first 4 letters are enough). Default is <code>bootstrap</code>. See 
-<code>Details</code>.</p></td>
+      <td><p>method for estimating standard errors of causal effects. <code>delta</code> and 
+<code>bootstrap</code> are implemented (the first 4 letters are enough). Default is <code>bootstrap</code>. 
+See <code>Details</code>.</p></td>
     </tr>
     <tr>
       <th>outcome</th>
@@ -283,49 +277,51 @@ or <code>aft_weibull</code>).</p></td>
     </tr>
     <tr>
       <th>mediator</th>
-      <td><p>a vector of variable name(s) of the mediator(s).</p></td>
+      <td><p>a vector of variable name(s) of the mediator(s) following the temporal order.</p></td>
     </tr>
     <tr>
       <th>EMint</th>
-      <td><p>a logical value (used when <code>yreg</code> is character). If <code>TRUE</code>, the 
-outcome regression formula includes the interaction(s) between the exposure and each of the 
-mediator(s). Default is <code>FALSE</code>.</p></td>
+      <td><p>a logical value (used when <code>yreg</code> is character and <code>model</code> is not 
+<code>iorw</code>). If <code>TRUE</code>, the outcome regression formula includes the interaction(s) 
+between the exposure and each of the mediator(s).</p></td>
     </tr>
     <tr>
       <th>basec</th>
-      <td><p>a vector of variable name(s) of the baseline confounder(s)</p></td>
+      <td><p>a vector of variable name(s) of the exposure-outcome confounder(s), exposure-mediator 
+confounder(s) and mediator-outcome confounder(s) not affected by the exposure</p></td>
     </tr>
     <tr>
       <th>postc</th>
-      <td><p>a vector of variable name(s) of mediator-outcome confounder(s) affected 
-by the exposure</p></td>
+      <td><p>a vector of variable name(s) of the mediator-outcome confounder(s) affected 
+by the exposure following the temporal order</p></td>
     </tr>
     <tr>
       <th>yreg</th>
-      <td><p>outcome regression. See <code>Details</code>.</p></td>
+      <td><p>outcome regression model. See <code>Details</code>.</p></td>
     </tr>
     <tr>
       <th>mreg</th>
-      <td><p>a list of regression(s) specifying a regression model for each of the 
-mediator(s) (used when <code>model</code> is <code>rb</code>, <code>msm</code> or <code>gformula</code>). See 
-<code>Details</code>.</p></td>
+      <td><p>a list specifying a regression model for each variable in <code>mediator</code> (used 
+when <code>model</code> is <code>rb</code>, <code>msm</code> or <code>gformula</code>). The order of regression models 
+must follow the order of variables in <code>mediator</code>. See <code>Details</code>.</p></td>
     </tr>
     <tr>
       <th>wmreg</th>
-      <td><p>a list of regression(s) specifying a regression model for calculating 
-weights with respect to each of the mediator(s) (used when <code>model</code> is <code>msm</code>). 
-See <code>Details</code>.</p></td>
+      <td><p>a list specifying a regression model for calculating weights with respect to 
+each variable in <code>mediator</code> (used when <code>model</code> is <code>msm</code>). The order of regression 
+models must follow the order of variables in <code>mediator</code>. See <code>Details</code>.</p></td>
     </tr>
     <tr>
       <th>ereg</th>
-      <td><p>exposure regression for calculating weights with respect to the exposure (used 
-when <code>model</code> is <code>wb</code> or <code>msm</code> with <code><a href='https://rdrr.io/r/base/length.html'>length(basec)</a></code> != 0 or when 
+      <td><p>exposure regression model for calculating weights with respect to the exposure (used 
+when <code>model</code> is <code>wb</code> or <code>msm</code> with a non-empty <code>basec</code> or when 
 <code>model</code> is <code>iorw</code>). See <code>Details</code>.</p></td>
     </tr>
     <tr>
       <th>postcreg</th>
-      <td><p>a list of regression(s) specifying a regression model for each variable
-in <code>postc</code> (used when <code>model</code> is <code>gformula</code>). See <code>Details</code>.</p></td>
+      <td><p>a list specifying a regression model for each variable in <code>postc</code> (used 
+when <code>model</code> is <code>gformula</code>). The order of regression models must follow the order of 
+variables in <code>postc</code>. See <code>Details</code>.</p></td>
     </tr>
     <tr>
       <th>astar</th>
@@ -337,7 +333,7 @@ in <code>postc</code> (used when <code>model</code> is <code>gformula</code>). S
     </tr>
     <tr>
       <th>mval</th>
-      <td><p>a list specifying a reference value for each of the mediator(s) (used when 
+      <td><p>a list specifying a reference value for each variable in <code>mediator</code> (used when 
 <code>model</code> is <code>rb</code>, <code>wb</code>, <code>ne</code>, <code>msm</code> or <code>gformula</code>).</p></td>
     </tr>
     <tr>
@@ -346,9 +342,10 @@ in <code>postc</code> (used when <code>model</code> is <code>gformula</code>). S
     </tr>
     <tr>
       <th>basecval</th>
-      <td><p>a list specifying a conditional value for each of the baseline 
-confounder(s) for estimating conditional causal effects (used when <code>estimation</code> is 
-<code>paramfunc</code>). If <code>NULL</code>, mean value(s) of the baseline confounder(s) are used.</p></td>
+      <td><p>a list specifying a conditional value for each variable in <code>basec</code> conditional 
+on which causal effects are estimated (used when <code>estimation</code> is <code>paramfunc</code>). The order 
+of conditional values must follow the order of variables in <code>basec</code>. If <code>NULL</code>, 
+mean values of variable(s) in <code>basec</code> are used.</p></td>
     </tr>
     <tr>
       <th>nboot</th>
@@ -358,13 +355,13 @@ Default is 200.</p></td>
     <tr>
       <th>nRep</th>
       <td><p>number of replications or hypothetical values of the exposure to sample for 
-each observation unit (used when <code>model</code> is <code>ne</code>). See <a href='https://rdrr.io/pkg/medflex/man/neImpute.default.html'>neImpute.default</a>
-for details. Default is <code>5</code>.</p></td>
+each observation unit (used when <code>model</code> is <code>ne</code>). Default is <code>5</code>.</p></td>
     </tr>
     <tr>
       <th>multimp</th>
       <td><p>a logical value (used when <code>data</code> contains missing values). If 
-<code>TRUE</code>, conduct multiple imputation using the <code>mice</code> package. Default is <code>FALSE</code>.</p></td>
+<code>TRUE</code>, conduct multiple imputations using the <a href='https://rdrr.io/pkg/mice/man/mice.html'>mice</a> function. Default is 
+<code>FALSE</code>.</p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -373,11 +370,11 @@ for details.</p></td>
     </tr>
     <tr>
       <th>x</th>
-      <td><p>an object of class 'cmest'</p></td>
+      <td><p>an object of class <code>cmest</code></p></td>
     </tr>
     <tr>
       <th>object</th>
-      <td><p>an object of class 'cmest'</p></td>
+      <td><p>an object of class <code>cmest</code></p></td>
     </tr>
     <tr>
       <th>digits</th>
@@ -387,12 +384,12 @@ for details.</p></td>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>An object of class 'cmest' is returned:</p>
+    <p>An object of class <code>cmest</code> is returned:</p>
 <dt>call</dt><dd><p>the function call,</p></dd>
 <dt>data</dt><dd><p>the dataset,</p></dd>
 <dt>methods</dt><dd><p>a list of methods used which may include <code>model</code>, <code>full</code>, 
-<code>casecontrol</code>, <code>yprevalence</code>, <code>yrare</code>, <code>estimation</code>, <code>inference</code> 
-and <code>nboot</code>,</p></dd>
+<code>casecontrol</code>, <code>yprevalence</code>, <code>yrare</code>, <code>estimation</code>, <code>inference</code>, 
+<code>nboot</code> and <code>nRep</code>,</p></dd>
 <dt>variables</dt><dd><p>a list of variables used which may include <code>outcome</code>, <code>event</code>, 
 <code>exposure</code>, <code>mediator</code>, <code>EMint</code>, <code>basec</code> and <code>postc</code>,</p></dd>
 <dt>reg.input</dt><dd><p>a list of regressions input,</p></dd>
@@ -401,9 +398,8 @@ and <code>nboot</code>,</p></dd>
 <dt>reg.output</dt><dd><p>a list of regressions output,</p></dd>
 <dt>effect.pe</dt><dd><p>point estimates of causal effects,</p></dd>
 <dt>effect.se</dt><dd><p>standard errors of causal effects,</p></dd>
-<dt>effect.ci.low</dt><dd><p>the lower limits of confidence intervals of causal effects,</p></dd>
-<dt>effect.ci.high</dt><dd><p>the higher limits of confidence intervals of causal effects,</p></dd>
-<dt>effect.pe</dt><dd><p>point estimates of causal effects,</p></dd>
+<dt>effect.ci.low</dt><dd><p>the lower limits of 95% confidence intervals of causal effects,</p></dd>
+<dt>effect.ci.high</dt><dd><p>the higher limits of 95% confidence intervals of causal effects,</p></dd>
 <dt>effect.pval</dt><dd><p>p-values of causal effects,</p></dd>
 ...
 
@@ -413,24 +409,24 @@ and <code>nboot</code>,</p></dd>
     <p><strong>Regressions</strong></p>
 <p>Each regression in <code>yreg</code>, <code>mreg</code>, <code>wmreg</code>,
 <code>ereg</code> and <code>postcreg</code> can be specified by a user-defined regression 
-object or the character name of a regression.</p>
+object or the character name of the regression.</p>
 <p><em>The Character Name of A Regression</em></p>
 <ul>
-<li><p>"<code>linear</code>": linear regression fitted by <a href='https://rdrr.io/r/stats/glm.html'>glm</a> with <code>family = gaussian()</code></p></li>
-<li><p>"<code>logistic</code>": logistic regression fitted by <a href='https://rdrr.io/r/stats/glm.html'>glm</a> with <code>family = logit()</code></p></li>
-<li><p>"<code>loglinear</code>": log linear regression fitted by <a href='https://rdrr.io/r/stats/glm.html'>glm</a> with 
+<li><p><code>linear</code>: linear regression fitted by <a href='https://rdrr.io/r/stats/glm.html'>glm</a> with <code>family = gaussian()</code></p></li>
+<li><p><code>logistic</code>: logistic regression fitted by <a href='https://rdrr.io/r/stats/glm.html'>glm</a> with <code>family = logit()</code></p></li>
+<li><p><code>loglinear</code>: log linear regression fitted by <a href='https://rdrr.io/r/stats/glm.html'>glm</a> with 
 <code>family = poisson()</code> for a binary response</p></li>
-<li><p>"<code>poisson</code>": poisson regression fitted by <a href='https://rdrr.io/r/stats/glm.html'>glm</a> with 
+<li><p><code>poisson</code>: poisson regression fitted by <a href='https://rdrr.io/r/stats/glm.html'>glm</a> with 
 <code>family = poisson()</code> for a count response</p></li>
-<li><p>"<code>quasipoisson</code>": quasipoisson regression fitted by <a href='https://rdrr.io/r/stats/glm.html'>glm</a> with 
+<li><p><code>quasipoisson</code>: quasipoisson regression fitted by <a href='https://rdrr.io/r/stats/glm.html'>glm</a> with 
 <code>family = quasipoisson()</code></p></li>
-<li><p>"<code>negbin</code>": negative binomial regression fitted by <a href='https://rdrr.io/pkg/MASS/man/glm.nb.html'>glm.nb</a></p></li>
-<li><p>"<code>multinomial</code>": multinomial regression fitted by <a href='https://rdrr.io/pkg/nnet/man/multinom.html'>multinom</a></p></li>
-<li><p>"<code>ordinal</code>": ordered logistic regression fitted by <a href='https://rdrr.io/pkg/MASS/man/polr.html'>polr</a></p></li>
-<li><p>"<code>coxph</code>": cox proportional hazard model fitted by <a href='https://rdrr.io/pkg/survival/man/coxph.html'>coxph</a></p></li>
-<li><p>"<code>aft_exp</code>": accelerated failure time model fitted by <a href='https://rdrr.io/pkg/survival/man/survreg.html'>survreg</a>
+<li><p><code>negbin</code>: negative binomial regression fitted by <a href='https://rdrr.io/pkg/MASS/man/glm.nb.html'>glm.nb</a></p></li>
+<li><p><code>multinomial</code>: multinomial regression fitted by <a href='https://rdrr.io/pkg/nnet/man/multinom.html'>multinom</a></p></li>
+<li><p><code>ordinal</code>: ordered logistic regression fitted by <a href='https://rdrr.io/pkg/MASS/man/polr.html'>polr</a></p></li>
+<li><p><code>coxph</code>: cox proportional hazard model fitted by <a href='https://rdrr.io/pkg/survival/man/coxph.html'>coxph</a></p></li>
+<li><p><code>aft_exp</code>: accelerated failure time model fitted by <a href='https://rdrr.io/pkg/survival/man/survreg.html'>survreg</a>
 with <code>dist = "exponential"</code></p></li>
-<li><p>"<code>aft_weibull</code>": accelerated failure time model fitted by <a href='https://rdrr.io/pkg/survival/man/survreg.html'>survreg</a>
+<li><p><code>aft_weibull</code>: accelerated failure time model fitted by <a href='https://rdrr.io/pkg/survival/man/survreg.html'>survreg</a>
 with <code>dist = "weibull"</code></p></li>
 </ul><p><code>coxph</code>, <code>aft_exp</code> and <code>aft_weibull</code> are currently not implemented for 
 <code>mreg</code>, <code>wmreg</code>, <code>ereg</code> and <code>postcreg</code>.</p>
@@ -442,40 +438,38 @@ are currently not supported for <code>mreg</code>, <code>wmreg</code>,
 <code>ereg</code> and <code>postcreg</code>.</p>
 <p>The <code>cmest</code> function calculates weights for regressions when weighting is required. If a 
 user-defined regression object is fitted with prior weights, the final weights for this 
-regression are constructed by multiplying the prior weights with the weights calculated by 
-the <code>cmest</code> function.</p>
+regression object are constructed by multiplying the prior weights and the weights calculated 
+inside the <code>cmest</code> function.</p>
 
 <p><strong>Causal Mediation Analysis Approaches</strong></p>
 <p>Let <code>Y</code> denote the outcome, <code>A</code> denote the exposure, <code>M=(M_1,...,M_k)^T</code> 
-denote the set of mediator(s) following the temporal order, <code>C</code> denote the set of 
-variables in <code>basec</code>, <code>L=(L_1,...,L_s)^T</code> denote the set of variables in 
-<code>postc</code> following the temporal order.</p>
+denote <code>mediator</code>, <code>C</code> denote <code>basec</code>, <code>L=(L_1,...,L_s)^T</code> denote <code>postc</code>.</p>
 <ul>
 <li><p><code>rb</code>: <em>the regression-based approach</em> by Valeri et al. (2013) and
       VanderWeele et al. (2014). <code>yreg</code> and <code>mreg</code> are required. If specified as
-      a user defined regression object, <code>yreg</code> should regress <code>Y</code> on <code>A</code>,
+      a user-defined regression object, <code>yreg</code> should regress <code>Y</code> on <code>A</code>,
 <code>M</code> and <code>C</code> and <code>mreg[p]</code> should regress <code>M_p</code> on <code>A</code>,
 <code>M_1</code>, ..., <code>M_{p-1}</code> and <code>C</code> for <code>p=1,...,k</code>.</p></li>
 <li><p><code>wb</code>: <em>the weighting-based approach</em> by VanderWeele et al. (2014).
     <code>yreg</code> is required. When <code>basec</code> is not empty, <code>ereg</code> is also required 
-    and <code>A</code> must be categorical. If specified as a user defined regression object, 
+    and <code>A</code> must be categorical. If specified as a user-defined regression object, 
     <code>yreg</code> should regress <code>Y</code> on <code>A</code>, <code>M</code> and <code>C</code> and <code>ereg</code> 
     should regress <code>A</code> on <code>C</code>.</p></li>
 <li><p><code>iorw</code>: <em>the inverse odd-ratio weighting approach</em> by
       Tchetgen Tchetgen (2013). <code>yreg</code> and <code>ereg</code> are required and 
-      <code>A</code> must be categorical. If specified as a user defined regression object, 
+      <code>A</code> must be categorical. If specified as a user-defined regression object, 
       <code>yreg</code> should regress <code>Y</code> on <code>A</code> and <code>C</code> and <code>ereg</code> should 
       regress <code>A</code> on <code>M</code> and <code>C</code>.</p></li>
 <li><p><code>ne</code>: <em>the natural effect model</em> by Vansteelandt et al. (2012). 
-    <code>yreg</code> is required. If specified as a user defined regression object, <code>yreg</code>
+    <code>yreg</code> is required. If specified as a user-defined regression object, <code>yreg</code>
     should regress <code>Y</code> on <code>A</code>, <code>M</code> and <code>C</code>. The variables in the 
-    formula of <code>yreg</code> should follow the order of <code>A</code>, <code>M</code> and <code>C</code>, i.e., 
-    the first variable needs to point to the exposure, the variable(s) right after the 
-    exposure need to point to the mediator(s), e.g., <code>Y ~ A + M_1 + M_2 + A*M_1 + C</code>.</p></li>
+    formula of <code>yreg</code> must follow the order of <code>A</code>, <code>M</code> and <code>C</code>, i.e., 
+    the first variable must point to the exposure, the variable(s) right after the 
+    exposure must point to the mediator(s), e.g., <code>Y ~ A + M_1 + M_2 + A*M_1 + C</code>.</p></li>
 <li><p><code>msm</code>: <em>the marginal structural model</em> by VanderWeele et al. (2017).
     <code>yreg</code>, <code>mreg</code> and <code>wmreg</code> are required and all 
     mediators must be categorical. When <code>basec</code> is not empty, <code>ereg</code> is also 
-    required and <code>A</code> must be categorical. If specified as a user defined regression 
+    required and <code>A</code> must be categorical. If specified as a user-defined regression 
     object, <code>yreg</code> should regress <code>Y</code> on <code>A</code> and <code>M</code>, 
     <code>mreg[p]</code> should regress <code>M_p</code> on <code>A</code>, <code>M_1</code>, ..., and 
     <code>M_{p-1}</code> for <code>p=1,...,k</code>, 
@@ -484,33 +478,32 @@ variables in <code>basec</code>, <code>L=(L_1,...,L_s)^T</code> denote the set o
     <code>C</code>.</p></li>
 <li><p><code>gformula</code>: <em>the g-formula approach</em> by Lin et al. (2017). 
     <code>yreg</code>, <code>mreg</code> are required. <code>postcreg</code> is also required when <code>postc</code>
-    is not empty. If specified as a user defined regression object, <code>yreg</code> should 
+    is not empty. If specified as a user-defined regression object, <code>yreg</code> should 
     regress <code>Y</code> on <code>A</code>, <code>M</code>, <code>C</code> and <code>L</code>, <code>mreg[p]</code> should 
-    regress <code>M_p</code> on <code>A</code>, <code>M_1</code>, ..., <code>M_{p-1}</code>, <code>C</code> and <code>L</code>,
-    for <code>p=1,...,k</code>, <code>postcreg[p]</code> should regress <code>L_q</code> on <code>A</code>, 
+    regress <code>M_p</code> on <code>A</code>, <code>M_1</code>, ..., <code>M_{p-1}</code>, <code>C</code> and <code>L</code>
+    for <code>p=1,...,k</code>, <code>postcreg[q]</code> should regress <code>L_q</code> on <code>A</code>, 
     <code>L_1</code>, ..., <code>L_{q-1}</code> and <code>C</code> for <code>q=1,...,s</code>.</p></li>
 </ul>
   
-<p>When <code>postc</code> is not empty, <code>msm</code> and <code>gformula</code> can be used, while <code>rb</code>, 
-<code>wb</code>, <code>iorw</code> and <code>ne</code> can't be used.</p>  
+<p>When <code>postc</code> is not empty, only <code>msm</code> and <code>gformula</code> can be used.</p>  
 
 <p><strong>Estimation Methods</strong></p>  
 <ul>
 <li><p><code>paramfunc</code>: closed-form parameter function estimation (only available when 
-<code>model = "rb"</code> with <code>length(mediator) = 1</code>). The point estimate of each causal 
-effect is obtained by its closed-form formula of regression coefficients. Effects 
-conditional on pre-specified values of <code>C</code>, i.e., <code>basecval</code>, are estimated.</p></li>
+<code>model = "rb"</code> and <code>length(mediator) = 1</code>). The point estimate of each causal 
+effect is obtained by a closed-form formula of regression coefficients. Effects conditional 
+on <code>basecval</code> are estimated.</p></li>
 <li><p><code>imputation</code>: direct counterfactual imputation estimation. The point estimate 
 of each causal effect is obtained by imputing counterfactuals directly.</p></li>
 </ul>
 
-<p>To use closed-form parameter function estimation, <code>yreg</code> and <code>mreg</code> must be 
-specified by the character name of the regression. <code>yreg</code> can be chosen from 
-<code>linear</code>, <code>logistic</code>, <code>loglinear</code>, <code>poisson</code>, <code>quasipoisson</code>, 
-<code>negbin</code>, <code>coxph</code>, <code>aft_exp</code> and <code>aft_weibull</code>. <code>mreg</code> can be 
-chosen from <code>linear</code>, <code>logistic</code> and <code>multinomial</code>.</p>
-<p>To use <code>yreg = "logistic"</code> in closed-form parameter function estimation, the binary 
-outcome must be rare. For common binary outcomes, use <code>yreg = "loglinear"</code>.</p>
+<p>To use <code>paramfunc</code>, <code>yreg</code> and <code>mreg</code> must be specified by the character name 
+of the regression. <code>yreg</code> can be chosen from <code>linear</code>, <code>logistic</code>, <code>loglinear</code>, 
+<code>poisson</code>, <code>quasipoisson</code>, <code>negbin</code>, <code>coxph</code>, <code>aft_exp</code> and 
+<code>aft_weibull</code>. <code>mreg</code> can be chosen from <code>linear</code>, <code>logistic</code> and 
+<code>multinomial</code>.</p>
+<p>To use <code>paramfunc</code> with <code>yreg = "logistic"</code>, the outcome must be rare. To use 
+<code>paramfunc</code> with <code>yreg = "coxph"</code>, the outcome at the end of follow-up must be rare.</p>
 
 <p><strong>Inference Methods</strong></p>
 <ul>
@@ -524,74 +517,52 @@ causal effects are obtained by percentiles of bootstrapped results.</p></li>
 
 
 <p><strong>Estimated Causal Effects</strong></p>
-<p>When there are multiple mediators, the joint effect of them is studied.</p>
 <p>For a continuous outcome, the causal effects on the difference scale are estimated. For a 
-categorical, count or survival outcome, the causal effects on the ratio scale are estimated.</p>
+categorical, count or survival outcome, the causal effects on the ratio scale are estimated. The 
+interpretation of the ratio depends on the type of the outcome and it can be risk 
+ratio for a categorical outcome, rate ratio for a count outcome, hazard ratio for a survival 
+outcome fitted by <a href='https://rdrr.io/pkg/survival/man/coxph.html'>coxph</a>, mean survival ratio for a survival outcome fitted 
+by <a href='https://rdrr.io/pkg/survival/man/survreg.html'>survreg</a>, etc.</p>
 <p><em>Continuous Outcome</em></p>
-<p>When <code>model = "rb", "wb", "ne", "msm" or "gformula"</code> with <code>length(postc) = 0</code> and 
-<code>full = TRUE</code>, <code>cde</code> (controlled direct effect), <code>pnde</code> (pure natural direct 
-effect), <code>tnde</code> (total natural direct effect), <code>pnie</code> (pure natural indirect effect), 
+<p>When <code>model = "rb", "wb", "ne", "msm" or "gformula"</code> with an empty <code>postc</code>, 
+<code>cde</code> (controlled direct effect), <code>pnde</code> (pure natural direct effect), 
+<code>tnde</code> (total natural direct effect), <code>pnie</code> (pure natural indirect effect), 
 <code>tnie</code> (total natural indirect effect), <code>te</code> (total effect),  <code>intref</code> 
 (reference interaction), <code>intmed</code> (mediated interaction), 
 <code>cde(prop)</code> (proportion <code>cde</code>), <code>intref(prop)</code> (proportion 
 <code>intref</code>), <code>intmed(prop)</code> (proportion <code>intmed</code>), <code>pnie(prop)</code> 
 (proportion <code>pnie</code>), <code>pm</code> (proportion mediated), <code>int</code> (proportion 
 attributable to interaction) and <code>pe</code> (proportion eliminated) are estimated.</p>
-<p>When <code>model = "rb", "wb", "ne", "msm" or "gformula"</code> with <code>length(postc) = 0</code> and
-<code>full = FALSE</code>, <code>cde</code>, <code>pnde</code>, <code>tnde</code>, <code>pnie</code>, <code>tnie</code> and 
-<code>te</code> are estimated.</p>
-<p>When <code>model = "msm" or "gformula"</code> with <code>length(postc) != 0</code> and <code>full = TRUE</code>, 
-<code>pnde</code>, <code>tnde</code>, <code>pnie</code>, <code>tnie</code>,  <code>intref</code>, <code>intmed</code>, 
-<code>intref(prop)</code>, <code>intmed(prop)</code>, <code><a href='https://rdrr.io/r/graphics/pie.html'>pie(prop)</a></code>, <code>pm</code>, <code>int</code> and 
-<code>pe</code> are replaced by their randomized analogues <code>rpnde</code>, <code>rtnde</code>, 
-<code>rpnie</code>, <code>rtnie</code>, <code>rintref</code>, <code>rintmed</code>, <code>rintref(prop)</code>, 
-<code>rintmed(prop)</code>, <code>rpie(prop)</code>, <code>rpm</code>, <code>rint</code> and <code>rpe</code>.</p>
-<p>When <code>model = "msm" or "gformula"</code> with <code>length(postc) != 0</code> and
-<code>full = FALSE</code>, <code>cde</code>, <code>rpnde</code>, <code>rtnde</code>, <code>rpnie</code>, <code>rtnie</code> and 
-<code>te</code> are estimated.</p>
-<p>When <code>model = "iorw"</code> and <code>full = TRUE</code>, <code>te</code>, <code>pnde</code>, <code>tnie</code> and
-<code>pm</code> are estimated. When <code>model = "iorw"</code> and <code>full = FALSE</code>, <code>te</code>, 
-<code>pnde</code> and <code>tnie</code> are estimated.</p>
+<p>When <code>postc</code> is not empty, <code>pnde</code>, <code>tnde</code>, <code>pnie</code>, <code>tnie</code>,  
+<code>intref</code>, <code>intmed</code>, <code>intref(prop)</code>, <code>intmed(prop)</code>, <code>pnie(prop)</code>, 
+<code>pm</code>, <code>int</code> and <code>pe</code> are replaced by their randomized analogues <code>rpnde</code>, 
+<code>rtnde</code>, <code>rpnie</code>, <code>rtnie</code>, <code>rintref</code>, <code>rintmed</code>, <code>rintref(prop)</code>, 
+<code>rintmed(prop)</code>, <code>rpnie(prop)</code>, <code>rpm</code>, <code>rint</code> and <code>rpe</code>.</p>
+<p>When <code>model = "iorw"</code>, <code>te</code>, <code>pnde</code>, <code>tnie</code> and <code>pm</code> are estimated.</p>
 <p><em>Categorical, Count or Survival Outcome</em></p>
-<p>When <code>model = "rb", "wb", "ne", "msm" or "gformula"</code> with <code>length(postc) = 0</code> and 
-<code>full = TRUE</code>, <code>RRcde</code> (<code>cde</code> risk rario or rate ratio), <code>RRpnde</code> 
-(<code>pnde</code> risk rario or rate ratio), <code>RRtnde</code> (<code>tnde</code> risk rario or rate ratio), 
-<code>RRpnie</code> (<code>pnie</code> risk rario or rate ratio), <code>RRtnie</code> (<code>tnie</code> risk rario 
-or rate ratio), <code>RRte</code> (<code>te</code> risk rario or rate ratio), <code>ERRcde</code> 
-(excess risk rario or rate ratio due to <code>cde</code>), <code>ERRintref</code> (excess risk rario or 
-rate ratio due to <code>intref</code>), <code>ERRintmed</code> (excess risk rario or rate ratio due to 
-<code>intmed</code>), <code>ERRpie</code> (excess risk rario or rate ratio due to <code>pie</code>), 
-<code>ERRcde(prop)</code> (proportion <code>ERRcde</code>), <code>ERRintref(prop)</code> (proportion 
-<code>ERRintref</code>), <code>ERRintmed(prop)</code> (proportion <code>ERRintmed</code>), <code>ERRpie(prop)</code> 
-(proportion <code>ERRpie</code>), <code>pm</code>, <code>int</code> (proportion attributable to 
-interaction) and <code>pe</code> (proportion eliminated) are estimated.</p>
-<p>When <code>model = "rb", "wb", "ne", "msm" or "gformula"</code> with <code>length(postc) = 0</code> and
-<code>full = FALSE</code>, <code>RRcde</code>, <code>RRpnde</code>, <code>RRtnde</code>, <code>RRpnie</code>, <code>RRtnie</code> 
-and <code>RRte</code> are estimated.</p>
-<p>When <code>model = "msm" or "gformula"</code> with <code>length(postc) != 0</code> and <code>full = TRUE</code>, 
-<code>RRpnde</code>, <code>RRtnde</code>, <code>RRpnie</code>, <code>RRtnie</code>,  <code>ERRintref</code>, 
-<code>ERRintmed</code>, <code>ERRpie</code>, <code>ERRintref(prop)</code>, <code>ERRintmed(prop)</code>, 
-<code>ERRpie(prop)</code>, <code>pm</code>, <code>int</code> and <code>pe</code> are 
-replaced by their randomized analogues <code>rRRpnde</code>, <code>rRRtnde</code>, <code>rRRpnie</code>, 
-<code>rRRtnie</code>, <code>rERRintref</code>, <code>rERRintmed</code>, <code>rERRpie</code>, 
-<code>rERRintref(prop)</code>, <code>rERRintmed(prop)</code>, <code>rERRpie(prop)</code>, 
-<code>rpm</code>, <code>rint</code> and <code>rpe</code>.</p>
-<p>When <code>model = "msm" or "gformula"</code> with <code>length(postc) != 0</code> and
-<code>full = FALSE</code>, <code>RRcde</code>, <code>rRRpnde</code>, <code>rRRtnde</code>, <code>rRRpnie</code>, 
-<code>rRRtnie</code> and <code>RRte</code> are estimated.</p>
-<p>When <code>model = "iorw"</code> and <code>full = TRUE</code>, <code>RRte</code>, <code>RRpnde</code>, 
-<code>RRtnie</code> and <code>pm</code> are estimated. When <code>model = "iorw"</code> and 
-<code>full = FALSE</code>, <code>RRte</code>, <code>RRpnde</code> and <code>RRtnie</code> are estimated.</p>
+<p>When <code>model = "rb", "wb", "ne", "msm" or "gformula"</code> with an empty <code>postc</code>, 
+<code>Rcde</code> (<code>cde</code> ratio), <code>Rpnde</code> (<code>pnde</code> ratio), <code>Rtnde</code> (<code>tnde</code> 
+ratio), <code>Rtnie</code> (<code>tnie</code> ratio), <code>Rte</code> (<code>te</code> ratio), <code>ERcde</code> (excess 
+ratio due to <code>cde</code>), <code>ERintref</code> (excess ratio due to <code>intref</code>), 
+<code>ERintmed</code> (excess ratio due to <code>intmed</code>), <code>ERpnie</code> (excess ratio due to 
+<code>pnie</code>), <code>ERcde(prop)</code> (proportion <code>ERcde</code>), <code>ERintref(prop)</code> (proportion 
+<code>ERintref</code>), <code>ERintmed(prop)</code> (proportion <code>ERintmed</code>), 
+<code>ERpnie(prop)</code> (proportion <code>ERpnie</code>), <code>pm</code>, <code>int</code> and <code>pe</code> are estimated.</p>
+<p>When <code>model = "msm" or "gformula"</code> with a non-empty <code>postc</code>, <code>Rpnde</code>, <code>Rtnde</code>, 
+<code>Rpnie</code>, <code>Rtnie</code>,  <code>ERintref</code>, <code>ERintmed</code>, <code>ERpnie</code>, 
+<code>ERintref(prop)</code>, <code>ERintmed(prop)</code>, <code>ERpnie(prop)</code>, <code>pm</code>, <code>int</code> and 
+<code>pe</code> are replaced by their randomized analogues <code>rRpnde</code>, <code>rRtnde</code>, <code>rRpnie</code>, 
+<code>rRtnie</code>, <code>rERintref</code>, <code>rERintmed</code>, <code>rERpnie</code>, <code>rERintref(prop)</code>, 
+<code>rERintmed(prop)</code>, <code>rERpnie(prop)</code>, <code>rpm</code>, <code>rint</code> and <code>rpe</code>.</p>
+<p>When <code>model = "iorw"</code>, <code>Rte</code>, <code>Rpnde</code>, <code>Rtnie</code> and <code>pm</code> are estimated.</p>
     
     <h2 class="hasAnchor" id="methods-by-generic-"><a class="anchor" href="#methods-by-generic-"></a>Methods (by generic)</h2>
 
     
 <ul>
-<li><p><code>print</code>: Print the results of cmest nicely</p></li>
-<li><p><code>summary</code>: Summarize the results of cmest nicely</p></li>
-<li><p><code>print</code>: Print the summary of cmest nicely</p></li>
-<li><p><code>print</code>: Print the results of cmsens.uc nicely</p></li>
-<li><p><code>print</code>: Print the results of cmsens.me nicely</p></li>
+<li><p><code>print</code>: Print the results of <code>cmest</code> nicely</p></li>
+<li><p><code>summary</code>: Summarize the results of <code>cmest</code> nicely</p></li>
+<li><p><code>print</code>: Print the summary of <code>cmest</code> nicely</p></li>
 </ul>
     
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
@@ -626,8 +597,7 @@ imputation (2018). Statistics in Medicine. 37(14): 2252 - 2266.</p>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='ggcmest.html'>ggcmest</a></code>, <code><a href='cmdag.html'>cmdag</a></code>, 
-<code><a href='cmsens.html'>cmsens</a></code>.</p></div>
+    <div class='dont-index'><p><a href='ggcmest.html'>ggcmest</a>, <a href='cmdag.html'>cmdag</a>, <a href='cmsens.html'>cmsens</a>, <a href='svymultinom.html'>svymultinom</a>.</p></div>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
@@ -652,7 +622,6 @@ imputation (2018). Statistics in Medicine. 37(14): 2252 - 2266.</p>
 <span class='kw'>estimation</span> <span class='kw'>=</span> <span class='st'>"imputation"</span>, <span class='kw'>inference</span> <span class='kw'>=</span> <span class='st'>"bootstrap"</span>, <span class='kw'>nboot</span> <span class='kw'>=</span> <span class='fl'>10</span>)
 
 <span class='co'># multiple-mediator case with ne</span>
-<span class='co'># 10 boots are used for illustration</span>
 <span class='no'>exp3</span> <span class='kw'>&lt;-</span> <span class='fu'>cmest</span>(<span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>cma2020</span>, <span class='kw'>model</span> <span class='kw'>=</span> <span class='st'>"ne"</span>, <span class='kw'>outcome</span> <span class='kw'>=</span> <span class='st'>"contY"</span>,
 <span class='kw'>exposure</span> <span class='kw'>=</span> <span class='st'>"A"</span>, <span class='kw'>mediator</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"M1"</span>, <span class='st'>"M2"</span>), <span class='kw'>basec</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"C1"</span>, <span class='st'>"C2"</span>),
 <span class='kw'>yreg</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/glm.html'>glm</a></span>(<span class='no'>contY</span> ~ <span class='no'>A</span> + <span class='no'>M1</span> + <span class='no'>M2</span> + <span class='no'>A</span>*<span class='no'>M1</span> + <span class='no'>A</span>*<span class='no'>M2</span> + <span class='no'>C1</span> + <span class='no'>C2</span>, <span class='kw'>family</span> <span class='kw'>=</span> <span class='no'>gaussian</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>cma2020</span>),
@@ -660,7 +629,6 @@ imputation (2018). Statistics in Medicine. 37(14): 2252 - 2266.</p>
 <span class='kw'>inference</span> <span class='kw'>=</span> <span class='st'>"bootstrap"</span>, <span class='kw'>nboot</span> <span class='kw'>=</span> <span class='fl'>10</span>)
 
 <span class='co'># case control study with msm</span>
-<span class='co'># 10 boots are used for illustration</span>
 <span class='no'>exp4</span> <span class='kw'>&lt;-</span> <span class='fu'>cmest</span>(<span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>cma2020</span>, <span class='kw'>model</span> <span class='kw'>=</span> <span class='st'>"msm"</span>, <span class='kw'>casecontrol</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
 <span class='kw'>yrare</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>outcome</span> <span class='kw'>=</span> <span class='st'>"binY"</span>, <span class='kw'>exposure</span> <span class='kw'>=</span> <span class='st'>"A"</span>,
 <span class='kw'>mediator</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"M1"</span>, <span class='st'>"M2"</span>), <span class='kw'>EMint</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>basec</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"C1"</span>, <span class='st'>"C2"</span>), <span class='kw'>yreg</span> <span class='kw'>=</span> <span class='st'>"logistic"</span>,

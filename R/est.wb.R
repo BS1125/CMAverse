@@ -176,7 +176,6 @@ est.wb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
   if (is.null(weightsEY)) weightsEY <- wa
 
   y_obs <- data[, outcome]
-
   # categorical Y
   if ((is_glm_yreg && ((family_yreg$family %in% c("binomial", "quasibinomial", "multinom")) |
                        startsWith(family_yreg$family, "Ordered Categorical")))|
@@ -185,17 +184,17 @@ est.wb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       if (dim(EY0m_pred)[2] == 1) {
         EY0m <- weighted.mean(cbind(1 - EY0m_pred, EY0m_pred)[, yref_index], na.rm = TRUE, w = weightsEY_cde)
         EY1m <- weighted.mean(cbind(1 - EY1m_pred, EY1m_pred)[, yref_index], na.rm = TRUE, w = weightsEY_cde)
-        EY00 <- weighted.mean(y_obs[subj_astar] == yref, na.rm = TRUE, w = weightsEY[subj_astar])
+        EY00 <- weighted.mean(as.numeric(y_obs[subj_astar] == yref), na.rm = TRUE, w = weightsEY[subj_astar])
         EY01 <- weighted.mean(cbind(1 - EY01_pred, EY01_pred)[, yref_index], na.rm = TRUE, w = weightsEY[subj_a])
         EY10 <- weighted.mean(cbind(1 - EY10_pred, EY10_pred)[, yref_index], na.rm = TRUE, w = weightsEY[subj_astar])
-        EY11 <- weighted.mean(y_obs[subj_a] == yref, na.rm = TRUE, w = weightsEY[subj_a])
+        EY11 <- weighted.mean(as.numeric(y_obs[subj_a] == yref), na.rm = TRUE, w = weightsEY[subj_a])
       } else {
         EY0m <- weighted.mean(EY0m_pred[, yref_index], na.rm = TRUE, w = weightsEY_cde)
         EY1m <- weighted.mean(EY1m_pred[, yref_index], na.rm = TRUE, w = weightsEY_cde)
-        EY00 <- weighted.mean(y_obs[subj_astar] == yref, na.rm = TRUE, w = weightsEY[subj_astar])
+        EY00 <- weighted.mean(as.numeric(y_obs[subj_astar] == yref), na.rm = TRUE, w = weightsEY[subj_astar])
         EY01 <- weighted.mean(EY01_pred[, yref_index], na.rm = TRUE, w = weightsEY[subj_a])
         EY10 <- weighted.mean(EY10_pred[, yref_index], na.rm = TRUE, w = weightsEY[subj_astar])
-        EY11 <- weighted.mean(y_obs[subj_a] == yref, na.rm = TRUE, w = weightsEY[subj_a])
+        EY11 <- weighted.mean(as.numeric(y_obs[subj_a] == yref), na.rm = TRUE, w = weightsEY[subj_a])
       }
     } else EY0m <- EY1m <- EY00 <- EY01 <- EY10 <- EY11 <- 0
   } else {

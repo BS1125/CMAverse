@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+<meta name="date" content="2020-09-11" />
+
+<title>Statistical Modeling with Multiple Mediators</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Statistical Modeling with Multiple Mediators</h1>
+<h4 class="date">2020-09-11</h4>
+
+
+
+<p>This example demonstrates how to use the <code>cmest</code> function when there are multiple mediators. For this purpose, we simulate some data containing a continuous baseline confounder <span class="math inline">\(C_1\)</span>, a binary baseline confounder <span class="math inline">\(C_2\)</span>, a binary exposure <span class="math inline">\(A\)</span>, a count mediator <span class="math inline">\(M_1\)</span>, a categorical mediator <span class="math inline">\(M_2\)</span> and a binary outcome <span class="math inline">\(Y\)</span>. The true regression models for <span class="math inline">\(A\)</span>, <span class="math inline">\(M_1\)</span>, <span class="math inline">\(M_2\)</span> and <span class="math inline">\(Y\)</span> are: <span class="math display">\[logit(E(A|C_1,C_2))=0.2+0.5C_1+0.1C_2\]</span> <span class="math display">\[log(E(M_1|A,C_1,C_2))=1-2A+0.5C_1+0.8C_2\]</span> <span class="math display">\[log\frac{E[M_2=1|A,M_1,C_1,C_2]}{E[M_2=0|A,M_1,C_1,C_2]}=0.1+0.1A+0.4M_1-0.5C_1+0.1C_2\]</span> <span class="math display">\[log\frac{E[M_2=2|A,M_1,C_1,C_2]}{E[M_2=0|A,M_1,C_1,C_2]}=0.4+0.2A-0.1M_1-C_1+0.5C_2\]</span> <span class="math display">\[logit(E(Y|A,M_1,M_2,C_1,C_2)))=-4+0.8A-1.8M_1+0.5(M_2==1)+0.8(M_2==2)+0.5AM_1-0.4A(M_2==1)-1.4A(M_2==2)+0.3*C_1-0.6C_2\]</span></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb1-2"><a href="#cb1-2"></a>expit &lt;-<span class="st"> </span><span class="cf">function</span>(x) <span class="kw">exp</span>(x)<span class="op">/</span>(<span class="dv">1</span><span class="op">+</span><span class="kw">exp</span>(x))</span>
+<span id="cb1-3"><a href="#cb1-3"></a>n &lt;-<span class="st"> </span><span class="dv">10000</span></span>
+<span id="cb1-4"><a href="#cb1-4"></a>C1 &lt;-<span class="st"> </span><span class="kw">rnorm</span>(n, <span class="dt">mean =</span> <span class="dv">1</span>, <span class="dt">sd =</span> <span class="fl">0.1</span>)</span>
+<span id="cb1-5"><a href="#cb1-5"></a>C2 &lt;-<span class="st"> </span><span class="kw">rbinom</span>(n, <span class="dv">1</span>, <span class="fl">0.6</span>)</span>
+<span id="cb1-6"><a href="#cb1-6"></a>A &lt;-<span class="st"> </span><span class="kw">rbinom</span>(n, <span class="dv">1</span>, <span class="kw">expit</span>(<span class="fl">0.2</span> <span class="op">+</span><span class="st"> </span><span class="fl">0.5</span><span class="op">*</span>C1 <span class="op">+</span><span class="st"> </span><span class="fl">0.1</span><span class="op">*</span>C2))</span>
+<span id="cb1-7"><a href="#cb1-7"></a>M1 &lt;-<span class="st"> </span><span class="kw">rpois</span>(n, <span class="kw">exp</span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>A <span class="op">+</span><span class="st"> </span><span class="fl">0.5</span><span class="op">*</span>C1 <span class="op">+</span><span class="st"> </span><span class="fl">0.8</span><span class="op">*</span>C2))</span>
+<span id="cb1-8"><a href="#cb1-8"></a>linpred1 &lt;-<span class="st"> </span><span class="fl">0.1</span> <span class="op">+</span><span class="st"> </span><span class="fl">0.1</span><span class="op">*</span>A <span class="op">+</span><span class="st"> </span><span class="fl">0.4</span><span class="op">*</span>M1 <span class="op">-</span><span class="st"> </span><span class="fl">0.5</span><span class="op">*</span>C1 <span class="op">+</span><span class="st"> </span><span class="fl">0.1</span><span class="op">*</span>C2</span>
+<span id="cb1-9"><a href="#cb1-9"></a>linpred2 &lt;-<span class="st"> </span><span class="fl">0.4</span> <span class="op">+</span><span class="st"> </span><span class="fl">0.2</span><span class="op">*</span>A <span class="op">-</span><span class="st"> </span><span class="fl">0.1</span><span class="op">*</span>M1 <span class="op">-</span><span class="st"> </span>C1 <span class="op">+</span><span class="st"> </span><span class="fl">0.5</span><span class="op">*</span>C2</span>
+<span id="cb1-10"><a href="#cb1-10"></a>probm0 =<span class="st"> </span><span class="dv">1</span> <span class="op">/</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(linpred1) <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(linpred2))</span>
+<span id="cb1-11"><a href="#cb1-11"></a>probm1 =<span class="st"> </span><span class="kw">exp</span>(linpred1) <span class="op">/</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(linpred1) <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(linpred2))</span>
+<span id="cb1-12"><a href="#cb1-12"></a>probm2 =<span class="st"> </span><span class="kw">exp</span>(linpred2) <span class="op">/</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(linpred1) <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(linpred2))</span>
+<span id="cb1-13"><a href="#cb1-13"></a>M2 =<span class="st"> </span><span class="kw">factor</span>(<span class="kw">sapply</span>(<span class="dv">1</span><span class="op">:</span>n, <span class="dt">FUN =</span> <span class="cf">function</span>(x) <span class="kw">sample</span>(<span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">size =</span> <span class="dv">1</span>, <span class="dt">replace =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb1-14"><a href="#cb1-14"></a>                                                 <span class="dt">prob=</span><span class="kw">c</span>(probm0[x],</span>
+<span id="cb1-15"><a href="#cb1-15"></a>                                                        probm1[x],</span>
+<span id="cb1-16"><a href="#cb1-16"></a>                                                        probm2[x]))))</span>
+<span id="cb1-17"><a href="#cb1-17"></a>Y &lt;-<span class="st"> </span><span class="kw">rbinom</span>(n, <span class="dv">1</span>, <span class="kw">expit</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="fl">0.8</span><span class="op">*</span>A <span class="op">-</span><span class="st"> </span><span class="fl">1.8</span><span class="op">*</span>M1 <span class="op">+</span><span class="st"> </span><span class="fl">0.5</span><span class="op">*</span>(M2 <span class="op">==</span><span class="st"> </span><span class="dv">1</span>) <span class="op">+</span><span class="st"> </span><span class="fl">0.8</span><span class="op">*</span>(M2 <span class="op">==</span><span class="st"> </span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb1-18"><a href="#cb1-18"></a><span class="st">                          </span><span class="fl">0.5</span><span class="op">*</span>A<span class="op">*</span>M1 <span class="op">-</span><span class="st"> </span><span class="fl">0.4</span><span class="op">*</span>A<span class="op">*</span>(M2 <span class="op">==</span><span class="st"> </span><span class="dv">1</span>) <span class="op">-</span><span class="st"> </span><span class="fl">1.4</span><span class="op">*</span>A<span class="op">*</span>(M2 <span class="op">==</span><span class="st"> </span><span class="dv">2</span>)  <span class="op">+</span><span class="st"> </span><span class="fl">0.3</span><span class="op">*</span>C1 <span class="op">-</span><span class="st"> </span><span class="fl">0.6</span><span class="op">*</span>C2))</span>
+<span id="cb1-19"><a href="#cb1-19"></a>data &lt;-<span class="st"> </span><span class="kw">data.frame</span>(A, M1, M2, Y, C1, C2)</span></code></pre></div>
+<p>The DAG for this scientific setting is:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">library</span>(CMAverse)</span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="kw">cmdag</span>(<span class="dt">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="dt">exposure =</span> <span class="st">&quot;A&quot;</span>, <span class="dt">mediator =</span> <span class="kw">c</span>(<span class="st">&quot;M1&quot;</span>, <span class="st">&quot;M2&quot;</span>),</span>
+<span id="cb2-3"><a href="#cb2-3"></a>      <span class="dt">basec =</span> <span class="kw">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="dt">postc =</span> <span class="ot">NULL</span>, <span class="dt">node =</span> <span class="ot">TRUE</span>, <span class="dt">text_col =</span> <span class="st">&quot;white&quot;</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>In this setting, we have a count mediator, so we can’t use the marginal structural model. We can the rest five statistical modeling approaches. The results are shown below.</p>
+<div id="the-regression-based-approach" class="section level2">
+<h2>The Regression-based Approach</h2>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>res_rb &lt;-<span class="st"> </span><span class="kw">cmest</span>(<span class="dt">data =</span> data, <span class="dt">model =</span> <span class="st">&quot;rb&quot;</span>, <span class="dt">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="dt">exposure =</span> <span class="st">&quot;A&quot;</span>,</span>
+<span id="cb3-2"><a href="#cb3-2"></a>                <span class="dt">mediator =</span> <span class="kw">c</span>(<span class="st">&quot;M1&quot;</span>, <span class="st">&quot;M2&quot;</span>), <span class="dt">basec =</span> <span class="kw">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="dt">EMint =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb3-3"><a href="#cb3-3"></a>                <span class="dt">mreg =</span> <span class="kw">list</span>(<span class="st">&quot;poisson&quot;</span>, <span class="st">&quot;multinomial&quot;</span>), <span class="dt">yreg =</span> <span class="st">&quot;logistic&quot;</span>,</span>
+<span id="cb3-4"><a href="#cb3-4"></a>                <span class="dt">astar =</span> <span class="dv">0</span>, <span class="dt">a =</span> <span class="dv">1</span>, <span class="dt">mval =</span> <span class="kw">list</span>(<span class="dv">0</span>, <span class="dv">2</span>), <span class="dt">yref =</span> <span class="dv">1</span>,</span>
+<span id="cb3-5"><a href="#cb3-5"></a>                <span class="dt">estimation =</span> <span class="st">&quot;imputation&quot;</span>, <span class="dt">inference =</span> <span class="st">&quot;bootstrap&quot;</span>, <span class="dt">nboot =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">summary</span>(res_rb)</span></code></pre></div>
+<pre><code>## # Causal Mediation Analysis via the Regression-based Approach
+##  
+## Direct counterfactual imputation estimation with 
+##  bootstrap standard errors, percentile confidence intervals and p-values 
+##  
+##                 Estimate Std.error   95% CIL 95% CIU  P.val    
+## Rcde            0.840859  0.041308  0.841993   0.897 &lt;2e-16 ***
+## Rpnde           2.254816  0.151019  2.140529   2.343 &lt;2e-16 ***
+## Rtnde           1.186904  0.019581  1.227297   1.254 &lt;2e-16 ***
+## Rpnie          20.893238  2.734318 20.142532  23.816 &lt;2e-16 ***
+## Rtnie          10.997914  0.886641 11.548953  12.740 &lt;2e-16 ***
+## Rte            24.798272  3.822335 24.720873  29.855 &lt;2e-16 ***
+## ERcde          -6.228081  2.807782 -7.549890  -3.778 &lt;2e-16 ***
+## ERintref        7.482897  2.958801  4.918400   8.894 &lt;2e-16 ***
+## ERintmed        2.650217  0.936999  3.442164   4.701 &lt;2e-16 ***
+## ERpnie         19.893238  2.734318 19.150610  22.824 &lt;2e-16 ***
+## ERcde(prop)    -0.261703  0.076265 -0.261031  -0.159 &lt;2e-16 ***
+## ERintref(prop)  0.314430  0.075131  0.206644   0.308 &lt;2e-16 ***
+## ERintmed(prop)  0.111362  0.013268  0.144930   0.163 &lt;2e-16 ***
+## ERpnie(prop)    0.835911  0.012134  0.790694   0.807 &lt;2e-16 ***
+## pm              0.947273  0.001134  0.951925   0.953 &lt;2e-16 ***
+## int             0.425792  0.088399  0.351574   0.470 &lt;2e-16 ***
+## pe              1.261703  0.076265  1.158569   1.261 &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Reference values: 
+## $a
+## [1] 1
+## 
+## $astar
+## [1] 0
+## 
+## $yref
+## [1] 1
+## 
+## $mval
+## $mval[[1]]
+## [1] 0
+## 
+## $mval[[2]]
+## [1] 2</code></pre>
+</div>
+<div id="the-weighting-base-approach" class="section level2">
+<h2>The Weighting-base Approach</h2>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>res_wb &lt;-<span class="st"> </span><span class="kw">cmest</span>(<span class="dt">data =</span> data, <span class="dt">model =</span> <span class="st">&quot;wb&quot;</span>, <span class="dt">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="dt">exposure =</span> <span class="st">&quot;A&quot;</span>,</span>
+<span id="cb6-2"><a href="#cb6-2"></a>                <span class="dt">mediator =</span> <span class="kw">c</span>(<span class="st">&quot;M1&quot;</span>, <span class="st">&quot;M2&quot;</span>), <span class="dt">basec =</span> <span class="kw">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="dt">EMint =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb6-3"><a href="#cb6-3"></a>                <span class="dt">ereg =</span> <span class="st">&quot;logistic&quot;</span>, <span class="dt">yreg =</span> <span class="st">&quot;logistic&quot;</span>,</span>
+<span id="cb6-4"><a href="#cb6-4"></a>                <span class="dt">astar =</span> <span class="dv">0</span>, <span class="dt">a =</span> <span class="dv">1</span>, <span class="dt">mval =</span> <span class="kw">list</span>(<span class="dv">0</span>, <span class="dv">2</span>), <span class="dt">yref =</span> <span class="dv">1</span>,</span>
+<span id="cb6-5"><a href="#cb6-5"></a>                <span class="dt">estimation =</span> <span class="st">&quot;imputation&quot;</span>, <span class="dt">inference =</span> <span class="st">&quot;bootstrap&quot;</span>, <span class="dt">nboot =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw">summary</span>(res_wb)</span></code></pre></div>
+<pre><code>## # Causal Mediation Analysis via the Weighting-based Approach
+##  
+## Direct counterfactual imputation estimation with 
+##  bootstrap standard errors, percentile confidence intervals and p-values 
+##  
+##                 Estimate Std.error   95% CIL 95% CIU  P.val    
+## Rcde            0.840859  0.011571  0.815451   0.831 &lt;2e-16 ***
+## Rpnde           2.184496  0.032210  1.957900   2.001 &lt;2e-16 ***
+## Rtnde           1.197960  0.014933  1.105984   1.126 &lt;2e-16 ***
+## Rpnie          20.345349  1.304755 19.650557  21.403 &lt;2e-16 ***
+## Rtnie          11.157227  0.702143 11.100261  12.044 &lt;2e-16 ***
+## Rte            24.372911  1.762690 21.733197  24.101 &lt;2e-16 ***
+## ERcde          -6.150317  1.090806 -7.319340  -5.854 &lt;2e-16 ***
+## ERintref        7.334812  1.123016  6.811751   8.321 &lt;2e-16 ***
+## ERintmed        2.843066  0.425725  1.125984   1.698 &lt;2e-16 ***
+## ERpnie         19.345349  1.304755 18.652551  20.405 &lt;2e-16 ***
+## ERcde(prop)    -0.263139  0.025683 -0.316696  -0.282 &lt;2e-16 ***
+## ERintref(prop)  0.313817  0.023552  0.328394   0.360 &lt;2e-16 ***
+## ERintmed(prop)  0.121639  0.014288  0.054241   0.073 &lt;2e-16 ***
+## ERpnie(prop)    0.827682  0.012157  0.883223   0.900 &lt;2e-16 ***
+## pm              0.949322  0.002131  0.953797   0.957 &lt;2e-16 ***
+## int             0.435456  0.037840  0.382635   0.433 &lt;2e-16 ***
+## pe              1.263139  0.025683  1.282191   1.317 &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Reference values: 
+## $a
+## [1] 1
+## 
+## $astar
+## [1] 0
+## 
+## $yref
+## [1] 1
+## 
+## $mval
+## $mval[[1]]
+## [1] 0
+## 
+## $mval[[2]]
+## [1] 2</code></pre>
+</div>
+<div id="the-inverse-odds-ratio-weighting-approach" class="section level2">
+<h2>The Inverse Odds-ratio Weighting Approach</h2>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>res_iorw &lt;-<span class="st"> </span><span class="kw">cmest</span>(<span class="dt">data =</span> data, <span class="dt">model =</span> <span class="st">&quot;iorw&quot;</span>, <span class="dt">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="dt">exposure =</span> <span class="st">&quot;A&quot;</span>,</span>
+<span id="cb9-2"><a href="#cb9-2"></a>                  <span class="dt">mediator =</span> <span class="kw">c</span>(<span class="st">&quot;M1&quot;</span>, <span class="st">&quot;M2&quot;</span>), <span class="dt">basec =</span> <span class="kw">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="dt">EMint =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb9-3"><a href="#cb9-3"></a>                  <span class="dt">ereg =</span> <span class="st">&quot;logistic&quot;</span>, <span class="dt">yreg =</span> <span class="st">&quot;logistic&quot;</span>,</span>
+<span id="cb9-4"><a href="#cb9-4"></a>                  <span class="dt">astar =</span> <span class="dv">0</span>, <span class="dt">a =</span> <span class="dv">1</span>, <span class="dt">mval =</span> <span class="kw">list</span>(<span class="dv">0</span>, <span class="dv">2</span>), <span class="dt">yref =</span> <span class="dv">1</span>,</span>
+<span id="cb9-5"><a href="#cb9-5"></a>                  <span class="dt">estimation =</span> <span class="st">&quot;imputation&quot;</span>, <span class="dt">inference =</span> <span class="st">&quot;bootstrap&quot;</span>, <span class="dt">nboot =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="kw">summary</span>(res_iorw)</span></code></pre></div>
+<pre><code>## # Causal Mediation Analysis via the Inverse Odds Ratio Weighting Approach
+##  
+## Direct counterfactual imputation estimation with 
+##  bootstrap standard errors, percentile confidence intervals and p-values 
+##  
+##        Estimate Std.error   95% CIL 95% CIU  P.val    
+## Rte   23.713831  6.428623 21.640929  30.273 &lt;2e-16 ***
+## Rpnde  4.483896  0.813734  4.429144   5.522 &lt;2e-16 ***
+## Rtnie  5.288667  0.443750  4.886030   5.482 &lt;2e-16 ***
+## pm     0.846618  0.008671  0.833881   0.846 &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Reference values: 
+## $a
+## [1] 1
+## 
+## $astar
+## [1] 0
+## 
+## $yref
+## [1] 1</code></pre>
+</div>
+<div id="the-natural-effect-model" class="section level2">
+<h2>The Natural Effect Model</h2>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>res_ne &lt;-<span class="st"> </span><span class="kw">cmest</span>(<span class="dt">data =</span> data, <span class="dt">model =</span> <span class="st">&quot;ne&quot;</span>, <span class="dt">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="dt">exposure =</span> <span class="st">&quot;A&quot;</span>,</span>
+<span id="cb12-2"><a href="#cb12-2"></a>                <span class="dt">mediator =</span> <span class="kw">c</span>(<span class="st">&quot;M1&quot;</span>, <span class="st">&quot;M2&quot;</span>), <span class="dt">basec =</span> <span class="kw">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="dt">EMint =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb12-3"><a href="#cb12-3"></a>                <span class="dt">yreg =</span> <span class="st">&quot;logistic&quot;</span>,</span>
+<span id="cb12-4"><a href="#cb12-4"></a>                <span class="dt">astar =</span> <span class="dv">0</span>, <span class="dt">a =</span> <span class="dv">1</span>, <span class="dt">mval =</span> <span class="kw">list</span>(<span class="dv">0</span>, <span class="dv">2</span>), <span class="dt">yref =</span> <span class="dv">1</span>,</span>
+<span id="cb12-5"><a href="#cb12-5"></a>                <span class="dt">estimation =</span> <span class="st">&quot;imputation&quot;</span>, <span class="dt">inference =</span> <span class="st">&quot;bootstrap&quot;</span>, <span class="dt">nboot =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="kw">summary</span>(res_ne)</span></code></pre></div>
+<pre><code>## # Causal Mediation Analysis via the Natural Effect Model
+##  
+## Direct counterfactual imputation estimation with 
+##  bootstrap standard errors, percentile confidence intervals and p-values 
+##  
+##                 Estimate Std.error   95% CIL 95% CIU  P.val    
+## Rcde            0.840859  0.067360  0.825263   0.916 &lt;2e-16 ***
+## Rpnde           2.397002  0.926317  2.554210   3.798 &lt;2e-16 ***
+## Rtnde           1.212344  0.146389  1.184207   1.381 &lt;2e-16 ***
+## Rpnie          20.806505  4.358756 22.298910  28.153 &lt;2e-16 ***
+## Rtnie          10.523413  0.075984 10.236342  10.338 &lt;2e-16 ***
+## Rte            25.224641  9.287561 26.406515  38.876 &lt;2e-16 ***
+## ERcde          -6.332043  1.992458 -7.333638  -4.657 &lt;2e-16 ***
+## ERintref        7.729045  1.066141  7.461710   8.894 &lt;2e-16 ***
+## ERintmed        3.021133  4.002488  2.590412   7.968 &lt;2e-16 ***
+## ERpnie         19.806505  4.358756 21.316628  27.173 &lt;2e-16 ***
+## ERcde(prop)    -0.261389  0.123528 -0.290157  -0.124 &lt;2e-16 ***
+## ERintref(prop)  0.319057  0.114072  0.198005   0.351 &lt;2e-16 ***
+## ERintmed(prop)  0.124713  0.080937  0.100276   0.209 &lt;2e-16 ***
+## ERpnie(prop)    0.817618  0.090393  0.717178   0.839 &lt;2e-16 ***
+## pm              0.942331  0.009456  0.926192   0.939 &lt;2e-16 ***
+## int             0.443770  0.033135  0.407019   0.452 &lt;2e-16 ***
+## pe              1.261389  0.123528  1.124197   1.290 &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Reference values: 
+## $a
+## [1] 1
+## 
+## $astar
+## [1] 0
+## 
+## $yref
+## [1] 1
+## 
+## $mval
+## $mval[[1]]
+## [1] 0
+## 
+## $mval[[2]]
+## [1] 2</code></pre>
+</div>
+<div id="the-g-formula-approach" class="section level2">
+<h2>The <span class="math inline">\(G\)</span>-formula Approach</h2>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>res_gformula &lt;-<span class="st"> </span><span class="kw">cmest</span>(<span class="dt">data =</span> data, <span class="dt">model =</span> <span class="st">&quot;gformula&quot;</span>, <span class="dt">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="dt">exposure =</span> <span class="st">&quot;A&quot;</span>,</span>
+<span id="cb15-2"><a href="#cb15-2"></a>                      <span class="dt">mediator =</span> <span class="kw">c</span>(<span class="st">&quot;M1&quot;</span>, <span class="st">&quot;M2&quot;</span>), <span class="dt">basec =</span> <span class="kw">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="dt">EMint =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb15-3"><a href="#cb15-3"></a>                      <span class="dt">mreg =</span> <span class="kw">list</span>(<span class="st">&quot;poisson&quot;</span>, <span class="st">&quot;multinomial&quot;</span>), <span class="dt">yreg =</span> <span class="st">&quot;logistic&quot;</span>,</span>
+<span id="cb15-4"><a href="#cb15-4"></a>                      <span class="dt">astar =</span> <span class="dv">0</span>, <span class="dt">a =</span> <span class="dv">1</span>, <span class="dt">mval =</span> <span class="kw">list</span>(<span class="dv">0</span>, <span class="dv">2</span>), <span class="dt">yref =</span> <span class="dv">1</span>,</span>
+<span id="cb15-5"><a href="#cb15-5"></a>                      <span class="dt">estimation =</span> <span class="st">&quot;imputation&quot;</span>, <span class="dt">inference =</span> <span class="st">&quot;bootstrap&quot;</span>, <span class="dt">nboot =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="kw">summary</span>(res_gformula)</span></code></pre></div>
+<pre><code>## # Causal Mediation Analysis via the G-formula Approach
+##  
+## Direct counterfactual imputation estimation with 
+##  bootstrap standard errors, percentile confidence intervals and p-values 
+##  
+##                 Estimate Std.error   95% CIL 95% CIU  P.val    
+## Rcde            0.840859  0.082142  0.827210   0.938 &lt;2e-16 ***
+## Rpnde           2.372106  0.265099  1.894106   2.250 &lt;2e-16 ***
+## Rtnde           1.199679  0.179804  1.032759   1.274 &lt;2e-16 ***
+## Rpnie          24.178349  1.052793 20.198212  21.613 &lt;2e-16 ***
+## Rtnie          12.228066  0.257677 11.438064  11.784 &lt;2e-16 ***
+## Rte            29.006268  2.543978 22.320627  25.738 &lt;2e-16 ***
+## ERcde          -7.316142  2.980550 -6.230392  -2.226 &lt;2e-16 ***
+## ERintref        8.688248  2.715451  3.477087   7.125 &lt;2e-16 ***
+## ERintmed        3.455813  3.331672 -0.181785   4.294      1    
+## ERpnie         23.178349  1.052793 19.199490  20.614 &lt;2e-16 ***
+## ERcde(prop)    -0.261232  0.150575 -0.293011  -0.091 &lt;2e-16 ***
+## ERintref(prop)  0.310225  0.144172  0.141240   0.335 &lt;2e-16 ***
+## ERintmed(prop)  0.123394  0.135598 -0.009312   0.173      1    
+## ERpnie(prop)    0.827613  0.142001  0.776609   0.967 &lt;2e-16 ***
+## pm              0.951007  0.006403  0.949473   0.958 &lt;2e-16 ***
+## int             0.433619  0.008574  0.314104   0.326 &lt;2e-16 ***
+## pe              1.261232  0.150575  1.090713   1.293 &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Reference values: 
+## $a
+## [1] 1
+## 
+## $astar
+## [1] 0
+## 
+## $yref
+## [1] 1
+## 
+## $mval
+## $mval[[1]]
+## [1] 0
+## 
+## $mval[[2]]
+## [1] 2</code></pre>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

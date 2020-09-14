@@ -114,7 +114,7 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Statistical Modeling for a Case Control Study</h1>
             
-            <h4 class="date">2020-08-27</h4>
+            <h4 class="date">2020-09-13</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BS1125/CMAverse/blob/master/vignettes/case_control.Rmd"><code>vignettes/case_control.Rmd</code></a></small>
       <div class="hidden name"><code>case_control.Rmd</code></div>
@@ -123,7 +123,7 @@
 
     
     
-<p>This example demonstrates how to use the <code>cmest</code> function for a case control study. For this purpose, we simulate some data containing a continuous baseline confounder <span class="math inline">\(C_1\)</span>, a binary baseline confounder <span class="math inline">\(C_2\)</span>, a binary exposure <span class="math inline">\(A\)</span>, a binary mediator <span class="math inline">\(M\)</span> and a binary outcome <span class="math inline">\(Y\)</span>. We sample 2000 cases out of all cases and sample 2000 controls out of all controls. The true regression models for <span class="math inline">\(A\)</span>, <span class="math inline">\(M\)</span> and <span class="math inline">\(Y\)</span> are: <span class="math display">\[logit(E(A|C_1,C_2))=0.2+0.5C_1+0.1C_2\]</span> <span class="math display">\[logit(E(M|A,C_1,C_2))=1+2A+1.5C_1+0.8C_2\]</span> <span class="math display">\[logit(E(Y|A,M,C_1,C_2)))=-3-0.4A-1.2M+0.5AM+0.3C_1-0.6C_2\]</span></p>
+<p>This example demonstrates how to use <code>cmest</code> for a case control study. For this purpose, we simulate some data containing a continuous baseline confounder <span class="math inline">\(C_1\)</span>, a binary baseline confounder <span class="math inline">\(C_2\)</span>, a binary exposure <span class="math inline">\(A\)</span>, a binary mediator <span class="math inline">\(M\)</span> and a binary outcome <span class="math inline">\(Y\)</span>. We sample 2000 cases out of all cases and sample 2000 controls out of all controls. The true regression models for <span class="math inline">\(A\)</span>, <span class="math inline">\(M\)</span> and <span class="math inline">\(Y\)</span> are: <span class="math display">\[logit(E(A|C_1,C_2))=0.2+0.5C_1+0.1C_2\]</span> <span class="math display">\[logit(E(M|A,C_1,C_2))=1+2A+1.5C_1+0.8C_2\]</span> <span class="math display">\[logit(E(Y|A,M,C_1,C_2)))=-5+0.8A-1.8M+0.5AM+0.3C_1-0.6C_2\]</span></p>
 <div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="fl">1</span>)
 <span class="co"># data simulation</span>
 <span class="no">expit</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">x</span>) <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="no">x</span>)/(<span class="fl">1</span>+<span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="no">x</span>))
@@ -143,7 +143,7 @@
 <span class="fu"><a href="../reference/cmdag.html">cmdag</a></span>(<span class="kw">outcome</span> <span class="kw">=</span> <span class="st">"Y"</span>, <span class="kw">exposure</span> <span class="kw">=</span> <span class="st">"A"</span>, <span class="kw">mediator</span> <span class="kw">=</span> <span class="st">"M"</span>,
       <span class="kw">basec</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"C1"</span>, <span class="st">"C2"</span>), <span class="kw">postc</span> <span class="kw">=</span> <span class="kw">NULL</span>, <span class="kw">node</span> <span class="kw">=</span> <span class="fl">TRUE</span>, <span class="kw">text_col</span> <span class="kw">=</span> <span class="st">"white"</span>)</pre></body></html></div>
 <p><img src="case_control_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
-<p>For a case control study, we set the <code>casecontrol</code> argument to be <code>TRUE</code>. It requires that the prevalence of the case be known or the case be rare. We use the regression-based approach for illustration.</p>
+<p>For a case control study, we set the <code>casecontrol</code> argument to be <code>TRUE</code>. It requires that either the prevalence of the case be known or the case be rare. We use the regression-based approach for illustration.</p>
 <p>If the prevalence of the case is known, we specify it by the <code>yprevalence</code> argument. The results are:</p>
 <div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="no">res_yprevelence</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span>(<span class="kw">data</span> <span class="kw">=</span> <span class="no">data</span>, <span class="kw">model</span> <span class="kw">=</span> <span class="st">"rb"</span>, <span class="kw">casecontrol</span> <span class="kw">=</span> <span class="fl">TRUE</span>, <span class="kw">yprevalence</span> <span class="kw">=</span> <span class="no">yprevalence</span>,
                          <span class="kw">outcome</span> <span class="kw">=</span> <span class="st">"Y"</span>, <span class="kw">exposure</span> <span class="kw">=</span> <span class="st">"A"</span>,
@@ -152,29 +152,29 @@
                          <span class="kw">astar</span> <span class="kw">=</span> <span class="fl">0</span>, <span class="kw">a</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">mval</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fl">1</span>), <span class="kw">yref</span> <span class="kw">=</span> <span class="fl">1</span>,
                          <span class="kw">estimation</span> <span class="kw">=</span> <span class="st">"paramfunc"</span>, <span class="kw">inference</span> <span class="kw">=</span> <span class="st">"delta"</span>)</pre></body></html></div>
 <div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">res_yprevelence</span>)</pre></body></html></div>
-<pre><code>## # Causal Mediation Analysis for a Case Control Study via the Regression-based Approach
+<pre><code>## Causal Mediation Analysis for a Case Control Study via the Regression-based Approach
 ##  
 ## Closed-form parameter function estimation with 
 ##  delta method standard errors, confidence intervals and p-values 
 ##  
-##                 Estimate Std.error  95% CIL 95% CIU    P.val    
-## RRcde            3.59399   0.31883  3.02041   4.276  &lt; 2e-16 ***
-## RRpnde           3.36071   0.32411  2.78189   4.060  &lt; 2e-16 ***
-## RRtnde           3.54873   0.30590  2.99708   4.202  &lt; 2e-16 ***
-## RRpnie           0.86627   0.03947  0.79226   0.947  0.00163 ** 
-## RRtnie           0.91474   0.03944  0.84060   0.995  0.03876 *  
-## RRte             3.07416   0.27397  2.58148   3.661  &lt; 2e-16 ***
-## ERRcde           2.17701   0.07050  2.03883   2.315  &lt; 2e-16 ***
-## ERRintref        0.18369   0.25870 -0.32336   0.691  0.47767    
-## ERRintmed       -0.15282   0.17242 -0.49076   0.185  0.37546    
-## ERRpnie         -0.13373   0.14438 -0.41670   0.149  0.35432    
-## ERRcde(prop)     1.04959   0.03947  0.97223   1.127  &lt; 2e-16 ***
-## ERRintref(prop)  0.08856   0.02977  0.03021   0.147  0.00293 ** 
-## ERRintmed(prop) -0.07368   0.08146 -0.23333   0.086  0.36573    
-## ERRpnie(prop)   -0.06447   0.06834 -0.19842   0.069  0.34549    
-## pm              -0.13815   0.02319 -0.18361  -0.093 2.58e-09 ***
-## int              0.01489   0.01400 -0.01256   0.042  0.28769    
-## pe              -0.04959   0.02977 -0.10794   0.009  0.09581 .  
+##                Estimate Std.error  95% CIL 95% CIU    P.val    
+## Rcde            3.59399   0.31883  3.02041   4.276  &lt; 2e-16 ***
+## Rpnde           3.36071   0.32411  2.78189   4.060  &lt; 2e-16 ***
+## Rtnde           3.54873   0.30590  2.99708   4.202  &lt; 2e-16 ***
+## Rpnie           0.86627   0.03947  0.79226   0.947  0.00163 ** 
+## Rtnie           0.91474   0.03944  0.84060   0.995  0.03876 *  
+## Rte             3.07416   0.27397  2.58148   3.661  &lt; 2e-16 ***
+## ERcde           2.17701   0.07050  2.03883   2.315  &lt; 2e-16 ***
+## ERintref        0.18369   0.25870 -0.32336   0.691  0.47767    
+## ERintmed       -0.15282   0.17242 -0.49076   0.185  0.37546    
+## ERpnie         -0.13373   0.14438 -0.41670   0.149  0.35432    
+## ERcde(prop)     1.04959   0.03947  0.97223   1.127  &lt; 2e-16 ***
+## ERintref(prop)  0.08856   0.02977  0.03021   0.147  0.00293 ** 
+## ERintmed(prop) -0.07368   0.08146 -0.23333   0.086  0.36573    
+## ERpnie(prop)   -0.06447   0.06834 -0.19842   0.069  0.34549    
+## pm             -0.13815   0.02319 -0.18361  -0.093 2.58e-09 ***
+## int             0.01489   0.01400 -0.01256   0.042  0.28769    
+## pe             -0.04959   0.02977 -0.10794   0.009  0.09581 .  
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
@@ -199,7 +199,7 @@
 ## 
 ## $basecval[[2]]
 ## [1] 0.51675</code></pre>
-<p>If the prevalence of the case is unknown but the case is rare, we set the <code>yrare</code> argument to be <code>TRUE</code>. The results are:</p>
+<p>If the prevalence of the case is unknown but we know the case is rare, we set the <code>yrare</code> argument to be <code>TRUE</code>. The results are:</p>
 <div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="no">res_yrare</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span>(<span class="kw">data</span> <span class="kw">=</span> <span class="no">data</span>, <span class="kw">model</span> <span class="kw">=</span> <span class="st">"rb"</span>, <span class="kw">casecontrol</span> <span class="kw">=</span> <span class="fl">TRUE</span>, <span class="kw">yrare</span> <span class="kw">=</span> <span class="fl">TRUE</span>,
                    <span class="kw">outcome</span> <span class="kw">=</span> <span class="st">"Y"</span>, <span class="kw">exposure</span> <span class="kw">=</span> <span class="st">"A"</span>,
                    <span class="kw">mediator</span> <span class="kw">=</span> <span class="st">"M"</span>, <span class="kw">basec</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"C1"</span>, <span class="st">"C2"</span>), <span class="kw">EMint</span> <span class="kw">=</span> <span class="fl">TRUE</span>,
@@ -207,29 +207,29 @@
                    <span class="kw">astar</span> <span class="kw">=</span> <span class="fl">0</span>, <span class="kw">a</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">mval</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fl">1</span>), <span class="kw">yref</span> <span class="kw">=</span> <span class="fl">1</span>,
                    <span class="kw">estimation</span> <span class="kw">=</span> <span class="st">"paramfunc"</span>, <span class="kw">inference</span> <span class="kw">=</span> <span class="st">"delta"</span>)</pre></body></html></div>
 <div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">res_yrare</span>)</pre></body></html></div>
-<pre><code>## # Causal Mediation Analysis for a Case Control Study via the Regression-based Approach
+<pre><code>## Causal Mediation Analysis for a Case Control Study via the Regression-based Approach
 ##  
 ## Closed-form parameter function estimation with 
 ##  delta method standard errors, confidence intervals and p-values 
 ##  
-##                 Estimate Std.error  95% CIL 95% CIU    P.val    
-## RRcde            3.62465   0.32005  3.04863   4.309  &lt; 2e-16 ***
-## RRpnde           3.39056   0.32623  2.80784   4.094  &lt; 2e-16 ***
-## RRtnde           3.57922   0.30687  3.02559   4.234  &lt; 2e-16 ***
-## RRpnie           0.86188   0.04000  0.78694   0.944  0.00136 ** 
-## RRtnie           0.90984   0.03986  0.83497   0.991  0.03103 *  
-## RRte             3.08485   0.27445  2.59122   3.673  &lt; 2e-16 ***
-## ERRcde           2.18932   0.07199  2.04823   2.330  &lt; 2e-16 ***
-## ERRintref        0.20124   0.25833 -0.30507   0.708  0.43597    
-## ERRintmed       -0.16759   0.17574 -0.51204   0.177  0.34029    
-## ERRpnie         -0.13812   0.14745 -0.42712   0.151  0.34890    
-## ERRcde(prop)     1.05011   0.04000  0.97171   1.129  &lt; 2e-16 ***
-## ERRintref(prop)  0.09653   0.03018  0.03737   0.156  0.00138 ** 
-## ERRintmed(prop) -0.08038   0.08251 -0.24210   0.081  0.32995    
-## ERRpnie(prop)   -0.06625   0.06940 -0.20227   0.070  0.33975    
-## pm              -0.14663   0.02354 -0.19278  -0.100 4.73e-10 ***
-## int              0.01614   0.01418 -0.01164   0.044  0.25476    
-## pe              -0.05011   0.03018 -0.10926   0.009  0.09689 .  
+##                Estimate Std.error  95% CIL 95% CIU    P.val    
+## Rcde            3.62465   0.32005  3.04863   4.309  &lt; 2e-16 ***
+## Rpnde           3.39056   0.32623  2.80784   4.094  &lt; 2e-16 ***
+## Rtnde           3.57922   0.30687  3.02559   4.234  &lt; 2e-16 ***
+## Rpnie           0.86188   0.04000  0.78694   0.944  0.00136 ** 
+## Rtnie           0.90984   0.03986  0.83497   0.991  0.03103 *  
+## Rte             3.08485   0.27445  2.59122   3.673  &lt; 2e-16 ***
+## ERcde           2.18932   0.07199  2.04823   2.330  &lt; 2e-16 ***
+## ERintref        0.20124   0.25833 -0.30507   0.708  0.43597    
+## ERintmed       -0.16759   0.17574 -0.51204   0.177  0.34029    
+## ERpnie         -0.13812   0.14745 -0.42712   0.151  0.34890    
+## ERcde(prop)     1.05011   0.04000  0.97171   1.129  &lt; 2e-16 ***
+## ERintref(prop)  0.09653   0.03018  0.03737   0.156  0.00138 ** 
+## ERintmed(prop) -0.08038   0.08251 -0.24210   0.081  0.32995    
+## ERpnie(prop)   -0.06625   0.06940 -0.20227   0.070  0.33975    
+## pm             -0.14663   0.02354 -0.19278  -0.100 4.73e-10 ***
+## int             0.01614   0.01418 -0.01164   0.044  0.25476    
+## pe             -0.05011   0.03018 -0.10926   0.009  0.09689 .  
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 

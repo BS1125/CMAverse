@@ -139,7 +139,7 @@
 <div id="dag-visualization" class="section level3">
 <h3 class="hasAnchor">
 <a href="#dag-visualization" class="anchor"></a>DAG Visualization</h3>
-<p><code>cmdag</code> visualizes the scientific setting via a DAG.</p>
+<p><code>cmdag</code> visualizes causal relationships via a directed acyclic graph (DAG).</p>
 </div>
 <div id="statistical-modeling" class="section level3">
 <h3 class="hasAnchor">
@@ -295,7 +295,7 @@ Survival Y
 √
 </td>
 <td style="text-align: center;">
-√
+×
 </td>
 <td style="text-align: center;">
 √
@@ -588,7 +588,7 @@ Multiple Mediators
 </tr>
 <tr class="odd">
 <td>
-Post-exposure Confounding
+Mediator-outcome Confounder(s) affected by A
 </td>
 <td style="text-align: center;">
 ×
@@ -795,7 +795,8 @@ Effects Conditional On C
 </tr>
 </tbody>
 </table>
-<section class="footnotes" role="doc-endnotes"><ol>
+<section class="footnotes" role="doc-endnotes"><hr>
+<ol>
 <li id="fn1" role="doc-endnote">
 <p>
 rb: the regression-based approach; wb: the weighting-based approach; iorw: the inverse odds ratio weighting approach; ne: the natural effect model; msm: the marginal structural model; gformula: the g-formula approach.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a>
@@ -803,7 +804,7 @@ rb: the regression-based approach; wb: the weighting-based approach; iorw: the i
 </li>
 <li id="fn2" role="doc-endnote">
 <p>
-Y denotes the outcome, A denotes the exposure, M denotes the mediator(s) and C denotes the pre-exposure confounder(s).<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a>
+Y denotes the outcome, A denotes the exposure, M denotes the mediator(s) and C denotes the exposure-outcome confounder(s), the exposure-mediator confounder(s) and the mediator-outcome confounder(s) not affected by the exposure.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a>
 </p>
 </li>
 <li id="fn3" role="doc-endnote">
@@ -828,7 +829,7 @@ count A is not supported when C is not empty; otherwise, it is supported.<a href
 </li>
 <li id="fn7" role="doc-endnote">
 <p>
-closed-form parameter function estimation only supports the regression-based approach and a single mediator.<a href="#fnref7" class="footnote-back" role="doc-backlink">↩︎</a>
+closed-form parameter function estimation only supports a single mediator.<a href="#fnref7" class="footnote-back" role="doc-backlink">↩︎</a>
 </p>
 </li>
 <li id="fn8" role="doc-endnote">
@@ -851,7 +852,7 @@ conditional effects are estimated when closed-form parameter function estimation
 <div id="multiple-imputation" class="section level3">
 <h3 class="hasAnchor">
 <a href="#multiple-imputation" class="anchor"></a>Multiple Imputation</h3>
-<p><code>cmest</code> provides options to perform multiple imputation for a dataset with missing values via the <code>mice</code> package, estimate the causal effects with each of the imputed datasets and pool the results together.</p>
+<p><code>cmest</code> provides the option <code>multimp = TRUE</code> to perform multiple imputations for a dataset with missing values.</p>
 </div>
 <div id="sensitivity-analysis" class="section level3">
 <h3 class="hasAnchor">
@@ -881,7 +882,11 @@ conditional effects are estimated when closed-form parameter function estimation
 <p>VanderWeele TJ. A unification of mediation and interaction: a 4-way decomposition (2014). Epidemiology. 25(5): 749 - 61.</p>
 <p>Imai K, Keele L, Tingley D. A general approach to causal mediation analysis (2010). Psychological Methods. 15(4): 309 - 334.</p>
 <p>Schomaker M, Heumann C. Bootstrap inference when using multiple imputation (2018). Statistics in Medicine. 37(14): 2252 - 2266.</p>
-<p>VanderWeele TJ, Ding P. Sensitivity analysis in observational research: introducing the E-Value (2017). Annals of Internal Medicine. 167(4): 268- 274.</p>
+<p>VanderWeele TJ, Ding P. Sensitivity analysis in observational research: introducing the E-Value (2017). Annals of Internal Medicine. 167(4): 268</p>
+<ul>
+<li><ol><li>
+</li></ol></li>
+</ul>
 <p>Smith LH, VanderWeele TJ. Mediational E-values: Approximate sensitivity analysis for unmeasured mediator-outcome confounding (2019). Epidemiology. 30(6): 835 - 837.</p>
 <p>Carrol RJ, Ruppert D, Stefanski LA, Crainiceanu C. Measurement Error in Nonlinear Models: A Modern Perspective, Second Edition (2006). London: Chapman &amp; Hall.</p>
 <p>Cook JR, Stefanski LA. Simulation-extrapolation estimation in parametric measurement error models (1994). Journal of the American Statistical Association, 89(428): 1314 - 1328.</p>

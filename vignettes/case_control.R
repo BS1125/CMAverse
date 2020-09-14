@@ -1,19 +1,4 @@
----
-title: "Statistical Modeling for a Case Control Study"
-output: rmarkdown::html_vignette
-date: "`r Sys.Date()`"
-vignette: >
-  %\VignetteIndexEntry{Statistical Modeling for a Case Control Study}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
----
-
-This example demonstrates how to use `cmest` for a case control study. For this purpose, we simulate some data containing a continuous baseline confounder $C_1$, a binary baseline confounder $C_2$, a binary exposure $A$, a binary mediator $M$ and a binary outcome $Y$. We sample 2000 cases out of all cases and sample 2000 controls out of all controls. The true regression models for $A$, $M$ and $Y$ are:
-$$logit(E(A|C_1,C_2))=0.2+0.5C_1+0.1C_2$$
-$$logit(E(M|A,C_1,C_2))=1+2A+1.5C_1+0.8C_2$$
-$$logit(E(Y|A,M,C_1,C_2)))=-5+0.8A-1.8M+0.5AM+0.3C_1-0.6C_2$$
-
-```{r}
+## -----------------------------------------------------------------------------
 set.seed(1)
 # data simulation
 expit <- function(x) exp(x)/(1+exp(x))
@@ -28,44 +13,31 @@ data <- data.frame(A, M, Y, C1, C2)
 case_indice <- sample(which(data$Y == 1), 2000, replace = FALSE)
 control_indice <- sample(which(data$Y == 0), 2000, replace = FALSE)
 data <- data[c(case_indice, control_indice), ]
-```
 
-The DAG for this scientific setting is:
-  
-```{r}
+## -----------------------------------------------------------------------------
 library(CMAverse)
 cmdag(outcome = "Y", exposure = "A", mediator = "M",
       basec = c("C1", "C2"), postc = NULL, node = TRUE, text_col = "white")
-```
 
-For a case control study, we set the `casecontrol` argument to be `TRUE`. It requires that either the prevalence of the case be known or the case be rare. We use the regression-based approach for illustration.
-
-If the prevalence of the case is known, we specify it by the `yprevalence` argument. The results are:
-
-```{r message=F,warning=F,results='hide'}
+## ----message=F,warning=F,results='hide'---------------------------------------
 res_yprevelence <- cmest(data = data, model = "rb", casecontrol = TRUE, yprevalence = yprevalence,
                          outcome = "Y", exposure = "A",
                          mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                          mreg = list("logistic"), yreg = "logistic",
                          astar = 0, a = 1, mval = list(1), yref = 1,
                          estimation = "paramfunc", inference = "delta")
-```
 
-```{r message=F,warning=F}
+## ----message=F,warning=F------------------------------------------------------
 summary(res_yprevelence)
-```
 
-If the prevalence of the case is unknown but we know the case is rare, we set the `yrare` argument to be `TRUE`. The results are:
-
-```{r message=F,warning=F,results='hide'}
+## ----message=F,warning=F,results='hide'---------------------------------------
 res_yrare <- cmest(data = data, model = "rb", casecontrol = TRUE, yrare = TRUE,
                    outcome = "Y", exposure = "A",
                    mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                    mreg = list("logistic"), yreg = "logistic",
                    astar = 0, a = 1, mval = list(1), yref = 1,
                    estimation = "paramfunc", inference = "delta")
-```
 
-```{r message=F,warning=F}
+## ----message=F,warning=F------------------------------------------------------
 summary(res_yrare)
-```
+

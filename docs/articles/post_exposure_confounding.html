@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Statistical Modeling with Post-exposure Confounding • CMAverse</title>
+<title>Statistical Modeling with Mediator-outcome Confounders Affected by the Exposure • CMAverse</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
 <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
@@ -17,7 +17,7 @@
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="Statistical Modeling with Post-exposure Confounding">
+<script src="../pkgdown.js"></script><meta property="og:title" content="Statistical Modeling with Mediator-outcome Confounders Affected by the Exposure">
 <meta property="og:description" content="CMAverse">
 <meta property="og:image" content="https://bs1125.github.io/CMAverse/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -112,9 +112,9 @@
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>Statistical Modeling with Post-exposure Confounding</h1>
+      <h1 data-toc-skip>Statistical Modeling with Mediator-outcome Confounders Affected by the Exposure</h1>
             
-            <h4 class="date">2020-08-27</h4>
+            <h4 class="date">2020-09-13</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BS1125/CMAverse/blob/master/vignettes/post_exposure_confounding.Rmd"><code>vignettes/post_exposure_confounding.Rmd</code></a></small>
       <div class="hidden name"><code>post_exposure_confounding.Rmd</code></div>
@@ -123,7 +123,7 @@
 
     
     
-<p>This example demonstrates how to use the <code>cmest</code> function when there is post-exposure confounding. For this purpose, we simulate some data containing a continuous baseline confounder <span class="math inline">\(C_1\)</span>, a binary baseline confounder <span class="math inline">\(C_2\)</span>, a binary exposure <span class="math inline">\(A\)</span>, a binary post-exposure confounder <span class="math inline">\(L\)</span>, a binary mediator <span class="math inline">\(M\)</span> and a binary outcome <span class="math inline">\(Y\)</span>. The true regression models for <span class="math inline">\(A\)</span>, <span class="math inline">\(L\)</span>, <span class="math inline">\(M\)</span> and <span class="math inline">\(Y\)</span> are: <span class="math display">\[logit(E(A|C_1,C_2))=0.2+0.5C_1+0.1C_2\]</span> <span class="math display">\[E(L|A,C_1,C_2)=1+A-C_1-0.5C_2\]</span> <span class="math display">\[logit(E(M|A,L,C_1,C_2))=1+2A-L+1.5C_1+0.8C_2\]</span> <span class="math display">\[logit(E(Y|A,L,M,C_1,C_2)))=-3-0.4A-1.2M+0.5AM-0.5L+0.3C_1-0.6C_2\]</span></p>
+<p>This example demonstrates how to use <code>cmest</code> when there are mediator-outcome confounders affected by the exposure. For this purpose, we simulate some data containing a continuous baseline confounder <span class="math inline">\(C_1\)</span>, a binary baseline confounder <span class="math inline">\(C_2\)</span>, a binary exposure <span class="math inline">\(A\)</span>, a continuous mediator-outcome confounder affected by the exposure <span class="math inline">\(L\)</span>, a binary mediator <span class="math inline">\(M\)</span> and a binary outcome <span class="math inline">\(Y\)</span>. The true regression models for <span class="math inline">\(A\)</span>, <span class="math inline">\(L\)</span>, <span class="math inline">\(M\)</span> and <span class="math inline">\(Y\)</span> are: <span class="math display">\[logit(E(A|C_1,C_2))=0.2+0.5C_1+0.1C_2\]</span> <span class="math display">\[E(L|A,C_1,C_2)=1+A-C_1-0.5C_2\]</span> <span class="math display">\[logit(E(M|A,L,C_1,C_2))=1+2A-L+1.5C_1+0.8C_2\]</span> <span class="math display">\[logit(E(Y|A,L,M,C_1,C_2)))=-3-0.4A-1.2M+0.5AM-0.5L+0.3C_1-0.6C_2\]</span></p>
 <div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="fl">1</span>)
 <span class="no">expit</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">x</span>) <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="no">x</span>)/(<span class="fl">1</span>+<span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="no">x</span>))
 <span class="no">n</span> <span class="kw">&lt;-</span> <span class="fl">10000</span>
@@ -150,29 +150,29 @@
                  <span class="kw">astar</span> <span class="kw">=</span> <span class="fl">0</span>, <span class="kw">a</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">mval</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fl">1</span>), <span class="kw">yref</span> <span class="kw">=</span> <span class="fl">1</span>,
                  <span class="kw">estimation</span> <span class="kw">=</span> <span class="st">"imputation"</span>, <span class="kw">inference</span> <span class="kw">=</span> <span class="st">"bootstrap"</span>, <span class="kw">nboot</span> <span class="kw">=</span> <span class="fl">2</span>)</pre></body></html></div>
 <div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">res_msm</span>)</pre></body></html></div>
-<pre><code>## # Causal Mediation Analysis via the Marginal Structural Model
+<pre><code>## Causal Mediation Analysis via the Marginal Structural Model
 ##  
 ## Direct counterfactual imputation estimation with 
 ##  bootstrap standard errors, percentile confidence intervals and p-values 
 ##  
-##                   Estimate Std.error   95% CIL 95% CIU  P.val    
-## RRcde             0.503551  0.072877  0.482294   0.580 &lt;2e-16 ***
-## rRRpnde           0.544418  0.034763  0.523317   0.570 &lt;2e-16 ***
-## rRRtnde           0.520806  0.056904  0.499153   0.576 &lt;2e-16 ***
-## rRRpnie           0.986785  0.002898  0.993957   0.998 &lt;2e-16 ***
-## rRRtnie           0.943987  0.044326  0.948063   1.008      1    
-## RRte              0.513923  0.058229  0.496137   0.574 &lt;2e-16 ***
-## ERRcde           -0.485202  0.070152 -0.512164  -0.418 &lt;2e-16 ***
-## rERRintref        0.029620  0.035388 -0.012010   0.036      1    
-## rERRintmed       -0.017279  0.020568 -0.021039   0.007      1    
-## rERRpnie         -0.013215  0.002898 -0.006043  -0.002 &lt;2e-16 ***
-## ERRcde(prop)      0.998201  0.025745  0.982045   1.017 &lt;2e-16 ***
-## rERRintref(prop) -0.060937  0.073575 -0.070130   0.029      1    
-## rERRintmed(prop)  0.035548  0.042657 -0.015782   0.042      1    
-## rERRpnie(prop)    0.027188  0.005172  0.005019   0.012 &lt;2e-16 ***
-## rpm               0.062736  0.047829 -0.010763   0.053      1    
-## rint             -0.025389  0.030918 -0.028602   0.013      1    
-## rpe               0.001799  0.025745 -0.016634   0.018      1    
+##                  Estimate Std.error   95% CIL 95% CIU  P.val    
+## Rcde             0.503551  0.072877  0.482294   0.580 &lt;2e-16 ***
+## rRpnde           0.544418  0.034763  0.523317   0.570 &lt;2e-16 ***
+## rRtnde           0.520806  0.056904  0.499153   0.576 &lt;2e-16 ***
+## rRpnie           0.986785  0.002898  0.993957   0.998 &lt;2e-16 ***
+## rRtnie           0.943987  0.044326  0.948063   1.008      1    
+## Rte              0.513923  0.058229  0.496137   0.574 &lt;2e-16 ***
+## ERcde           -0.485202  0.070152 -0.512164  -0.418 &lt;2e-16 ***
+## rERintref        0.029620  0.035388 -0.012010   0.036      1    
+## rERintmed       -0.017279  0.020568 -0.021039   0.007      1    
+## rERpnie         -0.013215  0.002898 -0.006043  -0.002 &lt;2e-16 ***
+## ERcde(prop)      0.998201  0.025745  0.982045   1.017 &lt;2e-16 ***
+## rERintref(prop) -0.060937  0.073575 -0.070130   0.029      1    
+## rERintmed(prop)  0.035548  0.042657 -0.015782   0.042      1    
+## rERpnie(prop)    0.027188  0.005172  0.005019   0.012 &lt;2e-16 ***
+## rpm              0.062736  0.047829 -0.010763   0.053      1    
+## rint            -0.025389  0.030918 -0.028602   0.013      1    
+## rpe              0.001799  0.025745 -0.016634   0.018      1    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
@@ -184,6 +184,10 @@
 ## [1] 0
 ## 
 ## $yref
+## [1] 1
+## 
+## $mval
+## $mval[[1]]
 ## [1] 1</code></pre>
 </div>
 <div id="the-g-formula-approach" class="section level2">
@@ -195,29 +199,29 @@
                       <span class="kw">astar</span> <span class="kw">=</span> <span class="fl">0</span>, <span class="kw">a</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">mval</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fl">1</span>), <span class="kw">yref</span> <span class="kw">=</span> <span class="fl">1</span>,
                       <span class="kw">estimation</span> <span class="kw">=</span> <span class="st">"imputation"</span>, <span class="kw">inference</span> <span class="kw">=</span> <span class="st">"bootstrap"</span>, <span class="kw">nboot</span> <span class="kw">=</span> <span class="fl">2</span>)</pre></body></html></div>
 <div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">res_gformula</span>)</pre></body></html></div>
-<pre><code>## # Causal Mediation Analysis via the G-formula Approach
+<pre><code>## Causal Mediation Analysis via the G-formula Approach
 ##  
 ## Direct counterfactual imputation estimation with 
 ##  bootstrap standard errors, percentile confidence intervals and p-values 
 ##  
-##                    Estimate  Std.error    95% CIL 95% CIU  P.val    
-## RRcde             0.5049413  0.0262100  0.4440074   0.479 &lt;2e-16 ***
-## rRRpnde           0.5263524  0.0747399  0.4411446   0.542 &lt;2e-16 ***
-## rRRtnde           0.5133427  0.0448688  0.4427110   0.503 &lt;2e-16 ***
-## rRRpnie           0.9676549  0.0400043  0.9480197   1.002      1    
-## rRRtnie           0.9437376  0.0928911  0.8805322   1.005      1    
-## RRte              0.4967385  0.0248239  0.4434923   0.477 &lt;2e-16 ***
-## ERRcde           -0.4692424  0.0591338 -0.5579752  -0.479 &lt;2e-16 ***
-## rERRintref       -0.0044052  0.0156061 -0.0006116   0.020      1    
-## rERRintmed        0.0027313  0.0099118 -0.0130102   0.000      1    
-## rERRpnie         -0.0323451  0.0400043 -0.0519407   0.002      1    
-## ERRcde(prop)      0.9324029  0.0654654  0.9145999   1.003 &lt;2e-16 ***
-## rERRintref(prop)  0.0087533  0.0297834 -0.0389798   0.001      1    
-## rERRintmed(prop) -0.0054272  0.0189231 -0.0005091   0.025      1    
-## rERRpnie(prop)    0.0642710  0.0763257 -0.0030779   0.099      1    
-## rpm               0.0588438  0.0952488 -0.0035871   0.124      1    
-## rint              0.0033262  0.0108604 -0.0140658   0.001      1    
-## rpe               0.0675971  0.0654654 -0.0025528   0.085      1    
+##                   Estimate  Std.error    95% CIL 95% CIU  P.val    
+## Rcde             0.5049413  0.0262100  0.4440074   0.479 &lt;2e-16 ***
+## rRpnde           0.5263524  0.0747399  0.4411446   0.542 &lt;2e-16 ***
+## rRtnde           0.5133427  0.0448688  0.4427110   0.503 &lt;2e-16 ***
+## rRpnie           0.9676549  0.0400043  0.9480197   1.002      1    
+## rRtnie           0.9437376  0.0928911  0.8805322   1.005      1    
+## Rte              0.4967385  0.0248239  0.4434923   0.477 &lt;2e-16 ***
+## ERcde           -0.4692424  0.0591338 -0.5579752  -0.479 &lt;2e-16 ***
+## rERintref       -0.0044052  0.0156061 -0.0006116   0.020      1    
+## rERintmed        0.0027313  0.0099118 -0.0130102   0.000      1    
+## rERpnie         -0.0323451  0.0400043 -0.0519407   0.002      1    
+## ERcde(prop)      0.9324029  0.0654654  0.9145999   1.003 &lt;2e-16 ***
+## rERintref(prop)  0.0087533  0.0297834 -0.0389798   0.001      1    
+## rERintmed(prop) -0.0054272  0.0189231 -0.0005091   0.025      1    
+## rERpnie(prop)    0.0642710  0.0763257 -0.0030779   0.099      1    
+## rpm              0.0588438  0.0952488 -0.0035871   0.124      1    
+## rint             0.0033262  0.0108604 -0.0140658   0.001      1    
+## rpe              0.0675971  0.0654654 -0.0025528   0.085      1    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 

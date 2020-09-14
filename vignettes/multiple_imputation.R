@@ -1,21 +1,4 @@
----
-title: "Multiple Imputations with Missing Data"
-output: rmarkdown::html_vignette
-date: "`r Sys.Date()`"
-vignette: >
-  %\VignetteIndexEntry{Multiple Imputations with Missing Data}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
----
-  
-This example demonstrates how to estimate causal effects with multiple imputations by using `cmest` when the dataset contains missing values. For this purpose, we simulate some data containing a continuous baseline confounder $C_1$, a binary baseline confounder $C_2$, a binary exposure $A$, a binary mediator $M$ and a binary outcome $Y$. The true regression models for $A$, $M$ and $Y$ are:
-$$logit(E(A|C_1,C_2))=0.2+0.5C_1+0.1C_2$$
-$$logit(E(M|A,C_1,C_2))=1+2A+1.5C_1+0.8C_2$$
-$$logit(E(Y|A,M,C_1,C_2)))=-3-0.4A-1.2M+0.5AM+0.3C_1-0.6C_2$$
-
-To create the dataset with missing values, we randomly delete 10% of values in the dataset. 
-
-```{r}
+## -----------------------------------------------------------------------------
 set.seed(1)
 expit <- function(x) exp(x)/(1+exp(x))
 n <- 10000
@@ -32,41 +15,30 @@ A[missing[which((missing > 2*n)*(missing <= 3*n) == 1)] - 2*n] <- NA
 M[missing[which((missing > 3*n)*(missing <= 4*n) == 1)] - 3*n] <- NA
 Y[missing[which((missing > 4*n)*(missing <= 5*n) == 1)] - 4*n] <- NA
 data <- data.frame(A, M, Y, C1, C2)
-```
 
-The DAG for this scientific setting is:
-
-```{r}
+## -----------------------------------------------------------------------------
 library(CMAverse)
 cmdag(outcome = "Y", exposure = "A", mediator = "M",
       basec = c("C1", "C2"), postc = NULL, node = TRUE, text_col = "white")
-```
 
-To conduct multiple imputations, we set the `multimp` argument to be `TRUE`. The regression-based approach is used for illustration. The multiple imputation results:
-
-```{r message=F,warning=F,results='hide'}
+## ----message=F,warning=F,results='hide'---------------------------------------
 res_multimp <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
                      mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                      mreg = list("logistic"), yreg = "logistic",
                      astar = 0, a = 1, mval = list(1), yref = 1,
                      estimation = "paramfunc", inference = "delta", 
                      multimp = TRUE, m = 10)
-```
 
-```{r message=F,warning=F}
+## ----message=F,warning=F------------------------------------------------------
 summary(res_multimp)
-```
 
-Compare the multiple imputation results with true results:
-
-```{r message=F,warning=F,results='hide'}
+## ----message=F,warning=F,results='hide'---------------------------------------
 res_noNA <- cmest(data = data_noNA, model = "rb", outcome = "Y", exposure = "A",
                   mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                   mreg = list("logistic"), yreg = "logistic",
                   astar = 0, a = 1, mval = list(1), yref = 1,
                   estimation = "paramfunc", inference = "delta")
-```
 
-```{r message=F,warning=F}
+## ----message=F,warning=F------------------------------------------------------
 summary(res_noNA)
-```
+

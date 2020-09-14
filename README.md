@@ -25,7 +25,8 @@ examples.
 
 ### DAG Visualization
 
-`cmdag` visualizes the scientific setting via a DAG.
+`cmdag` visualizes causal relationships via a directed acyclic graph
+(DAG).
 
 ### Statistical Modeling
 
@@ -107,7 +108,7 @@ al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5285457/).
 <tr class="even">
 <td>Survival Y</td>
 <td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
+<td style="text-align: center;">×</td>
 <td style="text-align: center;">√</td>
 <td style="text-align: center;">×</td>
 <td style="text-align: center;">√</td>
@@ -222,7 +223,7 @@ al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5285457/).
 <td style="text-align: center;">√</td>
 </tr>
 <tr class="odd">
-<td>Post-exposure Confounding</td>
+<td>Mediator-outcome Confounder(s) affected by A</td>
 <td style="text-align: center;">×</td>
 <td style="text-align: center;">×</td>
 <td style="text-align: center;">×</td>
@@ -305,14 +306,15 @@ al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5285457/).
 </tbody>
 </table>
 <section class="footnotes" role="doc-endnotes">
+<hr />
 <ol>
 <li id="fn1" role="doc-endnote"><p>rb: the regression-based approach; wb: the weighting-based approach; iorw: the inverse odds ratio weighting approach; ne: the natural effect model; msm: the marginal structural model; gformula: the g-formula approach.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2" role="doc-endnote"><p>Y denotes the outcome, A denotes the exposure, M denotes the mediator(s) and C denotes the pre-exposure confounder(s).<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2" role="doc-endnote"><p>Y denotes the outcome, A denotes the exposure, M denotes the mediator(s) and C denotes the exposure-outcome confounder(s), the exposure-mediator confounder(s) and the mediator-outcome confounder(s) not affected by the exposure.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn3" role="doc-endnote"><p>continuous A is not supported when C is not empty; otherwise, it is supported.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn4" role="doc-endnote"><p>continuous A is not supported when C is not empty; otherwise, it is supported.<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn5" role="doc-endnote"><p>count A is not supported when C is not empty; otherwise, it is supported.<a href="#fnref5" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn6" role="doc-endnote"><p>count A is not supported when C is not empty; otherwise, it is supported.<a href="#fnref6" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn7" role="doc-endnote"><p>closed-form parameter function estimation only supports the regression-based approach and a single mediator.<a href="#fnref7" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn7" role="doc-endnote"><p>closed-form parameter function estimation only supports a single mediator.<a href="#fnref7" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn8" role="doc-endnote"><p>delta method inference is available only when closed-form parameter function estimation is used.<a href="#fnref8" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn9" role="doc-endnote"><p>marginal effects are estimated when direct counterfactual imputation estimation is used.<a href="#fnref9" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn10" role="doc-endnote"><p>conditional effects are estimated when closed-form parameter function estimation is used.<a href="#fnref10" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
@@ -321,9 +323,8 @@ al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5285457/).
 
 ### Multiple Imputation
 
-`cmest` provides options to perform multiple imputation for a dataset
-with missing values via the `mice` package, estimate the causal effects
-with each of the imputed datasets and pool the results together.
+`cmest` provides the option `multimp = TRUE` to perform multiple
+imputations for a dataset with missing values.
 
 ### Sensitivity Analysis
 
@@ -397,8 +398,8 @@ Schomaker M, Heumann C. Bootstrap inference when using multiple
 imputation (2018). Statistics in Medicine. 37(14): 2252 - 2266.
 
 VanderWeele TJ, Ding P. Sensitivity analysis in observational research:
-introducing the E-Value (2017). Annals of Internal Medicine. 167(4): 
-268- 274.
+introducing the E-Value (2017). Annals of Internal Medicine. 167(4): 268
+- 274.
 
 Smith LH, VanderWeele TJ. Mediational E-values: Approximate sensitivity
 analysis for unmeasured mediator-outcome confounding (2019).

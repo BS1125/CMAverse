@@ -10,11 +10,11 @@ vignette: >
 
 We illustrate the general workflow of the `CMAverse` package by a quick example. The general workflow is:
 
-1. Plot the DAG of the scientific setting using the `cmdag` function.
+1. Plot the DAG of causal relationships using `cmdag`.
 
-2. Estimate the causal effects and make inferences using the `cmest` function.
+2. Estimate causal effects and make inferences using `cmest`.
 
-3. Conduct sensitivity analysis for unmeasured confounding and measurement error using the `cmsens` function.
+3. Conduct sensitivity analysis for unmeasured confounding and measurement error using `cmsens`.
 
 Firstly, let's load the package.
 
@@ -22,46 +22,40 @@ Firstly, let's load the package.
 library(CMAverse)
 ```
 
-Next, we simulate some data and plot the DAG of the scientific setting. The simulated dataset contains a binary exposure, a binary mediator, a continuous mediator, a continuous outcome and two pre-exposure confounders.
+Next, we simulate some data and plot the DAG. The simulated dataset contains a binary exposure, a binary mediator, a continuous mediator, a continuous outcome and two baseline confounders.
 
 ```{r message=F,warning=F}
+set.seed(1)
 n <- 100
 C1 <- rnorm(n, mean = 1, sd = 1)
 C2 <- rbinom(n, 1, 0.6)
-C2[which(C2 == 0)] <- "C2_0"
-C2[which(C2 == 1)] <- "C2_1"
-pa <- exp(0.2 - 0.5*C1 + 0.1*(C2 == "C2_1"))/(1 + exp(0.2 - 0.5*C1 + 0.1*(C2 == "C2_1")))
+pa <- exp(0.2 - 0.5*C1 + 0.1*C2)/(1 + exp(0.2 - 0.5*C1 + 0.1*C2))
 A <- rbinom(n, 1, pa)
-A[which(A == 0)] <- "control"
-A[which(A == 1)] <- "treat"
-pm <- exp(1 + 0.5*(A == "treat") - 1.5*C1 + 0.5*(C2 == "C2_1"))/
-  (1 + exp(1 + 0.5*(A == "treat") - 1.5*C1 + 0.5*(C2 == "C2_1")))
+pm <- exp(1 + 0.5*A - 1.5*C1 + 0.5*C2)/ (1 + exp(1 + 0.5*A - 1.5*C1 + 0.5*C2))
 M1 <- rbinom(n, 1, pm)
-M2 <- rnorm(n, 2 + 0.8*(A == "treat") - M1 + 0.5*C1 + 2*(C2 == "C2_1"), 1)
-Y <- rnorm(n, mean = 0.5 + 0.4*(A == "treat") + 0.5*M1 + 0.6*M2 + 0.3*(A == "treat")*M1 +
-             0.2*(A == "treat")*M2 - 0.3*C1 + 2*(C2=="C2_1"), sd = 1)
+M2 <- rnorm(n, 2 + 0.8*A - M1 + 0.5*C1 + 2*C2, 1)
+Y <- rnorm(n, mean = 0.5 + 0.4*A + 0.5*M1 + 0.6*M2 + 0.3*A*M1 + 0.2*A*M2 - 0.3*C1 + 2*C2, sd = 1)
 data <- data.frame(A, M1, M2, Y, C1, C2)
 ```
 
-The DAG can be plotted using the `cmdag` function.
+The DAG can be plotted using `cmdag`.
 
 ```{r plot_dag,message=F,warning=F}
 cmdag(outcome = "Y", exposure = "A", mediator = c("M1", "M2"), 
-      basec = c("C1", "C2", "C3"), postc = NULL,
-      node = FALSE, text_col = "black")
+      basec = c("C1", "C2"), postc = NULL, node = FALSE, text_col = "black")
 ```
 
-Then, we estimate the causal effects using the `cmest` function. We use the regression-based approach for illustration. The reference values for the exposure are set to be 0 and 1. The reference values for the two mediators are set to be 0. 
+Then, we estimate causal effects using `cmest`. We use the regression-based approach for illustration. The reference values for the exposure are set to be 0 and 1. The reference values for the two mediators are set to be 1. 
 
 ```{r message=F,warning=F,results='hide'}
 est <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
                 mediator = c("M1", "M2"), basec = c("C1", "C2"), EMint = TRUE,
                 mreg = list("logistic", "linear"), yreg = "linear",
-                astar = 0, a = 1, mval = list(0, 0),
+                astar = 0, a = 1, mval = list(1, 1),
                 estimation = "imputation", inference = "bootstrap", nboot = 20)
 ```
 
-Summarizing and plotting the results:
+Summarize and plot the results:
 
 ```{r message=F,warning=F}
 summary(est)
@@ -72,20 +66,20 @@ ggcmest(est) +
   ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 30, vjust = 0.8))
 ```
 
-Lastly, let's conduct sensitivity analysis for the results. Sensitivity analysis for unmeasured confounding:
+Lastly, we conduct sensitivity analysis for the results. Sensitivity analysis for unmeasured confounding:
 
 ```{r message=F,warning=F}
 cmsens(object = est, sens = "uc")
 ```
 
-Assume that the continuous pre-exposure confounder was measured with error. Sensitivity analysis for measurement error using regression calibration with a set of assumed standard deviations of the measurement error 0.1, 0.2 and 0.3:
+Assume that $C_1$ was measured with error. Sensitivity analysis for measurement error using regression calibration with a set of assumed error standard deviations 0.1, 0.2 and 0.3:
 
 ```{r message=F,warning=F,results='hide'}
 me1 <- cmsens(object = est, sens = "me", MEmethod = "rc", 
               MEvariable = "C1", MEvartype = "con", MEerror = c(0.1, 0.2, 0.3))
 ```
 
-Summarizing and plotting the results:
+Summarize and plot the results:
 
 ```{r message=F,warning=F}
 summary(me1)
@@ -105,7 +99,7 @@ me2 <- cmsens(object = est, sens = "me", MEmethod = "simex", MEvariable = "A",
                              matrix(c(0.9, 0.1, 0.1, 0.9), nrow = 2)))
 ```
 
-Summarizing and plotting the results:
+Summarize and plot the results:
 
 ```{r message=F,warning=F}
 summary(me2)

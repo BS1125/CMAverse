@@ -114,7 +114,7 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Sensitivity Analysis for Measurement Error</h1>
             
-            <h4 class="date">2020-08-27</h4>
+            <h4 class="date">2020-09-13</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BS1125/CMAverse/blob/master/vignettes/measurement_error.Rmd"><code>vignettes/measurement_error.Rmd</code></a></small>
       <div class="hidden name"><code>measurement_error.Rmd</code></div>
@@ -123,8 +123,8 @@
 
     
     
-<p>This example demonstrates how to conduct sensitivity analysis for measurement error via the <code>cmsens</code> function. For this purpose, we simulate some data containing a continuous baseline confounder <span class="math inline">\(C_1\)</span>, a binary baseline confounder <span class="math inline">\(C_2\)</span>, a binary exposure <span class="math inline">\(A\)</span>, a binary mediator <span class="math inline">\(M\)</span> and a binary outcome <span class="math inline">\(Y\)</span>. The true regression models for <span class="math inline">\(A\)</span>, <span class="math inline">\(M\)</span> and <span class="math inline">\(Y\)</span> are: <span class="math display">\[logit(E(A|C_1,C_2))=0.2+0.5C_1+0.1C_2\]</span> <span class="math display">\[logit(E(M|A,C_1,C_2))=1+2A+1.5C_1+0.8C_2\]</span> <span class="math display">\[logit(E(Y|A,M,C_1,C_2)))=-3-0.4A-1.2M+0.5AM+0.3C_1-0.6C_2\]</span></p>
-<p>Then, we generate some measurement error for the continuous variable <span class="math inline">\(C_1\)</span> and the binary variable <span class="math inline">\(A\)</span>.</p>
+<p>This example demonstrates how to conduct sensitivity analysis for measurement error by using <code>cmsens</code>. For this purpose, we simulate some data containing a continuous baseline confounder <span class="math inline">\(C_1\)</span>, a binary baseline confounder <span class="math inline">\(C_2\)</span>, a binary exposure <span class="math inline">\(A\)</span>, a binary mediator <span class="math inline">\(M\)</span> and a binary outcome <span class="math inline">\(Y\)</span>. The true regression models for <span class="math inline">\(A\)</span>, <span class="math inline">\(M\)</span> and <span class="math inline">\(Y\)</span> are: <span class="math display">\[logit(E(A|C_1,C_2))=0.2+0.5C_1+0.1C_2\]</span> <span class="math display">\[logit(E(M|A,C_1,C_2))=1+2A+1.5C_1+0.8C_2\]</span> <span class="math display">\[logit(E(Y|A,M,C_1,C_2)))=-3-0.4A-1.2M+0.5AM+0.3C_1-0.6C_2\]</span></p>
+<p>Then, we generate some measurement errors for <span class="math inline">\(C_1\)</span> and <span class="math inline">\(A\)</span>.</p>
 <div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="fl">1</span>)
 <span class="no">expit</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">x</span>) <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="no">x</span>)/(<span class="fl">1</span>+<span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="no">x</span>))
 <span class="no">n</span> <span class="kw">&lt;-</span> <span class="fl">10000</span>
@@ -150,36 +150,36 @@
 <div id="a-continuous-variable-measured-with-error" class="section level2">
 <h2 class="hasAnchor">
 <a href="#a-continuous-variable-measured-with-error" class="anchor"></a>A Continuous Variable Measured with Error</h2>
-<p>We use the regression-based approach for illustration. The naive results obtained by fitting data with measurement error:</p>
+<p>Firstly, we assume <span class="math inline">\(C1\)</span> was measured with error. <span class="math inline">\(C_1\)</span> is continuous, so the measurement error can be corrected by regression calibration or SIMEX. We use the regression-based approach for illustration. The naive results obtained by fitting data with measurement error:</p>
 <div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="no">res_naive_cont</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span>(<span class="kw">data</span> <span class="kw">=</span> <span class="no">data</span>, <span class="kw">model</span> <span class="kw">=</span> <span class="st">"rb"</span>, <span class="kw">outcome</span> <span class="kw">=</span> <span class="st">"Y"</span>, <span class="kw">exposure</span> <span class="kw">=</span> <span class="st">"A"</span>,
                         <span class="kw">mediator</span> <span class="kw">=</span> <span class="st">"M"</span>, <span class="kw">basec</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"C1_error"</span>, <span class="st">"C2"</span>), <span class="kw">EMint</span> <span class="kw">=</span> <span class="fl">TRUE</span>,
                         <span class="kw">mreg</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="st">"logistic"</span>), <span class="kw">yreg</span> <span class="kw">=</span> <span class="st">"logistic"</span>,
                         <span class="kw">astar</span> <span class="kw">=</span> <span class="fl">0</span>, <span class="kw">a</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">mval</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fl">1</span>), <span class="kw">yref</span> <span class="kw">=</span> <span class="fl">1</span>,
                         <span class="kw">estimation</span> <span class="kw">=</span> <span class="st">"paramfunc"</span>, <span class="kw">inference</span> <span class="kw">=</span> <span class="st">"delta"</span>)</pre></body></html></div>
 <div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">res_naive_cont</span>)</pre></body></html></div>
-<pre><code>## # Causal Mediation Analysis via the Regression-based Approach
+<pre><code>## Causal Mediation Analysis via the Regression-based Approach
 ##  
 ## Closed-form parameter function estimation with 
 ##  delta method standard errors, confidence intervals and p-values 
 ##  
-##                  Estimate Std.error   95% CIL 95% CIU   P.val    
-## RRcde             1.24383   0.22304   0.87524   1.768 0.22367    
-## RRpnde            1.01905   0.17645   0.72578   1.431 0.91323    
-## RRtnde            1.20938   0.21034   0.86004   1.701 0.27437    
-## RRpnie            0.80077   0.05414   0.70138   0.914 0.00102 ** 
-## RRtnie            0.95034   0.06599   0.82942   1.089 0.46320    
-## RRte              0.96844   0.15560   0.70683   1.327 0.84179    
-## ERRcde            0.18846   8.40147 -16.27812  16.655 0.98210    
-## ERRintref        -0.16941   0.16640  -0.49555   0.157 0.30864    
-## ERRintmed         0.14862   0.09996  -0.04731   0.345 0.13709    
-## ERRpnie          -0.19923   0.08786  -0.37142  -0.027 0.02335 *  
-## ERRcde(prop)     -5.97114   0.05414  -6.07726  -5.865 &lt; 2e-16 ***
-## ERRintref(prop)   5.36768  34.38901 -62.03355  72.769 0.87596    
-## ERRintmed(prop)  -4.70891  26.42572 -56.50236  47.085 0.85857    
-## ERRpnie(prop)     6.31237  23.17884 -39.11733  51.742 0.78537    
-## pm                1.60346  31.15632 -59.46181  62.669 0.95895    
-## int               0.65876   3.24847  -5.70811   7.026 0.83930    
-## pe                6.97114  34.38901 -60.43008  74.372 0.83936    
+##                 Estimate Std.error   95% CIL 95% CIU   P.val    
+## Rcde             1.24383   0.22304   0.87524   1.768 0.22367    
+## Rpnde            1.01905   0.17645   0.72578   1.431 0.91323    
+## Rtnde            1.20938   0.21034   0.86004   1.701 0.27437    
+## Rpnie            0.80077   0.05414   0.70138   0.914 0.00102 ** 
+## Rtnie            0.95034   0.06599   0.82942   1.089 0.46320    
+## Rte              0.96844   0.15560   0.70683   1.327 0.84179    
+## ERcde            0.18846   8.40147 -16.27812  16.655 0.98210    
+## ERintref        -0.16941   0.16640  -0.49555   0.157 0.30864    
+## ERintmed         0.14862   0.09996  -0.04731   0.345 0.13709    
+## ERpnie          -0.19923   0.08786  -0.37142  -0.027 0.02335 *  
+## ERcde(prop)     -5.97114   0.05414  -6.07726  -5.865 &lt; 2e-16 ***
+## ERintref(prop)   5.36768  34.38901 -62.03355  72.769 0.87596    
+## ERintmed(prop)  -4.70891  26.42572 -56.50236  47.085 0.85857    
+## ERpnie(prop)     6.31237  23.17884 -39.11733  51.742 0.78537    
+## pm               1.60346  31.15632 -59.46181  62.669 0.95895    
+## int              0.65876   3.24847  -5.70811   7.026 0.83930    
+## pe               6.97114  34.38901 -60.43008  74.372 0.83936    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
@@ -204,7 +204,7 @@
 ## 
 ## $basecval[[2]]
 ## [1] 0.5936</code></pre>
-<p>These results can be corrected by regression calibration or SIMEX. The results obtained after regression calibration:</p>
+<p>The results corrected by regression calibration:</p>
 <div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="no">res_rc_cont</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/cmsens.html">cmsens</a></span>(<span class="kw">object</span> <span class="kw">=</span> <span class="no">res_naive_cont</span>, <span class="kw">sens</span> <span class="kw">=</span> <span class="st">"me"</span>, <span class="kw">MEmethod</span> <span class="kw">=</span> <span class="st">"rc"</span>,
                       <span class="kw">MEvariable</span> <span class="kw">=</span> <span class="st">"C1_error"</span>, <span class="kw">MEvartype</span> <span class="kw">=</span> <span class="st">"con"</span>, <span class="kw">MEerror</span> <span class="kw">=</span> <span class="fl">0.05</span>)</pre></body></html></div>
 <div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">res_rc_cont</span>)</pre></body></html></div>
@@ -217,28 +217,28 @@
 ## [1] 0.05
 ## 
 ## Measurement error correction for measurement error 1: 
-##                  Estimate Std.error   95% CIL 95% CIU   P.val    
-## RRcde             1.24332   0.21920   0.88006   1.757 0.21673    
-## RRpnde            1.01851   0.52048   0.37410   2.773 0.97137    
-## RRtnde            1.20880   0.22133   0.84431   1.731 0.30036    
-## RRpnie            0.80064   0.05768   0.69521   0.922 0.00203 ** 
-## RRtnie            0.95024   0.40485   0.41227   2.190 0.90463    
-## RRte              0.96782   0.16337   0.69521   1.347 0.84636    
-## ERRcde            0.18801  18.14749 -35.38042  35.756 0.99173    
-## ERRintref        -0.16951   0.16289  -0.48877   0.150 0.29806    
-## ERRintmed         0.14867   0.49743  -0.82627   1.124 0.76503    
-## ERRpnie          -0.19936   0.43632  -1.05453   0.656 0.64774    
-## ERRcde(prop)     -5.84268   0.05768  -5.95573  -5.730 &lt; 2e-16 ***
-## ERRintref(prop)   5.26756  34.11855 -61.60356  72.139 0.87730    
-## ERRintmed(prop)  -4.62011  25.39887 -54.40097  45.161 0.85566    
-## ERRpnie(prop)     6.19523  22.27342 -37.45987  49.850 0.78090    
-## pm                1.57512  31.49154 -60.14716  63.297 0.96011    
-## int               0.64746   3.12706  -5.48147   6.776 0.83597    
-## pe                6.84268  34.11855 -60.02844  73.714 0.84105    
+##                 Estimate Std.error   95% CIL 95% CIU   P.val    
+## Rcde             1.24332   0.21920   0.88006   1.757 0.21673    
+## Rpnde            1.01851   0.52048   0.37410   2.773 0.97137    
+## Rtnde            1.20880   0.22133   0.84431   1.731 0.30036    
+## Rpnie            0.80064   0.05768   0.69521   0.922 0.00203 ** 
+## Rtnie            0.95024   0.40485   0.41227   2.190 0.90463    
+## Rte              0.96782   0.16337   0.69521   1.347 0.84636    
+## ERcde            0.18801  18.14749 -35.38042  35.756 0.99173    
+## ERintref        -0.16951   0.16289  -0.48877   0.150 0.29806    
+## ERintmed         0.14867   0.49743  -0.82627   1.124 0.76503    
+## ERpnie          -0.19936   0.43632  -1.05453   0.656 0.64774    
+## ERcde(prop)     -5.84268   0.05768  -5.95573  -5.730 &lt; 2e-16 ***
+## ERintref(prop)   5.26756  34.11855 -61.60356  72.139 0.87730    
+## ERintmed(prop)  -4.62011  25.39887 -54.40097  45.161 0.85566    
+## ERpnie(prop)     6.19523  22.27342 -37.45987  49.850 0.78090    
+## pm               1.57512  31.49154 -60.14716  63.297 0.96011    
+## int              0.64746   3.12706  -5.48147   6.776 0.83597    
+## pe               6.84268  34.11855 -60.02844  73.714 0.84105    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## ----------------------------------------------------------------</code></pre>
-<p>The results obtained after SIMEX:</p>
+<p>The results corrected by SIMEX:</p>
 <div class="sourceCode" id="cb9"><html><body><pre class="r"><span class="no">res_simex_cont</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/cmsens.html">cmsens</a></span>(<span class="kw">object</span> <span class="kw">=</span> <span class="no">res_naive_cont</span>, <span class="kw">sens</span> <span class="kw">=</span> <span class="st">"me"</span>, <span class="kw">MEmethod</span> <span class="kw">=</span> <span class="st">"simex"</span>,
                          <span class="kw">MEvariable</span> <span class="kw">=</span> <span class="st">"C1_error"</span>, <span class="kw">MEvartype</span> <span class="kw">=</span> <span class="st">"con"</span>, <span class="kw">MEerror</span> <span class="kw">=</span> <span class="fl">0.05</span>)</pre></body></html></div>
 <div class="sourceCode" id="cb10"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">res_simex_cont</span>)</pre></body></html></div>
@@ -251,24 +251,24 @@
 ## [1] 0.05
 ## 
 ## Measurement error correction for measurement error 1: 
-##                  Estimate Std.error   95% CIL 95% CIU   P.val    
-## RRcde             1.24345   0.22299   0.87495   1.767 0.22435    
-## RRpnde            1.01967   0.17650   0.72631   1.432 0.91039    
-## RRtnde            1.20914   0.21033   0.85982   1.700 0.27494    
-## RRpnie            0.80149   0.05403   0.70229   0.915 0.00103 ** 
-## RRtnie            0.95042   0.06578   0.82986   1.088 0.46249    
-## RRte              0.96912   0.15576   0.70724   1.328 0.84525    
-## ERRcde            0.18835   8.75433 -16.96981  17.347 0.98283    
-## ERRintref        -0.16868   0.16656  -0.49514   0.158 0.31119    
-## ERRintmed         0.14795   0.09971  -0.04747   0.343 0.13784    
-## ERRpnie          -0.19851   0.08762  -0.37023  -0.027 0.02347 *  
-## ERRcde(prop)     -6.09885   0.05403  -6.20475  -5.993 &lt; 2e-16 ***
-## ERRintref(prop)   5.46188  35.82468 -64.75321  75.677 0.87882    
-## ERRintmed(prop)  -4.79066  27.50709 -58.70357  49.122 0.86174    
-## ERRpnie(prop)     6.42764  24.12293 -40.85243  53.708 0.78989    
-## pm                1.63698  32.45470 -61.97307  65.247 0.95977    
-## int               0.67122   3.38575  -5.96473   7.307 0.84285    
-## pe                7.09885  35.82468 -63.11624  77.314 0.84292    
+##                 Estimate Std.error   95% CIL 95% CIU   P.val    
+## Rcde             1.24345   0.22299   0.87495   1.767 0.22435    
+## Rpnde            1.01967   0.17650   0.72631   1.432 0.91039    
+## Rtnde            1.20914   0.21033   0.85982   1.700 0.27494    
+## Rpnie            0.80149   0.05403   0.70229   0.915 0.00103 ** 
+## Rtnie            0.95042   0.06578   0.82986   1.088 0.46249    
+## Rte              0.96912   0.15576   0.70724   1.328 0.84525    
+## ERcde            0.18835   8.75433 -16.96981  17.347 0.98283    
+## ERintref        -0.16868   0.16656  -0.49514   0.158 0.31119    
+## ERintmed         0.14795   0.09971  -0.04747   0.343 0.13784    
+## ERpnie          -0.19851   0.08762  -0.37023  -0.027 0.02347 *  
+## ERcde(prop)     -6.09885   0.05403  -6.20475  -5.993 &lt; 2e-16 ***
+## ERintref(prop)   5.46188  35.82468 -64.75321  75.677 0.87882    
+## ERintmed(prop)  -4.79066  27.50709 -58.70357  49.122 0.86174    
+## ERpnie(prop)     6.42764  24.12293 -40.85243  53.708 0.78989    
+## pm               1.63698  32.45470 -61.97307  65.247 0.95977    
+## int              0.67122   3.38575  -5.96473   7.307 0.84285    
+## pe               7.09885  35.82468 -63.11624  77.314 0.84292    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## ----------------------------------------------------------------</code></pre>
@@ -276,36 +276,36 @@
 <div id="a-categorical-variable-measured-with-error" class="section level2">
 <h2 class="hasAnchor">
 <a href="#a-categorical-variable-measured-with-error" class="anchor"></a>A Categorical Variable Measured with Error</h2>
-<p>The naive results obtained by fitting data with measurement error:</p>
+<p>Then, we assume <span class="math inline">\(A\)</span> was measured with error. <span class="math inline">\(A\)</span> is categorical, so only SIMEX can be used. The naive results obtained by fitting data with measurement error:</p>
 <div class="sourceCode" id="cb12"><html><body><pre class="r"><span class="no">res_naive_cat</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span>(<span class="kw">data</span> <span class="kw">=</span> <span class="no">data</span>, <span class="kw">model</span> <span class="kw">=</span> <span class="st">"rb"</span>, <span class="kw">outcome</span> <span class="kw">=</span> <span class="st">"Y"</span>, <span class="kw">exposure</span> <span class="kw">=</span> <span class="st">"A_error"</span>,
                        <span class="kw">mediator</span> <span class="kw">=</span> <span class="st">"M"</span>, <span class="kw">basec</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"C1"</span>, <span class="st">"C2"</span>), <span class="kw">EMint</span> <span class="kw">=</span> <span class="fl">TRUE</span>,
                        <span class="kw">mreg</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="st">"logistic"</span>), <span class="kw">yreg</span> <span class="kw">=</span> <span class="st">"logistic"</span>,
                        <span class="kw">astar</span> <span class="kw">=</span> <span class="fl">0</span>, <span class="kw">a</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">mval</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fl">1</span>), <span class="kw">yref</span> <span class="kw">=</span> <span class="fl">1</span>,
                        <span class="kw">estimation</span> <span class="kw">=</span> <span class="st">"paramfunc"</span>, <span class="kw">inference</span> <span class="kw">=</span> <span class="st">"delta"</span>)</pre></body></html></div>
 <div class="sourceCode" id="cb13"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">res_naive_cat</span>)</pre></body></html></div>
-<pre><code>## # Causal Mediation Analysis via the Regression-based Approach
+<pre><code>## Causal Mediation Analysis via the Regression-based Approach
 ##  
 ## Closed-form parameter function estimation with 
 ##  delta method standard errors, confidence intervals and p-values 
 ##  
-##                 Estimate Std.error  95% CIL 95% CIU   P.val    
-## RRcde            1.08912   0.18279  0.78381   1.513 0.61100    
-## RRpnde           0.98700   0.15917  0.71952   1.354 0.93531    
-## RRtnde           1.06299   0.17173  0.77449   1.459 0.70532    
-## RRpnie           0.86553   0.04070  0.78932   0.949 0.00213 ** 
-## RRtnie           0.93218   0.04836  0.84205   1.032 0.17582    
-## RRte             0.92005   0.14238  0.67934   1.246 0.59029    
-## ERRcde           0.07373   1.71924 -3.29591   3.443 0.96579    
-## ERRintref       -0.08673   0.14960 -0.37995   0.206 0.56208    
-## ERRintmed        0.06753   0.08188 -0.09296   0.228 0.40955    
-## ERRpnie         -0.13447   0.06388 -0.25966  -0.009 0.03528 *  
-## ERRcde(prop)    -0.92222   0.04070 -1.00199  -0.842 &lt; 2e-16 ***
-## ERRintref(prop)  1.08489   3.45691 -5.69054   7.860 0.75365    
-## ERRintmed(prop) -0.84468   2.06437 -4.89077   3.201 0.68241    
-## ERRpnie(prop)    1.68201   1.60658 -1.46682   4.831 0.29512    
-## pm               0.83733   3.03652 -5.11414   6.789 0.78274    
-## int              0.24020   0.45912 -0.65966   1.140 0.60085    
-## pe               1.92222   3.45691 -4.85321   8.698 0.57818    
+##                Estimate Std.error  95% CIL 95% CIU   P.val    
+## Rcde            1.08912   0.18279  0.78381   1.513 0.61100    
+## Rpnde           0.98700   0.15917  0.71952   1.354 0.93531    
+## Rtnde           1.06299   0.17173  0.77449   1.459 0.70532    
+## Rpnie           0.86553   0.04070  0.78932   0.949 0.00213 ** 
+## Rtnie           0.93218   0.04836  0.84205   1.032 0.17582    
+## Rte             0.92005   0.14238  0.67934   1.246 0.59029    
+## ERcde           0.07373   1.71924 -3.29591   3.443 0.96579    
+## ERintref       -0.08673   0.14960 -0.37995   0.206 0.56208    
+## ERintmed        0.06753   0.08188 -0.09296   0.228 0.40955    
+## ERpnie         -0.13447   0.06388 -0.25966  -0.009 0.03528 *  
+## ERcde(prop)    -0.92222   0.04070 -1.00199  -0.842 &lt; 2e-16 ***
+## ERintref(prop)  1.08489   3.45691 -5.69054   7.860 0.75365    
+## ERintmed(prop) -0.84468   2.06437 -4.89077   3.201 0.68241    
+## ERpnie(prop)    1.68201   1.60658 -1.46682   4.831 0.29512    
+## pm              0.83733   3.03652 -5.11414   6.789 0.78274    
+## int             0.24020   0.45912 -0.65966   1.140 0.60085    
+## pe              1.92222   3.45691 -4.85321   8.698 0.57818    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
@@ -330,7 +330,7 @@
 ## 
 ## $basecval[[2]]
 ## [1] 0.5936</code></pre>
-<p>These results can be corrected by SIMEX. The results obtained after SIMEX:</p>
+<p>The results corrected by SIMEX:</p>
 <div class="sourceCode" id="cb15"><html><body><pre class="r"><span class="no">res_simex_cat</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/cmsens.html">cmsens</a></span>(<span class="kw">object</span> <span class="kw">=</span> <span class="no">res_naive_cat</span>, <span class="kw">sens</span> <span class="kw">=</span> <span class="st">"me"</span>, <span class="kw">MEmethod</span> <span class="kw">=</span> <span class="st">"simex"</span>,
                          <span class="kw">MEvariable</span> <span class="kw">=</span> <span class="st">"A_error"</span>, <span class="kw">MEvartype</span> <span class="kw">=</span> <span class="st">"cat"</span>, <span class="kw">MEerror</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="no">mc</span>))</pre></body></html></div>
 <div class="sourceCode" id="cb16"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">res_simex_cat</span>)</pre></body></html></div>
@@ -345,57 +345,57 @@
 ## [2,]  0.1  0.9
 ## 
 ## Measurement error correction for measurement error 1: 
-##                 Estimate Std.error  95% CIL 95% CIU   P.val    
-## RRcde            1.09611   0.23918  0.71469   1.681 0.67406    
-## RRpnde           0.95935   0.20343  0.63311   1.454 0.84485    
-## RRtnde           1.07186   0.22602  0.70900   1.620 0.74209    
-## RRpnie           0.82689   0.05485  0.72609   0.942 0.00416 ** 
-## RRtnie           0.92386   0.07540  0.78729   1.084 0.33191    
-## RRte             0.88631   0.17227  0.60553   1.297 0.53465    
-## ERRcde           0.07662   1.30608 -2.48325   2.636 0.95322    
-## ERRintref       -0.11726   0.18791 -0.48556   0.251 0.53260    
-## ERRintmed        0.10006   0.12130 -0.13768   0.338 0.40940    
-## ERRpnie         -0.17311   0.10363 -0.37623   0.030 0.09485 .  
-## ERRcde(prop)    -0.67391   0.05485 -0.78141  -0.566 &lt; 2e-16 ***
-## ERRintref(prop)  1.03144   2.63192 -4.12704   6.190 0.69514    
-## ERRintmed(prop) -0.88016   1.80091 -4.40989   2.650 0.62503    
-## ERRpnie(prop)    1.52264   1.53634 -1.48853   4.534 0.32165    
-## pm               0.64247   2.39863 -4.05876   5.344 0.78881    
-## int              0.15128   0.26593 -0.36994   0.672 0.56946    
-## pe               1.67391   2.63192 -3.48456   6.832 0.52477    
+##                Estimate Std.error  95% CIL 95% CIU   P.val    
+## Rcde            1.09611   0.23918  0.71469   1.681 0.67406    
+## Rpnde           0.95935   0.20343  0.63311   1.454 0.84485    
+## Rtnde           1.07186   0.22602  0.70900   1.620 0.74209    
+## Rpnie           0.82689   0.05485  0.72609   0.942 0.00416 ** 
+## Rtnie           0.92386   0.07540  0.78729   1.084 0.33191    
+## Rte             0.88631   0.17227  0.60553   1.297 0.53465    
+## ERcde           0.07662   1.30608 -2.48325   2.636 0.95322    
+## ERintref       -0.11726   0.18791 -0.48556   0.251 0.53260    
+## ERintmed        0.10006   0.12130 -0.13768   0.338 0.40940    
+## ERpnie         -0.17311   0.10363 -0.37623   0.030 0.09485 .  
+## ERcde(prop)    -0.67391   0.05485 -0.78141  -0.566 &lt; 2e-16 ***
+## ERintref(prop)  1.03144   2.63192 -4.12704   6.190 0.69514    
+## ERintmed(prop) -0.88016   1.80091 -4.40989   2.650 0.62503    
+## ERpnie(prop)    1.52264   1.53634 -1.48853   4.534 0.32165    
+## pm              0.64247   2.39863 -4.05876   5.344 0.78881    
+## int             0.15128   0.26593 -0.36994   0.672 0.56946    
+## pe              1.67391   2.63192 -3.48456   6.832 0.52477    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## ----------------------------------------------------------------</code></pre>
-<p>Compare the error-corrected results with the results obtained by fitting data without measurement error:</p>
+<p>Compare the error-corrected results with the true results:</p>
 <div class="sourceCode" id="cb18"><html><body><pre class="r"><span class="no">res_true</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span>(<span class="kw">data</span> <span class="kw">=</span> <span class="no">data</span>, <span class="kw">model</span> <span class="kw">=</span> <span class="st">"rb"</span>, <span class="kw">outcome</span> <span class="kw">=</span> <span class="st">"Y"</span>, <span class="kw">exposure</span> <span class="kw">=</span> <span class="st">"A"</span>,
                        <span class="kw">mediator</span> <span class="kw">=</span> <span class="st">"M"</span>, <span class="kw">basec</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"C1"</span>, <span class="st">"C2"</span>), <span class="kw">EMint</span> <span class="kw">=</span> <span class="fl">TRUE</span>,
                        <span class="kw">mreg</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="st">"logistic"</span>), <span class="kw">yreg</span> <span class="kw">=</span> <span class="st">"logistic"</span>,
                        <span class="kw">astar</span> <span class="kw">=</span> <span class="fl">0</span>, <span class="kw">a</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">mval</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fl">1</span>), <span class="kw">yref</span> <span class="kw">=</span> <span class="fl">1</span>,
                        <span class="kw">estimation</span> <span class="kw">=</span> <span class="st">"paramfunc"</span>, <span class="kw">inference</span> <span class="kw">=</span> <span class="st">"delta"</span>)</pre></body></html></div>
 <div class="sourceCode" id="cb19"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">res_true</span>)</pre></body></html></div>
-<pre><code>## # Causal Mediation Analysis via the Regression-based Approach
+<pre><code>## Causal Mediation Analysis via the Regression-based Approach
 ##  
 ## Closed-form parameter function estimation with 
 ##  delta method standard errors, confidence intervals and p-values 
 ##  
-##                  Estimate Std.error   95% CIL 95% CIU   P.val    
-## RRcde             1.24309   0.22291   0.87472   1.767 0.22495    
-## RRpnde            1.01814   0.17635   0.72506   1.430 0.91733    
-## RRtnde            1.20855   0.21018   0.85947   1.699 0.27607    
-## RRpnie            0.80040   0.05419   0.70093   0.914 0.00101 ** 
-## RRtnie            0.95009   0.06605   0.82906   1.089 0.46146    
-## RRte              0.96733   0.15543   0.70599   1.325 0.83621    
-## ERRcde            0.18777   7.88784 -15.27212  15.648 0.98101    
-## ERRintref        -0.16963   0.16621  -0.49539   0.156 0.30746    
-## ERRintmed         0.14878   0.10003  -0.04729   0.345 0.13694    
-## ERRpnie          -0.19960   0.08790  -0.37188  -0.027 0.02317 *  
-## ERRcde(prop)     -5.74662   0.05419  -5.85284  -5.640 &lt; 2e-16 ***
-## ERRintref(prop)   5.19141  32.11420 -57.75127  68.134 0.87158    
-## ERRintmed(prop)  -4.55337  24.66335 -52.89265  43.786 0.85353    
-## ERRpnie(prop)     6.10859  21.62860 -36.28269  48.500 0.77761    
-## pm                1.55521  29.09367 -55.46733  58.578 0.95737    
-## int               0.63803   3.03635  -5.31311   6.589 0.83357    
-## pe                6.74662  32.11420 -56.19606  69.689 0.83360    
+##                 Estimate Std.error   95% CIL 95% CIU   P.val    
+## Rcde             1.24309   0.22291   0.87472   1.767 0.22495    
+## Rpnde            1.01814   0.17635   0.72506   1.430 0.91733    
+## Rtnde            1.20855   0.21018   0.85947   1.699 0.27607    
+## Rpnie            0.80040   0.05419   0.70093   0.914 0.00101 ** 
+## Rtnie            0.95009   0.06605   0.82906   1.089 0.46146    
+## Rte              0.96733   0.15543   0.70599   1.325 0.83621    
+## ERcde            0.18777   7.88784 -15.27212  15.648 0.98101    
+## ERintref        -0.16963   0.16621  -0.49539   0.156 0.30746    
+## ERintmed         0.14878   0.10003  -0.04729   0.345 0.13694    
+## ERpnie          -0.19960   0.08790  -0.37188  -0.027 0.02317 *  
+## ERcde(prop)     -5.74662   0.05419  -5.85284  -5.640 &lt; 2e-16 ***
+## ERintref(prop)   5.19141  32.11420 -57.75127  68.134 0.87158    
+## ERintmed(prop)  -4.55337  24.66335 -52.89265  43.786 0.85353    
+## ERpnie(prop)     6.10859  21.62860 -36.28269  48.500 0.77761    
+## pm               1.55521  29.09367 -55.46733  58.578 0.95737    
+## int              0.63803   3.03635  -5.31311   6.589 0.83357    
+## pe               6.74662  32.11420 -56.19606  69.689 0.83360    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 

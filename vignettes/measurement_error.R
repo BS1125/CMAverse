@@ -1,21 +1,4 @@
----
-title: "Sensitivity Analysis for Measurement Error"
-output: rmarkdown::html_vignette
-date: "`r Sys.Date()`"
-vignette: >
-  %\VignetteIndexEntry{Sensitivity Analysis for Measurement Error}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
----
-  
-This example demonstrates how to conduct sensitivity analysis for measurement error by using `cmsens`. For this purpose, we simulate some data containing a continuous baseline confounder $C_1$, a binary baseline confounder $C_2$, a binary exposure $A$, a binary mediator $M$ and a binary outcome $Y$. The true regression models for $A$, $M$ and $Y$ are:
-$$logit(E(A|C_1,C_2))=0.2+0.5C_1+0.1C_2$$
-$$logit(E(M|A,C_1,C_2))=1+2A+1.5C_1+0.8C_2$$
-$$logit(E(Y|A,M,C_1,C_2)))=-3-0.4A-1.2M+0.5AM+0.3C_1-0.6C_2$$
-
-Then, we generate some measurement errors for $C_1$ and $A$.
-
-```{r}
+## -----------------------------------------------------------------------------
 set.seed(1)
 expit <- function(x) exp(x)/(1+exp(x))
 n <- 10000
@@ -33,93 +16,62 @@ for (j in 1:2) {
 M <- rbinom(n, 1, expit(1 + 2*A + 1.5*C1 + 0.8*C2))
 Y <- rbinom(n, 1, expit(-3 - 0.4*A - 1.2*M + 0.5*A*M + 0.3*C1 - 0.6*C2))
 data <- data.frame(A, A_error, M, Y, C1, C1_error, C2)
-```
 
-The DAG for this scientific setting is:
-
-```{r}
+## -----------------------------------------------------------------------------
 library(CMAverse)
 cmdag(outcome = "Y", exposure = "A", mediator = "M",
       basec = c("C1", "C2"), postc = NULL, node = TRUE, text_col = "white")
-```
 
-## A Continuous Variable Measured with Error
-
-Firstly, we assume $C1$ was measured with error. $C_1$ is continuous, so the measurement error can be corrected by regression calibration or SIMEX. We use the regression-based approach for illustration. The naive results obtained by fitting data with measurement error:
-
-```{r message=F,warning=F,results='hide'}
+## ----message=F,warning=F,results='hide'---------------------------------------
 res_naive_cont <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
                         mediator = "M", basec = c("C1_error", "C2"), EMint = TRUE,
                         mreg = list("logistic"), yreg = "logistic",
                         astar = 0, a = 1, mval = list(1), yref = 1,
                         estimation = "paramfunc", inference = "delta")
-```
 
-```{r message=F,warning=F}
+## ----message=F,warning=F------------------------------------------------------
 summary(res_naive_cont)
-```
 
-The results corrected by regression calibration:
-
-```{r message=F,warning=F,results='hide'}
+## ----message=F,warning=F,results='hide'---------------------------------------
 res_rc_cont <- cmsens(object = res_naive_cont, sens = "me", MEmethod = "rc", 
                       MEvariable = "C1_error", MEvartype = "con", MEerror = 0.05)
 
-```
 
-```{r message=F,warning=F}
+## ----message=F,warning=F------------------------------------------------------
 summary(res_rc_cont)
-```
 
-The results corrected by SIMEX:
-
-```{r message=F,warning=F,results='hide'}
+## ----message=F,warning=F,results='hide'---------------------------------------
 res_simex_cont <- cmsens(object = res_naive_cont, sens = "me", MEmethod = "simex", 
                          MEvariable = "C1_error", MEvartype = "con", MEerror = 0.05)
-```
 
-```{r message=F,warning=F}
+## ----message=F,warning=F------------------------------------------------------
 summary(res_simex_cont)
-```
 
-## A Categorical Variable Measured with Error
-
-Then, we assume $A$ was measured with error. $A$ is categorical, so only SIMEX can be used. The naive results obtained by fitting data with measurement error:
-
-```{r message=F,warning=F,results='hide'}
+## ----message=F,warning=F,results='hide'---------------------------------------
 res_naive_cat <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A_error",
                        mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                        mreg = list("logistic"), yreg = "logistic",
                        astar = 0, a = 1, mval = list(1), yref = 1,
                        estimation = "paramfunc", inference = "delta")
-```
 
-```{r message=F,warning=F}
+## ----message=F,warning=F------------------------------------------------------
 summary(res_naive_cat)
-```
 
-The results corrected by SIMEX:
-
-```{r message=F,warning=F,results='hide'}
+## ----message=F,warning=F,results='hide'---------------------------------------
 res_simex_cat <- cmsens(object = res_naive_cat, sens = "me", MEmethod = "simex", 
                          MEvariable = "A_error", MEvartype = "cat", MEerror = list(mc))
 
-```
 
-```{r message=F,warning=F}
+## ----message=F,warning=F------------------------------------------------------
 summary(res_simex_cat)
-```
 
-Compare the error-corrected results with the true results:
-
-```{r message=F,warning=F,results='hide'}
+## ----message=F,warning=F,results='hide'---------------------------------------
 res_true <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
                        mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                        mreg = list("logistic"), yreg = "logistic",
                        astar = 0, a = 1, mval = list(1), yref = 1,
                        estimation = "paramfunc", inference = "delta")
-```
 
-```{r message=F,warning=F}
+## ----message=F,warning=F------------------------------------------------------
 summary(res_true)
-```
+

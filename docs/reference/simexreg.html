@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Simulation and Extrapolation for Measurement Error — simexreg • CMAverse</title>
+<title>Simulation and Extrapolation for Measurement Error Correction — simexreg • CMAverse</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -43,7 +43,7 @@
 
 
 
-<meta property="og:title" content="Simulation and Extrapolation for Measurement Error — simexreg" />
+<meta property="og:title" content="Simulation and Extrapolation for Measurement Error Correction — simexreg" />
 
 <meta property="og:description" content="simexreg is used to correct a regression object with a variable measured with 
 error via SIMEX by Cook et al. (1994) and Küchenhoff et al. (2006)." />
@@ -156,7 +156,7 @@ error via SIMEX by Cook et al. (1994) and Küchenhoff et al. (2006)." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Simulation and Extrapolation for Measurement Error</h1>
+    <h1>Simulation and Extrapolation for Measurement Error Correction</h1>
     <small class="dont-index">Source: <a href='https://github.com/BS1125/CMAverse/blob/master/R/simexreg.R'><code>R/simexreg.R</code></a></small>
     <div class="hidden name"><code>simexreg.Rd</code></div>
     </div>
@@ -218,19 +218,19 @@ error via <em>SIMEX</em> by Cook et al. (1994) and Küchenhoff et al. (2006).</p
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>reg</th>
-      <td><p>the naive regression object. See <code>Details</code>.</p></td>
+      <td><p>naive regression object. See <code>Details</code>.</p></td>
     </tr>
     <tr>
       <th>data</th>
-      <td><p>the new dataset for <code>reg</code></p></td>
+      <td><p>new dataset for <code>reg</code></p></td>
     </tr>
     <tr>
       <th>weights</th>
-      <td><p>the new weights for <code>reg</code></p></td>
+      <td><p>new weights for <code>reg</code></p></td>
     </tr>
     <tr>
       <th>MEvariable</th>
-      <td><p>variable measured with error.</p></td>
+      <td><p>variable measured with error</p></td>
     </tr>
     <tr>
       <th>MEvartype</th>
@@ -245,7 +245,7 @@ is <code>categorical</code>).</p></td>
     </tr>
     <tr>
       <th>variance</th>
-      <td><p>a logical value. If <code>TRUE</code>, estimate the jackknife var-cov matrix of
+      <td><p>a logical value. If <code>TRUE</code>, estimate the var-cov matrix of
 coefficients through Jackknife. Default is <code>FALSE</code>.</p></td>
     </tr>
     <tr>
@@ -258,7 +258,7 @@ coefficients through Jackknife. Default is <code>FALSE</code>.</p></td>
     </tr>
     <tr>
       <th>object</th>
-      <td><p>an object of class 'rcreg'</p></td>
+      <td><p>an object of class <code>simexreg</code></p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -266,11 +266,11 @@ coefficients through Jackknife. Default is <code>FALSE</code>.</p></td>
     </tr>
     <tr>
       <th>x</th>
-      <td><p>an object of class 'rcreg'</p></td>
+      <td><p>an object of class <code>simexreg</code></p></td>
     </tr>
     <tr>
       <th>formula</th>
-      <td><p>an object of class 'rcreg'</p></td>
+      <td><p>an object of class <code>simexreg</code></p></td>
     </tr>
     <tr>
       <th>digits</th>
@@ -287,14 +287,15 @@ is <code>TRUE</code>.</p></td>
 
     <p>If <code>MEvariable</code> is not in the regression formula of <code>reg</code>, <code>reg</code> is 
 returned. If <code>MEvariable</code> is in the regression formula of <code>yeg</code>, an object of 
-class 'simexreg' is returned:</p>
+class <code>simexreg</code> is returned:</p>
 <dt>call</dt><dd><p>the function call,</p></dd>
 <dt>NAIVEreg</dt><dd><p>the naive regression object,</p></dd>
-<dt>ME</dt><dd><p>a list of <code>MEvariable</code>, <code>MEerror</code> and <code>variance</code>,</p></dd>
-<dt>RCcoef</dt><dd><p>coefficient estimates corrected by <em>SIMEX</em>,</p></dd>
+<dt>ME</dt><dd><p>a list of <code>MEvariable</code>, <code>MEvartype</code>, <code>MEerror</code>, <code>variance</code>,
+<code>lambda</code> and <code>B</code>,</p></dd>
+<dt>RCcoef</dt><dd><p>coefficient estimates corrected by SIMEX,</p></dd>
 <dt>RCsigma</dt><dd><p>the residual standard deviation of a linear regression object corrected by 
-<em>SIMEX</em>,</p></dd>
-<dt>RCvcov</dt><dd><p>the var-cov matrix of coefficients corrected by <em>SIMEX</em>,</p></dd>
+SIMEX,</p></dd>
+<dt>RCvcov</dt><dd><p>the var-cov matrix of coefficients corrected by SIMEX,</p></dd>
 ...
 
     
@@ -317,7 +318,7 @@ corrected by <code>simexreg</code></p></li>
 <li><p><code>family</code>: Extract the family of a regression of class <code>lm</code> or <code>glm</code></p></li>
 <li><p><code>predict</code>: Predict with new data</p></li>
 <li><p><code>model.frame</code>: Extract the model frame</p></li>
-<li><p><code>print</code>: Print the results of <code>simexreg</code> nicely</p></li>
+<li><p><code>print</code>: Print results of <code>simexreg</code> nicely</p></li>
 <li><p><code>summary</code>: Summarize results of <code>simexreg</code> nicely</p></li>
 <li><p><code>print</code>: Print summary of <code>simexreg</code> nicely</p></li>
 <li><p><code>update</code>: Update <code>simexreg</code></p></li>
@@ -336,8 +337,7 @@ Journal of the American Statistical Association. 90(432): 1247 - 56.</p>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='rcreg.html'>rcreg</a></code>, <code><a href='ggcmsens.html'>ggcmsens</a></code>, <code><a href='cmdag.html'>cmdag</a></code>, 
-<code><a href='cmest.html'>cmest</a></code></p></div>
+    <div class='dont-index'><p><code><a href='rcreg.html'>rcreg</a></code>, <code><a href='cmsens.html'>cmsens</a></code>, <code><a href='cmest.html'>cmest</a></code>.</p></div>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>

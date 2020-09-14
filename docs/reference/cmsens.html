@@ -184,6 +184,12 @@ et al. (1995) and <em>SIMEX</em> by Cook et al. (1994) and Küchenhoff et al. (2
   <span class='kw'>nboot.rc</span> <span class='kw'>=</span> <span class='fl'>400</span>
 )
 
+<span class='co'># S3 method for cmsens.uc</span>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>x</span>, <span class='no'>...</span>)
+
+<span class='co'># S3 method for cmsens.me</span>
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>x</span>, <span class='no'>...</span>)
+
 <span class='co'># S3 method for cmsens.me</span>
 <span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span>(<span class='no'>object</span>, <span class='no'>...</span>)
 
@@ -233,16 +239,16 @@ is <code>categorical</code>).</p></td>
     </tr>
     <tr>
       <th>nboot.rc</th>
-      <td><p>number of boots for estimating the var-cov matrix of coefficients 
+      <td><p>number of boots for correcting the var-cov matrix of coefficients 
 with regression calibration. Default is <code>400</code>.</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>other arguments.</p></td>
     </tr>
     <tr>
       <th>x</th>
       <td><p>an object of class <code>cmsens</code></p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>other arguments.</p></td>
     </tr>
     <tr>
       <th>digits</th>
@@ -252,37 +258,54 @@ with regression calibration. Default is <code>400</code>.</p></td>
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>If <code>sens</code> is <code>uc</code>, an object of class 'cmest.uc' is returned:</p>
+    <p>If <code>sens</code> is <code>uc</code>, an object of class <code>cmsens.uc</code> is returned:</p>
 <dt>call</dt><dd><p>the function call,</p></dd>
-<dt>evalues</dt><dd><p>the data frame in which the first three columns are the point estimates, 
-lower limits of confidence intervals, upper limits of confidence intervals of causal effects on 
-the ratio scale and the last three columns are the E-values on the ratio scale for them,</p></dd>
-If sens is me, an object of class 'cmest.me' is returned:
-<dt>call</dt><dd><p>the function call,</p></dd>
-<dt>ME</dt><dd><p>a list which might contain MEvariable, MEvartype, MEerror, reliability ratio, lambda and B,</p></dd>
-<dt>naive</dt><dd><p>naive causal mediation analysis results</p></dd>
-<dt>sens</dt><dd><p>a list of causal mediation analysis results after correcting errors in 
-<code>MEerror</code>,</p></dd>
+<dt>evalues</dt><dd><p>a data frame in which the first three columns are point estimates, lower limits 
+of 95% confidence intervals and upper limits of 95% confidence intervals of causal effects on 
+the risk or rate ratio scale and the last three columns are E-values on the risk or rate ratio scale,</p></dd>
 
+If sens is me, an object of class cmsens.me is returned:
+<dt>call</dt><dd><p>the function call,</p></dd>
+<dt>ME</dt><dd><p>a list which might contain <code>MEmethod</code>, <code>MEvariable</code>, <code>MEvartype</code>, 
+<code>MEerror</code>, <code>lambda</code>, <code>B</code>, <code>nboot.rc</code> and reliability ratio (which is calculated 
+by <code>1 - MEerror[i]/sd(data[, MEvariable])</code> for <code>i=1,...,length(MEerror)</code> when 
+<code>MEvartype</code> is <code>continuous</code>),</p></dd>
+<dt>naive</dt><dd><p>naive causal mediation analysis results,</p></dd>
+<dt>sens</dt><dd><p>a list of causal mediation analysis results after correcting errors in <code>MEerror</code>,</p></dd>
 ...
 
     
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>For unmeasured confounding, all E-values are on the (risk or rate) ratio scale. If the causal 
-effects are estimated on the difference scale, the point estimates are transformed into 
+    <p><strong>Sensitivity Analysis for Unmeasured Confounding</strong></p>
+<p>Currently, sensitivity analysis for unmeasured confounding are available when the outcome 
+regression model is fitted by <a href='https://rdrr.io/r/stats/lm.html'>lm</a>, <a href='https://rdrr.io/r/stats/glm.html'>glm</a>, glm.nb, <a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a>, 
+<a href='https://rdrr.io/pkg/nnet/man/multinom.html'>multinom</a>, <a href='https://rdrr.io/pkg/MASS/man/polr.html'>polr</a>.</p>
+<p>All E-values are reported on the risk or rate ratio scale. If the causal effects are estimated 
+on the difference scale (i.e., the outcome is continuous), they are transformed into risk
 ratios using the transformation described by Vanderweele et al. (2017).</p>
+<p><strong>Sensitivity Analysis for Measurement Error</strong></p>
+<p>Currently, sensitivity analysis for measurement error are available:</p>
+<p>1) when the regression 
+model involving the variable measured with error is fitted by <a href='https://rdrr.io/r/stats/lm.html'>lm</a>, 
+<a href='https://rdrr.io/r/stats/glm.html'>glm</a> (with family <code>gaussian</code>, <code>binomial</code> or <code>poisson</code>), <a href='https://rdrr.io/pkg/nnet/man/multinom.html'>multinom</a>, 
+<a href='https://rdrr.io/pkg/MASS/man/polr.html'>polr</a>, <a href='https://rdrr.io/pkg/survival/man/coxph.html'>coxph</a> or <a href='https://rdrr.io/pkg/survival/man/survreg.html'>survreg</a> and <code>model</code> is 
+<code>rb</code> or <code>gformula</code>;
+2) when <code>estimation</code> is <code>paramfunc</code>.</p>
 <p>Sensitivity analysis for measurement error only supports a single variable measured with error.
-Regression calibration only supports an independent continuous variable in a regression 
-formula measured with error. SIMEX supports a continuous or categorical variable measured 
-with error.</p>
+Regression calibration requires that the variable measured with error be an independent 
+continuous variable in the regression it's involved in. SIMEX supports a continuous or 
+categorical variable measured with error. Quadratic extrapolation method is implemented for
+SIMEX.</p>
     
     <h2 class="hasAnchor" id="methods-by-generic-"><a class="anchor" href="#methods-by-generic-"></a>Methods (by generic)</h2>
 
     
 <ul>
-<li><p><code>summary</code>: Summarize the results of cmsens.me nicely</p></li>
-<li><p><code>print</code>: Print the summary of cmsens.me nicely</p></li>
+<li><p><code>print</code>: Print results of <code>cmsens.uc</code> nicely</p></li>
+<li><p><code>print</code>: Print results of <code>cmsens.me</code> nicely</p></li>
+<li><p><code>summary</code>: Summarize results of <code>cmsens.me</code> nicely</p></li>
+<li><p><code>print</code>: Print the summary of <code>cmsens.me</code> nicely</p></li>
 </ul>
     
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
@@ -301,11 +324,11 @@ in regression: the misclassification SIMEX (2006). Biometrics. 62(1): 85 - 96.</
 Journal of the American Statistical Association. 90(432): 1247 - 56.</p>
 <p>Valeri L, Lin X, VanderWeele TJ. Mediation analysis when a continuous mediator is measured 
 with error and the outcome follows a generalized linear model (2014). Statistics in 
-medicine, 33(28): 4875–4890.</p>
+medicine, 33(28): 4875 – 4890.</p>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='ggcmsens.html'>ggcmsens</a></code>, <code><a href='cmdag.html'>cmdag</a></code>, <code><a href='cmest.html'>cmest</a></code></p></div>
+    <div class='dont-index'><p><a href='ggcmsens.html'>ggcmsens</a>, <a href='cmdag.html'>cmdag</a>, <a href='cmest.html'>cmest</a>, <a href='rcreg.html'>rcreg</a>, <a href='simexreg.html'>simexreg</a>.</p></div>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>

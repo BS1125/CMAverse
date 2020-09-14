@@ -24,7 +24,7 @@ See the package [website](https://bs1125.github.io/CMAverse/) for a quickstart g
 
 ### DAG Visualization
 
-`cmdag` visualizes the scientific setting via a DAG.
+`cmdag` visualizes causal relationships via a directed acyclic graph (DAG).
 
 ### Statistical Modeling
 
@@ -43,7 +43,7 @@ Table: Table: Supported Data Types and Functionalities of `cmest`
 |Count Y|√|√|√|√|√|√|
 |Nominal Y|√|√|√|×|√|√|
 |Ordinal Y|√|√|√|×|√|√|
-|Survival Y|√|√|√|×|√|√|
+|Survival Y|√|×|√|×|√|√|
 |Continuous M|√|√|√|√|×|√|
 |Binary M|√|√|√|√|√|√|
 |Nominal M|√|√|√|√|√|√|
@@ -56,7 +56,7 @@ Table: Table: Supported Data Types and Functionalities of `cmest`
 |Ordinal A|√|√|√|√|√|√|
 |Count A|√|×[^8]|×|√|×[^8]|√|
 |Multiple Mediators|√|√|√|√|√|√|
-|Post-exposure Confounding|×|×|×|×|√|√|
+|Mediator-outcome Confounder(s) affected by A|×|×|×|×|√|√|
 |2-way Decomposition|√|√|√|√|√|√|
 |4-way Decomposition|√|√|×|√|√|√|
 |Estimation: Closed-form Parameter Function|√[^2]|×|×|×|×|×|
@@ -66,17 +66,17 @@ Table: Table: Supported Data Types and Functionalities of `cmest`
 |Marginal Effects|√[^4]|√|√|√|√|√|
 |Effects Conditional On C|√[^5]|×|×|×|×|×|
 [^1]: rb: the regression-based approach; wb: the weighting-based approach; iorw: the inverse odds ratio weighting approach; ne: the natural effect model; msm: the marginal structural model; gformula: the g-formula approach.
-[^2]: closed-form parameter function estimation only supports the regression-based approach and a single mediator.
+[^2]: closed-form parameter function estimation only supports a single mediator.
 [^3]: delta method inference is available only when closed-form parameter function estimation is used.
 [^4]: marginal effects are estimated when direct counterfactual imputation estimation is used.
 [^5]: conditional effects are estimated when closed-form parameter function estimation is used.
-[^6]: Y denotes the outcome, A denotes the exposure, M denotes the mediator(s) and C denotes the pre-exposure confounder(s).
+[^6]: Y denotes the outcome, A denotes the exposure, M denotes the mediator(s) and C denotes the exposure-outcome confounder(s), the exposure-mediator confounder(s) and the mediator-outcome confounder(s) not affected by the exposure.
 [^7]: continuous A is not supported when C is not empty; otherwise, it is supported.
 [^8]: count A is not supported when C is not empty; otherwise, it is supported.
 
 ### Multiple Imputation
 
-`cmest` provides options to perform multiple imputation for a dataset with missing values via the `mice` package, estimate the causal effects with each of the imputed datasets and pool the results together.
+`cmest` provides the option `multimp = TRUE` to perform multiple imputations for a dataset with missing values. 
 
 ### Sensitivity Analysis
 

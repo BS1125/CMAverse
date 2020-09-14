@@ -114,7 +114,7 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Overview of Modeling Approaches for Causal Mediation Analysis</h1>
             
-            <h4 class="date">2020-08-27</h4>
+            <h4 class="date">2020-09-13</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BS1125/CMAverse/blob/master/vignettes/overview.Rmd"><code>vignettes/overview.Rmd</code></a></small>
       <div class="hidden name"><code>overview.Rmd</code></div>
@@ -123,12 +123,13 @@
 
     
     
-<p>This document describes how the six causal mediation analysis approaches including <em>the regression-based approach</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3659198/">Valeri et al. (2013)</a> and <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/">VanderWeele et al. (2014)</a>, <em>the weighting-based approach</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/">VanderWeele et al. (2014)</a>, <em>the inverse odd-ratio weighting approach</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3954805/">Tchetgen Tchetgen (2013)</a>, <em>the natural effect model</em> by <a href="https://www.degruyter.com/view/journals/em/1/1/article-p131.xml?language=en">Vansteelandt et al. (2012)</a>, <em>the marginal structural model</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5560424/">VanderWeele et al. (2017)</a>, and <em>the <span class="math inline">\(g\)</span>-formula approach</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5285457/">Lin et al. (2017)</a> are implemented by the <code>cmest</code> function in the <code>CMAverse</code> package. See publications of these approaches for methodological details .</p>
-<p>We categorize the approaches based on whether the approach deals with post-exposure confounding, i.e., there are mediator-outcome confounders affect by the exposure. <em>The regression-based approach</em>, <em>the weighting-based approach</em>, <em>the inverse odd-ratio weighting approach</em> and <em>the natural effect model</em> only deal with pre-exposure confounding. <em>The marginal structural model</em> and <em>the <span class="math inline">\(g\)</span>-formula approach</em> deal with both pre-exposure confounding and post-exposure confounding.</p>
-<p>The outcome, the exposure and the set of pre-exposure confounder(s) are denoted as <span class="math inline">\(Y\)</span>, <span class="math inline">\(A\)</span> and <span class="math inline">\(C\)</span> respectively. The set of mediator(s) <span class="math inline">\(\{M_p\}_{p=1,...,k}\)</span> is denoted as <span class="math inline">\(M\)</span> and <span class="math inline">\(M=(M_1,...,M_k)\)</span> follows the temporal order of the mediator(s). The set of post-exposure confounder(s) <span class="math inline">\(\{L_q\}_{q=1,...,s}\)</span> is denoted as <span class="math inline">\(L\)</span> and <span class="math inline">\(L=(L_1,...,L_s)\)</span> follows the temporal order of the post-exposure confounder(s).</p>
-<div id="pre-exposure-confounding" class="section level1">
+<p>This document describes how the six causal mediation analysis approaches including <em>the regression-based approach</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3659198/">Valeri et al. (2013)</a> and <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/">VanderWeele et al. (2014)</a>, <em>the weighting-based approach</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/">VanderWeele et al. (2014)</a>, <em>the inverse odd-ratio weighting approach</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3954805/">Tchetgen Tchetgen (2013)</a>, <em>the natural effect model</em> by <a href="https://www.degruyter.com/view/journals/em/1/1/article-p131.xml?language=en">Vansteelandt et al. (2012)</a>, <em>the marginal structural model</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5560424/">VanderWeele et al. (2017)</a>, and <em>the <span class="math inline">\(g\)</span>-formula approach</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5285457/">Lin et al. (2017)</a> are implemented by <code>cmest</code> in the <code>CMAverse</code> package. See publications of these approaches for methodological details .</p>
+<p>We categorize these approaches based on whether the approach can deal with mediator-outcome confounders affected by the exposure. Among the six approaches, only <em>The marginal structural model</em> and <em>the <span class="math inline">\(g\)</span>-formula approach</em> are able to deal with mediator-outcome confounders affected by the exposure.</p>
+<p>The outcome and the exposure are denoted as <span class="math inline">\(Y\)</span> and <span class="math inline">\(A\)</span> respectively. The set of exposure-mediator confounders, exposure-outcome confounders and mediator-outcome confounders not affected by the exposure is denoted as <span class="math inline">\(C\)</span>. The set of mediators is denoted as <span class="math inline">\(M\)</span> and <span class="math inline">\(M=(M_1,...,M_k)\)</span> follows the temporal order. The set of mediator-outcome confounders affected by the exposure is denoted as <span class="math inline">\(L\)</span> and <span class="math inline">\(L=(L_1,...,L_s)\)</span> follows the temporal order.</p>
+<p>Since weights calculated from noncategorical variables are unstable which hurts the performance of effect estimation and inference, we require all variables used to calculate weights be categorical.</p>
+<div id="no-confounders-affected-by-the-exposure" class="section level1">
 <h1 class="hasAnchor">
-<a href="#pre-exposure-confounding" class="anchor"></a>Pre-exposure Confounding</h1>
+<a href="#no-confounders-affected-by-the-exposure" class="anchor"></a>No Confounders Affected by the Exposure</h1>
 <div id="dag" class="section level2">
 <h2 class="hasAnchor">
 <a href="#dag" class="anchor"></a>DAG</h2>
@@ -137,7 +138,7 @@
 <div id="estimands" class="section level2">
 <h2 class="hasAnchor">
 <a href="#estimands" class="anchor"></a>Estimands</h2>
-<p>For a continuous outcome, causal effects are estimated on the difference scale (summarized in table 1). For a categorical, count, or survival outcome, causal effects are estimated on the (risk or rate) ratio scale (summarized in table 2). See <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3659198/">Valeri et al. (2013)</a> and <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4220271/">VanderWeele (2015)</a> for details about these effects.</p>
+<p>For a continuous outcome, causal effects are estimated on the difference scale (summarized in table 1). For a categorical, count, or survival outcome, causal effects are estimated on the ratio scale (summarized in table 2). See <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3659198/">Valeri et al. (2013)</a> and <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4220271/">VanderWeele (2015)</a> for details about these effects.</p>
 <table class="table table table-bordered table-striped table-hover table-responsive table-condensed">
 <caption>
 Table 1: Causal Effects on the Difference Scale
@@ -354,7 +355,7 @@ Formula
 Controlled Direct Effect
 </td>
 <td style="text-align:left;width: 8em; ">
-<span class="math inline">\(rr^{CDE}\)</span>
+<span class="math inline">\(R^{CDE}\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
 <span class="math inline">\(E[Y_{am}]/E[Y_{a^*m}]\)</span>
@@ -365,7 +366,7 @@ Controlled Direct Effect
 Pure Natural Direct Effect
 </td>
 <td style="text-align:left;width: 8em; ">
-<span class="math inline">\(rr^{PNDE}\)</span>
+<span class="math inline">\(R^{PNDE}\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
 <span class="math inline">\(E[Y_{aM_a^*}]/E[Y_{a^*M_a^*}]\)</span>
@@ -376,7 +377,7 @@ Pure Natural Direct Effect
 Total Natural Direct Effect
 </td>
 <td style="text-align:left;width: 8em; ">
-<span class="math inline">\(rr^{TNDE}\)</span>
+<span class="math inline">\(R^{TNDE}\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
 <span class="math inline">\(E[Y_{aM_a}]/E[Y_{a^*M_a}]\)</span>
@@ -387,7 +388,7 @@ Total Natural Direct Effect
 Pure Natural Indirect Effect
 </td>
 <td style="text-align:left;width: 8em; ">
-<span class="math inline">\(rr^{PNIE}\)</span>
+<span class="math inline">\(R^{PNIE}\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
 <span class="math inline">\(E[Y_{a^*M_a}]/E[Y_{a^*M_a^*}]\)</span>
@@ -398,7 +399,7 @@ Pure Natural Indirect Effect
 Total Natural Indirect Effect
 </td>
 <td style="text-align:left;width: 8em; ">
-<span class="math inline">\(rr^{TNIE}\)</span>
+<span class="math inline">\(R^{TNIE}\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
 <span class="math inline">\(E[Y_{aM_a}]/E[Y_{aM_a^*}]\)</span>
@@ -409,18 +410,18 @@ Total Natural Indirect Effect
 Total Effect
 </td>
 <td style="text-align:left;width: 8em; ">
-<span class="math inline">\(rr^{TE}\)</span>
+<span class="math inline">\(R^{TE}\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
-<span class="math inline">\(rr^{PNDE}\times rr^{TNIE}\)</span>
+<span class="math inline">\(R^{PNDE}\times R^{TNIE}\)</span>
 </td>
 </tr>
 <tr>
 <td style="text-align:left;width: 20em; ">
-Excess RR due to Controlled Direct Effect
+Excess Ratio due to Controlled Direct Effect
 </td>
 <td style="text-align:left;width: 8em; ">
-<span class="math inline">\(err^{CDE}\)</span>
+<span class="math inline">\(ER^{CDE}\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
 <span class="math inline">\((E[Y_{am}-Y_{a^*m}])/E[Y_{a^*M_a^*}]\)</span>
@@ -428,79 +429,79 @@ Excess RR due to Controlled Direct Effect
 </tr>
 <tr>
 <td style="text-align:left;width: 20em; ">
-Excess RR due to Reference Interaction
+Excess Ratio due to Reference Interaction
 </td>
 <td style="text-align:left;width: 8em; ">
-<span class="math inline">\(err^{INT_{ref}}\)</span>
+<span class="math inline">\(ER^{INT_{ref}}\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
-<span class="math inline">\(rr^{PNDE}-1-err^{CDE}\)</span>
+<span class="math inline">\(R^{PNDE}-1-ER^{CDE}\)</span>
 </td>
 </tr>
 <tr>
 <td style="text-align:left;width: 20em; ">
-Excess RR due to Mediated Interaction
+Excess Ratio due to Mediated Interaction
 </td>
 <td style="text-align:left;width: 8em; ">
-<span class="math inline">\(err^{INT_{med}}\)</span>
+<span class="math inline">\(ER^{INT_{med}}\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
-<span class="math inline">\(rr^{TNIE}*rr^{PNDE}-rr^{PNDE}-rr^{PNIE}+1\)</span>
+<span class="math inline">\(R^{TNIE}*R^{PNDE}-R^{PNDE}-R^{PNIE}+1\)</span>
 </td>
 </tr>
 <tr>
 <td style="text-align:left;width: 20em; ">
-Excess RR due to Pure Natural Indirect Effect
+Excess Ratio due to Pure Natural Indirect Effect
 </td>
 <td style="text-align:left;width: 8em; ">
-<span class="math inline">\(err^{PNIE}\)</span>
+<span class="math inline">\(ER^{PNIE}\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
-<span class="math inline">\(rr^{PNIE}-1\)</span>
+<span class="math inline">\(R^{PNIE}-1\)</span>
 </td>
 </tr>
 <tr>
 <td style="text-align:left;width: 20em; ">
-Proportion <span class="math inline">\(err^{CDE}\)</span>
+Proportion <span class="math inline">\(ER^{CDE}\)</span>
 </td>
 <td style="text-align:left;width: 8em; ">
-<span class="math inline">\(prop^{err^{CDE}}\)</span>
+<span class="math inline">\(prop^{ER^{CDE}}\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
-<span class="math inline">\(err^{CDE}/(rr^{TE}-1)\)</span>
+<span class="math inline">\(ER^{CDE}/(R^{TE}-1)\)</span>
 </td>
 </tr>
 <tr>
 <td style="text-align:left;width: 20em; ">
-Proportion <span class="math inline">\(err^{INT_{ref}}\)</span>
+Proportion <span class="math inline">\(ER^{INT_{ref}}\)</span>
 </td>
 <td style="text-align:left;width: 8em; ">
-<span class="math inline">\(prop^{err^{INT_{ref}}}\)</span>
+<span class="math inline">\(prop^{ER^{INT_{ref}}}\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
-<span class="math inline">\(err^{INT_{ref}}/(rr^{TE}-1)\)</span>
+<span class="math inline">\(ER^{INT_{ref}}/(R^{TE}-1)\)</span>
 </td>
 </tr>
 <tr>
 <td style="text-align:left;width: 20em; ">
-Proportion <span class="math inline">\(err^{INT_{med}}\)</span>
+Proportion <span class="math inline">\(ER^{INT_{med}}\)</span>
 </td>
 <td style="text-align:left;width: 8em; ">
-<span class="math inline">\(prop^{err^{INT_{med}}}\)</span>
+<span class="math inline">\(prop^{ER^{INT_{med}}}\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
-<span class="math inline">\(err^{INT_{med}}/(rr^{TE}-1)\)</span>
+<span class="math inline">\(ER^{INT_{med}}/(R^{TE}-1)\)</span>
 </td>
 </tr>
 <tr>
 <td style="text-align:left;width: 20em; ">
-Proportion <span class="math inline">\(err^{PNIE}\)</span>
+Proportion <span class="math inline">\(ER^{PNIE}\)</span>
 </td>
 <td style="text-align:left;width: 8em; ">
-<span class="math inline">\(prop^{err^{PNIE}}\)</span>
+<span class="math inline">\(prop^{ER^{PNIE}}\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
-<span class="math inline">\(err^{PNIE}/(rr^{TE}-1)\)</span>
+<span class="math inline">\(ER^{PNIE}/(R^{TE}-1)\)</span>
 </td>
 </tr>
 <tr>
@@ -511,7 +512,7 @@ Proportion Mediated
 <span class="math inline">\(PM\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
-<span class="math inline">\((rr^{PNDE}*(rr^{TNIE}-1))/(rr^{TE}-1)\)</span>
+<span class="math inline">\((R^{PNDE}*(R^{TNIE}-1))/(R^{TE}-1)\)</span>
 </td>
 </tr>
 <tr>
@@ -522,7 +523,7 @@ Proportion Attributable to Interaction
 <span class="math inline">\(INT\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
-<span class="math inline">\((err^{INT_{ref}}+err^{INT_{med}})/(rr^{TE}-1)\)</span>
+<span class="math inline">\((ER^{INT_{ref}}+ER^{INT_{med}})/(R^{TE}-1)\)</span>
 </td>
 </tr>
 <tr>
@@ -533,7 +534,7 @@ Proportion Eliminated
 <span class="math inline">\(PE\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
-<span class="math inline">\((err^{INT_{ref}}+err^{INT_{med}}+err^{PNIE})/(rr^{TE}-1)\)</span>
+<span class="math inline">\((ER^{INT_{ref}}+ER^{INT_{med}}+ER^{PNIE})/(R^{TE}-1)\)</span>
 </td>
 </tr>
 </tbody>
@@ -545,7 +546,7 @@ Proportion Eliminated
 </tr>
 <tr>
 <td style="padding: 0; border: 0;" colspan="100%">
-<sup></sup><span class="math inline">\(a\)</span> and <span class="math inline">\(a^*\)</span> are two reference values for <span class="math inline">\(A\)</span>. <span class="math inline">\(m\)</span> is the reference value for <span class="math inline">\(M\)</span>. <span class="math inline">\(M_a\)</span> denotes the counterfactual value of <span class="math inline">\(M\)</span> that would have been observed had <span class="math inline">\(A\)</span> been set to be <span class="math inline">\(a\)</span>. <span class="math inline">\(Y_{am}\)</span> denotes the counterfactual value of <span class="math inline">\(Y\)</span> that would have been observed had <span class="math inline">\(A\)</span> been set to be <span class="math inline">\(a\)</span>, and <span class="math inline">\(M\)</span> to be <span class="math inline">\(m\)</span>. <span class="math inline">\(Y_{aMa*}\)</span> denotes the counterfactual value of <span class="math inline">\(Y\)</span> that would have been observed had <span class="math inline">\(A\)</span> been set to be <span class="math inline">\(a\)</span>, and <span class="math inline">\(M\)</span> to be <span class="math inline">\(M_{a*}\)</span>. <span class="math inline">\(RR\)</span> represents risk or rate ratio.
+<sup></sup><span class="math inline">\(a\)</span> and <span class="math inline">\(a^*\)</span> are two reference values for <span class="math inline">\(A\)</span>. <span class="math inline">\(m\)</span> is the reference value for <span class="math inline">\(M\)</span>. <span class="math inline">\(M_a\)</span> denotes the counterfactual value of <span class="math inline">\(M\)</span> that would have been observed had <span class="math inline">\(A\)</span> been set to be <span class="math inline">\(a\)</span>. <span class="math inline">\(Y_{am}\)</span> denotes the counterfactual value of <span class="math inline">\(Y\)</span> that would have been observed had <span class="math inline">\(A\)</span> been set to be <span class="math inline">\(a\)</span>, and <span class="math inline">\(M\)</span> to be <span class="math inline">\(m\)</span>. <span class="math inline">\(Y_{aMa*}\)</span> denotes the counterfactual value of <span class="math inline">\(Y\)</span> that would have been observed had <span class="math inline">\(A\)</span> been set to be <span class="math inline">\(a\)</span>, and <span class="math inline">\(M\)</span> to be <span class="math inline">\(M_{a*}\)</span>. If <span class="math inline">\(Y\)</span> is categorical, a reference value of <span class="math inline">\(Y\)</span>, denoted as <span class="math inline">\(y\)</span>, is needed and <span class="math inline">\(E[Y]\)</span> represents the probability of <span class="math inline">\(Y=y\)</span>.
 </td>
 </tr>
 </tfoot>
@@ -554,15 +555,15 @@ Proportion Eliminated
 <div id="the-regression-based-approach" class="section level2">
 <h2 class="hasAnchor">
 <a href="#the-regression-based-approach" class="anchor"></a>The Regression-based Approach</h2>
-<p>With the regression-based approach, all causal effects are estimated through either closed-form parameter function estimation or direct counterfactual imputation estimation.</p>
+<p>With the regression-based approach, all causal effects are estimated through either closed-form parameter function estimation or direct counterfactual imputation estimation. Standard errors of causal effects are estimated through either the delta method or bootstrapping.</p>
 <div id="closed-form-parameter-function-estimation" class="section level3">
 <h3 class="hasAnchor">
 <a href="#closed-form-parameter-function-estimation" class="anchor"></a>Closed-form Parameter Function Estimation</h3>
-<p>Closed-form parameter function estimation is available when there is only a single mediator, i.e., <span class="math inline">\(M=M_1\)</span>. Also, <code>yreg</code> must be chosen from <code>linear</code>, <code>logistic</code>, <code>loglinear</code>, <code>poisson</code>, <code>quasipoisson</code>, <code>negbin</code>, <code>coxph</code>, <code>aft_exp</code>, and <code>aft_weibull</code>. <code>mreg</code> must be chosen from <code>linear</code>, <code>logistic</code> and <code>multinomial</code>. The causal effects estimated through closed-form parameter function estimation are conditional on values of pre-exposure confounders specified by the <code>precval</code> argument. Closed-form parameter functions are summarized below.</p>
+<p>Closed-form parameter function estimation is available when there is only a single mediator, i.e., <span class="math inline">\(M=M_1\)</span>. Also, <code>yreg</code> must be chosen from <code>linear</code>, <code>logistic</code>, <code>loglinear</code>, <code>poisson</code>, <code>quasipoisson</code>, <code>negbin</code>, <code>coxph</code>, <code>aft_exp</code> and <code>aft_weibull</code>. <code>mreg</code> must be chosen from <code>linear</code>, <code>logistic</code> and <code>multinomial</code>. To use <code>yreg = "logistic"</code> in closed-form parameter function estimation, the outcome must be rare. To use <code>yreg = "coxph"</code> in closed-form parameter function estimation, the outcome at the end of follow-up must be rare. Additionally, the causal effects estimated through closed-form parameter function estimation are conditional on the value of <span class="math inline">\(C\)</span> specified by the <code>precval</code> argument. Closed-form parameter functions are summarized below.</p>
 <div id="linear-yreg-linear-mreg-and-noncategorical-exposure" class="section level4">
 <h4 class="hasAnchor">
 <a href="#linear-yreg-linear-mreg-and-noncategorical-exposure" class="anchor"></a>Linear <code>yreg</code>, Linear <code>mreg</code> and Noncategorical Exposure</h4>
-<p>If the exposure is not categorical, <code>yreg="linear"</code> and <code>mreg=list("linear")</code>, the <code>cmest</code> function estimates the causal effects by the following steps:</p>
+<p>If the exposure is not categorical, <code>yreg="linear"</code> and <code>mreg=list("linear")</code>, <code>cmest</code> estimates the causal effects by the following steps:</p>
 <ol style="list-style-type: decimal">
 <li><p>Fit a linear regression model for the mediator: <span class="math display">\[E[M|A,C]=\beta_0+\beta_1A+\beta_2'C\]</span></p></li>
 <li><p>Fit a linear regression model for the outcome: <span class="math display">\[E[Y|A,M,C]=\theta_0+\theta_1A+\theta_2M+\theta_3AM+\theta_4'C\]</span></p></li>
@@ -582,9 +583,9 @@ Proportion Eliminated
 <div id="linear-yreg-linear-mreg-and-categorical-exposure" class="section level4">
 <h4 class="hasAnchor">
 <a href="#linear-yreg-linear-mreg-and-categorical-exposure" class="anchor"></a>Linear <code>yreg</code>, Linear <code>mreg</code> and Categorical Exposure</h4>
-<p>If the exposure is categorical, <code>yreg="linear"</code> and <code>mreg=list("linear")</code>, the <code>cmest</code> function estimates the causal effects by the following steps:</p>
+<p>If the exposure is categorical, <code>yreg="linear"</code> and <code>mreg=list("linear")</code>, <code>cmest</code> estimates the causal effects by the following steps:</p>
 <ol style="list-style-type: decimal">
-<li><p>Fit a linear regression model for the mediator: <span class="math display">\[E[M|A,C]=\beta_0+\sum_{k=1}^H\beta_{1h}I\{A=h\}+\beta_2'C\]</span></p></li>
+<li><p>Fit a linear regression model for the mediator: <span class="math display">\[E[M|A,C]=\beta_0+\sum_{h=1}^H\beta_{1h}I\{A=h\}+\beta_2'C\]</span></p></li>
 <li><p>Fit a linear regression model for the outcome: <span class="math display">\[E[Y|A,M,C]=\theta_0+\sum_{h=1}^H\theta_{1h}I\{A=h\}+\theta_2M+\sum_{h=1}^H\theta_{3h}I\{A=h\}M+\theta_4'C\]</span></p></li>
 <li>
 <p>Estimate <span class="math inline">\(CDE\)</span>, <span class="math inline">\(PNDE\)</span>, <span class="math inline">\(TNDE\)</span>, <span class="math inline">\(PNIE\)</span> and <span class="math inline">\(TNIE\)</span> by the following parameter functions:</p>
@@ -602,7 +603,7 @@ Proportion Eliminated
 <div id="linear-yreg-logistic-mreg-and-noncategorical-exposure" class="section level4">
 <h4 class="hasAnchor">
 <a href="#linear-yreg-logistic-mreg-and-noncategorical-exposure" class="anchor"></a>Linear <code>yreg</code>, Logistic <code>mreg</code> and Noncategorical Exposure</h4>
-<p>If the exposure is not categorical, <code>yreg="linear"</code> and <code>mreg=list("logistic")</code>, the <code>cmest</code> function estimates the causal effects by the following steps:</p>
+<p>If the exposure is not categorical, <code>yreg="linear"</code> and <code>mreg=list("logistic")</code>, <code>cmest</code> estimates the causal effects by the following steps:</p>
 <ol style="list-style-type: decimal">
 <li><p>Fit a logistic regression model for the mediator: <span class="math display">\[logitE[M|A,C]=\beta_0+\beta_1A+\beta_2'C\]</span></p></li>
 <li><p>Fit a linear regression model for the outcome: <span class="math display">\[E[Y|A,M,C]=\theta_0+\theta_1A+\theta_2M+\theta_3AM+\theta_4'C\]</span></p></li>
@@ -622,7 +623,7 @@ Proportion Eliminated
 <div id="linear-yreg-logistic-mreg-and-categorical-exposure" class="section level4">
 <h4 class="hasAnchor">
 <a href="#linear-yreg-logistic-mreg-and-categorical-exposure" class="anchor"></a>Linear <code>yreg</code>, Logistic <code>mreg</code> and Categorical Exposure</h4>
-<p>If the exposure is categorical, <code>yreg="linear"</code> and <code>mreg=list("logistic")</code>, the <code>cmest</code> function estimates the causal effects by the following steps:</p>
+<p>If the exposure is categorical, <code>yreg="linear"</code> and <code>mreg=list("logistic")</code>, <code>cmest</code> estimates the causal effects by the following steps:</p>
 <ol style="list-style-type: decimal">
 <li><p>Fit a logistic regression model for the mediator: <span class="math display">\[logitE[M|A,C]=\beta_0+\sum_{h=1}^H\beta_{1h}I\{A=h\}+\beta_2'C\]</span></p></li>
 <li><p>Fit a linear regression model for the outcome: <span class="math display">\[E[Y|A,M,C]=\theta_0+\sum_{h=1}^H\theta_{1h}I\{A=h\}+\theta_2M+\sum_{h=1}^H\theta_{3h}I\{A=h\}M+\theta_4'C\]</span></p></li>
@@ -642,7 +643,7 @@ Proportion Eliminated
 <div id="linear-yreg-multinomial-mreg-and-noncategorical-exposure" class="section level4">
 <h4 class="hasAnchor">
 <a href="#linear-yreg-multinomial-mreg-and-noncategorical-exposure" class="anchor"></a>Linear <code>yreg</code>, Multinomial <code>mreg</code> and Noncategorical Exposure</h4>
-<p>If the exposure is not categorical, <code>yreg="linear"</code> and <code>mreg=list("multinomial")</code>, the <code>cmest</code> function estimates the causal effects by the following steps:</p>
+<p>If the exposure is not categorical, <code>yreg="linear"</code> and <code>mreg=list("multinomial")</code>, <code>cmest</code> estimates the causal effects by the following steps:</p>
 <ol style="list-style-type: decimal">
 <li><p>Fit a multinomial regression model for the mediator: <span class="math display">\[log\frac{E[M=j|A,C]}{E[M=0|A,C]}=\beta_{0j}+\beta_{1j}A+\beta_{2j}'C, j=1,2,...,J\]</span></p></li>
 <li><p>Fit a linear regression model for the outcome: <span class="math display">\[E[Y|A,M,C]=\theta_0+\theta_1A+\sum_{j=1}^J\theta_{2j}I\{M=j\}+A\sum_{j=1}^J\theta_{3j}I\{M=j\}+\theta_4'C\]</span></p></li>
@@ -662,7 +663,7 @@ Proportion Eliminated
 <div id="linear-yreg-multinomial-mreg-and-categorical-exposure" class="section level4">
 <h4 class="hasAnchor">
 <a href="#linear-yreg-multinomial-mreg-and-categorical-exposure" class="anchor"></a>Linear <code>yreg</code>, Multinomial <code>mreg</code> and Categorical Exposure</h4>
-<p>If the exposure is categorical, <code>yreg="linear"</code> and <code>mreg=list("multinomial")</code>, the <code>cmest</code> function estimates the causal effects by the following steps:</p>
+<p>If the exposure is categorical, <code>yreg="linear"</code> and <code>mreg=list("multinomial")</code>, <code>cmest</code> estimates the causal effects by the following steps:</p>
 <ol style="list-style-type: decimal">
 <li><p>Fit a multinomial regression model for the mediator: <span class="math display">\[log\frac{E[M=j|A,C]}{E[M=0|A,C]}=\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{A=h\}+\beta_{2j}'C, j=1,2,...,J\]</span></p></li>
 <li><p>Fit a linear regression model for the outcome: <span class="math display">\[E[Y|A,M,C]=\theta_0+\sum_{h=1}^H\theta_{1h}I\{A=h\}+\sum_{j=1}^J\theta_{2j}I\{M=j\}+\sum_{j=1}^J\sum_{h=1}^H\theta_{3jh}I\{M=j\}I\{A=h\}+\theta_4'C\]</span></p></li>
@@ -682,19 +683,19 @@ Proportion Eliminated
 <div id="nonlinear-yreg-linear-mreg-and-noncategorical-exposure" class="section level4">
 <h4 class="hasAnchor">
 <a href="#nonlinear-yreg-linear-mreg-and-noncategorical-exposure" class="anchor"></a>Nonlinear <code>yreg</code>, Linear <code>mreg</code> and Noncategorical Exposure</h4>
-<p>If the exposure is not categorical, <code>yreg!="linear"</code> and <code>mreg=list("linear")</code>, the <code>cmest</code> function estimates the causal effects by the following steps:</p>
+<p>If the exposure is not categorical, <code>yreg!="linear"</code> and <code>mreg=list("linear")</code>, <code>cmest</code> estimates the causal effects by the following steps:</p>
 <ol style="list-style-type: decimal">
 <li><p>Fit a linear regression model for the mediator: <span class="math display">\[E[M|A,C]=\beta_0+\beta_1A+\beta_2'C+\epsilon_M,\epsilon_M\sim N(0,\sigma^2)\]</span></p></li>
 <li><p>Fit the specified regression model for the outcome: <span class="math display">\[g(E[Y|A,M,C])=\theta_0+\theta_1A+\theta_2M+\theta_3AM+\theta_4'C\]</span></p></li>
 <li>
-<p>Estimate <span class="math inline">\(rr^{CDE}\)</span>, <span class="math inline">\(rr^{PNDE}\)</span>, <span class="math inline">\(rr^{TNDE}\)</span>, <span class="math inline">\(rr^{PNIE}\)</span>, <span class="math inline">\(rr^{TNIE}\)</span> and <span class="math inline">\(err^{CDE}\)</span> by the following parameter functions:</p>
+<p>Estimate <span class="math inline">\(R^{CDE}\)</span>, <span class="math inline">\(R^{PNDE}\)</span>, <span class="math inline">\(R^{TNDE}\)</span>, <span class="math inline">\(R^{PNIE}\)</span>, <span class="math inline">\(R^{TNIE}\)</span> and <span class="math inline">\(ER^{CDE}\)</span> by the following parameter functions:</p>
 <ul>
-<li><span class="math inline">\(rr^{CDE}=exp((\theta_1+\theta_3m)(a-a^*))\)</span></li>
-<li><span class="math inline">\(rr^{PNDE}=exp(\{\theta_1+\theta_3(\beta_0+\beta_1a^*+\beta_2'c+\theta_2\sigma^2)\}(a-a^*)+0.5\theta_3^2\sigma^2(a^2-a^{*2}))\)</span></li>
-<li><span class="math inline">\(rr^{TNDE}=exp(\{\theta_1+\theta_3(\beta_0+\beta_1a+\beta_2'c+\theta_2\sigma^2)\}(a-a^*)+0.5\theta_3^2\sigma^2(a^2-a^{*2}))\)</span></li>
-<li><span class="math inline">\(rr^{PNIE}=exp((\theta_2\beta_1+\theta_3\beta_1a^*)(a-a^*))\)</span></li>
-<li><span class="math inline">\(rr^{TNIE}=exp((\theta_2\beta_1+\theta_3\beta_1a)(a-a^*))\)</span></li>
-<li><span class="math inline">\(err^{CDE}=(exp(\theta_1(a-a^*)+\theta_3am)-exp(\theta_3a^*m))exp(\theta_2m-(\theta_2+\theta_3a^*)(\beta_0+\beta_1a^*+\beta_2'c)-0.5(\theta_2+\theta_3a^*)^2\sigma^2)\)</span></li>
+<li><span class="math inline">\(R^{CDE}=exp((\theta_1+\theta_3m)(a-a^*))\)</span></li>
+<li><span class="math inline">\(R^{PNDE}=exp(\{\theta_1+\theta_3(\beta_0+\beta_1a^*+\beta_2'c+\theta_2\sigma^2)\}(a-a^*)+0.5\theta_3^2\sigma^2(a^2-a^{*2}))\)</span></li>
+<li><span class="math inline">\(R^{TNDE}=exp(\{\theta_1+\theta_3(\beta_0+\beta_1a+\beta_2'c+\theta_2\sigma^2)\}(a-a^*)+0.5\theta_3^2\sigma^2(a^2-a^{*2}))\)</span></li>
+<li><span class="math inline">\(R^{PNIE}=exp((\theta_2\beta_1+\theta_3\beta_1a^*)(a-a^*))\)</span></li>
+<li><span class="math inline">\(R^{TNIE}=exp((\theta_2\beta_1+\theta_3\beta_1a)(a-a^*))\)</span></li>
+<li><span class="math inline">\(ER^{CDE}=(exp(\theta_1(a-a^*)+\theta_3am)-exp(\theta_3a^*m))exp(\theta_2m-(\theta_2+\theta_3a^*)(\beta_0+\beta_1a^*+\beta_2'c)-0.5(\theta_2+\theta_3a^*)^2\sigma^2)\)</span></li>
 </ul>
 </li>
 <li><p>Calculate other effects using formulas in table 2.</p></li>
@@ -703,19 +704,19 @@ Proportion Eliminated
 <div id="nonlinear-yreg-linear-mreg-and-categorical-exposure" class="section level4">
 <h4 class="hasAnchor">
 <a href="#nonlinear-yreg-linear-mreg-and-categorical-exposure" class="anchor"></a>Nonlinear <code>yreg</code>, Linear <code>mreg</code> and Categorical Exposure</h4>
-<p>If the exposure is categorical, <code>yreg!="linear"</code> and <code>mreg=list("linear")</code>, the <code>cmest</code> function estimates the causal effects by the following steps:</p>
+<p>If the exposure is categorical, <code>yreg!="linear"</code> and <code>mreg=list("linear")</code>, <code>cmest</code> estimates the causal effects by the following steps:</p>
 <ol style="list-style-type: decimal">
 <li><p>Fit a linear regression model for the mediator: <span class="math display">\[E[M|A,C]=\beta_0+\sum_{h=1}^H\beta_{1h}I\{A=h\}+\beta_2'C+\epsilon_M,\epsilon_M\sim N(0,\sigma^2)\]</span></p></li>
 <li><p>Fit the specified regression model for the outcome: <span class="math display">\[g(E[Y|A,M,C])=\theta_0+\sum_{h=1}^H\theta_{1h}I\{A=h\}+\theta_2M+\sum_{h=1}^H\theta_{3h}I\{A=h\}M+\theta_4'C\]</span></p></li>
 <li>
-<p>Estimate <span class="math inline">\(rr^{CDE}\)</span>, <span class="math inline">\(rr^{PNDE}\)</span>, <span class="math inline">\(rr^{TNDE}\)</span>, <span class="math inline">\(rr^{PNIE}\)</span>, <span class="math inline">\(rr^{TNIE}\)</span> and <span class="math inline">\(err^{CDE}\)</span> by the following parameter functions:</p>
+<p>Estimate <span class="math inline">\(R^{CDE}\)</span>, <span class="math inline">\(R^{PNDE}\)</span>, <span class="math inline">\(R^{TNDE}\)</span>, <span class="math inline">\(R^{PNIE}\)</span>, <span class="math inline">\(R^{TNIE}\)</span> and <span class="math inline">\(ER^{CDE}\)</span> by the following parameter functions:</p>
 <ul>
-<li><span class="math inline">\(rr^{CDE}=exp(\sum_{h=1}^H\theta_{1h}I\{a=h\}-\sum_{h=1}^H\theta_{1h}I\{a^*=h\}+(\sum_{h=1}^H\theta_{3h}I\{a=h\}-\sum_{h=1}^H\theta_{3h}I\{a^*=h\})m)\)</span></li>
-<li><span class="math inline">\(rr^{PNDE}=exp(\sum_{h=1}^H\theta_{1h}I\{a=h\}-\sum_{h=1}^H\theta_{1h}I\{a^*=h\}+(\sum_{h=1}^H\theta_{3h}I\{a=h\}-\sum_{h=1}^H\theta_{3h}I\{a^*=h\})(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a^*=h\}+\beta_2'c+\theta_2\sigma^2)+0.5\sigma^2(\sum_{h=1}^H\theta_{3h}^2I\{a=h\}-\sum_{h=1}^H\theta_{3h}^2I\{a^*=h\}))\)</span></li>
-<li><span class="math inline">\(rr^{TNDE}=exp(\sum_{h=1}^H\theta_{1h}I\{a=h\}-\sum_{h=1}^H\theta_{1h}I\{a^*=h\}+(\sum_{h=1}^H\theta_{3h}I\{a=h\}-\sum_{h=1}^H\theta_{3h}I\{a^*=h\})(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a=h\}+\beta_2'c+\theta_2\sigma^2)+0.5\sigma^2(\sum_{h=1}^H\theta_{3h}^2I\{a=h\}-\sum_{h=1}^H\theta_{3h}^2I\{a^*=h\}))\)</span></li>
-<li><span class="math inline">\(rr^{PNIE}=exp(\theta_2(\sum_{h=1}^H\beta_{1h}I\{a=h\}-\sum_{h=1}^H\beta_{1h}I\{a^*=h\})+\sum_{h=1}^H\theta_{3h}I\{a^*=h\}(\sum_{h=1}^H\beta_{1h}I\{a=h\}-\sum_{h=1}^H\beta_{1h}I\{a^*=h\}))\)</span></li>
-<li><span class="math inline">\(rr^{TNIE}=exp(\theta_2(\sum_{h=1}^H\beta_{1h}I\{a=h\}-\sum_{h=1}^H\beta_{1h}I\{a^*=h\})+\sum_{h=1}^H\theta_{3h}I\{a=h\}(\sum_{h=1}^H\beta_{1h}I\{a=h\}-\sum_{h=1}^H\beta_{1h}I\{a^*=h\}))\)</span></li>
-<li><span class="math inline">\(err^{CDE}=(exp(\sum_{h=1}^H\theta_{1h}I\{a=h\}-\sum_{h=1}^H\theta_{1h}I\{a^*=h\}+\sum_{h=1}^H\theta_{3h}I\{a=h\}m)-exp(\sum_{h=1}^H\theta_{3h}I\{a^*=h\}m))exp(\theta_2m-(\theta_2+\sum_{h=1}^H\theta_{3h}I\{a^*=h\})(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a^*=h\}+\beta_2'c)-0.5(\theta_2+\sum_{h=1}^H\theta_{3h}I\{a^*=h\})^2\sigma^2)\)</span></li>
+<li><span class="math inline">\(R^{CDE}=exp(\sum_{h=1}^H\theta_{1h}I\{a=h\}-\sum_{h=1}^H\theta_{1h}I\{a^*=h\}+(\sum_{h=1}^H\theta_{3h}I\{a=h\}-\sum_{h=1}^H\theta_{3h}I\{a^*=h\})m)\)</span></li>
+<li><span class="math inline">\(R^{PNDE}=exp(\sum_{h=1}^H\theta_{1h}I\{a=h\}-\sum_{h=1}^H\theta_{1h}I\{a^*=h\}+(\sum_{h=1}^H\theta_{3h}I\{a=h\}-\sum_{h=1}^H\theta_{3h}I\{a^*=h\})(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a^*=h\}+\beta_2'c+\theta_2\sigma^2)+0.5\sigma^2(\sum_{h=1}^H\theta_{3h}^2I\{a=h\}-\sum_{h=1}^H\theta_{3h}^2I\{a^*=h\}))\)</span></li>
+<li><span class="math inline">\(R^{TNDE}=exp(\sum_{h=1}^H\theta_{1h}I\{a=h\}-\sum_{h=1}^H\theta_{1h}I\{a^*=h\}+(\sum_{h=1}^H\theta_{3h}I\{a=h\}-\sum_{h=1}^H\theta_{3h}I\{a^*=h\})(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a=h\}+\beta_2'c+\theta_2\sigma^2)+0.5\sigma^2(\sum_{h=1}^H\theta_{3h}^2I\{a=h\}-\sum_{h=1}^H\theta_{3h}^2I\{a^*=h\}))\)</span></li>
+<li><span class="math inline">\(R^{PNIE}=exp(\theta_2(\sum_{h=1}^H\beta_{1h}I\{a=h\}-\sum_{h=1}^H\beta_{1h}I\{a^*=h\})+\sum_{h=1}^H\theta_{3h}I\{a^*=h\}(\sum_{h=1}^H\beta_{1h}I\{a=h\}-\sum_{h=1}^H\beta_{1h}I\{a^*=h\}))\)</span></li>
+<li><span class="math inline">\(R^{TNIE}=exp(\theta_2(\sum_{h=1}^H\beta_{1h}I\{a=h\}-\sum_{h=1}^H\beta_{1h}I\{a^*=h\})+\sum_{h=1}^H\theta_{3h}I\{a=h\}(\sum_{h=1}^H\beta_{1h}I\{a=h\}-\sum_{h=1}^H\beta_{1h}I\{a^*=h\}))\)</span></li>
+<li><span class="math inline">\(ER^{CDE}=(exp(\sum_{h=1}^H\theta_{1h}I\{a=h\}-\sum_{h=1}^H\theta_{1h}I\{a^*=h\}+\sum_{h=1}^H\theta_{3h}I\{a=h\}m)-exp(\sum_{h=1}^H\theta_{3h}I\{a^*=h\}m))exp(\theta_2m-(\theta_2+\sum_{h=1}^H\theta_{3h}I\{a^*=h\})(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a^*=h\}+\beta_2'c)-0.5(\theta_2+\sum_{h=1}^H\theta_{3h}I\{a^*=h\})^2\sigma^2)\)</span></li>
 </ul>
 </li>
 <li><p>Calculate other effects using formulas in table 2.</p></li>
@@ -724,19 +725,19 @@ Proportion Eliminated
 <div id="nonlinear-yreg-logistic-mreg-and-noncategorical-exposure" class="section level4">
 <h4 class="hasAnchor">
 <a href="#nonlinear-yreg-logistic-mreg-and-noncategorical-exposure" class="anchor"></a>Nonlinear <code>yreg</code>, Logistic <code>mreg</code> and Noncategorical Exposure</h4>
-<p>If the exposure is not categorical, <code>yreg!="linear"</code> and <code>mreg=list("logistic")</code>, the <code>cmest</code> function estimates the causal effects by the following steps:</p>
+<p>If the exposure is not categorical, <code>yreg!="linear"</code> and <code>mreg=list("logistic")</code>, <code>cmest</code> estimates the causal effects by the following steps:</p>
 <ol style="list-style-type: decimal">
 <li><p>Fit a logistic regression model for the mediator: <span class="math display">\[logitE[M|A,C]=\beta_0+\beta_1A+\beta_2'C\]</span></p></li>
 <li><p>Fit the specified regression model for the outcome: <span class="math display">\[g(E[Y|A,M,C])=\theta_0+\theta_1A+\theta_2M+\theta_3AM+\theta_4'C\]</span></p></li>
 <li>
-<p>Estimate <span class="math inline">\(rr^{CDE}\)</span>, <span class="math inline">\(rr^{PNDE}\)</span>, <span class="math inline">\(rr^{TNDE}\)</span>, <span class="math inline">\(rr^{PNIE}\)</span>, <span class="math inline">\(rr^{TNIE}\)</span> and <span class="math inline">\(err^{CDE}\)</span> by the following parameter functions:</p>
+<p>Estimate <span class="math inline">\(R^{CDE}\)</span>, <span class="math inline">\(R^{PNDE}\)</span>, <span class="math inline">\(R^{TNDE}\)</span>, <span class="math inline">\(R^{PNIE}\)</span>, <span class="math inline">\(R^{TNIE}\)</span> and <span class="math inline">\(ER^{CDE}\)</span> by the following parameter functions:</p>
 <ul>
-<li><span class="math inline">\(rr^{CDE}=exp((\theta_1+\theta_3m)(a-a^*))\)</span></li>
-<li><span class="math inline">\(rr^{PNDE}=\frac{exp(\theta_1a)\{1+exp(\theta_2+\theta_3a+\beta_0+\beta_1a^*+\beta_2'c)\}}{exp(\theta_1a^*)\{1+exp(\theta_2+\theta_3a^*+\beta_0+\beta_1a^*+\beta_2'c)\}}\)</span></li>
-<li><span class="math inline">\(rr^{TNDE}=\frac{exp(\theta_1a)\{1+exp(\theta_2+\theta_3a+\beta_0+\beta_1a+\beta_2'c)\}}{exp(\theta_1a^*)\{1+exp(\theta_2+\theta_3a^*+\beta_0+\beta_1a+\beta_2'c)\}}\)</span></li>
-<li><span class="math inline">\(rr^{PNIE}=\frac{\{1+exp(\beta_0+\beta_1a^*+\beta_2'c)\}\{1+exp(\theta_2+\theta_3a^*+\beta_0+\beta_1a+\beta_2'c)\}}{\{1+exp(\beta_0+\beta_1a+\beta_2'c)\}\{1+exp(\theta_2+\theta_3a^*+\beta_0+\beta_1a^*+\beta_2'c)\}}\)</span></li>
-<li><span class="math inline">\(rr^{TNIE}=\frac{\{1+exp(\beta_0+\beta_1a^*+\beta_2'c)\}\{1+exp(\theta_2+\theta_3a+\beta_0+\beta_1a+\beta_2'c)\}}{\{1+exp(\beta_0+\beta_1a+\beta_2'c)\}\{1+exp(\theta_2+\theta_3a+\beta_0+\beta_1a^*+\beta_2'c)\}}\)</span></li>
-<li><span class="math inline">\(err^{CDE}=\frac{exp(\theta_2m)(exp(\theta_1(a-a^*)+\theta_3am)-exp(\theta_3a^*m))(1+exp(\beta_0+\beta_1a^*+\beta_2'c))}{1+exp(\beta_0+\beta_1a^*+\beta_2'c+\theta_2+\theta_3a^*)}\)</span></li>
+<li><span class="math inline">\(R^{CDE}=exp((\theta_1+\theta_3m)(a-a^*))\)</span></li>
+<li><span class="math inline">\(R^{PNDE}=\frac{exp(\theta_1a)\{1+exp(\theta_2+\theta_3a+\beta_0+\beta_1a^*+\beta_2'c)\}}{exp(\theta_1a^*)\{1+exp(\theta_2+\theta_3a^*+\beta_0+\beta_1a^*+\beta_2'c)\}}\)</span></li>
+<li><span class="math inline">\(R^{TNDE}=\frac{exp(\theta_1a)\{1+exp(\theta_2+\theta_3a+\beta_0+\beta_1a+\beta_2'c)\}}{exp(\theta_1a^*)\{1+exp(\theta_2+\theta_3a^*+\beta_0+\beta_1a+\beta_2'c)\}}\)</span></li>
+<li><span class="math inline">\(R^{PNIE}=\frac{\{1+exp(\beta_0+\beta_1a^*+\beta_2'c)\}\{1+exp(\theta_2+\theta_3a^*+\beta_0+\beta_1a+\beta_2'c)\}}{\{1+exp(\beta_0+\beta_1a+\beta_2'c)\}\{1+exp(\theta_2+\theta_3a^*+\beta_0+\beta_1a^*+\beta_2'c)\}}\)</span></li>
+<li><span class="math inline">\(R^{TNIE}=\frac{\{1+exp(\beta_0+\beta_1a^*+\beta_2'c)\}\{1+exp(\theta_2+\theta_3a+\beta_0+\beta_1a+\beta_2'c)\}}{\{1+exp(\beta_0+\beta_1a+\beta_2'c)\}\{1+exp(\theta_2+\theta_3a+\beta_0+\beta_1a^*+\beta_2'c)\}}\)</span></li>
+<li><span class="math inline">\(ER^{CDE}=\frac{exp(\theta_2m)(exp(\theta_1(a-a^*)+\theta_3am)-exp(\theta_3a^*m))(1+exp(\beta_0+\beta_1a^*+\beta_2'c))}{1+exp(\beta_0+\beta_1a^*+\beta_2'c+\theta_2+\theta_3a^*)}\)</span></li>
 </ul>
 </li>
 <li><p>Calculate other effects using formulas in table 2.</p></li>
@@ -745,19 +746,19 @@ Proportion Eliminated
 <div id="nonlinear-yreg-logistic-mreg-and-categorical-exposure" class="section level4">
 <h4 class="hasAnchor">
 <a href="#nonlinear-yreg-logistic-mreg-and-categorical-exposure" class="anchor"></a>Nonlinear <code>yreg</code>, Logistic <code>mreg</code> and Categorical Exposure</h4>
-<p>If the exposure is categorical, <code>yreg!="linear"</code> and <code>mreg=list("logistic")</code>, the <code>cmest</code> function estimates the causal effects by the following steps:</p>
+<p>If the exposure is categorical, <code>yreg!="linear"</code> and <code>mreg=list("logistic")</code>, <code>cmest</code> estimates the causal effects by the following steps:</p>
 <ol style="list-style-type: decimal">
 <li><p>Fit a logistic regression model for the mediator: <span class="math display">\[logitE[M|A,C]=\beta_0+\sum_{h=1}^H\beta_{1h}I\{A=h\}+\beta_2'C\]</span></p></li>
 <li><p>Fit the specified regression model for the outcome: <span class="math display">\[g(E[Y|A,M,C])=\theta_0+\sum_{h=1}^H\theta_{1h}I\{A=h\}+\theta_2M+\sum_{h=1}^H\theta_{3h}I\{A=h\}M+\theta_4'C\]</span></p></li>
 <li>
-<p>Estimate <span class="math inline">\(rr^{CDE}\)</span>, <span class="math inline">\(rr^{PNDE}\)</span>, <span class="math inline">\(rr^{TNDE}\)</span>, <span class="math inline">\(rr^{PNIE}\)</span>, <span class="math inline">\(rr^{TNIE}\)</span> and <span class="math inline">\(err^{CDE}\)</span> by the following parameter functions:</p>
+<p>Estimate <span class="math inline">\(R^{CDE}\)</span>, <span class="math inline">\(R^{PNDE}\)</span>, <span class="math inline">\(R^{TNDE}\)</span>, <span class="math inline">\(R^{PNIE}\)</span>, <span class="math inline">\(R^{TNIE}\)</span> and <span class="math inline">\(ER^{CDE}\)</span> by the following parameter functions:</p>
 <ul>
-<li><span class="math inline">\(rr^{CDE}=exp(\sum_{h=1}^H\theta_{1h}I\{a=h\}-\sum_{h=1}^H\theta_{1h}I\{a^*=h\}+(\sum_{h=1}^H\theta_{3h}I\{a=h\}-\sum_{h=1}^H\theta_{3h}I\{a^*=h\})m)\)</span></li>
-<li><span class="math inline">\(rr^{PNDE}=\frac{exp(\sum_{h=1}^H\theta_{1h}I\{a=h\})\{1+exp(\theta_2+\sum_{h=1}^H\theta_{3h}I\{a=h\}+\beta_0+\sum_{h=1}^H\beta_{1h}I\{a^*=h\}+\beta_2'c)\}}{exp(\sum_{h=1}^H\theta_{1h}I\{a^*=h\})\{1+exp(\theta_2+\sum_{h=1}^H\theta_{3h}I\{a^*=h\}+\beta_0+\sum_{h=1}^H\beta_{1h}I\{a^*=h\}+\beta_2'c)\}}\)</span></li>
-<li><span class="math inline">\(rr^{TNDE}=\frac{exp(\sum_{h=1}^H\theta_{1h}I\{a=h\})\{1+exp(\theta_2+\sum_{h=1}^H\theta_{3h}I\{a=h\}+\beta_0+\sum_{h=1}^H\beta_{1h}I\{a=h\}+\beta_2'c)\}}{exp(\sum_{h=1}^H\theta_{1h}I\{a^*=h\})\{1+exp(\theta_2+\sum_{h=1}^H\theta_{3h}I\{a^*=h\}+\beta_0+\sum_{h=1}^H\beta_{1h}I\{a=h\}+\beta_2'c)\}}\)</span></li>
-<li><span class="math inline">\(rr^{PNIE}=\frac{\{1+exp(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a^*=h\}+\beta_2'c)\}\{1+exp(\theta_2+\sum_{h=1}^H\theta_{3h}I\{a^*=h\}+\beta_0+\sum_{h=1}^H\beta_{1h}I\{a=h\}+\beta_2'c)\}}{\{1+exp(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a=h\}+\beta_2'c)\}\{1+exp(\theta_2+\sum_{h=1}^H\theta_{3h}I\{a^*=h\}+\beta_0+\sum_{h=1}^H\beta_{1h}I\{a^*=h\}+\beta_2'c)\}}\)</span></li>
-<li><span class="math inline">\(rr^{TNIE}=\frac{\{1+exp(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a^*=h\}+\beta_2'c)\}\{1+exp(\theta_2+\sum_{h=1}^H\theta_{3h}I\{a=h\}+\beta_0+\sum_{h=1}^H\beta_{1h}I\{a=h\}+\beta_2'c)\}}{\{1+exp(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a=h\}+\beta_2'c)\}\{1+exp(\theta_2+\sum_{h=1}^H\theta_{3h}I\{a=h\}+\beta_0+\sum_{h=1}^H\beta_{1h}I\{a^*=h\}+\beta_2'c)\}}\)</span></li>
-<li><span class="math inline">\(err^{CDE}=\frac{exp(\theta_2m)(exp(\sum_{h=1}^H\theta_{1h}I\{a=h\}-\sum_{h=1}^H\theta_{1h}I\{a^*=h\}+\sum_{h=1}^H\theta_{3h}I\{a=h\}m)-exp(\sum_{h=1}^H\theta_{3h}I\{a^*=h\}m))(1+exp(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a^*=h\}+\beta_2'c))}{1+exp(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a^*=h\}+\beta_2'c+\theta_2+\sum_{h=1}^H\theta_{3h}I\{a^*=h\})}\)</span></li>
+<li><span class="math inline">\(R^{CDE}=exp(\sum_{h=1}^H\theta_{1h}I\{a=h\}-\sum_{h=1}^H\theta_{1h}I\{a^*=h\}+(\sum_{h=1}^H\theta_{3h}I\{a=h\}-\sum_{h=1}^H\theta_{3h}I\{a^*=h\})m)\)</span></li>
+<li><span class="math inline">\(R^{PNDE}=\frac{exp(\sum_{h=1}^H\theta_{1h}I\{a=h\})\{1+exp(\theta_2+\sum_{h=1}^H\theta_{3h}I\{a=h\}+\beta_0+\sum_{h=1}^H\beta_{1h}I\{a^*=h\}+\beta_2'c)\}}{exp(\sum_{h=1}^H\theta_{1h}I\{a^*=h\})\{1+exp(\theta_2+\sum_{h=1}^H\theta_{3h}I\{a^*=h\}+\beta_0+\sum_{h=1}^H\beta_{1h}I\{a^*=h\}+\beta_2'c)\}}\)</span></li>
+<li><span class="math inline">\(R^{TNDE}=\frac{exp(\sum_{h=1}^H\theta_{1h}I\{a=h\})\{1+exp(\theta_2+\sum_{h=1}^H\theta_{3h}I\{a=h\}+\beta_0+\sum_{h=1}^H\beta_{1h}I\{a=h\}+\beta_2'c)\}}{exp(\sum_{h=1}^H\theta_{1h}I\{a^*=h\})\{1+exp(\theta_2+\sum_{h=1}^H\theta_{3h}I\{a^*=h\}+\beta_0+\sum_{h=1}^H\beta_{1h}I\{a=h\}+\beta_2'c)\}}\)</span></li>
+<li><span class="math inline">\(R^{PNIE}=\frac{\{1+exp(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a^*=h\}+\beta_2'c)\}\{1+exp(\theta_2+\sum_{h=1}^H\theta_{3h}I\{a^*=h\}+\beta_0+\sum_{h=1}^H\beta_{1h}I\{a=h\}+\beta_2'c)\}}{\{1+exp(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a=h\}+\beta_2'c)\}\{1+exp(\theta_2+\sum_{h=1}^H\theta_{3h}I\{a^*=h\}+\beta_0+\sum_{h=1}^H\beta_{1h}I\{a^*=h\}+\beta_2'c)\}}\)</span></li>
+<li><span class="math inline">\(R^{TNIE}=\frac{\{1+exp(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a^*=h\}+\beta_2'c)\}\{1+exp(\theta_2+\sum_{h=1}^H\theta_{3h}I\{a=h\}+\beta_0+\sum_{h=1}^H\beta_{1h}I\{a=h\}+\beta_2'c)\}}{\{1+exp(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a=h\}+\beta_2'c)\}\{1+exp(\theta_2+\sum_{h=1}^H\theta_{3h}I\{a=h\}+\beta_0+\sum_{h=1}^H\beta_{1h}I\{a^*=h\}+\beta_2'c)\}}\)</span></li>
+<li><span class="math inline">\(ER^{CDE}=\frac{exp(\theta_2m)(exp(\sum_{h=1}^H\theta_{1h}I\{a=h\}-\sum_{h=1}^H\theta_{1h}I\{a^*=h\}+\sum_{h=1}^H\theta_{3h}I\{a=h\}m)-exp(\sum_{h=1}^H\theta_{3h}I\{a^*=h\}m))(1+exp(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a^*=h\}+\beta_2'c))}{1+exp(\beta_0+\sum_{h=1}^H\beta_{1h}I\{a^*=h\}+\beta_2'c+\theta_2+\sum_{h=1}^H\theta_{3h}I\{a^*=h\})}\)</span></li>
 </ul>
 </li>
 <li><p>Calculate other effects using formulas in table 2.</p></li>
@@ -766,19 +767,19 @@ Proportion Eliminated
 <div id="nonlinear-yreg-multinomial-mreg-and-noncategorical-exposure" class="section level4">
 <h4 class="hasAnchor">
 <a href="#nonlinear-yreg-multinomial-mreg-and-noncategorical-exposure" class="anchor"></a>Nonlinear <code>yreg</code>, Multinomial <code>mreg</code> and Noncategorical Exposure</h4>
-<p>If the exposure is not categorical, <code>yreg!="linear"</code> and <code>mreg=list("multinomial")</code>, the <code>cmest</code> function estimates the causal effects by the following steps:</p>
+<p>If the exposure is not categorical, <code>yreg!="linear"</code> and <code>mreg=list("multinomial")</code>, <code>cmest</code> estimates the causal effects by the following steps:</p>
 <ol style="list-style-type: decimal">
 <li><p>Fit a multinomial regression model for the mediator: <span class="math display">\[log\frac{E[M=j|A,C]}{E[M=0|A,C]}=\beta_{0j}+\beta_{1j}A+\beta_{2j}'C, j=1,2,...,J\]</span></p></li>
 <li><p>Fit the specified regression model for the outcome: <span class="math display">\[g(E[Y|A,M,C])=\theta_0+\theta_1A+\sum_{j=1}^J\theta_{2j}I\{M=j\}+A\sum_{j=1}^J\theta_{3j}I\{M=j\}+\theta_4'C\]</span></p></li>
 <li>
-<p>Estimate <span class="math inline">\(rr^{CDE}\)</span>, <span class="math inline">\(rr^{PNDE}\)</span>, <span class="math inline">\(rr^{TNDE}\)</span>, <span class="math inline">\(rr^{PNIE}\)</span>, <span class="math inline">\(rr^{TNIE}\)</span> and <span class="math inline">\(err^{CDE}\)</span> by the following parameter functions:</p>
+<p>Estimate <span class="math inline">\(R^{CDE}\)</span>, <span class="math inline">\(R^{PNDE}\)</span>, <span class="math inline">\(R^{TNDE}\)</span>, <span class="math inline">\(R^{PNIE}\)</span>, <span class="math inline">\(R^{TNIE}\)</span> and <span class="math inline">\(ER^{CDE}\)</span> by the following parameter functions:</p>
 <ul>
-<li><span class="math inline">\(rr^{CDE}=exp((\theta_1+\sum_{j=1}^J\theta_{3j}I\{m=j\})(a-a^*))\)</span></li>
-<li><span class="math inline">\(rr^{PNDE}=\frac{exp(\theta_1a)\{1+\sum_{j=1}^Jexp(\theta_{2j}+\theta_{3j}a+\beta_{0j}+\beta_{1j}a^*+\beta_{2j}'c)\}}{exp(\theta_1a^*)\{1+\sum_{j=1}^Jexp(\theta_{2j}+\theta_{3j}a^*+\beta_{0j}+\beta_{1j}a^*+\beta_{2j}'c)\}}\)</span></li>
-<li><span class="math inline">\(rr^{TNDE}=\frac{exp(\theta_1a)\{1+\sum_{j=1}^Jexp(\theta_{2j}+\theta_{3j}a+\beta_{0j}+\beta_{1j}a+\beta_{2j}'c)\}}{exp(\theta_1a^*)\{1+\sum_{j=1}^Jexp(\theta_{2j}+\theta_{3j}a^*+\beta_{0j}+\beta_{1j}a+\beta_{2j}'c)\}}\)</span></li>
-<li><span class="math inline">\(rr^{PNIE}=\frac{\{1+\sum_{j=1}^Jexp(\beta_{0j}+\beta_{1j}a^*+\beta_{2j}'c)\}\{1+\sum_{j=1}^Jexp(\theta_{2j}+\theta_{3j}a^*+\beta_{0j}+\beta_{1j}a+\beta_{2j}'c)\}}{\{1+\sum_{j=1}^Jexp(\beta_{0j}+\beta_{1j}a+\beta_{2j}'c)\}\{1+\sum_{j=1}^Jexp(\theta_{2j}+\theta_{3j}a^*+\beta_{0j}+\beta_{1j}a^*+\beta_{2j}'c)\}}\)</span></li>
-<li><span class="math inline">\(rr^{TNIE}=\frac{\{1+\sum_{j=1}^Jexp(\beta_{0j}+\beta_{1j}a^*+\beta_{2j}'c)\}\{1+\sum_{j=1}^Jexp(\theta_{2j}+\theta_{3j}a+\beta_{0j}+\beta_{1j}a+\beta_{2j}'c)\}}{\{1+\sum_{j=1}^Jexp(\beta_{0j}+\beta_{1j}a+\beta_{2j}'c)\}\{1+\sum_{j=1}^Jexp(\theta_{2j}+\theta_{3j}a+\beta_{0j}+\beta_{1j}a^*+\beta_{2j}'c)\}}\)</span></li>
-<li><span class="math inline">\(err^{CDE}=\frac{exp(\sum_{j=1}^J\theta_{2j}I\{m=j\})(1+\sum_{j=1}^Jexp(\beta_{0j}+\beta_{1j}a^*+\beta_{2j}'c))(exp(\theta_1(a-a^*)+a\sum_{j=1}^J\theta_{3j}I\{m=j\})-exp(a^*\sum_{j=1}^J\theta_{3j}I\{m=j\}))}{1+\sum_{j=1}^Jexp(\theta_{2j}+\theta_{3j}a^*+\beta_{0j}+\beta_{1j}a^*+\beta_{2j}'c)}\)</span></li>
+<li><span class="math inline">\(R^{CDE}=exp((\theta_1+\sum_{j=1}^J\theta_{3j}I\{m=j\})(a-a^*))\)</span></li>
+<li><span class="math inline">\(R^{PNDE}=\frac{exp(\theta_1a)\{1+\sum_{j=1}^Jexp(\theta_{2j}+\theta_{3j}a+\beta_{0j}+\beta_{1j}a^*+\beta_{2j}'c)\}}{exp(\theta_1a^*)\{1+\sum_{j=1}^Jexp(\theta_{2j}+\theta_{3j}a^*+\beta_{0j}+\beta_{1j}a^*+\beta_{2j}'c)\}}\)</span></li>
+<li><span class="math inline">\(R^{TNDE}=\frac{exp(\theta_1a)\{1+\sum_{j=1}^Jexp(\theta_{2j}+\theta_{3j}a+\beta_{0j}+\beta_{1j}a+\beta_{2j}'c)\}}{exp(\theta_1a^*)\{1+\sum_{j=1}^Jexp(\theta_{2j}+\theta_{3j}a^*+\beta_{0j}+\beta_{1j}a+\beta_{2j}'c)\}}\)</span></li>
+<li><span class="math inline">\(R^{PNIE}=\frac{\{1+\sum_{j=1}^Jexp(\beta_{0j}+\beta_{1j}a^*+\beta_{2j}'c)\}\{1+\sum_{j=1}^Jexp(\theta_{2j}+\theta_{3j}a^*+\beta_{0j}+\beta_{1j}a+\beta_{2j}'c)\}}{\{1+\sum_{j=1}^Jexp(\beta_{0j}+\beta_{1j}a+\beta_{2j}'c)\}\{1+\sum_{j=1}^Jexp(\theta_{2j}+\theta_{3j}a^*+\beta_{0j}+\beta_{1j}a^*+\beta_{2j}'c)\}}\)</span></li>
+<li><span class="math inline">\(R^{TNIE}=\frac{\{1+\sum_{j=1}^Jexp(\beta_{0j}+\beta_{1j}a^*+\beta_{2j}'c)\}\{1+\sum_{j=1}^Jexp(\theta_{2j}+\theta_{3j}a+\beta_{0j}+\beta_{1j}a+\beta_{2j}'c)\}}{\{1+\sum_{j=1}^Jexp(\beta_{0j}+\beta_{1j}a+\beta_{2j}'c)\}\{1+\sum_{j=1}^Jexp(\theta_{2j}+\theta_{3j}a+\beta_{0j}+\beta_{1j}a^*+\beta_{2j}'c)\}}\)</span></li>
+<li><span class="math inline">\(ER^{CDE}=\frac{exp(\sum_{j=1}^J\theta_{2j}I\{m=j\})(1+\sum_{j=1}^Jexp(\beta_{0j}+\beta_{1j}a^*+\beta_{2j}'c))(exp(\theta_1(a-a^*)+a\sum_{j=1}^J\theta_{3j}I\{m=j\})-exp(a^*\sum_{j=1}^J\theta_{3j}I\{m=j\}))}{1+\sum_{j=1}^Jexp(\theta_{2j}+\theta_{3j}a^*+\beta_{0j}+\beta_{1j}a^*+\beta_{2j}'c)}\)</span></li>
 </ul>
 </li>
 <li><p>Calculate other effects using formulas in table 2.</p></li>
@@ -787,19 +788,19 @@ Proportion Eliminated
 <div id="nonlinear-yreg-multinomial-mreg-and-categorical-exposure" class="section level4">
 <h4 class="hasAnchor">
 <a href="#nonlinear-yreg-multinomial-mreg-and-categorical-exposure" class="anchor"></a>Nonlinear <code>yreg</code>, Multinomial <code>mreg</code> and Categorical Exposure</h4>
-<p>If the exposure is categorical, <code>yreg!="linear"</code> and <code>mreg=list("multinomial")</code>, the <code>cmest</code> function estimates the causal effects by the following steps:</p>
+<p>If the exposure is categorical, <code>yreg!="linear"</code> and <code>mreg=list("multinomial")</code>, <code>cmest</code> estimates the causal effects by the following steps:</p>
 <ol style="list-style-type: decimal">
 <li><p>Fit a multinomial regression model for the mediator: <span class="math display">\[log\frac{E[M=j|A,C]}{E[M=0|A,C]}=\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{A=h\}+\beta_{2j}'C, j=1,2,...,J\]</span></p></li>
 <li><p>Fit the specified regression model for the outcome: <span class="math display">\[g(E[Y|A,M,C])=\theta_0+\sum_{h=1}^H\theta_{1h}I\{A=h\}+\sum_{j=1}^J\theta_{2j}I\{M=j\}+\sum_{j=1}^J\sum_{h=1}^H\theta_{3jh}I\{M=j\}I\{A=h\}+\theta_4'C\]</span></p></li>
 <li>
-<p>Estimate <span class="math inline">\(rr^{CDE}\)</span>, <span class="math inline">\(rr^{PNDE}\)</span>, <span class="math inline">\(rr^{TNDE}\)</span>, <span class="math inline">\(rr^{PNIE}\)</span>, <span class="math inline">\(rr^{TNIE}\)</span> and <span class="math inline">\(err^{CDE}\)</span> by the following parameter functions:</p>
+<p>Estimate <span class="math inline">\(R^{CDE}\)</span>, <span class="math inline">\(R^{PNDE}\)</span>, <span class="math inline">\(R^{TNDE}\)</span>, <span class="math inline">\(R^{PNIE}\)</span>, <span class="math inline">\(R^{TNIE}\)</span> and <span class="math inline">\(ER^{CDE}\)</span> by the following parameter functions:</p>
 <ul>
-<li><span class="math inline">\(rr^{CDE}=exp(\sum_{h=1}^H\theta_{1h}I\{a=h\}-\sum_{h=1}^H\theta_{1h}I\{a^*=h\}+\sum_{j=1}^J\sum_{h=1}^H\theta_{3jh}I\{m=l\}I\{a=h\}-\sum_{j=1}^J\sum_{h=1}^H\theta_{3jh}I\{m=l\}I\{a^*=h\})\)</span></li>
-<li><span class="math inline">\(rr^{PNDE}=\frac{exp(\sum_{h=1}^H\theta_{1h}I\{a=h\})\{1+\sum_{j=1}^Jexp(\theta_{2j}+\sum_{h=1}^H\theta_{3jh}I\{a=h\}+\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a^*=h\}+\beta_{2j}'c)\}}{exp(\sum_{h=1}^H\theta_{1h}I\{a^*=h\})\{1+\sum_{j=1}^Jexp(\theta_{2j}+\sum_{h=1}^H\theta_{3jh}I\{a^*=h\}+\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a^*=h\}+\beta_{2j}'c)\}}\)</span></li>
-<li><span class="math inline">\(rr^{TNDE}=\frac{exp(\sum_{h=1}^H\theta_{1h}I\{a=h\})\{1+\sum_{j=1}^Jexp(\theta_{2j}+\sum_{h=1}^H\theta_{3jh}I\{a=h\}+\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a=h\}+\beta_{2j}'c)\}}{exp(\sum_{h=1}^H\theta_{1h}I\{a^*=h\})\{1+\sum_{j=1}^Jexp(\theta_{2j}+\sum_{h=1}^H\theta_{3jh}I\{a^*=h\}+\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a=h\}+\beta_{2j}'c)\}}\)</span></li>
-<li><span class="math inline">\(rr^{PNIE}=\frac{\{1+\sum_{j=1}^Jexp(\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a^*=h\}+\beta_{2j}'c)\}\{1+\sum_{j=1}^Jexp(\theta_{2j}+\sum_{h=1}^H\theta_{3jh}I\{a^*=h\}+\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a=h\}+\beta_{2j}'c)\}}{\{1+\sum_{j=1}^Jexp(\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a=h\}+\beta_{2j}'c)\}\{1+\sum_{j=1}^Jexp(\theta_{2j}+\sum_{h=1}^H\theta_{3jh}I\{a^*=h\}+\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a^*=h\}+\beta_{2j}'c)\}}\)</span></li>
-<li><span class="math inline">\(rr^{TNIE}=\frac{\{1+\sum_{j=1}^Jexp(\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a^*=h\}+\beta_{2j}'c)\}\{1+\sum_{j=1}^Jexp(\theta_{2j}+\sum_{h=1}^H\theta_{3jh}I\{a=h\}+\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a=h\}+\beta_{2j}'c)\}}{\{1+\sum_{j=1}^Jexp(\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a=h\}+\beta_{2j}'c)\}\{1+\sum_{j=1}^Jexp(\theta_{2j}+\sum_{h=1}^H\theta_{3jh}I\{a=h\}+\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a^*=h\}+\beta_{2j}'c)\}}\)</span></li>
-<li><span class="math inline">\(err^{CDE}=\frac{exp(\sum_{j=1}^J\theta_{2j}I\{m=j\})(1+\sum_{j=1}^Jexp(\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a^*=h\}+\beta_{2j}'c))(exp((\sum_{h=1}^H\theta_{1h}I\{a=h\}-\sum_{h=1}^H\theta_{1h}I\{a^*=h\})+\sum_{j=1}^J\sum_{h=1}^H\theta_{3jh}I\{a=h\}I\{m=j\})-exp(\sum_{j=1}^J\sum_{h=1}^H\theta_{3jh}I\{a^*=h\}I\{m=j\}))}{1+\sum_{j=1}^Jexp(\theta_{2j}+\sum_{h=1}^H\theta_{3jh}I\{a^*=h\}+\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a^*=h\}+\beta_{2j}'c)}\)</span></li>
+<li><span class="math inline">\(R^{CDE}=exp(\sum_{h=1}^H\theta_{1h}I\{a=h\}-\sum_{h=1}^H\theta_{1h}I\{a^*=h\}+\sum_{j=1}^J\sum_{h=1}^H\theta_{3jh}I\{m=l\}I\{a=h\}-\sum_{j=1}^J\sum_{h=1}^H\theta_{3jh}I\{m=l\}I\{a^*=h\})\)</span></li>
+<li><span class="math inline">\(R^{PNDE}=\frac{exp(\sum_{h=1}^H\theta_{1h}I\{a=h\})\{1+\sum_{j=1}^Jexp(\theta_{2j}+\sum_{h=1}^H\theta_{3jh}I\{a=h\}+\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a^*=h\}+\beta_{2j}'c)\}}{exp(\sum_{h=1}^H\theta_{1h}I\{a^*=h\})\{1+\sum_{j=1}^Jexp(\theta_{2j}+\sum_{h=1}^H\theta_{3jh}I\{a^*=h\}+\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a^*=h\}+\beta_{2j}'c)\}}\)</span></li>
+<li><span class="math inline">\(R^{TNDE}=\frac{exp(\sum_{h=1}^H\theta_{1h}I\{a=h\})\{1+\sum_{j=1}^Jexp(\theta_{2j}+\sum_{h=1}^H\theta_{3jh}I\{a=h\}+\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a=h\}+\beta_{2j}'c)\}}{exp(\sum_{h=1}^H\theta_{1h}I\{a^*=h\})\{1+\sum_{j=1}^Jexp(\theta_{2j}+\sum_{h=1}^H\theta_{3jh}I\{a^*=h\}+\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a=h\}+\beta_{2j}'c)\}}\)</span></li>
+<li><span class="math inline">\(R^{PNIE}=\frac{\{1+\sum_{j=1}^Jexp(\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a^*=h\}+\beta_{2j}'c)\}\{1+\sum_{j=1}^Jexp(\theta_{2j}+\sum_{h=1}^H\theta_{3jh}I\{a^*=h\}+\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a=h\}+\beta_{2j}'c)\}}{\{1+\sum_{j=1}^Jexp(\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a=h\}+\beta_{2j}'c)\}\{1+\sum_{j=1}^Jexp(\theta_{2j}+\sum_{h=1}^H\theta_{3jh}I\{a^*=h\}+\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a^*=h\}+\beta_{2j}'c)\}}\)</span></li>
+<li><span class="math inline">\(R^{TNIE}=\frac{\{1+\sum_{j=1}^Jexp(\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a^*=h\}+\beta_{2j}'c)\}\{1+\sum_{j=1}^Jexp(\theta_{2j}+\sum_{h=1}^H\theta_{3jh}I\{a=h\}+\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a=h\}+\beta_{2j}'c)\}}{\{1+\sum_{j=1}^Jexp(\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a=h\}+\beta_{2j}'c)\}\{1+\sum_{j=1}^Jexp(\theta_{2j}+\sum_{h=1}^H\theta_{3jh}I\{a=h\}+\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a^*=h\}+\beta_{2j}'c)\}}\)</span></li>
+<li><span class="math inline">\(ER^{CDE}=\frac{exp(\sum_{j=1}^J\theta_{2j}I\{m=j\})(1+\sum_{j=1}^Jexp(\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a^*=h\}+\beta_{2j}'c))(exp((\sum_{h=1}^H\theta_{1h}I\{a=h\}-\sum_{h=1}^H\theta_{1h}I\{a^*=h\})+\sum_{j=1}^J\sum_{h=1}^H\theta_{3jh}I\{a=h\}I\{m=j\})-exp(\sum_{j=1}^J\sum_{h=1}^H\theta_{3jh}I\{a^*=h\}I\{m=j\}))}{1+\sum_{j=1}^Jexp(\theta_{2j}+\sum_{h=1}^H\theta_{3jh}I\{a^*=h\}+\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{a^*=h\}+\beta_{2j}'c)}\)</span></li>
 </ul>
 </li>
 <li><p>Calculate other effects using formulas in table 2.</p></li>
@@ -809,7 +810,7 @@ Proportion Eliminated
 <div id="direct-counterfactural-imputation-estimation" class="section level3">
 <h3 class="hasAnchor">
 <a href="#direct-counterfactural-imputation-estimation" class="anchor"></a>Direct Counterfactural Imputation Estimation</h3>
-<p>The <code>cmest</code> function conducts direct counterfactural imputation estimation by the following steps:</p>
+<p><code>cmest</code> conducts direct counterfactural imputation estimation by the following steps:</p>
 <ol style="list-style-type: decimal">
 <li><p>Fit a regression model for <span class="math inline">\(E(Y|A,M,C)\)</span>. This regression model is specified by the <code>yreg</code> argument.</p></li>
 <li><p>For <span class="math inline">\(p=1,...,k\)</span>, fit a regression model for the distribution of <span class="math inline">\(M_p\)</span> given <span class="math inline">\(A\)</span>, <span class="math inline">\(M_1\)</span>, …, <span class="math inline">\(M_{p-1}\)</span> and <span class="math inline">\(C\)</span>. These regression models are specified by the <code>mreg</code> argument.</p></li>
@@ -820,7 +821,7 @@ Proportion Eliminated
 <li>Simulate <span class="math inline">\(M_{a^*,p,i}\)</span> by randomly drawing a value from the distribution of <span class="math inline">\(M_{p}\)</span> given <span class="math inline">\(A=a^*,M_1=M_{a^*,1,i},...,M_{p-1}=M_{a^*,p-1,i},C=C_i\)</span>. Denote <span class="math inline">\(M_{a^*,i}=(M_{a^*,1,i},...,M_{a^*,k,i})^T\)</span>.</li>
 </ul>
 </li>
-<li><p>For <span class="math inline">\(i=1,...,n\)</span>, obtain <span class="math inline">\(E[Y_i|A=a^*,M=m,C=C_i]\)</span>,<span class="math inline">\(E[Y_i|A=a,M=m,C=C_i]\)</span>,<span class="math inline">\(E[Y_i|A=a^*,M=M_{a^*,i},C=C_i]\)</span>,<span class="math inline">\(E[Y_i|A=a^*,M=M_{a,i},C=C_i]\)</span>,<span class="math inline">\(E[Y_i|A=a,M=M_{a^*,i},C=C_i]\)</span> and <span class="math inline">\(E[Y_i|A=a,M=M_{a,i},C=C_i]\)</span> from the regression model in step 1.</p></li>
+<li><p>For <span class="math inline">\(i=1,...,n\)</span>, obtain <span class="math inline">\(E[Y_i|A=a^*,M=m,C=C_i]\)</span>, <span class="math inline">\(E[Y_i|A=a,M=m,C=C_i]\)</span>, <span class="math inline">\(E[Y_i|A=a^*,M=M_{a^*,i},C=C_i]\)</span>, <span class="math inline">\(E[Y_i|A=a^*,M=M_{a,i},C=C_i]\)</span>, <span class="math inline">\(E[Y_i|A=a,M=M_{a^*,i},C=C_i]\)</span> and <span class="math inline">\(E[Y_i|A=a,M=M_{a,i},C=C_i]\)</span> from the regression model in step 1.</p></li>
 <li>
 <p>Impute the counterfacturals <span class="math inline">\(E[Y_{a^*m}]\)</span>, <span class="math inline">\(E[Y_{am}]\)</span>, <span class="math inline">\(E[Y_{a^*Ma^*}]\)</span>, <span class="math inline">\(E[Y_{aMa}]\)</span>, <span class="math inline">\(E[Y_{aMa^*}]\)</span> and <span class="math inline">\(E[Y_{a^*Ma}]\)</span>.</p>
 <ul>
@@ -839,11 +840,11 @@ Proportion Eliminated
 <div id="the-weighting-based-approach" class="section level2">
 <h2 class="hasAnchor">
 <a href="#the-weighting-based-approach" class="anchor"></a>The Weighting-based Approach</h2>
-<p>With the weighting-based approach, the <code>cmest</code> function estimates causal effect through direct counterfactural imputation estimation by the following steps:</p>
+<p>With the weighting-based approach, <code>cmest</code> estimates causal effects through direct counterfactural imputation estimation by the following steps:</p>
 <ol style="list-style-type: decimal">
 <li><p>Fit a regression model for the distribution of <span class="math inline">\(E(Y|A,M,C)\)</span>. This regression model is specified by the <code>yreg</code> argument.</p></li>
 <li><p>If <span class="math inline">\(C\)</span> is not empty, fit a regression model for <span class="math inline">\(P(A|C)\)</span> and obtain <span class="math inline">\(P(A=A_i|C=C_i)\)</span> for <span class="math inline">\(i=1,...,n\)</span>. This regression model is specified by the <code>ereg</code> argument.</p></li>
-<li><p>For <span class="math inline">\(i=1,...,n\)</span>, obtain <span class="math inline">\(E[Y_i|A=a^*,M=m,C=C_i]\)</span>,<span class="math inline">\(E[Y_i|A=a,M=m,C=C_i]\)</span>,<span class="math inline">\(E[Y_i|A=a^*,M=M_{a^*,i},C=C_i]\)</span>,<span class="math inline">\(E[Y_i|A=a^*,M=M_{a,i},C=C_i]\)</span>,<span class="math inline">\(E[Y_i|A=a,M=M_{a^*,i},C=C_i]\)</span> and <span class="math inline">\(E[Y_i|A=a,M=M_{a,i},C=C_i]\)</span> from the regression model in step 1.</p></li>
+<li><p>For <span class="math inline">\(i=1,...,n\)</span>, obtain <span class="math inline">\(E[Y_i|A=a^*,M=m,C=C_i]\)</span>, <span class="math inline">\(E[Y_i|A=a,M=m,C=C_i]\)</span>, <span class="math inline">\(E[Y_i|A=a^*,M=M_i,C=C_i]\)</span> and <span class="math inline">\(E[Y_i|A=a,M=M_i,C=C_i]\)</span> from the regression model in step 1.</p></li>
 <li>
 <p>Impute the counterfacturals <span class="math inline">\(E[Y_{a^*m}]\)</span>, <span class="math inline">\(E[Y_{am}]\)</span>, <span class="math inline">\(E[Y_{a^*Ma^*}]\)</span>, <span class="math inline">\(E[Y_{aMa}]\)</span>, <span class="math inline">\(E[Y_{aMa^*}]\)</span> and <span class="math inline">\(E[Y_{a^*Ma}]\)</span>.</p>
 <ul>
@@ -861,7 +862,7 @@ Proportion Eliminated
 <div id="the-inverse-odds-ratio-weighting-approach" class="section level2">
 <h2 class="hasAnchor">
 <a href="#the-inverse-odds-ratio-weighting-approach" class="anchor"></a>The Inverse Odds Ratio Weighting Approach</h2>
-<p>With the inverse odds ratio weighting approach, the <code>cmest</code> function estimates causal effect through direct counterfactural imputation estimation by the following steps:</p>
+<p>With the inverse odds ratio weighting approach, <code>cmest</code> estimates causal effects through direct counterfactural imputation estimation by the following steps:</p>
 <ol style="list-style-type: decimal">
 <li><p>Fit a regression model for <span class="math inline">\(P(A|M,C)\)</span> and obtain <span class="math inline">\(\frac{P(A=0|M=M_i,C=C_i)}{P(A=A_i|M=M_i,C=C_i)}\)</span> for <span class="math inline">\(i=1,...,n\)</span>. This regression model is specified by the <code>ereg</code> argument.</p></li>
 <li><p>Fit a regression model for <span class="math inline">\(E(Y|A,C)\)</span>. This regression model is specified by the <code>yreg</code> argument.</p></li>
@@ -876,20 +877,20 @@ Proportion Eliminated
 </ul>
 </li>
 <li><ul>
-<li>For continuous outcome, calculate <span class="math inline">\(TE\)</span> by <span class="math inline">\(E_{tot}[Y_{a}]-E_{tot}[Y_{a^*}]\)</span>, calculate <span class="math inline">\(PNDE\)</span> by <span class="math inline">\(E_{dir}[Y_{a}]-E_{dir}[Y_{a^*}]\)</span> and calculate <span class="math inline">\(TNIE\)</span> by <span class="math inline">\(TE-PNDE\)</span>.</li>
-<li>For categorical, count or survival outcome, calculate <span class="math inline">\(TE\)</span> by <span class="math inline">\(E_{tot}[Y_{a}]/E_{tot}[Y_{a^*}]\)</span>, calculate <span class="math inline">\(PNDE\)</span> by <span class="math inline">\(E_{dir}[Y_{a}]/E_{dir}[Y_{a^*}]\)</span> and calculate <span class="math inline">\(TNIE\)</span> by <span class="math inline">\(TE/PNDE\)</span>.</li>
+<li>For a continuous outcome, calculate <span class="math inline">\(TE\)</span> by <span class="math inline">\(E_{tot}[Y_{a}]-E_{tot}[Y_{a^*}]\)</span>, calculate <span class="math inline">\(PNDE\)</span> by <span class="math inline">\(E_{dir}[Y_{a}]-E_{dir}[Y_{a^*}]\)</span> and calculate <span class="math inline">\(TNIE\)</span> by <span class="math inline">\(TE-PNDE\)</span>.</li>
+<li>For a categorical, count or survival outcome, calculate <span class="math inline">\(TE\)</span> by <span class="math inline">\(E_{tot}[Y_{a}]/E_{tot}[Y_{a^*}]\)</span>, calculate <span class="math inline">\(PNDE\)</span> by <span class="math inline">\(E_{dir}[Y_{a}]/E_{dir}[Y_{a^*}]\)</span> and calculate <span class="math inline">\(TNIE\)</span> by <span class="math inline">\(TE/PNDE\)</span>.</li>
 </ul></li>
 </ol>
 </div>
 <div id="the-natural-effect-model" class="section level2">
 <h2 class="hasAnchor">
 <a href="#the-natural-effect-model" class="anchor"></a>The Natural Effect Model</h2>
-<p>With the natural effect model, the <code>cmest</code> function estimates causal effect through direct counterfactural imputation estimation by the following steps:</p>
+<p>With the natural effect model, <code>cmest</code> estimates causal effects through direct counterfactural imputation estimation by the following steps:</p>
 <ol style="list-style-type: decimal">
 <li><p>Fit a regression model for <span class="math inline">\(E(Y|A,M,C)\)</span>. This regression model is specified by the <code>yreg</code> argument.</p></li>
 <li><p>Expand the dataset using the regression model in step 1 and the <code>neImpute</code> function in the <code>medflex</code> package.</p></li>
 <li><p>Fit the regression model in step 1 by the expanded dataset in step 2 with the exposure in the regression formula replaced by <span class="math inline">\(A0\)</span> and mediators in the regression formula replaced by <span class="math inline">\(A1\)</span>, i.e., <span class="math inline">\(Y\sim A0+A1+A0*A1+C\)</span> if the regression formula in step 1 is <span class="math inline">\(Y\sim A+M_1+M_2+A*M_1+C\)</span>.</p></li>
-<li><p>For <span class="math inline">\(i=1,...,n\)</span>, obtain <span class="math inline">\(E[Y_i|A=a^*,M=m,C=C_i]\)</span> and <span class="math inline">\(E[Y_i|A=a,M=m,C=C_i]\)</span> from the regression model in step 1; obtain <span class="math inline">\(E[Y_i|A0=a^*,A1=a^*,C=C_i]\)</span>,<span class="math inline">\(E[Y_i|A0=a^*,A1=a,C=C_i]\)</span>,<span class="math inline">\(E[Y_i|A0=a,A1=a^*,C=C_i]\)</span> and <span class="math inline">\(E[Y_i|A0=a,A1=a,C=C_i]\)</span> from the regression model in step 3.</p></li>
+<li><p>For <span class="math inline">\(i=1,...,n\)</span>, obtain <span class="math inline">\(E[Y_i|A=a^*,M=m,C=C_i]\)</span> and <span class="math inline">\(E[Y_i|A=a,M=m,C=C_i]\)</span> from the regression model in step 1; obtain <span class="math inline">\(E[Y_i|A0=a^*,A1=a^*,C=C_i]\)</span>, <span class="math inline">\(E[Y_i|A0=a^*,A1=a,C=C_i]\)</span>, <span class="math inline">\(E[Y_i|A0=a,A1=a^*,C=C_i]\)</span> and <span class="math inline">\(E[Y_i|A0=a,A1=a,C=C_i]\)</span> from the regression model in step 3.</p></li>
 <li>
 <p>Impute the counterfacturals <span class="math inline">\(E[Y_{a^*m}]\)</span>, <span class="math inline">\(E[Y_{am}]\)</span>, <span class="math inline">\(E[Y_{a^*Ma^*}]\)</span>, <span class="math inline">\(E[Y_{aMa}]\)</span>, <span class="math inline">\(E[Y_{aMa^*}]\)</span> and <span class="math inline">\(E[Y_{a^*Ma}]\)</span>.</p>
 <ul>
@@ -905,9 +906,9 @@ Proportion Eliminated
 </ol>
 </div>
 </div>
-<div id="post-exposure-confounding" class="section level1">
+<div id="confounders-affected-by-the-exposure" class="section level1">
 <h1 class="hasAnchor">
-<a href="#post-exposure-confounding" class="anchor"></a>Post-exposure Confounding</h1>
+<a href="#confounders-affected-by-the-exposure" class="anchor"></a>Confounders Affected by the exposure</h1>
 <div id="dag-1" class="section level2">
 <h2 class="hasAnchor">
 <a href="#dag-1" class="anchor"></a>DAG</h2>
@@ -916,7 +917,7 @@ Proportion Eliminated
 <div id="estimands-1" class="section level2">
 <h2 class="hasAnchor">
 <a href="#estimands-1" class="anchor"></a>Estimands</h2>
-<p>For a continuous outcome, causal effects are estimated on the difference scale (summarized in table 3). For a categorical, count, or survival outcome, causal effects are estimated on the (risk or rate) ratio scale (summarized in table 4). Because of the existence of <span class="math inline">\(L\)</span>, some causal effects in table 1 and table 2 are not identifiable. However, their randomized analogues are identifiable. See <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4214081/">VanderWeele et al. (2014)</a> for details about randomized analogues of causal effects.</p>
+<p>For a continuous outcome, causal effects are estimated on the difference scale (summarized in table 3). For a categorical, count, or survival outcome, causal effects are estimated on the ratio scale (summarized in table 4). Because of the existence of <span class="math inline">\(L\)</span>, some causal effects in table 1 and table 2 are not identifiable. However, their randomized analogues are still identifiable. See <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4214081/">VanderWeele et al. (2014)</a> for details about randomized analogues of causal effects.</p>
 <table class="table table table-bordered table-striped table-hover table-responsive table-condensed">
 <caption>
 Table 3: Causal Effects on the Difference Scale
@@ -1133,7 +1134,7 @@ Formula
 Controlled Direct Effect
 </td>
 <td style="text-align:left;width: 8em; ">
-<span class="math inline">\(rr^{CDE}\)</span>
+<span class="math inline">\(R^{CDE}\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
 <span class="math inline">\(E[Y_{am}]/E[Y_{a^*m}]\)</span>
@@ -1144,7 +1145,7 @@ Controlled Direct Effect
 Randomized Analogue of <span class="math inline">\(PNDE\)</span>
 </td>
 <td style="text-align:left;width: 8em; ">
-<span class="math inline">\(rr^{rPNDE}\)</span>
+<span class="math inline">\(rR^{PNDE}\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
 <span class="math inline">\(E[Y_{aG_{a^*}}]/E[Y_{a^*G_{a^*}}]\)</span>
@@ -1155,7 +1156,7 @@ Randomized Analogue of <span class="math inline">\(PNDE\)</span>
 Randomized Analogue of <span class="math inline">\(TNDE\)</span>
 </td>
 <td style="text-align:left;width: 8em; ">
-<span class="math inline">\(rr^{rTNDE}\)</span>
+<span class="math inline">\(rR^{TNDE}\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
 <span class="math inline">\(E[Y_{aG_{a}}]/E[Y_{a^*G_{a}}]\)</span>
@@ -1166,7 +1167,7 @@ Randomized Analogue of <span class="math inline">\(TNDE\)</span>
 Randomized Analogue of <span class="math inline">\(PNIE\)</span>
 </td>
 <td style="text-align:left;width: 8em; ">
-<span class="math inline">\(rr^{rPNIE}\)</span>
+<span class="math inline">\(rR^{PNIE}\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
 <span class="math inline">\(E[Y_{a^*G_{a}}]/E[Y_{a^*G_{a^*}}]\)</span>
@@ -1177,7 +1178,7 @@ Randomized Analogue of <span class="math inline">\(PNIE\)</span>
 Randomized Analogue of <span class="math inline">\(TNIE\)</span>
 </td>
 <td style="text-align:left;width: 8em; ">
-<span class="math inline">\(rr^{rTNIE}\)</span>
+<span class="math inline">\(rR^{TNIE}\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
 <span class="math inline">\(E[Y_{aG_{a}}]/E[Y_{aG_{a^*}}]\)</span>
@@ -1188,18 +1189,18 @@ Randomized Analogue of <span class="math inline">\(TNIE\)</span>
 Total Effect
 </td>
 <td style="text-align:left;width: 8em; ">
-<span class="math inline">\(rr^{TE}\)</span>
+<span class="math inline">\(R^{TE}\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
-<span class="math inline">\(rr^{rPNDE}\times rr^{rTNIE}\)</span>
+<span class="math inline">\(rR^{PNDE}\times rR^{TNIE}\)</span>
 </td>
 </tr>
 <tr>
 <td style="text-align:left;width: 20em; ">
-Excess RR due to Controlled Direct Effect
+Excess ratio due to Controlled Direct Effect
 </td>
 <td style="text-align:left;width: 8em; ">
-<span class="math inline">\(err^{CDE}\)</span>
+<span class="math inline">\(ER^{CDE}\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
 <span class="math inline">\((E[Y_{am}-Y_{a^*m}])/E[Y_{a^*M_a^*}]\)</span>
@@ -1207,79 +1208,79 @@ Excess RR due to Controlled Direct Effect
 </tr>
 <tr>
 <td style="text-align:left;width: 20em; ">
-Randomized Analogue of <span class="math inline">\(err^{INT_{ref}}\)</span>
+Randomized Analogue of <span class="math inline">\(ER^{INT_{ref}}\)</span>
 </td>
 <td style="text-align:left;width: 8em; ">
-<span class="math inline">\(rerr^{INT_{ref}}\)</span>
+<span class="math inline">\(rER^{INT_{ref}}\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
-<span class="math inline">\(rr^{rPNDE}-1-err^{CDE}\)</span>
+<span class="math inline">\(rR^{PNDE}-1-ER^{CDE}\)</span>
 </td>
 </tr>
 <tr>
 <td style="text-align:left;width: 20em; ">
-Randomized Analogue of <span class="math inline">\(err^{INT_{med}}\)</span>
+Randomized Analogue of <span class="math inline">\(ER^{INT_{med}}\)</span>
 </td>
 <td style="text-align:left;width: 8em; ">
-<span class="math inline">\(rerr^{INT_{med}}\)</span>
+<span class="math inline">\(rER^{INT_{med}}\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
-<span class="math inline">\(rr^{rTNIE}*rr^{rPNDE}-rr^{rPNDE}-rr^{rPNIE}+1\)</span>
+<span class="math inline">\(rR^{TNIE}*rR^{PNDE}-rR^{PNDE}-rR^{PNIE}+1\)</span>
 </td>
 </tr>
 <tr>
 <td style="text-align:left;width: 20em; ">
-Randomized Analogue of <span class="math inline">\(err^{PNIE}\)</span>
+Randomized Analogue of <span class="math inline">\(ER^{PNIE}\)</span>
 </td>
 <td style="text-align:left;width: 8em; ">
-<span class="math inline">\(rerr^{PNIE}\)</span>
+<span class="math inline">\(rER^{PNIE}\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
-<span class="math inline">\(rr^{rPNIE}-1\)</span>
+<span class="math inline">\(rR^{PNIE}-1\)</span>
 </td>
 </tr>
 <tr>
 <td style="text-align:left;width: 20em; ">
-Proportion <span class="math inline">\(err^{CDE}\)</span>
+Proportion <span class="math inline">\(ER^{CDE}\)</span>
 </td>
 <td style="text-align:left;width: 8em; ">
-<span class="math inline">\(prop^{err^{CDE}}\)</span>
+<span class="math inline">\(prop^{ER^{CDE}}\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
-<span class="math inline">\(err^{CDE}/(rr^{TE}-1)\)</span>
+<span class="math inline">\(ER^{CDE}/(rR^{TE}-1)\)</span>
 </td>
 </tr>
 <tr>
 <td style="text-align:left;width: 20em; ">
-Proportion <span class="math inline">\(rerr^{INT_{ref}}\)</span>
+Proportion <span class="math inline">\(rER^{INT_{ref}}\)</span>
 </td>
 <td style="text-align:left;width: 8em; ">
-<span class="math inline">\(prop^{rerr^{INT_{ref}}}\)</span>
+<span class="math inline">\(prop^{rER^{INT_{ref}}}\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
-<span class="math inline">\(rerr^{INT_{ref}}/(rr^{TE}-1)\)</span>
+<span class="math inline">\(rER^{INT_{ref}}/(R^{TE}-1)\)</span>
 </td>
 </tr>
 <tr>
 <td style="text-align:left;width: 20em; ">
-Proportion <span class="math inline">\(rerr^{INT_{med}}\)</span>
+Proportion <span class="math inline">\(rER^{INT_{med}}\)</span>
 </td>
 <td style="text-align:left;width: 8em; ">
-<span class="math inline">\(prop^{rerr^{INT_{med}}}\)</span>
+<span class="math inline">\(prop^{rER^{INT_{med}}}\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
-<span class="math inline">\(rerr^{INT_{med}}/(rr^{TE}-1)\)</span>
+<span class="math inline">\(rER^{INT_{med}}/(R^{TE}-1)\)</span>
 </td>
 </tr>
 <tr>
 <td style="text-align:left;width: 20em; ">
-Proportion <span class="math inline">\(rerr^{PNIE}\)</span>
+Proportion <span class="math inline">\(rER^{PNIE}\)</span>
 </td>
 <td style="text-align:left;width: 8em; ">
-<span class="math inline">\(prop^{rerr^{PNIE}}\)</span>
+<span class="math inline">\(prop^{rER^{PNIE}}\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
-<span class="math inline">\(rerr^{PNIE}/(rr^{TE}-1)\)</span>
+<span class="math inline">\(rER^{PNIE}/(R^{TE}-1)\)</span>
 </td>
 </tr>
 <tr>
@@ -1290,7 +1291,7 @@ Randomized Analogue of <span class="math inline">\(PM\)</span>
 <span class="math inline">\(rPM\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
-<span class="math inline">\((rr^{rPNDE}*(rr^{rTNIE}-1))/(rr^{TE}-1)\)</span>
+<span class="math inline">\((rR^{PNDE}*(rR^{TNIE}-1))/(R^{TE}-1)\)</span>
 </td>
 </tr>
 <tr>
@@ -1301,7 +1302,7 @@ Randomized Analogue of <span class="math inline">\(INT\)</span>
 <span class="math inline">\(rINT\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
-<span class="math inline">\((rerr^{INT_{ref}}+rerr^{INT_{med}})/(rr^{TE}-1)\)</span>
+<span class="math inline">\((rER^{INT_{ref}}+rER^{INT_{med}})/(R^{TE}-1)\)</span>
 </td>
 </tr>
 <tr>
@@ -1312,7 +1313,7 @@ Randomized Analogue of <span class="math inline">\(PE\)</span>
 <span class="math inline">\(rPE\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
-<span class="math inline">\((rerr^{INT_{ref}}+rerr^{INT_{med}}+rerr^{PNIE})/(rr^{TE}-1)\)</span>
+<span class="math inline">\((rER^{INT_{ref}}+rER^{INT_{med}}+rER^{PNIE})/(R^{TE}-1)\)</span>
 </td>
 </tr>
 </tbody>
@@ -1324,7 +1325,7 @@ Randomized Analogue of <span class="math inline">\(PE\)</span>
 </tr>
 <tr>
 <td style="padding: 0; border: 0;" colspan="100%">
-<sup></sup><span class="math inline">\(a\)</span> and <span class="math inline">\(a^*\)</span> are two reference values for <span class="math inline">\(A\)</span>. <span class="math inline">\(m\)</span> is the reference value for <span class="math inline">\(M\)</span>. <span class="math inline">\(G_{a}\)</span> denotes a random draw from the distribution of <span class="math inline">\(M\)</span> among those with <span class="math inline">\(A=a\)</span>. <span class="math inline">\(Y_{am}\)</span> denotes the counterfactual value of <span class="math inline">\(Y\)</span> that would have been observed had <span class="math inline">\(A\)</span> been set to be <span class="math inline">\(a\)</span>, and <span class="math inline">\(M\)</span> to be <span class="math inline">\(m\)</span>. <span class="math inline">\(Y_{aG_{a*}}\)</span> denotes the counterfactual value of <span class="math inline">\(Y\)</span> that would have been observed had <span class="math inline">\(A\)</span> been set to be <span class="math inline">\(a\)</span>, and <span class="math inline">\(M\)</span> to be <span class="math inline">\(G_{a*}\)</span>. <span class="math inline">\(RR\)</span> represents risk or rate ratio.
+<sup></sup><span class="math inline">\(a\)</span> and <span class="math inline">\(a^*\)</span> are two reference values for <span class="math inline">\(A\)</span>. <span class="math inline">\(m\)</span> is the reference value for <span class="math inline">\(M\)</span>. <span class="math inline">\(G_{a}\)</span> denotes a random draw from the distribution of <span class="math inline">\(M\)</span> among those with <span class="math inline">\(A=a\)</span>. <span class="math inline">\(Y_{am}\)</span> denotes the counterfactual value of <span class="math inline">\(Y\)</span> that would have been observed had <span class="math inline">\(A\)</span> been set to be <span class="math inline">\(a\)</span>, and <span class="math inline">\(M\)</span> to be <span class="math inline">\(m\)</span>. <span class="math inline">\(Y_{aG_{a*}}\)</span> denotes the counterfactual value of <span class="math inline">\(Y\)</span> that would have been observed had <span class="math inline">\(A\)</span> been set to be <span class="math inline">\(a\)</span>, and <span class="math inline">\(M\)</span> to be <span class="math inline">\(G_{a*}\)</span>. If <span class="math inline">\(Y\)</span> is categorical, a reference value of <span class="math inline">\(Y\)</span>, denoted as <span class="math inline">\(y\)</span>, is needed and <span class="math inline">\(E[Y]\)</span> represents the probability of <span class="math inline">\(Y=y\)</span>.
 </td>
 </tr>
 </tfoot>
@@ -1333,7 +1334,7 @@ Randomized Analogue of <span class="math inline">\(PE\)</span>
 <div id="the-marginal-structural-model" class="section level2">
 <h2 class="hasAnchor">
 <a href="#the-marginal-structural-model" class="anchor"></a>The Marginal Structural Model</h2>
-<p>With the marginal structural model, the <code>cmest</code> function estimates causal effect through direct counterfactural imputation estimation by the following steps:</p>
+<p>With the marginal structural model, <code>cmest</code> estimates causal effects through direct counterfactural imputation estimation by the following steps:</p>
 <ol style="list-style-type: decimal">
 <li><p>For <span class="math inline">\(p=1,...,k\)</span>, fit the regression model specified by <code>wmreg[p]</code> for <span class="math inline">\(P(M_p|A,M_1, ...,M_{p-1},L,C)\)</span> and obtain <span class="math inline">\(P(M_p=M_{p,i}|A=A_i,M_1=M_{1,i},...,M_{p-1}=M_{p-1,i},L=L_i,C=C_i)\)</span> for <span class="math inline">\(i=1,...,n\)</span>.</p></li>
 <li><p>For <span class="math inline">\(p=1,...,k\)</span>, fit the regression model specified by <code>mreg[p]</code> for <span class="math inline">\(P(M_p|A,M_1, ...,M_{p-1})\)</span> and obtain <span class="math inline">\(P(M_p=M_{p,i}|A=A_i,M_1=M_{1,i},...,M_{p-1}=M_{p-1,i})\)</span> for <span class="math inline">\(i=1,...,n\)</span>.</p></li>
@@ -1347,7 +1348,7 @@ Randomized Analogue of <span class="math inline">\(PE\)</span>
 <li>Simulate <span class="math inline">\(M_{a^*,p,i}\)</span> by randomly drawing a value from the distribution of <span class="math inline">\(M_{p}\)</span> given <span class="math inline">\(A=a^*,M_1=M_{a^*,1,i},...,M_{p-1}=M_{a^*,p-1,i}\)</span>. Denote <span class="math inline">\(M_{a^*,i}=(M_{a^*,1,i},...,M_{a^*,k,i})^T\)</span>.</li>
 </ul>
 </li>
-<li><p>For <span class="math inline">\(i=1,...,n\)</span>, obtain <span class="math inline">\(E[Y_i|A=a^*,M=m]\)</span>,<span class="math inline">\(E[Y_i|A=a,M=m]\)</span>,<span class="math inline">\(E[Y_i|A=a^*,M=M_{a^*,i}]\)</span>,<span class="math inline">\(E[Y_i|A=a^*,M=M_{a,i}]\)</span>,<span class="math inline">\(E[Y_i|A=a,M=M_{a^*,i}]\)</span> and <span class="math inline">\(E[Y_i|A=a,M=M_{a,i}]\)</span> from the regression model in step 4.</p></li>
+<li><p>For <span class="math inline">\(i=1,...,n\)</span>, obtain <span class="math inline">\(E[Y_i|A=a^*,M=m]\)</span>, <span class="math inline">\(E[Y_i|A=a,M=m]\)</span>, <span class="math inline">\(E[Y_i|A=a^*,M=M_{a^*,i}]\)</span>, <span class="math inline">\(E[Y_i|A=a^*,M=M_{a,i}]\)</span>, <span class="math inline">\(E[Y_i|A=a,M=M_{a^*,i}]\)</span> and <span class="math inline">\(E[Y_i|A=a,M=M_{a,i}]\)</span> from the regression model in step 4.</p></li>
 <li>
 <p>Impute the counterfacturals <span class="math inline">\(E[Y_{a^*m}]\)</span>, <span class="math inline">\(E[Y_{am}]\)</span>, <span class="math inline">\(E[Y_{a^*Ga^*}]\)</span>, <span class="math inline">\(E[Y_{aGa}]\)</span>, <span class="math inline">\(E[Y_{aGa^*}]\)</span> and <span class="math inline">\(E[Y_{a^*Ga}]\)</span>.</p>
 <ul>
@@ -1366,7 +1367,7 @@ Randomized Analogue of <span class="math inline">\(PE\)</span>
 <div id="the-g-formula-approach" class="section level2">
 <h2 class="hasAnchor">
 <a href="#the-g-formula-approach" class="anchor"></a>The <span class="math inline">\(G\)</span>-formula Approach</h2>
-<p>With the <span class="math inline">\(g\)</span>-formula approach, the <code>cmest</code> function estimates causal effect through direct counterfactural imputation estimation by the following steps:</p>
+<p>With the <span class="math inline">\(g\)</span>-formula approach, <code>cmest</code> estimates causal effects through direct counterfactural imputation estimation by the following steps:</p>
 <ol style="list-style-type: decimal">
 <li><p>For <span class="math inline">\(q=1,...,s\)</span>, fit the regression model specified by <code>postcreg[q]</code> for the distribution of <span class="math inline">\(L_q\)</span> given <span class="math inline">\(A\)</span>, <span class="math inline">\(L_1\)</span>, …, <span class="math inline">\(L_{q-1}\)</span> and <span class="math inline">\(C\)</span>.</p></li>
 <li>
@@ -1386,7 +1387,7 @@ Randomized Analogue of <span class="math inline">\(PE\)</span>
 </li>
 <li><p>Obtain <span class="math inline">\(\{G_{a,i}\}_{i=1,...,n}\)</span> by randomly permuting <span class="math inline">\(\{M_{a,i}\}_{i=1,...,n}\)</span> and obtain <span class="math inline">\(\{G_{a^*,i}\}_{i=1,...,n}\)</span> by randomly permuting <span class="math inline">\(\{M_{a^*,i}\}_{i=1,...,n}\)</span>.</p></li>
 <li><p>Fit the regression model specified by <code>yreg</code> for <span class="math inline">\(E(Y|A,M,L,C)\)</span>.</p></li>
-<li><p>For <span class="math inline">\(i=1,...,n\)</span>, obtain <span class="math inline">\(E[Y_i|A=a^*,M=m,L=L_{a^*,i},C=C_i]\)</span>,<span class="math inline">\(E[Y_i|A=a,M=m,L=L_{a,i},C=C_i]\)</span>,<span class="math inline">\(E[Y_i|A=a^*,M=G_{a^*,i},L=L_{a^*,i},C=C_i]\)</span>,<span class="math inline">\(E[Y_i|A=a^*,M=G_{a,i},L=L_{a^*,i},C=C_i]\)</span>,<span class="math inline">\(E[Y_i|A=a,M=G_{a^*,i},L=L_{a,i},C=C_i]\)</span> and <span class="math inline">\(E[Y_i|A=a,M=G_{a,i},L=L_{a,i},C=C_i]\)</span> from the regression model in step 5.</p></li>
+<li><p>For <span class="math inline">\(i=1,...,n\)</span>, obtain <span class="math inline">\(E[Y_i|A=a^*,M=m,L=L_{a^*,i},C=C_i]\)</span>, <span class="math inline">\(E[Y_i|A=a,M=m,L=L_{a,i},C=C_i]\)</span>, <span class="math inline">\(E[Y_i|A=a^*,M=G_{a^*,i},L=L_{a^*,i},C=C_i]\)</span>, <span class="math inline">\(E[Y_i|A=a^*,M=G_{a,i},L=L_{a^*,i},C=C_i]\)</span>, <span class="math inline">\(E[Y_i|A=a,M=G_{a^*,i},L=L_{a,i},C=C_i]\)</span> and <span class="math inline">\(E[Y_i|A=a,M=G_{a,i},L=L_{a,i},C=C_i]\)</span> from the regression model in step 5.</p></li>
 <li>
 <p>Impute the counterfacturals <span class="math inline">\(E[Y_{a^*m}]\)</span>, <span class="math inline">\(E[Y_{am}]\)</span>, <span class="math inline">\(E[Y_{a^*Ga^*}]\)</span>, <span class="math inline">\(E[Y_{aGa}]\)</span>, <span class="math inline">\(E[Y_{aGa^*}]\)</span> and <span class="math inline">\(E[Y_{a^*Ga}]\)</span>.</p>
 <ul>

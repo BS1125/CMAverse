@@ -8,12 +8,13 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
   
-This example demonstrates how to use the `cmest` function when there is only a single mediator. For this purpose, we simulate some data containing a continuous baseline confounder $C_1$, a binary baseline confounder $C_2$, a binary exposure $A$, a binary mediator $M$ and a binary outcome $Y$. The true regression models for $A$, $M$ and $Y$ are:
+This example demonstrates how to use `cmest` when there is a single mediator. For this purpose, we simulate some data containing a continuous baseline confounder $C_1$, a binary baseline confounder $C_2$, a binary exposure $A$, a binary mediator $M$ and a binary outcome $Y$. The true regression models for $A$, $M$ and $Y$ are:
 $$logit(E(A|C_1,C_2))=0.2+0.5C_1+0.1C_2$$
 $$logit(E(M|A,C_1,C_2))=1+2A+1.5C_1+0.8C_2$$
 $$logit(E(Y|A,M,C_1,C_2)))=-3-0.4A-1.2M+0.5AM+0.3C_1-0.6C_2$$
   
 ```{r}
+library(CMAverse)
 set.seed(1)
 expit <- function(x) exp(x)/(1+exp(x))
 n <- 10000
@@ -28,12 +29,11 @@ data <- data.frame(A, M, Y, C1, C2)
 The DAG for this scientific setting is:
 
 ```{r}
-library(CMAverse)
 cmdag(outcome = "Y", exposure = "A", mediator = "M",
       basec = c("C1", "C2"), postc = NULL, node = TRUE, text_col = "white")
 ```
 
-In this setting, we can use all of the six statistical modeling approaches. The results are shown below.
+In this setting, we can use all of the six statistical modeling approaches. The results are shown below:
 
 ## The Regression-based Approach
 
@@ -97,7 +97,7 @@ summary(res_wb)
 
 ```{r message=F,warning=F,results='hide'}
 res_iorw <- cmest(data = data, model = "iorw", outcome = "Y", exposure = "A",
-                  mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
+                  mediator = "M", basec = c("C1", "C2"), 
                   ereg = "logistic", yreg = "logistic",
                   astar = 0, a = 1, mval = list(1), yref = 1,
                   estimation = "imputation", inference = "bootstrap", nboot = 2)

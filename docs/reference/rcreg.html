@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Regression Calibration for Measurement Error — rcreg • CMAverse</title>
+<title>Regression Calibration for Measurement Error Correction — rcreg • CMAverse</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -43,7 +43,7 @@
 
 
 
-<meta property="og:title" content="Regression Calibration for Measurement Error — rcreg" />
+<meta property="og:title" content="Regression Calibration for Measurement Error Correction — rcreg" />
 
 <meta property="og:description" content="rcreg is used to correct a regression object with a continuous independent variable
 measured with error via regression calibration by Carroll et al. (1995)." />
@@ -156,7 +156,7 @@ measured with error via regression calibration by Carroll et al. (1995)." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Regression Calibration for Measurement Error</h1>
+    <h1>Regression Calibration for Measurement Error Correction</h1>
     <small class="dont-index">Source: <a href='https://github.com/BS1125/CMAverse/blob/master/R/rcreg.R'><code>R/rcreg.R</code></a></small>
     <div class="hidden name"><code>rcreg.Rd</code></div>
     </div>
@@ -216,19 +216,19 @@ measured with error via <em>regression calibration</em> by Carroll et al. (1995)
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>reg</th>
-      <td><p>the naive regression object. See <code>Details</code>.</p></td>
+      <td><p>naive regression object. See <code>Details</code>.</p></td>
     </tr>
     <tr>
       <th>data</th>
-      <td><p>the new dataset for <code>reg</code></p></td>
+      <td><p>new dataset for <code>reg</code></p></td>
     </tr>
     <tr>
       <th>weights</th>
-      <td><p>the new weights for <code>reg</code></p></td>
+      <td><p>new weights for <code>reg</code></p></td>
     </tr>
     <tr>
       <th>MEvariable</th>
-      <td><p>variable measured with error.</p></td>
+      <td><p>variable measured with error</p></td>
     </tr>
     <tr>
       <th>MEerror</th>
@@ -236,17 +236,17 @@ measured with error via <em>regression calibration</em> by Carroll et al. (1995)
     </tr>
     <tr>
       <th>variance</th>
-      <td><p>a logical value. If <code>TRUE</code>, estimate the var-cov matrix of
-coefficients though bootstrapping. Default is <code>FALSE</code>.</p></td>
+      <td><p>a logical value. If <code>TRUE</code>, correct the var-cov matrix of
+coefficients by bootstrapping. Default is <code>FALSE</code>.</p></td>
     </tr>
     <tr>
       <th>nboot</th>
-      <td><p>number of boots for estimating the var-cov matrix of coefficients. Default 
+      <td><p>number of boots for correcting the var-cov matrix of coefficients. Default 
 is <code>400</code>.</p></td>
     </tr>
     <tr>
       <th>object</th>
-      <td><p>an object of class 'rcreg'</p></td>
+      <td><p>an object of class <code>rcreg</code></p></td>
     </tr>
     <tr>
       <th>...</th>
@@ -254,11 +254,11 @@ is <code>400</code>.</p></td>
     </tr>
     <tr>
       <th>x</th>
-      <td><p>an object of class 'rcreg'</p></td>
+      <td><p>an object of class <code>rcreg</code></p></td>
     </tr>
     <tr>
       <th>formula</th>
-      <td><p>an object of class 'rcreg'</p></td>
+      <td><p>an object of class <code>rcreg</code></p></td>
     </tr>
     <tr>
       <th>digits</th>
@@ -275,14 +275,14 @@ is <code>TRUE</code>.</p></td>
 
     <p>If <code>MEvariable</code> is not in the regression formula of <code>reg</code>, <code>reg</code> is 
 returned. If <code>MEvariable</code> is a continuous independent variable in the regression formula of 
-<code>yeg</code>, an object of class 'rcreg' is returned:</p>
+<code>yeg</code>, an object of class <code>rcreg</code> is returned:</p>
 <dt>call</dt><dd><p>the function call,</p></dd>
 <dt>NAIVEreg</dt><dd><p>the naive regression object,</p></dd>
-<dt>ME</dt><dd><p>a list of <code>MEvariable</code>, <code>MEerror</code> and <code>variance</code>,</p></dd>
-<dt>RCcoef</dt><dd><p>coefficient estimates corrected by <em>regression calibration</em>,</p></dd>
+<dt>ME</dt><dd><p>a list of <code>MEvariable</code>, <code>MEerror</code>, <code>variance</code> and <code>nboot</code>,</p></dd>
+<dt>RCcoef</dt><dd><p>coefficient estimates corrected by regression calibration,</p></dd>
 <dt>RCsigma</dt><dd><p>the residual standard deviation of a linear regression object corrected by 
-<em>regression calibration</em>,</p></dd>
-<dt>RCvcov</dt><dd><p>the var-cov matrix of coefficients corrected by <em>regression calibration</em>,</p></dd>
+regression calibration,</p></dd>
+<dt>RCvcov</dt><dd><p>the var-cov matrix of coefficients corrected by regression calibration,</p></dd>
 ...
 
     
@@ -304,7 +304,7 @@ corrected by <code>rcreg</code></p></li>
 <li><p><code>family</code>: Extract the family of a regression of class <code>lm</code> or <code>glm</code></p></li>
 <li><p><code>predict</code>: Predict with new data</p></li>
 <li><p><code>model.frame</code>: Extract the model frame</p></li>
-<li><p><code>print</code>: Print the results of <code>rcreg</code> nicely</p></li>
+<li><p><code>print</code>: Print results of <code>rcreg</code> nicely</p></li>
 <li><p><code>summary</code>: Summarize results of <code>rcreg</code> nicely</p></li>
 <li><p><code>print</code>: Print summary of <code>rcreg</code> nicely</p></li>
 <li><p><code>update</code>: Update <code>rcreg</code></p></li>
@@ -317,8 +317,7 @@ A Modern Perspective, Second Edition (2006). London: Chapman &amp; Hall.</p>
     
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='simexreg.html'>simexreg</a></code>, <code><a href='ggcmsens.html'>ggcmsens</a></code>, <code><a href='cmdag.html'>cmdag</a></code>, 
-<code><a href='cmest.html'>cmest</a></code></p></div>
+    <div class='dont-index'><p><code><a href='simexreg.html'>simexreg</a></code>, <code>cmsens</code>, <code><a href='cmest.html'>cmest</a></code></p></div>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>

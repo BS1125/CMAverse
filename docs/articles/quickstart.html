@@ -114,7 +114,7 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>CMAverse Quickstart Guide</h1>
             
-            <h4 class="date">2020-08-27</h4>
+            <h4 class="date">2020-09-13</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BS1125/CMAverse/blob/master/vignettes/quickstart.Rmd"><code>vignettes/quickstart.Rmd</code></a></small>
       <div class="hidden name"><code>quickstart.Rmd</code></div>
@@ -125,98 +125,92 @@
     
 <p>We illustrate the general workflow of the <code>CMAverse</code> package by a quick example. The general workflow is:</p>
 <ol style="list-style-type: decimal">
-<li><p>Plot the DAG of the scientific setting using the <code>cmdag</code> function.</p></li>
-<li><p>Estimate the causal effects and make inferences using the <code>cmest</code> function.</p></li>
-<li><p>Conduct sensitivity analysis for unmeasured confounding and measurement error using the <code>cmsens</code> function.</p></li>
+<li><p>Plot the DAG of causal relationships using <code>cmdag</code>.</p></li>
+<li><p>Estimate causal effects and make inferences using <code>cmest</code>.</p></li>
+<li><p>Conduct sensitivity analysis for unmeasured confounding and measurement error using <code>cmsens</code>.</p></li>
 </ol>
 <p>Firstly, let’s load the package.</p>
 <div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">CMAverse</span>)</pre></body></html></div>
-<p>Next, we simulate some data and plot the DAG of the scientific setting. The simulated dataset contains a binary exposure, a binary mediator, a continuous mediator, a continuous outcome and two pre-exposure confounders.</p>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="no">n</span> <span class="kw">&lt;-</span> <span class="fl">100</span>
+<p>Next, we simulate some data and plot the DAG. The simulated dataset contains a binary exposure, a binary mediator, a continuous mediator, a continuous outcome and two baseline confounders.</p>
+<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="fl">1</span>)
+<span class="no">n</span> <span class="kw">&lt;-</span> <span class="fl">100</span>
 <span class="no">C1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="no">n</span>, <span class="kw">mean</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">sd</span> <span class="kw">=</span> <span class="fl">1</span>)
 <span class="no">C2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html">rbinom</a></span>(<span class="no">n</span>, <span class="fl">1</span>, <span class="fl">0.6</span>)
-<span class="no">C2</span>[<span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span>(<span class="no">C2</span> <span class="kw">==</span> <span class="fl">0</span>)] <span class="kw">&lt;-</span> <span class="st">"C2_0"</span>
-<span class="no">C2</span>[<span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span>(<span class="no">C2</span> <span class="kw">==</span> <span class="fl">1</span>)] <span class="kw">&lt;-</span> <span class="st">"C2_1"</span>
-<span class="no">pa</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="fl">0.2</span> - <span class="fl">0.5</span>*<span class="no">C1</span> + <span class="fl">0.1</span>*(<span class="no">C2</span> <span class="kw">==</span> <span class="st">"C2_1"</span>))/(<span class="fl">1</span> + <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="fl">0.2</span> - <span class="fl">0.5</span>*<span class="no">C1</span> + <span class="fl">0.1</span>*(<span class="no">C2</span> <span class="kw">==</span> <span class="st">"C2_1"</span>)))
+<span class="no">pa</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="fl">0.2</span> - <span class="fl">0.5</span>*<span class="no">C1</span> + <span class="fl">0.1</span>*<span class="no">C2</span>)/(<span class="fl">1</span> + <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="fl">0.2</span> - <span class="fl">0.5</span>*<span class="no">C1</span> + <span class="fl">0.1</span>*<span class="no">C2</span>))
 <span class="no">A</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html">rbinom</a></span>(<span class="no">n</span>, <span class="fl">1</span>, <span class="no">pa</span>)
-<span class="no">A</span>[<span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span>(<span class="no">A</span> <span class="kw">==</span> <span class="fl">0</span>)] <span class="kw">&lt;-</span> <span class="st">"control"</span>
-<span class="no">A</span>[<span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span>(<span class="no">A</span> <span class="kw">==</span> <span class="fl">1</span>)] <span class="kw">&lt;-</span> <span class="st">"treat"</span>
-<span class="no">pm</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="fl">1</span> + <span class="fl">0.5</span>*(<span class="no">A</span> <span class="kw">==</span> <span class="st">"treat"</span>) - <span class="fl">1.5</span>*<span class="no">C1</span> + <span class="fl">0.5</span>*(<span class="no">C2</span> <span class="kw">==</span> <span class="st">"C2_1"</span>))/
-  (<span class="fl">1</span> + <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="fl">1</span> + <span class="fl">0.5</span>*(<span class="no">A</span> <span class="kw">==</span> <span class="st">"treat"</span>) - <span class="fl">1.5</span>*<span class="no">C1</span> + <span class="fl">0.5</span>*(<span class="no">C2</span> <span class="kw">==</span> <span class="st">"C2_1"</span>)))
+<span class="no">pm</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="fl">1</span> + <span class="fl">0.5</span>*<span class="no">A</span> - <span class="fl">1.5</span>*<span class="no">C1</span> + <span class="fl">0.5</span>*<span class="no">C2</span>)/ (<span class="fl">1</span> + <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="fl">1</span> + <span class="fl">0.5</span>*<span class="no">A</span> - <span class="fl">1.5</span>*<span class="no">C1</span> + <span class="fl">0.5</span>*<span class="no">C2</span>))
 <span class="no">M1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html">rbinom</a></span>(<span class="no">n</span>, <span class="fl">1</span>, <span class="no">pm</span>)
-<span class="no">M2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="no">n</span>, <span class="fl">2</span> + <span class="fl">0.8</span>*(<span class="no">A</span> <span class="kw">==</span> <span class="st">"treat"</span>) - <span class="no">M1</span> + <span class="fl">0.5</span>*<span class="no">C1</span> + <span class="fl">2</span>*(<span class="no">C2</span> <span class="kw">==</span> <span class="st">"C2_1"</span>), <span class="fl">1</span>)
-<span class="no">Y</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="no">n</span>, <span class="kw">mean</span> <span class="kw">=</span> <span class="fl">0.5</span> + <span class="fl">0.4</span>*(<span class="no">A</span> <span class="kw">==</span> <span class="st">"treat"</span>) + <span class="fl">0.5</span>*<span class="no">M1</span> + <span class="fl">0.6</span>*<span class="no">M2</span> + <span class="fl">0.3</span>*(<span class="no">A</span> <span class="kw">==</span> <span class="st">"treat"</span>)*<span class="no">M1</span> +
-             <span class="fl">0.2</span>*(<span class="no">A</span> <span class="kw">==</span> <span class="st">"treat"</span>)*<span class="no">M2</span> - <span class="fl">0.3</span>*<span class="no">C1</span> + <span class="fl">2</span>*(<span class="no">C2</span><span class="kw">==</span><span class="st">"C2_1"</span>), <span class="kw">sd</span> <span class="kw">=</span> <span class="fl">1</span>)
+<span class="no">M2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="no">n</span>, <span class="fl">2</span> + <span class="fl">0.8</span>*<span class="no">A</span> - <span class="no">M1</span> + <span class="fl">0.5</span>*<span class="no">C1</span> + <span class="fl">2</span>*<span class="no">C2</span>, <span class="fl">1</span>)
+<span class="no">Y</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="no">n</span>, <span class="kw">mean</span> <span class="kw">=</span> <span class="fl">0.5</span> + <span class="fl">0.4</span>*<span class="no">A</span> + <span class="fl">0.5</span>*<span class="no">M1</span> + <span class="fl">0.6</span>*<span class="no">M2</span> + <span class="fl">0.3</span>*<span class="no">A</span>*<span class="no">M1</span> + <span class="fl">0.2</span>*<span class="no">A</span>*<span class="no">M2</span> - <span class="fl">0.3</span>*<span class="no">C1</span> + <span class="fl">2</span>*<span class="no">C2</span>, <span class="kw">sd</span> <span class="kw">=</span> <span class="fl">1</span>)
 <span class="no">data</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="no">A</span>, <span class="no">M1</span>, <span class="no">M2</span>, <span class="no">Y</span>, <span class="no">C1</span>, <span class="no">C2</span>)</pre></body></html></div>
-<p>The DAG can be plotted using the <code>cmdag</code> function.</p>
+<p>The DAG can be plotted using <code>cmdag</code>.</p>
 <div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="fu"><a href="../reference/cmdag.html">cmdag</a></span>(<span class="kw">outcome</span> <span class="kw">=</span> <span class="st">"Y"</span>, <span class="kw">exposure</span> <span class="kw">=</span> <span class="st">"A"</span>, <span class="kw">mediator</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"M1"</span>, <span class="st">"M2"</span>),
-      <span class="kw">basec</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"C1"</span>, <span class="st">"C2"</span>, <span class="st">"C3"</span>), <span class="kw">postc</span> <span class="kw">=</span> <span class="kw">NULL</span>,
-      <span class="kw">node</span> <span class="kw">=</span> <span class="fl">FALSE</span>, <span class="kw">text_col</span> <span class="kw">=</span> <span class="st">"black"</span>)</pre></body></html></div>
+      <span class="kw">basec</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"C1"</span>, <span class="st">"C2"</span>), <span class="kw">postc</span> <span class="kw">=</span> <span class="kw">NULL</span>, <span class="kw">node</span> <span class="kw">=</span> <span class="fl">FALSE</span>, <span class="kw">text_col</span> <span class="kw">=</span> <span class="st">"black"</span>)</pre></body></html></div>
 <p><img src="quickstart_files/figure-html/plot_dag-1.png" width="700"></p>
-<p>Then, we estimate the causal effects using the <code>cmest</code> function. We use the regression-based approach for illustration. The reference values for the exposure are set to be 0 and 1. The reference values for the two mediators are set to be 0.</p>
+<p>Then, we estimate causal effects using <code>cmest</code>. We use the regression-based approach for illustration. The reference values for the exposure are set to be 0 and 1. The reference values for the two mediators are set to be 1.</p>
 <div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="no">est</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span>(<span class="kw">data</span> <span class="kw">=</span> <span class="no">data</span>, <span class="kw">model</span> <span class="kw">=</span> <span class="st">"rb"</span>, <span class="kw">outcome</span> <span class="kw">=</span> <span class="st">"Y"</span>, <span class="kw">exposure</span> <span class="kw">=</span> <span class="st">"A"</span>,
                 <span class="kw">mediator</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"M1"</span>, <span class="st">"M2"</span>), <span class="kw">basec</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"C1"</span>, <span class="st">"C2"</span>), <span class="kw">EMint</span> <span class="kw">=</span> <span class="fl">TRUE</span>,
                 <span class="kw">mreg</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="st">"logistic"</span>, <span class="st">"linear"</span>), <span class="kw">yreg</span> <span class="kw">=</span> <span class="st">"linear"</span>,
-                <span class="kw">astar</span> <span class="kw">=</span> <span class="fl">0</span>, <span class="kw">a</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">mval</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fl">0</span>, <span class="fl">0</span>),
+                <span class="kw">astar</span> <span class="kw">=</span> <span class="fl">0</span>, <span class="kw">a</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">mval</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fl">1</span>, <span class="fl">1</span>),
                 <span class="kw">estimation</span> <span class="kw">=</span> <span class="st">"imputation"</span>, <span class="kw">inference</span> <span class="kw">=</span> <span class="st">"bootstrap"</span>, <span class="kw">nboot</span> <span class="kw">=</span> <span class="fl">20</span>)</pre></body></html></div>
-<p>Summarizing and plotting the results:</p>
+<p>Summarize and plot the results:</p>
 <div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">est</span>)</pre></body></html></div>
-<pre><code>## # Causal Mediation Analysis via the Regression-based Approach
+<pre><code>## Causal Mediation Analysis via the Regression-based Approach
 ##  
 ## Direct counterfactual imputation estimation with 
 ##  bootstrap standard errors, percentile confidence intervals and p-values 
 ##  
 ##              Estimate Std.error  95% CIL 95% CIU  P.val    
-## cde          -0.02525   0.89395 -1.50401   1.770    0.7    
-## pnde          1.33460   0.26760  0.82793   1.685 &lt;2e-16 ***
-## tnde          1.70612   0.20195  1.29632   1.971 &lt;2e-16 ***
-## pnie          0.48272   0.16702  0.18828   0.778 &lt;2e-16 ***
-## tnie          0.85423   0.28646  0.23865   1.272 &lt;2e-16 ***
-## te            2.18884   0.26076  1.75258   2.572 &lt;2e-16 ***
-## intref        1.35985   0.71686 -0.23660   2.409    0.2    
-## intmed        0.37152   0.20949 -0.07446   0.740    0.2    
-## cde(prop)    -0.01154   0.47846 -0.81538   0.970    0.7    
-## intref(prop)  0.62127   0.37959 -0.12990   1.284    0.2    
-## intmed(prop)  0.16973   0.10806 -0.04083   0.363    0.2    
-## pnie(prop)    0.22054   0.06657  0.09868   0.322 &lt;2e-16 ***
-## pm            0.39027   0.12858  0.12768   0.602 &lt;2e-16 ***
-## int           0.79100   0.48027 -0.17073   1.617    0.2    
-## pe            1.01154   0.47846  0.03020   1.815    0.1 .  
+## cde           1.43144   0.38889  0.89760   2.124 &lt;2e-16 ***
+## pnde          1.34494   0.14017  1.14817   1.634 &lt;2e-16 ***
+## tnde          1.36362   0.13963  1.11969   1.543 &lt;2e-16 ***
+## pnie          0.32925   0.14960  0.09298   0.573 &lt;2e-16 ***
+## tnie          0.34793   0.14559  0.15078   0.620 &lt;2e-16 ***
+## te            1.69287   0.15968  1.43973   1.972 &lt;2e-16 ***
+## intref       -0.08650   0.32774 -0.73435   0.322    0.9    
+## intmed        0.01868   0.09689 -0.16249   0.171    0.8    
+## cde(prop)     0.84557   0.17613  0.57510   1.142 &lt;2e-16 ***
+## intref(prop) -0.05110   0.19092 -0.41677   0.205    0.9    
+## intmed(prop)  0.01103   0.05546 -0.09098   0.093    0.8    
+## pnie(prop)    0.19449   0.08169  0.05764   0.337 &lt;2e-16 ***
+## pm            0.20553   0.07566  0.09378   0.336 &lt;2e-16 ***
+## int          -0.04006   0.21249 -0.45116   0.226    0.7    
+## pe            0.15443   0.17613 -0.14175   0.425    0.4    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## Reference values: 
 ## $a
-## [1] "treat"
+## [1] 1
 ## 
 ## $astar
-## [1] "control"
+## [1] 0
 ## 
 ## $mval
 ## $mval[[1]]
-## [1] 0
+## [1] 1
 ## 
 ## $mval[[2]]
-## [1] 0</code></pre>
+## [1] 1</code></pre>
 <div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="fu"><a href="../reference/ggcmest.html">ggcmest</a></span>(<span class="no">est</span>) +
-  <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="kw">axis.text.x</span> <span class="kw">=</span> <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span>(<span class="kw">angle</span> <span class="kw">=</span> <span class="fl">30</span>, <span class="kw">vjust</span> <span class="kw">=</span> <span class="fl">0.8</span>))</pre></body></html></div>
+  <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/theme.html">theme</a></span>(<span class="kw">axis.text.x</span> <span class="kw">=</span> <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/element.html">element_text</a></span>(<span class="kw">angle</span> <span class="kw">=</span> <span class="fl">30</span>, <span class="kw">vjust</span> <span class="kw">=</span> <span class="fl">0.8</span>))</pre></body></html></div>
 <p><img src="quickstart_files/figure-html/plot_cmest-1.png" width="768"></p>
-<p>Lastly, let’s conduct sensitivity analysis for the results. Sensitivity analysis for unmeasured confounding:</p>
+<p>Lastly, we conduct sensitivity analysis for the results. Sensitivity analysis for unmeasured confounding:</p>
 <div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="fu"><a href="../reference/cmsens.html">cmsens</a></span>(<span class="kw">object</span> <span class="kw">=</span> <span class="no">est</span>, <span class="kw">sens</span> <span class="kw">=</span> <span class="st">"uc"</span>)</pre></body></html></div>
 <pre><code>## Sensitivity Analysis For Unmeasured Confounding 
 ## 
-## Evalues on the ratio scale: 
-##          estRR   lowerRR  upperRR Evalue.estRR Evalue.lowerRR Evalue.upperRR
-## cde  0.9911629 0.5360158 1.832789     1.103760             NA              1
-## pnde 1.5986733 1.3299771 1.921654     2.576979       1.992444             NA
-## tnde 1.8217182 1.5855142 2.093111     3.045213       2.549019             NA
-## pnie 1.1849456 1.0563816 1.329156     1.653081       1.300432             NA
-## tnie 1.3502678 1.1088516 1.644244     2.037985       1.456271             NA
-## te   2.1586370 1.8042949 2.582568     3.740116       3.008946             NA</code></pre>
-<p>Assume that the continuous pre-exposure confounder was measured with error. Sensitivity analysis for measurement error using regression calibration with a set of assumed standard deviations of the measurement error 0.1, 0.2 and 0.3:</p>
+## Evalues on the risk or rate ratio scale: 
+##         estRR  lowerRR  upperRR Evalue.estRR Evalue.lowerRR Evalue.upperRR
+## cde  1.719704 1.289236 2.293904     2.832214       1.899885             NA
+## pnde 1.664276 1.500123 1.846393     2.715723       2.366290             NA
+## tnde 1.676092 1.511380 1.858754     2.740607       2.390522             NA
+## pnie 1.132811 1.013966 1.265585     1.520689       1.132969             NA
+## tnie 1.140853 1.024209 1.270782     1.541719       1.181673             NA
+## te   1.898695 1.686861 2.137131     3.204968       2.763263             NA</code></pre>
+<p>Assume that <span class="math inline">\(C_1\)</span> was measured with error. Sensitivity analysis for measurement error using regression calibration with a set of assumed error standard deviations 0.1, 0.2 and 0.3:</p>
 <div class="sourceCode" id="cb10"><html><body><pre class="r"><span class="no">me1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/cmsens.html">cmsens</a></span>(<span class="kw">object</span> <span class="kw">=</span> <span class="no">est</span>, <span class="kw">sens</span> <span class="kw">=</span> <span class="st">"me"</span>, <span class="kw">MEmethod</span> <span class="kw">=</span> <span class="st">"rc"</span>,
               <span class="kw">MEvariable</span> <span class="kw">=</span> <span class="st">"C1"</span>, <span class="kw">MEvartype</span> <span class="kw">=</span> <span class="st">"con"</span>, <span class="kw">MEerror</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.1</span>, <span class="fl">0.2</span>, <span class="fl">0.3</span>))</pre></body></html></div>
-<p>Summarizing and plotting the results:</p>
+<p>Summarize and plot the results:</p>
 <div class="sourceCode" id="cb11"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">me1</span>)</pre></body></html></div>
 <pre><code>## Sensitivity Analysis For Measurement Error 
 ##  
@@ -228,21 +222,21 @@
 ## 
 ## Measurement error correction for measurement error 1: 
 ##              Estimate Std.error  95% CIL 95% CIU  P.val    
-## cde          -0.02588   0.72999 -0.76707   1.621    0.8    
-## pnde          1.34500   0.24799  0.98862   1.778 &lt;2e-16 ***
-## tnde          1.63631   0.25125  1.25970   1.972 &lt;2e-16 ***
-## pnie          0.43509   0.20318  0.09731   0.777 &lt;2e-16 ***
-## tnie          0.72639   0.20794  0.39343   1.039 &lt;2e-16 ***
-## te            2.07139   0.29810  1.53929   2.539 &lt;2e-16 ***
-## intref        1.37088   0.60681  0.05760   1.940    0.1 .  
-## intmed        0.29131   0.20317 -0.14053   0.619    0.3    
-## cde(prop)    -0.01249   0.35083 -0.44757   0.721    0.8    
-## intref(prop)  0.66181   0.32709  0.03609   1.088    0.1 .  
-## intmed(prop)  0.14063   0.09828 -0.06335   0.314    0.3    
-## pnie(prop)    0.21005   0.08268  0.04728   0.312 &lt;2e-16 ***
-## pm            0.35068   0.08416  0.20621   0.479 &lt;2e-16 ***
-## int           0.80245   0.40183 -0.02726   1.275    0.1 .  
-## pe            1.01249   0.35083  0.27922   1.448 &lt;2e-16 ***
+## cde           1.43076   0.51658  0.55341   2.359 &lt;2e-16 ***
+## pnde          1.35091   0.22933  1.04796   1.868 &lt;2e-16 ***
+## tnde          1.37605   0.19539  1.09919   1.753 &lt;2e-16 ***
+## pnie          0.33677   0.11413  0.18460   0.544 &lt;2e-16 ***
+## tnie          0.36191   0.15389  0.06329   0.599 &lt;2e-16 ***
+## te            1.71282   0.19487  1.38118   1.992 &lt;2e-16 ***
+## intref       -0.07985   0.41254 -0.90834   0.573    0.9    
+## intmed        0.02514   0.09940 -0.19991   0.145    0.9    
+## cde(prop)     0.83532   0.26861  0.33020   1.329 &lt;2e-16 ***
+## intref(prop) -0.04662   0.23588 -0.50937   0.346    0.9    
+## intmed(prop)  0.01468   0.05840 -0.11449   0.088    0.9    
+## pnie(prop)    0.19662   0.06345  0.10822   0.327 &lt;2e-16 ***
+## pm            0.21130   0.08856  0.03712   0.361 &lt;2e-16 ***
+## int          -0.03194   0.24848 -0.53199   0.400    0.8    
+## pe            0.16468   0.26861 -0.32905   0.670    0.4    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## ----------------------------------------------------------------
@@ -252,21 +246,21 @@
 ## 
 ## Measurement error correction for measurement error 2: 
 ##              Estimate Std.error  95% CIL 95% CIU  P.val    
-## cde          -0.02788   0.85350 -1.52097   1.132    0.8    
-## pnde          1.37785   0.25290  0.76146   1.724 &lt;2e-16 ***
-## tnde          1.65417   0.22755  1.19128   1.938 &lt;2e-16 ***
-## pnie          0.42800   0.18585  0.25991   0.819 &lt;2e-16 ***
-## tnie          0.70432   0.27213  0.33865   1.280 &lt;2e-16 ***
-## te            2.08217   0.26829  1.64147   2.475 &lt;2e-16 ***
-## intref        1.40573   0.70576  0.35191   2.358 &lt;2e-16 ***
-## intmed        0.27632   0.24092 -0.03918   0.765    0.1 .  
-## cde(prop)    -0.01339   0.43624 -0.85466   0.571    0.8    
-## intref(prop)  0.67513   0.37284  0.17818   1.356 &lt;2e-16 ***
-## intmed(prop)  0.13271   0.11604 -0.01748   0.379    0.1 .  
-## pnie(prop)    0.20556   0.07632  0.13270   0.354 &lt;2e-16 ***
-## pm            0.33826   0.11195  0.17036   0.581 &lt;2e-16 ***
-## int           0.80783   0.47063  0.16810   1.657 &lt;2e-16 ***
-## pe            1.01339   0.43624  0.42912   1.855 &lt;2e-16 ***
+## cde           1.42856   0.45646  0.38441   1.881 &lt;2e-16 ***
+## pnde          1.34082   0.13617  0.98912   1.437 &lt;2e-16 ***
+## tnde          1.38018   0.15944  1.00133   1.536 &lt;2e-16 ***
+## pnie          0.35485   0.17362  0.10686   0.661 &lt;2e-16 ***
+## tnie          0.39421   0.11978  0.12349   0.541 &lt;2e-16 ***
+## te            1.73503   0.15082  1.32200   1.860 &lt;2e-16 ***
+## intref       -0.08773   0.39960 -0.60024   0.690    0.9    
+## intmed        0.03936   0.13131 -0.30646   0.139    0.8    
+## cde(prop)     0.82336   0.28656  0.28439   1.213 &lt;2e-16 ***
+## intref(prop) -0.05057   0.27169 -0.39914   0.526    0.9    
+## intmed(prop)  0.02268   0.08005 -0.18098   0.096    0.8    
+## pnie(prop)    0.20452   0.09817  0.07244   0.391 &lt;2e-16 ***
+## pm            0.22720   0.06806  0.08595   0.307 &lt;2e-16 ***
+## int          -0.02788   0.30902 -0.48943   0.592    0.8    
+## pe            0.17664   0.28656 -0.21320   0.716    0.5    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## ----------------------------------------------------------------
@@ -276,33 +270,33 @@
 ## 
 ## Measurement error correction for measurement error 3: 
 ##              Estimate Std.error  95% CIL 95% CIU  P.val    
-## cde          -0.03168   0.69061 -1.27858   0.747    0.7    
-## pnde          1.31297   0.30642  0.68689   1.840 &lt;2e-16 ***
-## tnde          1.65839   0.19386  1.36755   2.009 &lt;2e-16 ***
-## pnie          0.46824   0.18737  0.17105   0.794 &lt;2e-16 ***
-## tnie          0.81366   0.33619  0.33070   1.508 &lt;2e-16 ***
-## te            2.12663   0.24225  1.70934   2.500 &lt;2e-16 ***
-## intref        1.34465   0.47559  0.82864   2.323 &lt;2e-16 ***
-## intmed        0.34542   0.20987  0.09328   0.779 &lt;2e-16 ***
-## cde(prop)    -0.01490   0.32783 -0.59997   0.337    0.7    
-## intref(prop)  0.63229   0.24491  0.39422   1.144 &lt;2e-16 ***
-## intmed(prop)  0.16243   0.09637  0.04778   0.360 &lt;2e-16 ***
-## pnie(prop)    0.22018   0.07658  0.09287   0.354 &lt;2e-16 ***
-## pm            0.38261   0.14357  0.16799   0.686 &lt;2e-16 ***
-## int           0.79472   0.31910  0.44674   1.440 &lt;2e-16 ***
-## pe            1.01490   0.32783  0.66345   1.600 &lt;2e-16 ***
+## cde           1.42431   0.33982  0.43934   1.655 &lt;2e-16 ***
+## pnde          1.34546   0.17940  0.97885   1.605 &lt;2e-16 ***
+## tnde          1.36929   0.19287  1.03778   1.759 &lt;2e-16 ***
+## pnie          0.34505   0.15630  0.11620   0.626 &lt;2e-16 ***
+## tnie          0.36887   0.13038  0.14459   0.570 &lt;2e-16 ***
+## te            1.71433   0.15448  1.40352   1.943 &lt;2e-16 ***
+## intref       -0.07885   0.25824 -0.22293   0.576    0.9    
+## intmed        0.02383   0.09961 -0.19459   0.167    0.9    
+## cde(prop)     0.83082   0.19650  0.28930   0.989 &lt;2e-16 ***
+## intref(prop) -0.04600   0.15712 -0.14423   0.374    0.9    
+## intmed(prop)  0.01390   0.05389 -0.10437   0.095    0.9    
+## pnie(prop)    0.20127   0.08798  0.07043   0.341 &lt;2e-16 ***
+## pm            0.21517   0.07912  0.09332   0.367 &lt;2e-16 ***
+## int          -0.03210   0.17241 -0.14680   0.416    0.9    
+## pe            0.16918   0.19650  0.01114   0.711 &lt;2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## ----------------------------------------------------------------</code></pre>
 <div class="sourceCode" id="cb13"><html><body><pre class="r"><span class="fu"><a href="../reference/ggcmsens.html">ggcmsens</a></span>(<span class="no">me1</span>) +
-  <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="kw">axis.text.x</span> <span class="kw">=</span> <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span>(<span class="kw">angle</span> <span class="kw">=</span> <span class="fl">30</span>, <span class="kw">vjust</span> <span class="kw">=</span> <span class="fl">0.8</span>))</pre></body></html></div>
+  <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/theme.html">theme</a></span>(<span class="kw">axis.text.x</span> <span class="kw">=</span> <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/element.html">element_text</a></span>(<span class="kw">angle</span> <span class="kw">=</span> <span class="fl">30</span>, <span class="kw">vjust</span> <span class="kw">=</span> <span class="fl">0.8</span>))</pre></body></html></div>
 <p><img src="quickstart_files/figure-html/plot_cmsens_me_con-1.png" width="768"></p>
 <p>Then, assume that the exposure was measured with error. Sensitivity analysis for measurement error using SIMEX with two assumed misclassification matrices:</p>
 <div class="sourceCode" id="cb14"><html><body><pre class="r"><span class="no">me2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/cmsens.html">cmsens</a></span>(<span class="kw">object</span> <span class="kw">=</span> <span class="no">est</span>, <span class="kw">sens</span> <span class="kw">=</span> <span class="st">"me"</span>, <span class="kw">MEmethod</span> <span class="kw">=</span> <span class="st">"simex"</span>, <span class="kw">MEvariable</span> <span class="kw">=</span> <span class="st">"A"</span>,
               <span class="kw">MEvartype</span> <span class="kw">=</span> <span class="st">"cat"</span>, <span class="kw">B</span> <span class="kw">=</span> <span class="fl">5</span>,
               <span class="kw">MEerror</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.95</span>, <span class="fl">0.05</span>, <span class="fl">0.05</span>, <span class="fl">0.95</span>), <span class="kw">nrow</span> <span class="kw">=</span> <span class="fl">2</span>),
                              <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.9</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>, <span class="fl">0.9</span>), <span class="kw">nrow</span> <span class="kw">=</span> <span class="fl">2</span>)))</pre></body></html></div>
-<p>Summarizing and plotting the results:</p>
+<p>Summarize and plot the results:</p>
 <div class="sourceCode" id="cb15"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">me2</span>)</pre></body></html></div>
 <pre><code>## Sensitivity Analysis For Measurement Error 
 ##  
@@ -316,21 +310,21 @@
 ## 
 ## Measurement error correction for measurement error 1: 
 ##               Estimate Std.error   95% CIL 95% CIU  P.val    
-## cde           0.427854  1.146131 -2.433505   1.643    0.9    
-## pnde          1.592612  0.363178  0.997741   2.156 &lt;2e-16 ***
-## tnde          2.006486  0.417177  1.421804   2.791 &lt;2e-16 ***
-## pnie          0.445115  0.246303 -0.056927   0.802    0.1 .  
-## tnie          0.858989  0.332633  0.348404   1.467 &lt;2e-16 ***
-## te            2.451602  0.431524  1.766788   3.205 &lt;2e-16 ***
-## intref        1.164759  0.982415  0.103721   3.519    0.1 .  
-## intmed        0.413874  0.356570  0.018079   1.249    0.1 .  
-## cde(prop)     0.174520  0.521704 -1.166460   0.793    0.9    
-## intref(prop)  0.475101  0.450030  0.012866   1.700    0.1 .  
-## intmed(prop)  0.168818  0.148032  0.006152   0.525    0.1 .  
-## pnie(prop)    0.181561  0.097376 -0.026605   0.321    0.1 .  
-## pm            0.350379  0.116701  0.180724   0.542 &lt;2e-16 ***
-## int           0.643919  0.585865  0.022220   2.186    0.1 .  
-## pe            0.825480  0.521704  0.207046   2.166    0.1 .  
+## cde           1.629767  0.876144  0.293280   3.355 &lt;2e-16 ***
+## pnde          1.640048  0.323380  1.033275   1.961 &lt;2e-16 ***
+## tnde          1.499898  0.313785  0.975573   1.968 &lt;2e-16 ***
+## pnie          0.481277  0.179434  0.178624   0.752 &lt;2e-16 ***
+## tnie          0.341128  0.123942  0.206991   0.605 &lt;2e-16 ***
+## te            1.981175  0.296728  1.408943   2.259 &lt;2e-16 ***
+## intref        0.010280  0.723164 -1.504975   0.980    1.0    
+## intmed       -0.140149  0.150642 -0.335558   0.204    0.9    
+## cde(prop)     0.822626  0.399315  0.166205   1.536 &lt;2e-16 ***
+## intref(prop)  0.005189  0.379754 -0.749481   0.555    1.0    
+## intmed(prop) -0.070740  0.073794 -0.154034   0.107    0.9    
+## pnie(prop)    0.242925  0.091211  0.090567   0.382 &lt;2e-16 ***
+## pm            0.172185  0.074430  0.102721   0.336 &lt;2e-16 ***
+## int          -0.065551  0.428004 -0.850935   0.660    1.0    
+## pe            0.177374  0.399315 -0.536202   0.834    0.8    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## ----------------------------------------------------------------
@@ -342,26 +336,26 @@
 ## 
 ## Measurement error correction for measurement error 2: 
 ##              Estimate Std.error  95% CIL 95% CIU  P.val    
-## cde           0.71553   1.05941 -1.23293   2.097    1.0    
-## pnde          1.68591   0.36185  1.08969   2.406 &lt;2e-16 ***
-## tnde          1.93068   0.41395  1.63593   2.994 &lt;2e-16 ***
-## pnie          0.57324   0.33678 -0.21360   0.916    0.4    
-## tnie          0.81801   0.48962 -0.03885   1.618    0.1 .  
-## te            2.50392   0.43881  1.78164   3.262 &lt;2e-16 ***
-## intref        0.97038   0.78847  0.06818   2.803    0.1 .  
-## intmed        0.24477   0.51784 -0.25625   1.500    0.2    
-## cde(prop)     0.28576   0.41470 -0.52972   0.782    1.0    
-## intref(prop)  0.38754   0.36321  0.03402   1.342    0.1 .  
-## intmed(prop)  0.09775   0.19488 -0.13207   0.513    0.2    
-## pnie(prop)    0.22894   0.12467 -0.10641   0.315    0.4    
-## pm            0.32669   0.17139 -0.01514   0.591    0.1 .  
-## int           0.48530   0.48055  0.03542   1.571    0.1 .  
-## pe            0.71424   0.41470  0.21806   1.530 &lt;2e-16 ***
+## cde           1.68869   0.76331  0.53873   3.408 &lt;2e-16 ***
+## pnde          1.96866   0.31411  1.23538   2.313 &lt;2e-16 ***
+## tnde          1.88709   0.26615  1.30344   2.165 &lt;2e-16 ***
+## pnie          0.37383   0.19584 -0.06195   0.600    0.3    
+## tnie          0.29225   0.17027  0.02011   0.650    0.1 .  
+## te            2.26092   0.27207  1.68591   2.540 &lt;2e-16 ***
+## intref        0.27997   0.61221 -1.10066   1.207    1.0    
+## intmed       -0.08158   0.21873 -0.37393   0.439    0.8    
+## cde(prop)     0.74691   0.30433  0.27469   1.352 &lt;2e-16 ***
+## intref(prop)  0.12383   0.27922 -0.44080   0.577    1.0    
+## intmed(prop) -0.03608   0.10082 -0.14613   0.213    0.8    
+## pnie(prop)    0.16534   0.09031 -0.03093   0.262    0.3    
+## pm            0.12926   0.08935  0.01052   0.339    0.1 .  
+## int           0.08775   0.33000 -0.58543   0.569    0.9    
+## pe            0.25309   0.30433 -0.35168   0.725    0.5    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## ----------------------------------------------------------------</code></pre>
 <div class="sourceCode" id="cb17"><html><body><pre class="r"><span class="fu"><a href="../reference/ggcmsens.html">ggcmsens</a></span>(<span class="no">me2</span>) +
-  <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="kw">axis.text.x</span> <span class="kw">=</span> <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span>(<span class="kw">angle</span> <span class="kw">=</span> <span class="fl">30</span>, <span class="kw">vjust</span> <span class="kw">=</span> <span class="fl">0.8</span>))</pre></body></html></div>
+  <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/theme.html">theme</a></span>(<span class="kw">axis.text.x</span> <span class="kw">=</span> <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/element.html">element_text</a></span>(<span class="kw">angle</span> <span class="kw">=</span> <span class="fl">30</span>, <span class="kw">vjust</span> <span class="kw">=</span> <span class="fl">0.8</span>))</pre></body></html></div>
 <p><img src="quickstart_files/figure-html/plot_cmsens_me_cat-1.png" width="768"></p>
   </div>
 

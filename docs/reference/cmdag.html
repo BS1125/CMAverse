@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>DAG For Causal Mediation Analysis — cmdag • CMAverse</title>
+<title>DAG Visualization — cmdag • CMAverse</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -43,7 +43,7 @@
 
 
 
-<meta property="og:title" content="DAG For Causal Mediation Analysis — cmdag" />
+<meta property="og:title" content="DAG Visualization — cmdag" />
 
 <meta property="og:description" content="Plot the directed acyclic graph (DAG) for causal mediation analysis." />
 
@@ -155,7 +155,7 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>DAG For Causal Mediation Analysis</h1>
+    <h1>DAG Visualization</h1>
     <small class="dont-index">Source: <a href='https://github.com/BS1125/CMAverse/blob/master/R/cmdag.R'><code>R/cmdag.R</code></a></small>
     <div class="hidden name"><code>cmdag.Rd</code></div>
     </div>
@@ -200,56 +200,58 @@
     </tr>
     <tr>
       <th>mediator</th>
-      <td><p>a character or vector of variable name(s) of the mediator(s)</p></td>
+      <td><p>a vector of variable name(s) of the mediator(s)</p></td>
     </tr>
     <tr>
       <th>basec</th>
-      <td><p>(optional) a character or vector of variable name(s) of the baseline confounder(s)</p></td>
+      <td><p>(optional) a vector of variable name(s) of the exposure-outcome
+confounder(s), exposure-mediator confounder(s) and mediator-outcome 
+confounder(s) not affected by the exposure</p></td>
     </tr>
     <tr>
       <th>postc</th>
-      <td><p>(optional) a character or vector of variable name(s) of the post-exposure 
+      <td><p>(optional) a vector of variable name(s) of the mediator-outcome 
 confounder(s) affected by the exposure</p></td>
     </tr>
     <tr>
       <th>x.outcome</th>
-      <td><p>x coordinate of the outcome. Default is <code>4</code>.</p></td>
+      <td><p>x coordinate of <code>outcome</code>. Default is <code>4</code>.</p></td>
     </tr>
     <tr>
       <th>x.exposure</th>
-      <td><p>x coordinate of the exposure. Default is <code>0</code>.</p></td>
+      <td><p>x coordinate of <code>exposure</code>. Default is <code>0</code>.</p></td>
     </tr>
     <tr>
       <th>x.mediator</th>
-      <td><p>x coordinate of the mediator. Default is <code>2</code>.</p></td>
+      <td><p>x coordinate of <code>mediator</code>. Default is <code>2</code>.</p></td>
     </tr>
     <tr>
       <th>x.basec</th>
-      <td><p>x coordinate of the pre-exposure confounder. Default is <code>2</code>.</p></td>
+      <td><p>x coordinate of <code>basec</code>. Default is <code>2</code>.</p></td>
     </tr>
     <tr>
       <th>x.postc</th>
-      <td><p>x coordinate of the post-exposure confounder. Default is <code>2</code>.</p></td>
+      <td><p>x coordinate of <code>postc</code>. Default is <code>2</code>.</p></td>
     </tr>
     <tr>
       <th>y.outcome</th>
-      <td><p>y coordinate of the outcome. Default is <code>0</code>.</p></td>
+      <td><p>y coordinate of <code>outcome</code>. Default is <code>0</code>.</p></td>
     </tr>
     <tr>
       <th>y.exposure</th>
-      <td><p>y coordinate of the exposure. Default is <code>0</code>.</p></td>
+      <td><p>y coordinate of <code>exposure</code>. Default is <code>0</code>.</p></td>
     </tr>
     <tr>
       <th>y.mediator</th>
-      <td><p>y coordinate of the mediator. Default is <code>1</code>.</p></td>
+      <td><p>y coordinate of <code>mediator</code>. Default is <code>1</code>.</p></td>
     </tr>
     <tr>
       <th>y.basec</th>
-      <td><p>y coordinate of the baseline confounder. Default is <code>2</code>.</p></td>
+      <td><p>y coordinate of <code>basec</code>. Default is <code>2</code>.</p></td>
     </tr>
     <tr>
       <th>y.postc</th>
-      <td><p>y coordinate of the post-exposure confounder. Default is <code>-0.5</code>.</p></td>
+      <td><p>y coordinate of <code>postc</code>. Default is <code>-0.5</code>.</p></td>
     </tr>
     <tr>
       <th>caption.width</th>
@@ -265,12 +267,17 @@ confounder(s) affected by the exposure</p></td>
     </tr>
     </table>
     
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p><a href='cmest.html'>cmest</a>, <a href='cmsens.html'>cmsens</a>.</p></div>
+    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'>## basec and postc are empty</span>
+    <pre class="examples"><div class='input'>
+<span class='co'>## basec and postc are empty</span>
 <span class='fu'>cmdag</span>(<span class='kw'>outcome</span> <span class='kw'>=</span> <span class='st'>"Y"</span>, <span class='kw'>exposure</span> <span class='kw'>=</span> <span class='st'>"A"</span>, <span class='kw'>mediator</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"M1"</span>, <span class='st'>"M2"</span>),
      <span class='kw'>basec</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>postc</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>node</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>text_col</span> <span class='kw'>=</span> <span class='st'>"white"</span>)</div><div class='img'><img src='cmdag-1.png' alt='' width='700' height='433' /></div><div class='input'>
-<span class='co'>#' ## postc is empty</span>
+<span class='co'>## postc is empty</span>
 <span class='fu'>cmdag</span>(<span class='kw'>outcome</span> <span class='kw'>=</span> <span class='st'>"Y"</span>, <span class='kw'>exposure</span> <span class='kw'>=</span> <span class='st'>"A"</span>, <span class='kw'>mediator</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"M1"</span>, <span class='st'>"M2"</span>),
      <span class='kw'>basec</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"C1"</span>, <span class='st'>"C2"</span>, <span class='st'>"C3"</span>), <span class='kw'>postc</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>node</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>text_col</span> <span class='kw'>=</span> <span class='st'>"black"</span>)</div><div class='img'><img src='cmdag-2.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'>## basec is empty</span>

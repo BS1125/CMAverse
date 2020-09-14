@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Statistical Modeling with Missing Data • CMAverse</title>
+<title>Multiple Imputations with Missing Data • CMAverse</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
 <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
@@ -17,7 +17,7 @@
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="Statistical Modeling with Missing Data">
+<script src="../pkgdown.js"></script><meta property="og:title" content="Multiple Imputations with Missing Data">
 <meta property="og:description" content="CMAverse">
 <meta property="og:image" content="https://bs1125.github.io/CMAverse/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -112,9 +112,9 @@
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>Statistical Modeling with Missing Data</h1>
+      <h1 data-toc-skip>Multiple Imputations with Missing Data</h1>
             
-            <h4 class="date">2020-08-27</h4>
+            <h4 class="date">2020-09-13</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BS1125/CMAverse/blob/master/vignettes/multiple_imputation.Rmd"><code>vignettes/multiple_imputation.Rmd</code></a></small>
       <div class="hidden name"><code>multiple_imputation.Rmd</code></div>
@@ -123,7 +123,7 @@
 
     
     
-<p>This example demonstrates how to use the <code>cmest</code> function when there is missing data. For this purpose, we simulate some data containing a continuous baseline confounder <span class="math inline">\(C_1\)</span>, a binary baseline confounder <span class="math inline">\(C_2\)</span>, a binary exposure <span class="math inline">\(A\)</span>, a binary mediator <span class="math inline">\(M\)</span> and a binary outcome <span class="math inline">\(Y\)</span>. The true regression models for <span class="math inline">\(A\)</span>, <span class="math inline">\(M\)</span> and <span class="math inline">\(Y\)</span> are: <span class="math display">\[logit(E(A|C_1,C_2))=0.2+0.5C_1+0.1C_2\]</span> <span class="math display">\[logit(E(M|A,C_1,C_2))=1+2A+1.5C_1+0.8C_2\]</span> <span class="math display">\[logit(E(Y|A,M,C_1,C_2)))=-3-0.4A-1.2M+0.5AM+0.3C_1-0.6C_2\]</span></p>
+<p>This example demonstrates how to estimate causal effects with multiple imputations by using <code>cmest</code> when the dataset contains missing values. For this purpose, we simulate some data containing a continuous baseline confounder <span class="math inline">\(C_1\)</span>, a binary baseline confounder <span class="math inline">\(C_2\)</span>, a binary exposure <span class="math inline">\(A\)</span>, a binary mediator <span class="math inline">\(M\)</span> and a binary outcome <span class="math inline">\(Y\)</span>. The true regression models for <span class="math inline">\(A\)</span>, <span class="math inline">\(M\)</span> and <span class="math inline">\(Y\)</span> are: <span class="math display">\[logit(E(A|C_1,C_2))=0.2+0.5C_1+0.1C_2\]</span> <span class="math display">\[logit(E(M|A,C_1,C_2))=1+2A+1.5C_1+0.8C_2\]</span> <span class="math display">\[logit(E(Y|A,M,C_1,C_2)))=-3-0.4A-1.2M+0.5AM+0.3C_1-0.6C_2\]</span></p>
 <p>To create the dataset with missing values, we randomly delete 10% of values in the dataset.</p>
 <div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="fl">1</span>)
 <span class="no">expit</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">x</span>) <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="no">x</span>)/(<span class="fl">1</span>+<span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="no">x</span>))
@@ -146,7 +146,7 @@
 <span class="fu"><a href="../reference/cmdag.html">cmdag</a></span>(<span class="kw">outcome</span> <span class="kw">=</span> <span class="st">"Y"</span>, <span class="kw">exposure</span> <span class="kw">=</span> <span class="st">"A"</span>, <span class="kw">mediator</span> <span class="kw">=</span> <span class="st">"M"</span>,
       <span class="kw">basec</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"C1"</span>, <span class="st">"C2"</span>), <span class="kw">postc</span> <span class="kw">=</span> <span class="kw">NULL</span>, <span class="kw">node</span> <span class="kw">=</span> <span class="fl">TRUE</span>, <span class="kw">text_col</span> <span class="kw">=</span> <span class="st">"white"</span>)</pre></body></html></div>
 <p><img src="multiple_imputation_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
-<p>To deal with missing data, we set the <code>multimp</code> argument to be <code>TRUE</code>. The regression-based approach is used for illustration. The multiple imputation results:</p>
+<p>To conduct multiple imputations, we set the <code>multimp</code> argument to be <code>TRUE</code>. The regression-based approach is used for illustration. The multiple imputation results:</p>
 <div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="no">res_multimp</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span>(<span class="kw">data</span> <span class="kw">=</span> <span class="no">data</span>, <span class="kw">model</span> <span class="kw">=</span> <span class="st">"rb"</span>, <span class="kw">outcome</span> <span class="kw">=</span> <span class="st">"Y"</span>, <span class="kw">exposure</span> <span class="kw">=</span> <span class="st">"A"</span>,
                      <span class="kw">mediator</span> <span class="kw">=</span> <span class="st">"M"</span>, <span class="kw">basec</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"C1"</span>, <span class="st">"C2"</span>), <span class="kw">EMint</span> <span class="kw">=</span> <span class="fl">TRUE</span>,
                      <span class="kw">mreg</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="st">"logistic"</span>), <span class="kw">yreg</span> <span class="kw">=</span> <span class="st">"logistic"</span>,
@@ -154,29 +154,29 @@
                      <span class="kw">estimation</span> <span class="kw">=</span> <span class="st">"paramfunc"</span>, <span class="kw">inference</span> <span class="kw">=</span> <span class="st">"delta"</span>,
                      <span class="kw">multimp</span> <span class="kw">=</span> <span class="fl">TRUE</span>, <span class="kw">m</span> <span class="kw">=</span> <span class="fl">10</span>)</pre></body></html></div>
 <div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">res_multimp</span>)</pre></body></html></div>
-<pre><code>## # Causal Mediation Analysis via the Regression-based Approach with Multiple Imputation
+<pre><code>## Causal Mediation Analysis via the Regression-based Approach with Multiple Imputation
 ##  
 ## Closed-form parameter function estimation with 
 ##  delta method standard errors, confidence intervals and p-values 
 ##  
-##                 Estimate Std.error  95% CIL 95% CIU    P.val    
-## RRcde            1.36120   0.23353  0.97250   1.905 0.072270 .  
-## RRpnde           1.52020   0.26126  1.08546   2.129 0.014804 *  
-## RRtnde           1.39496   0.23283  1.00575   1.935 0.046119 *  
-## RRpnie           0.94014   0.03647  0.87130   1.014 0.111600    
-## RRtnie           0.86269   0.05535  0.76075   0.978 0.021319 *  
-## RRte             1.31145   0.21064  0.95727   1.797 0.091397 .  
-## ERRcde           0.33467   0.48120 -0.60847   1.278 0.486748    
-## ERRintref        0.18625   0.21012 -0.22557   0.598 0.375389    
-## ERRintmed       -0.14913   0.13320 -0.41021   0.112 0.262886    
-## ERRpnie         -0.05980   0.10495 -0.26549   0.146 0.568827    
-## ERRcde(prop)     1.07365   0.07723  0.92228   1.225  &lt; 2e-16 ***
-## ERRintref(prop)  0.60374   0.23304  0.14699   1.060 0.009578 ** 
-## ERRintmed(prop) -0.48338   0.51848 -1.49958   0.533 0.351186    
-## ERRpnie(prop)   -0.19401   0.40845 -0.99455   0.607 0.634783    
-## pm              -0.67739   0.20037 -1.07010  -0.285 0.000723 ***
-## int              0.12036   0.10582 -0.08704   0.328 0.255352    
-## pe              -0.07365   0.19071 -0.44744   0.300 0.699349    
+##                Estimate Std.error  95% CIL 95% CIU    P.val    
+## Rcde            1.36120   0.23353  0.97250   1.905 0.072270 .  
+## Rpnde           1.52020   0.26126  1.08546   2.129 0.014804 *  
+## Rtnde           1.39496   0.23283  1.00575   1.935 0.046119 *  
+## Rpnie           0.94014   0.03647  0.87130   1.014 0.111600    
+## Rtnie           0.86269   0.05535  0.76075   0.978 0.021319 *  
+## Rte             1.31145   0.21064  0.95727   1.797 0.091397 .  
+## ERcde           0.33467   0.48120 -0.60847   1.278 0.486748    
+## ERintref        0.18625   0.21012 -0.22557   0.598 0.375389    
+## ERintmed       -0.14913   0.13320 -0.41021   0.112 0.262886    
+## ERpnie         -0.05980   0.10495 -0.26549   0.146 0.568827    
+## ERcde(prop)     1.07365   0.07723  0.92228   1.225  &lt; 2e-16 ***
+## ERintref(prop)  0.60374   0.23304  0.14699   1.060 0.009578 ** 
+## ERintmed(prop) -0.48338   0.51848 -1.49958   0.533 0.351186    
+## ERpnie(prop)   -0.19401   0.40845 -0.99455   0.607 0.634783    
+## pm             -0.67739   0.20037 -1.07010  -0.285 0.000723 ***
+## int             0.12036   0.10582 -0.08704   0.328 0.255352    
+## pe             -0.07365   0.19071 -0.44744   0.300 0.699349    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
@@ -201,36 +201,36 @@
 ## 
 ## $basecval[[2]]
 ## [1] 0.6065056</code></pre>
-<p>Compare the multiple imputation results with the results obtained from the dataset without missing data:</p>
+<p>Compare the multiple imputation results with true results:</p>
 <div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="no">res_noNA</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span>(<span class="kw">data</span> <span class="kw">=</span> <span class="no">data_noNA</span>, <span class="kw">model</span> <span class="kw">=</span> <span class="st">"rb"</span>, <span class="kw">outcome</span> <span class="kw">=</span> <span class="st">"Y"</span>, <span class="kw">exposure</span> <span class="kw">=</span> <span class="st">"A"</span>,
                   <span class="kw">mediator</span> <span class="kw">=</span> <span class="st">"M"</span>, <span class="kw">basec</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"C1"</span>, <span class="st">"C2"</span>), <span class="kw">EMint</span> <span class="kw">=</span> <span class="fl">TRUE</span>,
                   <span class="kw">mreg</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="st">"logistic"</span>), <span class="kw">yreg</span> <span class="kw">=</span> <span class="st">"logistic"</span>,
                   <span class="kw">astar</span> <span class="kw">=</span> <span class="fl">0</span>, <span class="kw">a</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">mval</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fl">1</span>), <span class="kw">yref</span> <span class="kw">=</span> <span class="fl">1</span>,
                   <span class="kw">estimation</span> <span class="kw">=</span> <span class="st">"paramfunc"</span>, <span class="kw">inference</span> <span class="kw">=</span> <span class="st">"delta"</span>)</pre></body></html></div>
 <div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">res_noNA</span>)</pre></body></html></div>
-<pre><code>## # Causal Mediation Analysis via the Regression-based Approach
+<pre><code>## Causal Mediation Analysis via the Regression-based Approach
 ##  
 ## Closed-form parameter function estimation with 
 ##  delta method standard errors, confidence intervals and p-values 
 ##  
-##                 Estimate Std.error  95% CIL 95% CIU   P.val    
-## RRcde            1.33138   0.22278  0.95912   1.848 0.08717 .  
-## RRpnde           1.41988   0.23708  1.02358   1.970 0.03577 *  
-## RRtnde           1.34928   0.22056  0.97940   1.859 0.06686 .  
-## RRpnie           0.93338   0.03576  0.86587   1.006 0.07191 .  
-## RRtnie           0.88697   0.05295  0.78902   0.997 0.04453 *  
-## RRte             1.25939   0.19804  0.92535   1.714 0.14249    
-## ERRcde           0.30416   0.50289 -0.68149   1.290 0.54529    
-## ERRintref        0.11571   0.20019 -0.27665   0.508 0.56325    
-## ERRintmed       -0.09387   0.11472 -0.31872   0.131 0.41323    
-## ERRpnie         -0.06662   0.09323 -0.24934   0.116 0.47486    
-## ERRcde(prop)     1.17262   0.03576  1.10254   1.243 &lt; 2e-16 ***
-## ERRintref(prop)  0.44610   0.23540 -0.01528   0.907 0.05809 .  
-## ERRintmed(prop) -0.36189   0.49051 -1.32327   0.599 0.46065    
-## ERRpnie(prop)   -0.25684   0.39881 -1.03849   0.525 0.51957    
-## pm              -0.61872   0.23474 -1.07880  -0.159 0.00839 ** 
-## int              0.08421   0.09264 -0.09736   0.266 0.36334    
-## pe              -0.17262   0.23540 -0.63400   0.289 0.46338    
+##                Estimate Std.error  95% CIL 95% CIU   P.val    
+## Rcde            1.33138   0.22278  0.95912   1.848 0.08717 .  
+## Rpnde           1.41988   0.23708  1.02358   1.970 0.03577 *  
+## Rtnde           1.34928   0.22056  0.97940   1.859 0.06686 .  
+## Rpnie           0.93338   0.03576  0.86587   1.006 0.07191 .  
+## Rtnie           0.88697   0.05295  0.78902   0.997 0.04453 *  
+## Rte             1.25939   0.19804  0.92535   1.714 0.14249    
+## ERcde           0.30416   0.50289 -0.68149   1.290 0.54529    
+## ERintref        0.11571   0.20019 -0.27665   0.508 0.56325    
+## ERintmed       -0.09387   0.11472 -0.31872   0.131 0.41323    
+## ERpnie         -0.06662   0.09323 -0.24934   0.116 0.47486    
+## ERcde(prop)     1.17262   0.03576  1.10254   1.243 &lt; 2e-16 ***
+## ERintref(prop)  0.44610   0.23540 -0.01528   0.907 0.05809 .  
+## ERintmed(prop) -0.36189   0.49051 -1.32327   0.599 0.46065    
+## ERpnie(prop)   -0.25684   0.39881 -1.03849   0.525 0.51957    
+## pm             -0.61872   0.23474 -1.07880  -0.159 0.00839 ** 
+## int             0.08421   0.09264 -0.09736   0.266 0.36334    
+## pe             -0.17262   0.23540 -0.63400   0.289 0.46338    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
