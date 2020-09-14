@@ -504,7 +504,7 @@ knitr::kable(tb3, escape = FALSE, caption = "Table 3: Causal Effects on the Diff
 tb4 <- data.frame(c("Controlled Direct Effect", "Randomized Analogue of $PNDE$",
                     "Randomized Analogue of $TNDE$", "Randomized Analogue of $PNIE$",
                     "Randomized Analogue of $TNIE$", "Total Effect", 
-                    "Excess ratio due to Controlled Direct Effect", 
+                    "Excess Ratio due to Controlled Direct Effect", 
                     "Randomized Analogue of $ER^{INT_{ref}}$", 
                     "Randomized Analogue of $ER^{INT_{med}}$", 
                     "Randomized Analogue of $ER^{PNIE}$", 

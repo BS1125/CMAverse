@@ -114,7 +114,7 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>CMAverse Quickstart Guide</h1>
             
-            <h4 class="date">2020-09-13</h4>
+            <h4 class="date">2020-09-14</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BS1125/CMAverse/blob/master/vignettes/quickstart.Rmd"><code>vignettes/quickstart.Rmd</code></a></small>
       <div class="hidden name"><code>quickstart.Rmd</code></div>
@@ -193,7 +193,7 @@
 ## $mval[[2]]
 ## [1] 1</code></pre>
 <div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="fu"><a href="../reference/ggcmest.html">ggcmest</a></span>(<span class="no">est</span>) +
-  <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/theme.html">theme</a></span>(<span class="kw">axis.text.x</span> <span class="kw">=</span> <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/element.html">element_text</a></span>(<span class="kw">angle</span> <span class="kw">=</span> <span class="fl">30</span>, <span class="kw">vjust</span> <span class="kw">=</span> <span class="fl">0.8</span>))</pre></body></html></div>
+  <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="kw">axis.text.x</span> <span class="kw">=</span> <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span>(<span class="kw">angle</span> <span class="kw">=</span> <span class="fl">30</span>, <span class="kw">vjust</span> <span class="kw">=</span> <span class="fl">0.8</span>))</pre></body></html></div>
 <p><img src="quickstart_files/figure-html/plot_cmest-1.png" width="768"></p>
 <p>Lastly, we conduct sensitivity analysis for the results. Sensitivity analysis for unmeasured confounding:</p>
 <div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="fu"><a href="../reference/cmsens.html">cmsens</a></span>(<span class="kw">object</span> <span class="kw">=</span> <span class="no">est</span>, <span class="kw">sens</span> <span class="kw">=</span> <span class="st">"uc"</span>)</pre></body></html></div>
@@ -289,7 +289,7 @@
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## ----------------------------------------------------------------</code></pre>
 <div class="sourceCode" id="cb13"><html><body><pre class="r"><span class="fu"><a href="../reference/ggcmsens.html">ggcmsens</a></span>(<span class="no">me1</span>) +
-  <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/theme.html">theme</a></span>(<span class="kw">axis.text.x</span> <span class="kw">=</span> <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/element.html">element_text</a></span>(<span class="kw">angle</span> <span class="kw">=</span> <span class="fl">30</span>, <span class="kw">vjust</span> <span class="kw">=</span> <span class="fl">0.8</span>))</pre></body></html></div>
+  <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="kw">axis.text.x</span> <span class="kw">=</span> <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span>(<span class="kw">angle</span> <span class="kw">=</span> <span class="fl">30</span>, <span class="kw">vjust</span> <span class="kw">=</span> <span class="fl">0.8</span>))</pre></body></html></div>
 <p><img src="quickstart_files/figure-html/plot_cmsens_me_con-1.png" width="768"></p>
 <p>Then, assume that the exposure was measured with error. Sensitivity analysis for measurement error using SIMEX with two assumed misclassification matrices:</p>
 <div class="sourceCode" id="cb14"><html><body><pre class="r"><span class="no">me2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/cmsens.html">cmsens</a></span>(<span class="kw">object</span> <span class="kw">=</span> <span class="no">est</span>, <span class="kw">sens</span> <span class="kw">=</span> <span class="st">"me"</span>, <span class="kw">MEmethod</span> <span class="kw">=</span> <span class="st">"simex"</span>, <span class="kw">MEvariable</span> <span class="kw">=</span> <span class="st">"A"</span>,
@@ -355,7 +355,7 @@
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## ----------------------------------------------------------------</code></pre>
 <div class="sourceCode" id="cb17"><html><body><pre class="r"><span class="fu"><a href="../reference/ggcmsens.html">ggcmsens</a></span>(<span class="no">me2</span>) +
-  <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/theme.html">theme</a></span>(<span class="kw">axis.text.x</span> <span class="kw">=</span> <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/element.html">element_text</a></span>(<span class="kw">angle</span> <span class="kw">=</span> <span class="fl">30</span>, <span class="kw">vjust</span> <span class="kw">=</span> <span class="fl">0.8</span>))</pre></body></html></div>
+  <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="kw">axis.text.x</span> <span class="kw">=</span> <span class="kw pkg">ggplot2</span><span class="kw ns">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span>(<span class="kw">angle</span> <span class="kw">=</span> <span class="fl">30</span>, <span class="kw">vjust</span> <span class="kw">=</span> <span class="fl">0.8</span>))</pre></body></html></div>
 <p><img src="quickstart_files/figure-html/plot_cmsens_me_cat-1.png" width="768"></p>
   </div>
 
