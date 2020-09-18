@@ -31,6 +31,26 @@ test_that("simexreg works correctly for lm", {
   expect_equal(class(print(reg_simex)), "numeric")
   expect_equal(class(print(summary(reg_simex))), "data.frame")
   
+  # a continuous dependent variable measured with error
+  set.seed(1)
+  n <- 10000
+  x1 <- rnorm(n, mean = 0, sd = 1)
+  x2 <- rnorm(n, mean = 1, sd = 1)
+  x3 <- rbinom(n, size = 1, prob = 0.4)
+  error1 <- rnorm(n, mean = 0, sd = 0.5)
+  y_true <- 1 + 2 * x1 + 4 * x2 + 2 * x3  + rnorm(n, mean = 0, sd = 2)
+  y_error <- y_true + error1
+  data <- data.frame(x1 = x1, x2 = x2,
+                     x3 = x3, y_true = y_true, y_error = y_error)
+  reg_naive <- lm(y_error ~ x1 + x2 + x3, data = data)
+  reg_true <- lm(y_true ~ x1 + x2 + x3, data = data)
+  reg_simex <- simexreg(reg = reg_naive, data = data, MEvariable = "y_error", MEvartype = "con",
+                        MEerror = 0.5, variance = TRUE)
+  
+  # test
+  expect_equal(unname(coef(reg_simex)), unname(coef(reg_true)), tolerance = 0.1)
+  expect_equal(sigma(reg_simex), 2, tolerance = 0.1)
+  
   # a categorical variable measured with error
   set.seed(1)
   n <- 10000

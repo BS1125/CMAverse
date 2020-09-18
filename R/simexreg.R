@@ -282,7 +282,9 @@ simexreg <- function (reg = NULL, data = NULL, weights = NULL,
          identical(regClass, "lm")) && MEvartype == "continuous") {
       reg_fit <- reg
       reg_fit$coefficients <- SIMEXcoef
-      SIMEXsigma <- sqrt(sum((model.frame(reg_fit)[, 1] - predict(reg_fit, newdata = data)) ^ 2) / 
+      if (MEvariable == all.vars(formula(reg))[1]) SIMEXsigma <- sqrt(sigma(reg)^2 - MEerror^2)
+      if (MEvariable != all.vars(formula(reg))[1]) SIMEXsigma <- 
+        sqrt(sum((model.frame(reg_fit)[, 1] - predict(reg_fit, newdata = data)) ^ 2) / 
                            (n - ncoef) - (SIMEXcoef[MEvariable] * MEerror) ^ 2)
       out$SIMEXsigma <- unname(SIMEXsigma)
     }
