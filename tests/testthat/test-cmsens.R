@@ -215,7 +215,7 @@ test_that("sensitivity analysis for unmeasured confounding works correctly for b
   ci.up <- res_binbin_naive$effect.ci.high[1:6]
   evalues <- c()
   for (i in 1:6) {
-    evalues <- rbind(evalues, evalues.RR(est = effect.pe[i], lo = ci.lo[i], hi = ci.up[i])[2, ])
+    evalues <- rbind(evalues, EValue::evalues.RR(est = effect.pe[i], lo = ci.lo[i], hi = ci.up[i])[2, ])
   }
 
   # test

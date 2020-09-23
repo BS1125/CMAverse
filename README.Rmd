@@ -32,7 +32,44 @@ See the package [website](https://bs1125.github.io/CMAverse/) for a quickstart g
 *the weighting-based approach* by [VanderWeele et al. (2014)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/), *the inverse odd-ratio weighting approach* by [Tchetgen Tchetgen (2013)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3954805/), 
 *the natural effect model* by
 [Vansteelandt et al. (2012)](https://www.degruyter.com/view/journals/em/1/1/article-p131.xml?language=en), *the marginal structural model* by [VanderWeele 
-et al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5560424/), and *the g-formula approach* by [Lin et al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5285457/). 
+et al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5560424/), and *the g-formula approach* by [Robins (1986)](https://www.sciencedirect.com/science/article/pii/0270025586900886). 
+
+`cmest` currently supports a single exposure, multiple sequential mediators and a single outcome.  When multiple mediators are of interest, `cmest` estimates the joint mediated effect through the set of mediators. `cmest` also allows for time varying confounders preceding mediators. The two causal scenarios supported are:
+
+(i) There are no confounders affected by the exposure.
+
+```{r echo=F,warning=F,message=F,fig.width=6,fig.height=3}
+library(dagitty)
+g1 <- dagitty( "dag {
+    A -> Y
+    A -> M -> Y
+    C -> A
+    C -> M
+    C -> Y
+}")
+coordinates(g1) <- list(x=c(A=0,Y=4,M=2,C=0.2),y=c(A=0,Y=0,M=-0.8,C=-1))
+plot(g1)
+```
+
+(ii) There are mediator-outcome confounders affected by the exposure and these confounders precede all of the mediators.
+
+```{r echo=F,warning=F,message=F,fig.width=6,fig.height=3}
+g2 <- dagitty::dagitty( "dag {
+    A -> Y
+    A -> M -> Y
+    C -> A
+    C -> M
+    C -> Y
+    A -> L
+    L -> Y
+    L -> M
+    C -> L
+}")
+
+dagitty::coordinates(g2) <- list(x=c(A=0,Y=4,M=2,C=0.2,L=2),y=c(A=0,Y=0,M=-0.8,C=-1,L=0.5))
+
+plot(g2)
+```
 
 Table: Table: Supported Data Types and Functionalities of `cmest`
 
@@ -55,7 +92,6 @@ Table: Table: Supported Data Types and Functionalities of `cmest`
 |Nominal A|√|√|√|√|√|√|
 |Ordinal A|√|√|√|√|√|√|
 |Count A|√|×[^8]|×|√|×[^8]|√|
-|Multiple Mediators|√|√|√|√|√|√|
 |Mediator-outcome Confounder(s) affected by A|×|×|×|×|√|√|
 |2-way Decomposition|√|√|√|√|√|√|
 |4-way Decomposition|√|√|×|√|√|√|
@@ -64,7 +100,7 @@ Table: Table: Supported Data Types and Functionalities of `cmest`
 |Inference: Delta Method|√[^3]|×|×|×|×|×|
 |Inference: Bootstrapping|√|√|√|√|√|√|
 |Marginal Effects|√[^4]|√|√|√|√|√|
-|Effects Conditional On C|√[^5]|×|×|×|×|×|
+|Effects Conditional on C|√[^5]|×|×|×|×|×|
 [^1]: rb: the regression-based approach; wb: the weighting-based approach; iorw: the inverse odds ratio weighting approach; ne: the natural effect model; msm: the marginal structural model; gformula: the g-formula approach.
 [^2]: closed-form parameter function estimation only supports a single mediator.
 [^3]: delta method inference is available only when closed-form parameter function estimation is used.
@@ -80,7 +116,7 @@ Table: Table: Supported Data Types and Functionalities of `cmest`
 
 ### Sensitivity Analysis
 
-`cmsens` conducts sensitivity analysis for unmeasured confounding via the *E-value* approach by [VanderWeele et al. (2017)](https://pubmed.ncbi.nlm.nih.gov/28693043/) and [Smith et al. (2019)](https://pubmed.ncbi.nlm.nih.gov/31348008/), and sensitivity analysis for measurement error via *regression calibration* by [Carroll et al. (1995)](https://www.taylorfrancis.com/books/9780429139635) and *SIMEX* by [Cook et al. (1994)](https://www.jstor.org/stable/2290994?seq=1#metadata_info_tab_contents) and [Küchenhoff et al. (2006)](https://pubmed.ncbi.nlm.nih.gov/16542233/). The sensitivity analysis for measurement error is currently available for *the regression-based approach* and *the g-formula approach*.
+`cmsens` conducts sensitivity analysis for unmeasured confounding via the *E-value* approach by [VanderWeele et al. (2017)](https://pubmed.ncbi.nlm.nih.gov/28693043/) and [Smith et al. (2019)](https://pubmed.ncbi.nlm.nih.gov/31348008/), and sensitivity analysis for measurement error via *regression calibration* by [Carroll et al. (1995)](https://www.taylorfrancis.com/books/9780429139635) and *SIMEX* by [Cook et al. (1994)](https://www.jstor.org/stable/2290994?seq=1#metadata_info_tab_contents) and [Küchenhoff et al. (2006)](https://pubmed.ncbi.nlm.nih.gov/16542233/). Sensitivity analysis for measurement error is currently available for *the regression-based approach* and *the g-formula approach*.
 
 ## Installation
 
@@ -108,7 +144,7 @@ Nguyen QC, Osypuk TL, Schmidt NM, Glymour MM, Tchetgen Tchetgen EJ. Practical gu
 
 VanderWeele TJ, Tchetgen Tchetgen EJ (2017). Mediation analysis with time varying exposures and mediators. Journal of the Royal Statistical Society: Series B (Statistical Methodology). 79(3): 917 - 938.
 
-Lin SH, Young J, Logan R, Tchetgen Tchetgen EJ, VanderWeele TJ (2017). Parametric mediational g-formula approach to mediation analysis with time-varying exposures, mediators, and confounders. Epidemiology. 28: 266 - 274.
+Robins JM (1986). A new approach to causal inference in mortality studies with a sustained exposure period-Application to control of the healthy worker survivor effect. Mathematical Modelling. 7: 1393 - 1512.
 
 Vansteelandt S, Bekaert M, Lange T. (2012). Imputation Strategies for the Estimation of Natural Direct and Indirect Effects. Epidemiologic Methods. 1(1): 131 - 158.
 

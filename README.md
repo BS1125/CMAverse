@@ -43,8 +43,23 @@ natural effect model* by [Vansteelandt et
 al. (2012)](https://www.degruyter.com/view/journals/em/1/1/article-p131.xml?language=en),
 *the marginal structural model* by [VanderWeele et
 al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5560424/), and
-*the g-formula approach* by [Lin et
-al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5285457/).
+*the g-formula approach* by [Robins
+(1986)](https://www.sciencedirect.com/science/article/pii/0270025586900886).
+
+`cmest` currently supports a single exposure, multiple sequential
+mediators and a single outcome. When multiple mediators are of interest,
+`cmest` estimates the joint mediated effect through the set of
+mediators. `cmest` also allows for time varying confounders preceding mediators. The two
+causal scenarios supported are:
+
+1.  There are no confounders affected by the exposure.
+
+![](man/figures/unnamed-chunk-1-1.png)
+
+2.  There are mediator-outcome confounders affected by the exposure and
+    these confounders precede all of the mediators.
+
+![](man/figures/unnamed-chunk-2-1.png)
 
 <table>
 <caption>Table: Supported Data Types and Functionalities of <code>cmest</code></caption>
@@ -214,15 +229,6 @@ al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5285457/).
 <td style="text-align: center;">√</td>
 </tr>
 <tr class="even">
-<td>Multiple Mediators</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-<td style="text-align: center;">√</td>
-</tr>
-<tr class="odd">
 <td>Mediator-outcome Confounder(s) affected by A</td>
 <td style="text-align: center;">×</td>
 <td style="text-align: center;">×</td>
@@ -231,7 +237,7 @@ al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5285457/).
 <td style="text-align: center;">√</td>
 <td style="text-align: center;">√</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2-way Decomposition</td>
 <td style="text-align: center;">√</td>
 <td style="text-align: center;">√</td>
@@ -240,7 +246,7 @@ al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5285457/).
 <td style="text-align: center;">√</td>
 <td style="text-align: center;">√</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>4-way Decomposition</td>
 <td style="text-align: center;">√</td>
 <td style="text-align: center;">√</td>
@@ -249,7 +255,7 @@ al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5285457/).
 <td style="text-align: center;">√</td>
 <td style="text-align: center;">√</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Estimation: Closed-form Parameter Function</td>
 <td style="text-align: center;">√<a href="#fn7" class="footnote-ref" id="fnref7" role="doc-noteref"><sup>7</sup></a></td>
 <td style="text-align: center;">×</td>
@@ -258,7 +264,7 @@ al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5285457/).
 <td style="text-align: center;">×</td>
 <td style="text-align: center;">×</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Estimation: Direct Counterfactual Imputation</td>
 <td style="text-align: center;">√</td>
 <td style="text-align: center;">√</td>
@@ -267,7 +273,7 @@ al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5285457/).
 <td style="text-align: center;">√</td>
 <td style="text-align: center;">√</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Inference: Delta Method</td>
 <td style="text-align: center;">√<a href="#fn8" class="footnote-ref" id="fnref8" role="doc-noteref"><sup>8</sup></a></td>
 <td style="text-align: center;">×</td>
@@ -276,7 +282,7 @@ al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5285457/).
 <td style="text-align: center;">×</td>
 <td style="text-align: center;">×</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Inference: Bootstrapping</td>
 <td style="text-align: center;">√</td>
 <td style="text-align: center;">√</td>
@@ -285,7 +291,7 @@ al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5285457/).
 <td style="text-align: center;">√</td>
 <td style="text-align: center;">√</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Marginal Effects</td>
 <td style="text-align: center;">√<a href="#fn9" class="footnote-ref" id="fnref9" role="doc-noteref"><sup>9</sup></a></td>
 <td style="text-align: center;">√</td>
@@ -294,8 +300,8 @@ al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5285457/).
 <td style="text-align: center;">√</td>
 <td style="text-align: center;">√</td>
 </tr>
-<tr class="odd">
-<td>Effects Conditional On C</td>
+<tr class="even">
+<td>Effects Conditional on C</td>
 <td style="text-align: center;">√<a href="#fn10" class="footnote-ref" id="fnref10" role="doc-noteref"><sup>10</sup></a></td>
 <td style="text-align: center;">×</td>
 <td style="text-align: center;">×</td>
@@ -336,7 +342,7 @@ et al. (1995)](https://www.taylorfrancis.com/books/9780429139635) and
 *SIMEX* by [Cook et
 al. (1994)](https://www.jstor.org/stable/2290994?seq=1#metadata_info_tab_contents)
 and [Küchenhoff et
-al. (2006)](https://pubmed.ncbi.nlm.nih.gov/16542233/). The sensitivity
+al. (2006)](https://pubmed.ncbi.nlm.nih.gov/16542233/). Sensitivity
 analysis for measurement error is currently available for *the
 regression-based approach* and *the g-formula approach*.
 
@@ -374,10 +380,9 @@ VanderWeele TJ, Tchetgen Tchetgen EJ (2017). Mediation analysis with
 time varying exposures and mediators. Journal of the Royal Statistical
 Society: Series B (Statistical Methodology). 79(3): 917 - 938.
 
-Lin SH, Young J, Logan R, Tchetgen Tchetgen EJ, VanderWeele TJ (2017).
-Parametric mediational g-formula approach to mediation analysis with
-time-varying exposures, mediators, and confounders. Epidemiology. 28:
-266 - 274.
+Robins JM (1986). A new approach to causal inference in mortality
+studies with a sustained exposure period-Application to control of the
+healthy worker survivor effect. Mathematical Modelling. 7: 1393 - 1512.
 
 Vansteelandt S, Bekaert M, Lange T. (2012). Imputation Strategies for
 the Estimation of Natural Direct and Indirect Effects. Epidemiologic

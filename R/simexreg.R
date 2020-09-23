@@ -190,7 +190,7 @@ simexreg <- function (reg = NULL, data = NULL, weights = NULL,
     if (!((((identical(regClass, c("glm", "lm")) && family(reg)$family == "gaussian") |
             identical(regClass, "lm")) && MEvartype == "categorical") | 
           inherits(reg, "svyglm") | inherits(reg, "svymultinom") | 
-          inherits(reg, "multinom") | inherits(reg, "survreg"))) {
+          inherits(reg, "multinom") | inherits(reg, "survreg") | inherits(reg, "coxph"))) {
       if (MEvartype == "continuous") {
         SIMEX <- simex::simex(model = reg, SIMEXvariable = MEvariable, measurement.error = MEerror, 
                               lambda = lambda, B = B, fitting.method = "quadratic",
