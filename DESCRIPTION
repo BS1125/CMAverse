@@ -45,7 +45,7 @@ Imports:
     EValue,
     ggplot2,
     medflex
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 Suggests: 
     knitr,
     kableExtra,

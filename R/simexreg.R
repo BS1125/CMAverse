@@ -151,8 +151,7 @@ simexreg <- function (reg = NULL, data = NULL, weights = NULL,
       if (length(MEvariable) != 0 && !is.matrix(MEerror)) stop("MEerror should be a matrix")
       if (dim(MEerror)[1] != dim(MEerror)[2] |
           dim(MEerror)[1] != length(unique(data[, MEvariable]))) stop("Incorrect dimension of MEerror")
-      data[, MEvariable] <- as.factor(data[, MEvariable])
-      MEvar_lev <- levels(data[, MEvariable])
+      MEvar_lev <- levels(as.factor(data[, MEvariable]))
       dimnames(MEerror) <- list(MEvar_lev, MEvar_lev)
       if (!check.mc.matrix(list(MEerror))) stop("MEerror may contain negative values for exponents smaller than 1")
     } else stop("Unsupported MEvartype; use 'continuous' or 'categorical'")
@@ -210,6 +209,11 @@ simexreg <- function (reg = NULL, data = NULL, weights = NULL,
           out$SIMEXsigma <- unname(SIMEXsigma)
         }
       } else if (MEvartype == "categorical") {
+        if (!is.factor(data[, MEvariable])) {
+        data[, MEvariable] <- as.factor(data[, MEvariable])
+        regCall$data <- data
+        reg <- eval.parent(regCall)
+        }
         SIMEX <- simex::mcsimex(model = reg, SIMEXvariable = MEvariable, mc.matrix = MEerror, 
                                 lambda = lambda, B = B, fitting.method = "quadratic",
                                 jackknife.estimation = "quadratic", asymptotic = FALSE)
