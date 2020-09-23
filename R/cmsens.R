@@ -443,12 +443,18 @@ ggcmsens <- function(x, errorbar.width = 0.3, errorbar.size = 0.3,
       if ((inherits(x$naive$reg.output$yreg, "lm") | inherits(x$naive$reg.output$yreg, "glm")) &&
           (family(x$naive$reg.output$yreg)$family %in% c("gaussian","Gamma","inverse.gaussian","quasi"))) {
         ref <- 0
-      } else ref <- 1
+      } else {
+        if (x$naive$methods$full) ref <- c(0, 1)
+        if (!x$naive$methods$full) ref <- 1
+      }
     } else {
       if ((inherits(x$naive$reg.output[[1]]$yreg, "lm") | inherits(x$naive$reg.output[[1]]$yreg, "glm")) &&
           (family(x$naive$reg.output[[1]]$yreg)$family %in% c("gaussian","Gamma","inverse.gaussian","quasi"))) {
         ref <- 0
-      } else ref <- 1
+      } else {
+        if (x$naive$methods$full) ref <- c(0, 1)
+        if (!x$naive$methods$full) ref <- 1
+      }
     }
   } else ref <- NULL
   # naive results

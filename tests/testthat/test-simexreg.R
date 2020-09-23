@@ -266,7 +266,7 @@ test_that("simexreg works correctly for polr", {
   # a categorical variable measured with error
   set.seed(1)
   n <- 10000
-  x1 <- rnorm(n, mean = 5, sd = 3)
+  x1 <- rnorm(n, mean = 5, sd = 1)
   x2_true <- sample(x = c(1:3), size = n, prob = c(0.2,0.3,0.5), replace = TRUE)
   MEerror <- matrix(c(0.9,0.05,0.05,0.06,0.92,0.02,0.02,0.03,0.95), nrow = 3)
   x2_error <- x2_true
@@ -278,8 +278,8 @@ test_that("simexreg works correctly for polr", {
   x2_true <- as.factor(x2_true)
   x2_error <- as.factor(x2_error)
   x3 <- rnorm(n, mean = 2, sd = 1)
-  linearpred1 <- 1 + 0.3 * x1 - 1.5*(x2_true == 2) - 2.5*(x2_true == 3) - 0.2 * x3
-  linearpred2 <- 2 + 1 * x1 - 2*(x2_true == 2) - 0.5*(x2_true == 3) - 1 * x3
+  linearpred1 <- 0.3 * x1 - 0.5*(x2_true == 2) - 0.2*(x2_true == 3) - 0.2 * x3
+  linearpred2 <- -1 + 0.2 * x1 - 0.8*(x2_true == 2) - 0.5*(x2_true == 3) - 0.1 * x3
   py2 <- exp(linearpred1) / (1 + exp(linearpred1) + exp(linearpred2))
   py3 <- exp(linearpred2) / (1 + exp(linearpred1) + exp(linearpred2))
   py1 <- 1 - py2 - py3

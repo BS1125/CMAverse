@@ -860,12 +860,18 @@ ggcmest <- function(x, errorbar.width = 0.3, errorbar.size = 0.3, errorbar.colou
       if ((inherits(x$reg.output$yreg, "lm") | inherits(x$reg.output$yreg, "glm")) &&
           (family(x$reg.output$yreg)$family %in% c("gaussian","Gamma","inverse.gaussian","quasi"))) {
         ref <- 0
-      } else ref <- 1
+      } else {
+        if (x$methods$full) ref <- c(0, 1)
+        if (!x$methods$full) ref <- 1
+      }
     } else {
       if ((inherits(x$reg.output[[1]]$yreg, "lm") | inherits(x$reg.output[[1]]$yreg, "glm")) &&
           (family(x$reg.output[[1]]$yreg)$family %in% c("gaussian","Gamma","inverse.gaussian","quasi"))) {
         ref <- 0
-      } else ref <- 1
+      } else {
+        if (x$methods$full) ref <- c(0, 1)
+        if (!x$methods$full) ref <- 1
+      }
     }
   } else ref <- NULL
   # plot
@@ -877,4 +883,5 @@ ggcmest <- function(x, errorbar.width = 0.3, errorbar.size = 0.3, errorbar.colou
                size = point.size, colour = point.colour, data = effect_df) +
     ylab("Point Estimate and 95% CI") +
     geom_hline(yintercept = ref, color = refline.colour, size = refline.size)
+  
 }
