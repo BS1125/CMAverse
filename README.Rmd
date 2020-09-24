@@ -36,7 +36,7 @@ et al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5560424/), and *the 
 
 `cmest` currently supports a single exposure, multiple sequential mediators and a single outcome.  When multiple mediators are of interest, `cmest` estimates the joint mediated effect through the set of mediators. `cmest` also allows for time varying confounders preceding mediators. The two causal scenarios supported are:
 
-(i) There are no confounders affected by the exposure.
+(i) There are no confounders affected by the exposure:
 
 ```{r echo=F,warning=F,message=F,fig.width=6,fig.height=3}
 library(dagitty)
@@ -51,7 +51,7 @@ coordinates(g1) <- list(x=c(A=0,Y=4,M=2,C=0.2),y=c(A=0,Y=0,M=-0.8,C=-1))
 plot(g1)
 ```
 
-(ii) There are mediator-outcome confounders affected by the exposure and these confounders precede all of the mediators.
+(ii) There are mediator-outcome confounders affected by the exposure and these confounders precede all of the mediators:
 
 ```{r echo=F,warning=F,message=F,fig.width=6,fig.height=3}
 g2 <- dagitty::dagitty( "dag {
@@ -92,7 +92,7 @@ Table: Table: Supported Data Types and Functionalities of `cmest`
 |Nominal A|√|√|√|√|√|√|
 |Ordinal A|√|√|√|√|√|√|
 |Count A|√|×[^8]|×|√|×[^8]|√|
-|Mediator-outcome Confounder(s) affected by A|×|×|×|×|√|√|
+|Mediator-outcome Confounder(s) Affected by A|×|×|×|×|√|√|
 |2-way Decomposition|√|√|√|√|√|√|
 |4-way Decomposition|√|√|×|√|√|√|
 |Estimation: Closed-form Parameter Function|√[^2]|×|×|×|×|×|

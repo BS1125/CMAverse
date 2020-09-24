@@ -283,17 +283,17 @@ test_that("simexreg works correctly for polr", {
   py2 <- exp(linearpred1) / (1 + exp(linearpred1) + exp(linearpred2))
   py3 <- exp(linearpred2) / (1 + exp(linearpred1) + exp(linearpred2))
   py1 <- 1 - py2 - py3
-  y <- sapply(1:n, function(x) sample(size = 1, c(1:3), prob = c(py1[x], py2[x], py3[x])))
+  y <- as.factor(sapply(1:n, function(x) sample(size = 1, c(1:3), prob = c(py1[x], py2[x], py3[x]))))
   data <- data.frame(x1 = x1, x2_true = x2_true, x2_error = x2_error,
                      x3 = x3, y = y)
-  reg_naive <- MASS::polr(factor(y) ~ x1 + x2_error + x3, data = data)
-  reg_true <- MASS::polr(factor(y) ~ x1 + x2_true + x3, data = data)
+  reg_naive <- MASS::polr(y ~ x1 + x2_error + x3, data = data)
+  reg_true <- MASS::polr(y ~ x1 + x2_true + x3, data = data)
   reg_simex <- simexreg(reg = reg_naive, data = data, MEvariable = "x2_error",
                         MEerror = MEerror, variance = TRUE, MEvartype = "cat")
   
   # test
   expect_equal(unname(coef(reg_simex))[1:4], as.numeric(t(unname(coef(reg_true)))), tolerance = 0.1)
-  expect_equal(formula(reg_simex), as.formula(factor(y) ~ x1 + x2_error + x3))
+  expect_equal(formula(reg_simex), as.formula(y ~ x1 + x2_error + x3))
   expect_equal(as.numeric(predict(reg_simex, newdata = data[1, ], type = "probs")),
                c(py1[1], py2[1], py3[1]), tolerance = 0.1)
   expect_equal(model.frame(reg_simex), model.frame(reg_naive))

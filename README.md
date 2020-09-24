@@ -52,12 +52,12 @@ mediators and a single outcome. When multiple mediators are of interest,
 mediators. `cmest` also allows for time varying confounders preceding mediators. The two
 causal scenarios supported are:
 
-1.  There are no confounders affected by the exposure.
+1.  There are no confounders affected by the exposure:
 
 ![](man/figures/unnamed-chunk-1-1.png)
 
 2.  There are mediator-outcome confounders affected by the exposure and
-    these confounders precede all of the mediators.
+    these confounders precede all of the mediators:
 
 ![](man/figures/unnamed-chunk-2-1.png)
 
@@ -229,7 +229,7 @@ causal scenarios supported are:
 <td style="text-align: center;">√</td>
 </tr>
 <tr class="even">
-<td>Mediator-outcome Confounder(s) affected by A</td>
+<td>Mediator-outcome Confounder(s) Affected by A</td>
 <td style="text-align: center;">×</td>
 <td style="text-align: center;">×</td>
 <td style="text-align: center;">×</td>
