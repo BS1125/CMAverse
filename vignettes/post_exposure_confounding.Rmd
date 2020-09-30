@@ -43,7 +43,7 @@ In this setting, we can use the marginal structural model and the $g$-formula ap
 res_msm <- cmest(data = data, model = "msm", outcome = "Y", exposure = "A",
                  mediator = "M", basec = c("C1", "C2"), postc = "L", EMint = TRUE,
                  ereg = "logistic", yreg = "logistic", mreg = list("logistic"),
-                 wmreg = list("logistic"),
+                 wmnomreg = list("logistic"), wmdenomreg = list("logistic"),
                  astar = 0, a = 1, mval = list(1), yref = 1,
                  estimation = "imputation", inference = "bootstrap", nboot = 2)
 ```
