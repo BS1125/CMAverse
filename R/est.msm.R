@@ -44,14 +44,14 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     wmdenom <- wmnom <- matrix(nrow = n, ncol = length(mediator))
     for (p in 1:length(mediator)) {
       # weights for wmdenomreg[[p]] and wmnomreg[[p]]
-      if (!is.null(weights_wmnomreg[[p]])) weights_wmnomreg <- weights_wmnomreg[[p]][indices] * w4casecon
-      if (is.null(weights_wmnomreg[[p]])) weights_wmnomreg <- w4casecon      
-      if (!is.null(weights_wmmdenomreg[[p]])) weights_wmdenomreg <- weights_wmdenomreg[[p]][indices] * w4casecon
-      if (is.null(weights_wmmdenomreg[[p]])) weights_wmdenomreg <- w4casecon
+      if (!is.null(weights_wmnomreg[[p]])) weights_wmnomreg[[p]] <- weights_wmnomreg[[p]][indices] * w4casecon
+      if (is.null(weights_wmnomreg[[p]])) weights_wmnomreg[[p]] <- w4casecon      
+      if (!is.null(weights_wmdenomreg[[p]])) weights_wmdenomreg[[p]] <- weights_wmdenomreg[[p]][indices] * w4casecon
+      if (is.null(weights_wmdenomreg[[p]])) weights_wmdenomreg[[p]] <- w4casecon
       # update wmdenomreg[[p]] and wmnomreg[[p]]
-      call_wmdenomreg[[p]]$weights <- weights_wmdenomreg
+      call_wmdenomreg[[p]]$weights <- weights_wmdenomreg[[p]]
       call_wmdenomreg[[p]]$data <- data
-      call_wmnomreg[[p]]$weights <- weights_wmnomreg
+      call_wmnomreg[[p]]$weights <- weights_wmnomreg[[p]]
       call_wmnomreg[[p]]$data <- data
       wmdenomreg[[p]] <- eval.parent(call_wmdenomreg[[p]])
       wmnomreg[[p]] <- eval.parent(call_wmnomreg[[p]])
@@ -75,8 +75,7 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       }
     }
     wm <- wmnom / wmdenom
-    rm(weights_wmdenomreg, weights_wmnomreg, m_lev, wm_data, 
-       wmdenom_prob, wmnom_prob, category, wmdenom, wmnom)
+    rm(m_lev, wm_data, wmdenom_prob, wmnom_prob, category, wmdenom, wmnom)
     
     # weights for yreg
     w_yreg <- wa
