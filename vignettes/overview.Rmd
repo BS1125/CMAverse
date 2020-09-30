@@ -18,13 +18,15 @@ knitr::opts_chunk$set(
 This document describes how the six causal mediation analysis approaches including *the regression-based approach* by [Valeri et al. (2013)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3659198/) and [VanderWeele et al. (2014)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/), 
 *the weighting-based approach* by [VanderWeele et al. (2014)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/), *the inverse odd-ratio weighting approach* by [Tchetgen Tchetgen (2013)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3954805/), *the natural effect model* by
 [Vansteelandt et al. (2012)](https://www.degruyter.com/view/journals/em/1/1/article-p131.xml?language=en), *the marginal structural model* by [VanderWeele 
-et al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5560424/), and *the $g$-formula approach* by [Lin et al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5285457/) are implemented by `cmest` in the `CMAverse` package. See publications of these approaches for methodological details .
+et al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5560424/), and *the $g$-formula approach* by [Robins (1986)](https://www.sciencedirect.com/science/article/pii/0270025586900886) are implemented by the `CMAverse` package. See publications of these approaches for methodological details .
 
-We categorize these approaches based on whether the approach can deal with mediator-outcome confounders affected by the exposure. Among the six approaches, only *The marginal structural model* and *the $g$-formula approach* are able to deal with mediator-outcome confounders affected by the exposure.
+`CMAverse` currently supports a single exposure, multiple sequential mediators and a single outcome.  When multiple mediators are of interest, `CMAverse` estimates the joint mediated effect through the set of mediators. `CMAverse` also supports time varying confounders preceding the mediators. 
 
-The outcome and the exposure are denoted as $Y$ and $A$ respectively. The set of exposure-mediator confounders, exposure-outcome confounders and mediator-outcome confounders not affected by the exposure is denoted as $C$. The set of mediators is denoted as $M$ and $M=(M_1,...,M_k)$ follows the temporal order. The set of mediator-outcome confounders affected by the exposure is denoted as $L$ and $L=(L_1,...,L_s)$ follows the temporal order. 
+We categorize the causal mediation analysis approaches based on whether the approach can deal with mediator-outcome confounders affected by the exposure. Among the six approaches, only *The marginal structural model* and *the $g$-formula approach* are able to deal with mediator-outcome confounders affected by the exposure.
 
-Since weights calculated from noncategorical variables are unstable which hurts the performance of effect estimation and inference, we require all variables used to calculate weights be categorical. 
+In this document, the outcome and the exposure are denoted as $Y$ and $A$ respectively. The set of exposure-mediator confounders, exposure-outcome confounders and mediator-outcome confounders not affected by the exposure is denoted as $C$. The set of mediators is denoted as $M$ and $M=(M_1,...,M_k)$ follows the temporal order. The set of mediator-outcome confounders affected by the exposure is denoted as $L$ and $L=(L_1,...,L_s)$ follows the temporal order. 
+
+Since weights calculated from noncategorical variables are unstable, which hurts the performance of effect estimation and inference, weighted approaches can be implemented only for categorical exposure and mediator(s). 
 
 # No Confounders Affected by the Exposure
 
@@ -61,14 +63,14 @@ tb1 <- data.frame(c("Controlled Direct Effect", "Pure Natural Direct Effect",
              "$INT_{med}$", "$prop^{CDE}$", "$prop^{INT_{ref}}$", "$prop^{INT_{med}}$", 
              "$prop^{PNIE}$", "$PM$", "$INT$", "$PE$"),
            c("$E[Y_{am}-Y_{a^*m}]$", "$E[Y_{aM_a^*}-Y_{a^*M_a^*}]$", "$E[Y_{aM_a}-Y_{a^*M_a}]$", 
-             "$E[Y_{a^*M_a}-Y_{a^*M_a^*}]$", "$E[Y_{aM_a}-Y_{aM_a^*}]$", "$PNDE+TNIE$", 
+             "$E[Y_{a^*M_a}-Y_{a^*M_a^*}]$", "$E[Y_{aM_a}-Y_{aM_a^*}]$", "$PNDE+TNIE$ or $TNDE+PNIE$", 
              "$PNDE-CDE$", "$TNIE-PNIE$", "$CDE/TE$", 
              "$INT_{ref}/TE$", "$INT_{med}/TE$", "$PNIE/TE$", "$TNIE/TE$", 
              "$(INT_{ref}+INT_{med})/TE$", 
              "$(INT_{ref}+INT_{med}+PNIE)/TE$"))
 colnames(tb1) <- c("Full Name", "Abbreviation", "Formula")
 knitr::kable(tb1, escape = FALSE, caption = "Table 1: Causal Effects on the Difference Scale") %>%
-  footnote(general = "$a$ and $a^*$ are two reference values for $A$. $m$ is the reference value for $M$. $M_a$ denotes the counterfactual value of $M$ that would have been observed had $A$ been set to be $a$. $Y_{am}$ denotes the counterfactual value of $Y$ that would have been observed had $A$ been set to be $a$, and $M$ to be $m$. $Y_{aMa*}$ denotes the counterfactual value of $Y$ that would have been observed had $A$ been set to be $a$, and $M$ to be $M_{a*}$.") %>%
+  footnote(general = "$a$ and $a^*$ are the active and control values for $A$ respectively. $m$ is the value at which $M$ is controlled. $M_a$ denotes the counterfactual value of $M$ that would have been observed had $A$ been set to be $a$. $Y_{am}$ denotes the counterfactual value of $Y$ that would have been observed had $A$ been set to be $a$, and $M$ to be $m$. $Y_{aMa*}$ denotes the counterfactual value of $Y$ that would have been observed had $A$ been set to be $a$, and $M$ to be the counterfactual value $M_{a*}$.") %>%
   column_spec(1, width = "20em") %>%
   column_spec(2, width = "8em") %>%
   column_spec(3, width = "10em") %>%
@@ -95,7 +97,7 @@ tb2 <- data.frame(c("Controlled Direct Effect", "Pure Natural Direct Effect",
              "$prop^{ER^{PNIE}}$", "$PM$", "$INT$", "$PE$"),
            c("$E[Y_{am}]/E[Y_{a^*m}]$", "$E[Y_{aM_a^*}]/E[Y_{a^*M_a^*}]$", 
              "$E[Y_{aM_a}]/E[Y_{a^*M_a}]$", "$E[Y_{a^*M_a}]/E[Y_{a^*M_a^*}]$", 
-             "$E[Y_{aM_a}]/E[Y_{aM_a^*}]$", "$R^{PNDE}\\times R^{TNIE}$", 
+             "$E[Y_{aM_a}]/E[Y_{aM_a^*}]$", "$R^{PNDE}\\times R^{TNIE}$ or $R^{TNDE}\\times R^{PNIE}$", 
               "$(E[Y_{am}-Y_{a^*m}])/E[Y_{a^*M_a^*}]$",
              "$R^{PNDE}-1-ER^{CDE}$", "$R^{TNIE}*R^{PNDE}-R^{PNDE}-R^{PNIE}+1$", 
              "$R^{PNIE}-1$", "$ER^{CDE}/(R^{TE}-1)$", 
@@ -106,7 +108,7 @@ tb2 <- data.frame(c("Controlled Direct Effect", "Pure Natural Direct Effect",
              "$(ER^{INT_{ref}}+ER^{INT_{med}}+ER^{PNIE})/(R^{TE}-1)$"))
 colnames(tb2) <- c("Full Name", "Abbreviation", "Formula")
 knitr::kable(tb2, escape = FALSE, caption = "Table 2: Causal Effects on the Ratio Scale") %>%
-  footnote(general = "$a$ and $a^*$ are two reference values for $A$. $m$ is the reference value for $M$. $M_a$ denotes the counterfactual value of $M$ that would have been observed had $A$ been set to be $a$. $Y_{am}$ denotes the counterfactual value of $Y$ that would have been observed had $A$ been set to be $a$, and $M$ to be $m$. $Y_{aMa*}$ denotes the counterfactual value of $Y$ that would have been observed had $A$ been set to be $a$, and $M$ to be $M_{a*}$. If $Y$ is categorical, a reference value of $Y$, denoted as $y$, is needed and $E[Y]$ represents the probability of $Y=y$.") %>%
+  footnote(general = "$a$ and $a^*$ are the active and control values for $A$ respectively. $m$ is the value at which $M$ is controlled. $M_a$ denotes the counterfactual value of $M$ that would have been observed had $A$ been set to be $a$. $Y_{am}$ denotes the counterfactual value of $Y$ that would have been observed had $A$ been set to be $a$, and $M$ to be $m$. $Y_{aMa*}$ denotes the counterfactual value of $Y$ that would have been observed had $A$ been set to be $a$, and $M$ to be the counterfactual value $M_{a*}$. If $Y$ is categorical, a reference value of $Y$, denoted as $y$, is needed and $E[Y]$ represents the probability of $Y=y$.") %>%
   column_spec(1, width = "20em") %>%
   column_spec(2, width = "8em") %>%
   column_spec(3, width = "10em") %>%
@@ -120,11 +122,11 @@ With the regression-based approach, all causal effects are estimated through eit
 
 ### Closed-form Parameter Function Estimation
 
-Closed-form parameter function estimation is available when there is only a single mediator, i.e., $M=M_1$. Also, `yreg` must be chosen from `linear`, `logistic`, `loglinear`, `poisson`, `quasipoisson`, `negbin`, `coxph`, `aft_exp` and `aft_weibull`. `mreg` must be chosen from `linear`, `logistic` and `multinomial`. To use `yreg = "logistic"` in closed-form parameter function estimation, the outcome must be rare. To use `yreg = "coxph"` in closed-form parameter function estimation, the outcome at the end of follow-up must be rare. Additionally, the causal effects estimated through closed-form parameter function estimation are conditional on the value of $C$ specified by the `precval` argument. Closed-form parameter functions are summarized below.
+Closed-form parameter function estimation is available when there is only a single mediator, i.e., $M=M_1$. Also, `yreg` must be chosen from `linear`, `logistic`, `loglinear`, `poisson`, `quasipoisson`, `negbin`, `coxph`, `aft_exp` and `aft_weibull`. `mreg` must be chosen from `linear`, `logistic` and `multinomial`. To use `yreg = "logistic"` and `yreg = "coxph"` in closed-form parameter function estimation, the outcome must be rare. Additionally, the causal effects estimated through closed-form parameter function estimation are conditional on the value of $C$ specified by the `precval` argument. Closed-form parameter functions are summarized below.
 
 #### Linear `yreg`, Linear `mreg` and Noncategorical Exposure
 
-If the exposure is not categorical, `yreg="linear"` and `mreg=list("linear")`, `cmest` estimates the causal effects by the following steps:
+If the exposure is not categorical, `yreg="linear"` and `mreg=list("linear")`, `CMAverse` estimates the causal effects by the following steps:
 
 1. Fit a linear regression model for the mediator:
 $$E[M|A,C]=\beta_0+\beta_1A+\beta_2'C$$
@@ -143,7 +145,7 @@ $$E[Y|A,M,C]=\theta_0+\theta_1A+\theta_2M+\theta_3AM+\theta_4'C$$
 
 #### Linear `yreg`, Linear `mreg` and Categorical Exposure
 
-If the exposure is categorical, `yreg="linear"` and `mreg=list("linear")`, `cmest` estimates the causal effects by the following steps:
+If the exposure is categorical, `yreg="linear"` and `mreg=list("linear")`, `CMAverse` estimates the causal effects by the following steps:
 
 1. Fit a linear regression model for the mediator:
 $$E[M|A,C]=\beta_0+\sum_{h=1}^H\beta_{1h}I\{A=h\}+\beta_2'C$$
@@ -162,7 +164,7 @@ $$E[Y|A,M,C]=\theta_0+\sum_{h=1}^H\theta_{1h}I\{A=h\}+\theta_2M+\sum_{h=1}^H\the
 
 #### Linear `yreg`, Logistic `mreg` and Noncategorical Exposure
 
-If the exposure is not categorical, `yreg="linear"` and `mreg=list("logistic")`, `cmest` estimates the causal effects by the following steps:
+If the exposure is not categorical, `yreg="linear"` and `mreg=list("logistic")`, `CMAverse` estimates the causal effects by the following steps:
 
 1. Fit a logistic regression model for the mediator:
 $$logitE[M|A,C]=\beta_0+\beta_1A+\beta_2'C$$
@@ -181,7 +183,7 @@ $$E[Y|A,M,C]=\theta_0+\theta_1A+\theta_2M+\theta_3AM+\theta_4'C$$
 
 #### Linear `yreg`, Logistic `mreg` and Categorical Exposure
 
-If the exposure is categorical, `yreg="linear"` and `mreg=list("logistic")`, `cmest` estimates the causal effects by the following steps:
+If the exposure is categorical, `yreg="linear"` and `mreg=list("logistic")`, `CMAverse` estimates the causal effects by the following steps:
 
 1. Fit a logistic regression model for the mediator:
 $$logitE[M|A,C]=\beta_0+\sum_{h=1}^H\beta_{1h}I\{A=h\}+\beta_2'C$$
@@ -200,7 +202,7 @@ $$E[Y|A,M,C]=\theta_0+\sum_{h=1}^H\theta_{1h}I\{A=h\}+\theta_2M+\sum_{h=1}^H\the
 
 #### Linear `yreg`, Multinomial `mreg` and Noncategorical Exposure
 
-If the exposure is not categorical, `yreg="linear"` and `mreg=list("multinomial")`, `cmest` estimates the causal effects by the following steps:
+If the exposure is not categorical, `yreg="linear"` and `mreg=list("multinomial")`, `CMAverse` estimates the causal effects by the following steps:
 
 1. Fit a multinomial regression model for the mediator:
 $$log\frac{E[M=j|A,C]}{E[M=0|A,C]}=\beta_{0j}+\beta_{1j}A+\beta_{2j}'C, j=1,2,...,J$$
@@ -219,7 +221,7 @@ $$E[Y|A,M,C]=\theta_0+\theta_1A+\sum_{j=1}^J\theta_{2j}I\{M=j\}+A\sum_{j=1}^J\th
 
 #### Linear `yreg`, Multinomial `mreg` and Categorical Exposure
 
-If the exposure is categorical, `yreg="linear"` and `mreg=list("multinomial")`, `cmest` estimates the causal effects by the following steps:
+If the exposure is categorical, `yreg="linear"` and `mreg=list("multinomial")`, `CMAverse` estimates the causal effects by the following steps:
 
 1. Fit a multinomial regression model for the mediator:
 $$log\frac{E[M=j|A,C]}{E[M=0|A,C]}=\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{A=h\}+\beta_{2j}'C, j=1,2,...,J$$
@@ -238,7 +240,7 @@ $$E[Y|A,M,C]=\theta_0+\sum_{h=1}^H\theta_{1h}I\{A=h\}+\sum_{j=1}^J\theta_{2j}I\{
 
 #### Nonlinear `yreg`, Linear `mreg` and Noncategorical Exposure
 
-If the exposure is not categorical, `yreg!="linear"` and `mreg=list("linear")`, `cmest` estimates the causal effects by the following steps:
+If the exposure is not categorical, `yreg!="linear"` and `mreg=list("linear")`, `CMAverse` estimates the causal effects by the following steps:
 
 1. Fit a linear regression model for the mediator:
 $$E[M|A,C]=\beta_0+\beta_1A+\beta_2'C+\epsilon_M,\epsilon_M\sim N(0,\sigma^2)$$
@@ -258,7 +260,7 @@ $$g(E[Y|A,M,C])=\theta_0+\theta_1A+\theta_2M+\theta_3AM+\theta_4'C$$
 
 #### Nonlinear `yreg`, Linear `mreg` and Categorical Exposure
 
-If the exposure is categorical, `yreg!="linear"` and `mreg=list("linear")`, `cmest` estimates the causal effects by the following steps:
+If the exposure is categorical, `yreg!="linear"` and `mreg=list("linear")`, `CMAverse` estimates the causal effects by the following steps:
 
 1. Fit a linear regression model for the mediator:
 $$E[M|A,C]=\beta_0+\sum_{h=1}^H\beta_{1h}I\{A=h\}+\beta_2'C+\epsilon_M,\epsilon_M\sim N(0,\sigma^2)$$
@@ -278,7 +280,7 @@ $$g(E[Y|A,M,C])=\theta_0+\sum_{h=1}^H\theta_{1h}I\{A=h\}+\theta_2M+\sum_{h=1}^H\
 
 #### Nonlinear `yreg`, Logistic `mreg` and Noncategorical Exposure
 
-If the exposure is not categorical, `yreg!="linear"` and `mreg=list("logistic")`, `cmest` estimates the causal effects by the following steps:
+If the exposure is not categorical, `yreg!="linear"` and `mreg=list("logistic")`, `CMAverse` estimates the causal effects by the following steps:
 
 1. Fit a logistic regression model for the mediator:
 $$logitE[M|A,C]=\beta_0+\beta_1A+\beta_2'C$$
@@ -298,7 +300,7 @@ $$g(E[Y|A,M,C])=\theta_0+\theta_1A+\theta_2M+\theta_3AM+\theta_4'C$$
 
 #### Nonlinear `yreg`, Logistic `mreg` and Categorical Exposure
 
-If the exposure is categorical, `yreg!="linear"` and `mreg=list("logistic")`, `cmest` estimates the causal effects by the following steps:
+If the exposure is categorical, `yreg!="linear"` and `mreg=list("logistic")`, `CMAverse` estimates the causal effects by the following steps:
 
 1. Fit a logistic regression model for the mediator:
 $$logitE[M|A,C]=\beta_0+\sum_{h=1}^H\beta_{1h}I\{A=h\}+\beta_2'C$$
@@ -318,7 +320,7 @@ $$g(E[Y|A,M,C])=\theta_0+\sum_{h=1}^H\theta_{1h}I\{A=h\}+\theta_2M+\sum_{h=1}^H\
 
 #### Nonlinear `yreg`, Multinomial `mreg` and Noncategorical Exposure
 
-If the exposure is not categorical, `yreg!="linear"` and `mreg=list("multinomial")`, `cmest` estimates the causal effects by the following steps:
+If the exposure is not categorical, `yreg!="linear"` and `mreg=list("multinomial")`, `CMAverse` estimates the causal effects by the following steps:
 
 1. Fit a multinomial regression model for the mediator:
 $$log\frac{E[M=j|A,C]}{E[M=0|A,C]}=\beta_{0j}+\beta_{1j}A+\beta_{2j}'C, j=1,2,...,J$$
@@ -338,7 +340,7 @@ $$g(E[Y|A,M,C])=\theta_0+\theta_1A+\sum_{j=1}^J\theta_{2j}I\{M=j\}+A\sum_{j=1}^J
 
 #### Nonlinear `yreg`, Multinomial `mreg` and Categorical Exposure
 
-If the exposure is categorical, `yreg!="linear"` and `mreg=list("multinomial")`, `cmest` estimates the causal effects by the following steps:
+If the exposure is categorical, `yreg!="linear"` and `mreg=list("multinomial")`, `CMAverse` estimates the causal effects by the following steps:
 
 1. Fit a multinomial regression model for the mediator:
 $$log\frac{E[M=j|A,C]}{E[M=0|A,C]}=\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{A=h\}+\beta_{2j}'C, j=1,2,...,J$$
@@ -356,21 +358,21 @@ $$g(E[Y|A,M,C])=\theta_0+\sum_{h=1}^H\theta_{1h}I\{A=h\}+\sum_{j=1}^J\theta_{2j}
 
 4. Calculate other effects using formulas in table 2.
 
-### Direct Counterfactural Imputation Estimation
+### Direct Counterfactual Imputation Estimation
 
-`cmest` conducts direct counterfactural imputation estimation by the following steps:
+`CMAverse` conducts direct counterfactual imputation estimation by the following steps:
 
 1. Fit a regression model for $E(Y|A,M,C)$. This regression model is specified by the `yreg` argument.
 
-2. For $p=1,...,k$, fit a regression model for the distribution of $M_p$ given $A$, $M_1$, ..., $M_{p-1}$ and $C$. These regression models are specified by the `mreg` argument.
+2. For $p=1,...,k$, fit a regression model for the distribution of $M_p$ given $A$ and $C$. These regression models are specified by the `mreg` argument.
 
-3. For $p=1,...,k$ and $i=1,...,n$, simulate the counterfacturals $M_{a,p,i}$ and $M_{a^*,p,i}$.
-    + Simulate $M_{a,p,i}$ by randomly drawing a value from the distribution of $M_{p}$ given $A=a,M_1=M_{a,1,i},...,M_{p-1}=M_{a,p-1,i},C=C_i$. Denote $M_{a,i}=(M_{a,1,i},...,M_{a,k,i})^T$.
-    + Simulate $M_{a^*,p,i}$ by randomly drawing a value from the distribution of $M_{p}$ given $A=a^*,M_1=M_{a^*,1,i},...,M_{p-1}=M_{a^*,p-1,i},C=C_i$. Denote $M_{a^*,i}=(M_{a^*,1,i},...,M_{a^*,k,i})^T$.
+3. For $p=1,...,k$ and $i=1,...,n$, simulate the counterfactuals $M_{a,p,i}$ and $M_{a^*,p,i}$.
+    + Simulate $M_{a,p,i}$ by randomly drawing a value from the distribution of $M_{p}$ given $A=a,C=C_i$. Denote $M_{a,i}=(M_{a,1,i},...,M_{a,k,i})^T$.
+    + Simulate $M_{a^*,p,i}$ by randomly drawing a value from the distribution of $M_{p}$ given $A=a^*,C=C_i$. Denote $M_{a^*,i}=(M_{a^*,1,i},...,M_{a^*,k,i})^T$.
 
 4. For $i=1,...,n$, obtain $E[Y_i|A=a^*,M=m,C=C_i]$, $E[Y_i|A=a,M=m,C=C_i]$, $E[Y_i|A=a^*,M=M_{a^*,i},C=C_i]$,  $E[Y_i|A=a^*,M=M_{a,i},C=C_i]$, $E[Y_i|A=a,M=M_{a^*,i},C=C_i]$ and $E[Y_i|A=a,M=M_{a,i},C=C_i]$ from the regression model in step 1.
 
-5. Impute the counterfacturals $E[Y_{a^*m}]$, $E[Y_{am}]$, $E[Y_{a^*Ma^*}]$, $E[Y_{aMa}]$, $E[Y_{aMa^*}]$ and $E[Y_{a^*Ma}]$.
+5. Impute the counterfactuals $E[Y_{a^*m}]$, $E[Y_{am}]$, $E[Y_{a^*Ma^*}]$, $E[Y_{aMa}]$, $E[Y_{aMa^*}]$ and $E[Y_{a^*Ma}]$.
     + Impute $E[Y_{a^*m}]$ by taking an average of $\{E[Y_i|A=a^*,M=m,C=C_i]\}_{i=1,...,n}$.
     + Impute $E[Y_{am}]$ by taking an average of $\{E[Y_i|A=a,M=m,C=C_i]\}_{i=1,...,n}$.
     + Impute $E[Y_{a^*Ma^*}]$ by taking an average of $\{E[Y_i|A=a^*,M=M_{a^*,i},C=C_i]\}_{i=1,...,n}$.
@@ -383,7 +385,7 @@ $$g(E[Y|A,M,C])=\theta_0+\sum_{h=1}^H\theta_{1h}I\{A=h\}+\sum_{j=1}^J\theta_{2j}
 
 ## The Weighting-based Approach
 
-With the weighting-based approach, `cmest` estimates causal effects through direct counterfactural imputation estimation by the following steps:
+With the weighting-based approach, `CMAverse` estimates causal effects through direct counterfactual imputation estimation by the following steps:
 
 1. Fit a regression model for the distribution of $E(Y|A,M,C)$. This regression model is specified by the `yreg` argument.
 
@@ -391,7 +393,7 @@ With the weighting-based approach, `cmest` estimates causal effects through dire
 
 3. For $i=1,...,n$, obtain $E[Y_i|A=a^*,M=m,C=C_i]$, $E[Y_i|A=a,M=m,C=C_i]$, $E[Y_i|A=a^*,M=M_i,C=C_i]$ and $E[Y_i|A=a,M=M_i,C=C_i]$ from the regression model in step 1.
 
-4. Impute the counterfacturals $E[Y_{a^*m}]$, $E[Y_{am}]$, $E[Y_{a^*Ma^*}]$, $E[Y_{aMa}]$, $E[Y_{aMa^*}]$ and $E[Y_{a^*Ma}]$.
+4. Impute the counterfactuals $E[Y_{a^*m}]$, $E[Y_{am}]$, $E[Y_{a^*Ma^*}]$, $E[Y_{aMa}]$, $E[Y_{aMa^*}]$ and $E[Y_{a^*Ma}]$.
     + Impute $E[Y_{a^*m}]$ by taking an average of $\{E[Y_i|A=a^*,M=m,C=C_i]\}_{i=1,...,n}$.
     + Impute $E[Y_{am}]$ by taking an average of $\{E[Y_i|A=a,M=m,C=C_i]\}_{i=1,...,n}$.
     + Impute $E[Y_{a^*Ma^*}]$ by taking a weighted average of $\{Y_i\}_{i\in \{i:A_i=a^*\}}$, and each subject i is given a weight $\frac{P(A=A_i)}{P(A=A_i|C=C_i)}$.
@@ -404,7 +406,7 @@ With the weighting-based approach, `cmest` estimates causal effects through dire
 
 ## The Inverse Odds Ratio Weighting Approach
 
-With the inverse odds ratio weighting approach, `cmest` estimates causal effects through direct counterfactural imputation estimation by the following steps:
+With the inverse odds ratio weighting approach, `CMAverse` estimates causal effects through direct counterfactual imputation estimation by the following steps:
 
 1. Fit a regression model for $P(A|M,C)$ and obtain $\frac{P(A=0|M=M_i,C=C_i)}{P(A=A_i|M=M_i,C=C_i)}$ for $i=1,...,n$. This regression model is specified by the `ereg` argument. 
 
@@ -412,7 +414,7 @@ With the inverse odds ratio weighting approach, `cmest` estimates causal effects
 
 3. Fit a weighted regression model for $E(Y|A,C)$ and each subject $i$ is given a weight $\frac{P(A=0|M=M_i,C=C_i)}{P(A=A_i|M=M_i,C=C_i)}$. This regression model is obtained by adding the weights to the regression model in step 2.
 
-4. Impute the counterfacturals $E_{tot}[Y_{a}]$, $E_{tot}[Y_{a^*}]$, $E_{dir}[Y_{a}]$ and $E_{dir}[Y_{a^*}]$.
+4. Impute the counterfactuals $E_{tot}[Y_{a}]$, $E_{tot}[Y_{a^*}]$, $E_{dir}[Y_{a}]$ and $E_{dir}[Y_{a^*}]$.
     + Impute $E_{tot}[Y_{a}]$ by taking an average of $\{E[Y_i|A=a,C=C_i]\}_{i=1,...,n}$ obtained from the regression model in step 2.
     + Impute $E_{tot}[Y_{a^*}]$ by taking an average of $\{E[Y_i|A=a^*,C=C_i]\}_{i=1,...,n}$ obtained from the regression model in step 2.
     + Impute $E_{dir}[Y_{a}]$ by taking a weighted average of $\{E[Y_i|A=a,C=C_i]\}_{i=1,...,n}$ obtained from the regression model in step 3 and each subject $i$ is given a weight $\frac{P(A=0|M=M_i,C=C_i)}{P(A=A_i|M=M_i,C=C_i)}$.
@@ -424,24 +426,24 @@ With the inverse odds ratio weighting approach, `cmest` estimates causal effects
 
 ## The Natural Effect Model
 
-With the natural effect model, `cmest` estimates causal effects through direct counterfactural imputation estimation by the following steps:
+With the natural effect model, `CMAverse` estimates causal effects through direct counterfactual imputation estimation by the following steps:
 
 1. Fit a regression model for $E(Y|A,M,C)$. This regression model is specified by the `yreg` argument.
 
-2. Expand the dataset using the regression model in step 1 and the `neImpute` function in the `medflex` package.
+2. Expand the dataset using the regression model in step 1 and the `neImpute` function in the `medflex` package. The expanded dataset gives $A0$ for the direct effect and $A1$ for the indirect effect.
 
 3. Fit the regression model in step 1 by the expanded dataset in step 2 with the exposure in the regression formula replaced by $A0$ and mediators in the regression formula replaced by $A1$, i.e.,
 $Y\sim A0+A1+A0*A1+C$ if the regression formula in step 1 is $Y\sim A+M_1+M_2+A*M_1+C$.
 
 4. For $i=1,...,n$, obtain $E[Y_i|A=a^*,M=m,C=C_i]$ and $E[Y_i|A=a,M=m,C=C_i]$ from the regression model in step 1; obtain $E[Y_i|A0=a^*,A1=a^*,C=C_i]$, $E[Y_i|A0=a^*,A1=a,C=C_i]$, $E[Y_i|A0=a,A1=a^*,C=C_i]$ and $E[Y_i|A0=a,A1=a,C=C_i]$ from the regression model in step 3.
 
-5. Impute the counterfacturals $E[Y_{a^*m}]$, $E[Y_{am}]$, $E[Y_{a^*Ma^*}]$, $E[Y_{aMa}]$, $E[Y_{aMa^*}]$ and $E[Y_{a^*Ma}]$.
+5. Impute the counterfactuals $E[Y_{a^*m}]$, $E[Y_{am}]$, $E[Y_{a^*Ma^*}]$, $E[Y_{aMa}]$, $E[Y_{aMa^*}]$ and $E[Y_{a^*Ma}]$.
     + Impute $E[Y_{a^*m}]$ by taking an average of $\{E[Y_i|A=a^*,M=m,C=C_i]\}_{i=1,...,n}$.
     + Impute $E[Y_{am}]$ by taking an average of $\{E[Y_i|A=a,M=m,C=C_i]\}_{i=1,...,n}$.
-    + Impute $E[Y_{a^*Ma^*}]$ by taking an average of $\{E[Y_i|A=a^*,A1=a^*,C=C_i]\}_{i=1,...,n}$.
-    + Impute $E[Y_{aMa}]$ by taking an average of $\{E[Y_i|A=a,A1=a,C=C_i]\}_{i=1,...,n}$.
-    + Impute $E[Y_{aMa^*}]$ by taking an average of $\{E[Y_i|A=a,A1=a^*,C=C_i]\}_{i=1,...,n}$.
-    + Impute $E[Y_{a^*Ma}]$ by taking an average of $\{E[Y_i|A=a^*,A1=a,C=C_i]\}_{i=1,...,n}$.
+    + Impute $E[Y_{a^*Ma^*}]$ by taking an average of $\{E[Y_i|A0=a^*,A1=a^*,C=C_i]\}_{i=1,...,n}$.
+    + Impute $E[Y_{aMa}]$ by taking an average of $\{E[Y_i|A0=a,A1=a,C=C_i]\}_{i=1,...,n}$.
+    + Impute $E[Y_{aMa^*}]$ by taking an average of $\{E[Y_i|A0=a,A1=a^*,C=C_i]\}_{i=1,...,n}$.
+    + Impute $E[Y_{a^*Ma}]$ by taking an average of $\{E[Y_i|A0=a^*,A1=a,C=C_i]\}_{i=1,...,n}$.
 
 6. Calculate causal effects with formulas in table 1 or table 2.
 
@@ -486,14 +488,14 @@ tb3 <- data.frame(c("Controlled Direct Effect", "Randomized Analogue of $PNDE$",
              "$rINT_{med}$", "$prop^{CDE}$", "$prop^{rINT_{ref}}$", "$prop^{rINT_{med}}$", 
              "$prop^{rPNIE}$", "$rPM$", "$rINT$", "$rPE$"),
            c("$E[Y_{am}-Y_{a^*m}]$", "$E[Y_{aG_{a^*}}-Y_{a^*G_{a^*}}]$", "$E[Y_{aG_{a}}-Y_{a^*G_{a}}]$", 
-             "$E[Y_{a^*G_{a}}-Y_{a^*G_{a^*}}]$", "$E[Y_{aG_{a}}-Y_{aG_{a^*}}]$", "$rPNDE+rTNIE$", 
+             "$E[Y_{a^*G_{a}}-Y_{a^*G_{a^*}}]$", "$E[Y_{aG_{a}}-Y_{aG_{a^*}}]$", "$rPNDE+rTNIE$ or $rTNDE+rPNIE$", 
              "$rPNDE-CDE$", "$rTNIE-rPNIE$", "$CDE/TE$", 
              "$rINT_{ref}/TE$", "$rINT_{med}/TE$", "$rPNIE/TE$", "$rTNIE/TE$", 
              "$(rINT_{ref}+rINT_{med})/TE$", 
              "$(rINT_{ref}+rINT_{med}+rPNIE)/TE$"))
 colnames(tb3) <- c("Full Name", "Abbreviation", "Formula")
 knitr::kable(tb3, escape = FALSE, caption = "Table 3: Causal Effects on the Difference Scale") %>%
-  footnote(general = "$a$ and $a^*$ are two reference values for $A$. $m$ is the reference value for $M$. $G_{a}$ denotes a random draw from the distribution of $M$ among those with $A=a$. $Y_{am}$ denotes the counterfactual value of $Y$ that would have been observed had $A$ been set to be $a$, and $M$ to be $m$. $Y_{aG_{a*}}$ denotes the counterfactual value of $Y$ that would have been observed had $A$ been set to be $a$, and $M$ to be $G_{a*}$.") %>%
+  footnote(general = "$a$ and $a^*$ are the active and control values for $A$. $m$ is the value at which $M$ is controlled. $G_{a}$ denotes a random draw from the distribution of $M$ had $A=a$. $Y_{am}$ denotes the counterfactual value of $Y$ that would have been observed had $A$ been set to be $a$, and $M$ to be $m$. $Y_{aG_{a*}}$ denotes the counterfactual value of $Y$ that would have been observed had $A$ been set to be $a$, and $M$ to be the counterfactual value $G_{a*}$.") %>%
   column_spec(1, width = "20em") %>%
   column_spec(2, width = "8em") %>%
   column_spec(3, width = "10em") %>%
@@ -519,7 +521,7 @@ tb4 <- data.frame(c("Controlled Direct Effect", "Randomized Analogue of $PNDE$",
              "$prop^{rER^{PNIE}}$", "$rPM$", "$rINT$", "$rPE$"),
            c("$E[Y_{am}]/E[Y_{a^*m}]$", "$E[Y_{aG_{a^*}}]/E[Y_{a^*G_{a^*}}]$", 
              "$E[Y_{aG_{a}}]/E[Y_{a^*G_{a}}]$", "$E[Y_{a^*G_{a}}]/E[Y_{a^*G_{a^*}}]$", 
-             "$E[Y_{aG_{a}}]/E[Y_{aG_{a^*}}]$", "$rR^{PNDE}\\times rR^{TNIE}$", 
+             "$E[Y_{aG_{a}}]/E[Y_{aG_{a^*}}]$", "$rR^{PNDE}\\times rR^{TNIE}$ or $rR^{TNDE}\\times rR^{PNIE}$", 
               "$(E[Y_{am}-Y_{a^*m}])/E[Y_{a^*M_a^*}]$",
              "$rR^{PNDE}-1-ER^{CDE}$", "$rR^{TNIE}*rR^{PNDE}-rR^{PNDE}-rR^{PNIE}+1$", 
              "$rR^{PNIE}-1$", "$ER^{CDE}/(rR^{TE}-1)$", 
@@ -530,7 +532,7 @@ tb4 <- data.frame(c("Controlled Direct Effect", "Randomized Analogue of $PNDE$",
              "$(rER^{INT_{ref}}+rER^{INT_{med}}+rER^{PNIE})/(R^{TE}-1)$"))
 colnames(tb4) <- c("Full Name", "Abbreviation", "Formula")
 knitr::kable(tb4, escape = FALSE, caption = "Table 4: Causal Effects on the Ratio Scale") %>%
-  footnote(general = "$a$ and $a^*$ are two reference values for $A$. $m$ is the reference value for $M$. $G_{a}$ denotes a random draw from the distribution of $M$ among those with $A=a$. $Y_{am}$ denotes the counterfactual value of $Y$ that would have been observed had $A$ been set to be $a$, and $M$ to be $m$. $Y_{aG_{a*}}$ denotes the counterfactual value of $Y$ that would have been observed had $A$ been set to be $a$, and $M$ to be $G_{a*}$. If $Y$ is categorical, a reference value of $Y$, denoted as $y$, is needed and $E[Y]$ represents the probability of $Y=y$.") %>%
+  footnote(general = "$a$ and $a^*$ are the active and control values for $A$. $m$ is the value at which $M$ is controlled. $G_{a}$ denotes a random draw from the distribution of $M$ among those with $A=a$. $Y_{am}$ denotes the counterfactual value of $Y$ that would have been observed had $A$ been set to be $a$, and $M$ to be $m$. $Y_{aG_{a*}}$ denotes the counterfactual value of $Y$ that would have been observed had $A$ been set to be $a$, and $M$ to be the counterfactual value $G_{a*}$. If $Y$ is categorical, a reference value of $Y$, denoted as $y$, is needed and $E[Y]$ represents the probability of $Y=y$.") %>%
   column_spec(1, width = "20em") %>%
   column_spec(2, width = "8em") %>%
   column_spec(3, width = "10em") %>%
@@ -539,25 +541,25 @@ knitr::kable(tb4, escape = FALSE, caption = "Table 4: Causal Effects on the Rati
 
 ## The Marginal Structural Model
 
-With the marginal structural model, `cmest` estimates causal effects through direct counterfactural imputation estimation by the following steps:
+With the marginal structural model, `CMAverse` estimates causal effects through direct counterfactual imputation estimation by the following steps:
 
-1. For $p=1,...,k$, fit the regression model specified by `wmreg[p]` for $P(M_p|A,M_1, ...,M_{p-1},L,C)$ and obtain $P(M_p=M_{p,i}|A=A_i,M_1=M_{1,i},...,M_{p-1}=M_{p-1,i},L=L_i,C=C_i)$ for $i=1,...,n$. 
+1. For $p=1,...,k$, fit the regression model specified by `wmnomreg[p]` for $P(M_p|A,M_1, ...,M_{p-1})$ and obtain $P(M_p=M_{p,i}|A=A_i,M_1=M_{1,i},...,M_{p-1}=M_{p-1,i})$ for $i=1,...,n$. 
 
-2. For $p=1,...,k$, fit the regression model specified by `mreg[p]` for $P(M_p|A,M_1, ...,M_{p-1})$ and obtain $P(M_p=M_{p,i}|A=A_i,M_1=M_{1,i},...,M_{p-1}=M_{p-1,i})$ for $i=1,...,n$. 
+2. For $p=1,...,k$, fit the regression model specified by `wmdenomreg[p]` for $P(M_p|A,M_1, ...,M_{p-1},L,C)$ and obtain $P(M_p=M_{p,i}|A=A_i,M_1=M_{1,i},...,M_{p-1}=M_{p-1,i},L=L_i,C=C_i)$ for $i=1,...,n$. 
 
 3. If $C$ is not empty, fit the regression model specified by `ereg` for $P(A|C)$ and obtain $P(A=A_i|C=C_i)$ for $i=1,...,n$. 
 
 4. Add weights to the regression model specified by `yreg` for $E(Y|A,M)$ and each subject $i,i=1,...,n$ is given a weight $\frac{P(A=A_i)}{P(A=A_i|C=C_i)}\frac{P(M_1=M_{1,i}|A=A_i)}{P(M_1=M_{1,i}|A=A_i,C=C_i,L=L_i)}...\frac{P(M_k=M_{k,i}|A=A_i,M_1=M_{1,i},...,M_{k-1}=M_{k-1,i})}{P(M_k=M_{k,i}|A=A_i,M_1=M_{1,i},...,M_{k-1}=M_{k-1,i},C=C_i,L=L_i)}$. 
 
-5. For $p=1,...,k$, add weights to the regression model specified by `mreg[p]` for the distribution of $M_p$ given $A$, $M_1$,...,$M_{p-1}$ and each subject $i,i=1,...,n$ is given a weight $\frac{P(A=A_i)}{P(A=A_i|C=C_i)}$.
+5. For $p=1,...,k$, add weights to the regression model specified by `mreg[p]` for the distribution of $M_p$ given $A$ and each subject $i,i=1,...,n$ is given a weight $\frac{P(A=A_i)}{P(A=A_i|C=C_i)}$.
 
-6. For $p=1,...,k$ and $i=1,...,n$, simulate the counterfacturals $M_{a,p,i}$ and $M_{a^*,p,i}$ from the regression models in step 5.
-    + Simulate $M_{a,p,i}$ by randomly drawing a value from the distribution of $M_{p}$ given $A=a,M_1=M_{a,1,i},...,M_{p-1}=M_{a,p-1,i}$. Denote $M_{a,i}=(M_{a,1,i},...,M_{a,k,i})^T$.
-    + Simulate $M_{a^*,p,i}$ by randomly drawing a value from the distribution of $M_{p}$ given $A=a^*,M_1=M_{a^*,1,i},...,M_{p-1}=M_{a^*,p-1,i}$. Denote $M_{a^*,i}=(M_{a^*,1,i},...,M_{a^*,k,i})^T$.
+6. For $p=1,...,k$ and $i=1,...,n$, simulate the counterfactuals $M_{a,p,i}$ and $M_{a^*,p,i}$ from the regression models in step 5.
+    + Simulate $M_{a,p,i}$ by randomly drawing a value from the distribution of $M_{p}$ given $A=a$. Denote $M_{a,i}=(M_{a,1,i},...,M_{a,k,i})^T$.
+    + Simulate $M_{a^*,p,i}$ by randomly drawing a value from the distribution of $M_{p}$ given $A=a^*$. Denote $M_{a^*,i}=(M_{a^*,1,i},...,M_{a^*,k,i})^T$.
 
 7. For $i=1,...,n$, obtain $E[Y_i|A=a^*,M=m]$, $E[Y_i|A=a,M=m]$, $E[Y_i|A=a^*,M=M_{a^*,i}]$, $E[Y_i|A=a^*,M=M_{a,i}]$, $E[Y_i|A=a,M=M_{a^*,i}]$ and $E[Y_i|A=a,M=M_{a,i}]$ from the regression model in step 4.
 
-8. Impute the counterfacturals $E[Y_{a^*m}]$, $E[Y_{am}]$, $E[Y_{a^*Ga^*}]$, $E[Y_{aGa}]$, $E[Y_{aGa^*}]$ and $E[Y_{a^*Ga}]$.
+8. Impute the counterfactuals $E[Y_{a^*m}]$, $E[Y_{am}]$, $E[Y_{a^*Ga^*}]$, $E[Y_{aGa}]$, $E[Y_{aGa^*}]$ and $E[Y_{a^*Ga}]$.
     + Impute $E[Y_{a^*m}]$ by taking a weighted average of $\{E[Y_i|A=a^*,M=m]\}_{i=1,...,n}$;
     + Impute $E[Y_{am}]$ by taking a weighted average of $\{E[Y_i|A=a,M=m]\}_{i=1,...,n}$;
     + Impute $E[Y_{a^*Ga^*}]$ by taking a weighted average of $\{E[Y_i|A=a^*,M=M_{a^*,i}]\}_{i=1,...,n}$;
@@ -572,19 +574,19 @@ With the marginal structural model, `cmest` estimates causal effects through dir
 
 ## The G-formula Approach
 
-With the $g$-formula approach, `cmest` estimates causal effects through direct counterfactural imputation estimation by the following steps:
+With the $g$-formula approach, `CMAverse` estimates causal effects through direct counterfactual imputation estimation by the following steps:
 
-1. For $q=1,...,s$, fit the regression model specified by `postcreg[q]` for the distribution of $L_q$ given $A$, $L_1$, ..., $L_{q-1}$ and $C$. 
+1. For $q=1,...,s$, fit the regression model specified by `postcreg[q]` for the distribution of $L_q$ given $A$ and $C$. 
 
-2. For $q=1,...,s$ and $i=1,...,n$, simulate the counterfacturals $L_{a,q,i}$ and $L_{a^*,q,i}$ from the regression models in step 1.
-    + Simulate $L_{a,q,i}$ by randomly drawing a value from the distribution of $L_{q}$ given $A=a,L_1=L_{a,1,i},...,L_{q-1}=L_{a,q-1,i},C=C_i$. Denote $L_{a,i}=(L_{a,1,i},...,L_{a,s,i})^T$.
-    + Simulate $L_{a^*,q,i}$ by randomly drawing a value from the distribution of $L_{q}$ given $A=a^*,L_1=L_{a^*,1,i},...,L_{q-1}=L_{a^*,q-1,i},C=C_i$. Denote $L_{a^*,i}=(L_{a^*,1,i},...,L_{a^*,s,i})^T$.
+2. For $q=1,...,s$ and $i=1,...,n$, simulate the counterfactuals $L_{a,q,i}$ and $L_{a^*,q,i}$ from the regression models in step 1.
+    + Simulate $L_{a,q,i}$ by randomly drawing a value from the distribution of $L_{q}$ given $A=a,C=C_i$. Denote $L_{a,i}=(L_{a,1,i},...,L_{a,s,i})^T$.
+    + Simulate $L_{a^*,q,i}$ by randomly drawing a value from the distribution of $L_{q}$ given $A=a^*,C=C_i$. Denote $L_{a^*,i}=(L_{a^*,1,i},...,L_{a^*,s,i})^T$.
     
-3. For $p=1,...,k$, fit the regression model specified by `mreg[p]` for the distribution of $M_p$ given $A$, $M_1$, ..., $M_{p-1}$, $L$ and $C$. 
+3. For $p=1,...,k$, fit the regression model specified by `mreg[p]` for the distribution of $M_p$ given $A$, $L$ and $C$. 
 
-4. For $p=1,...,k$ and $i=1,...,n$, simulate the counterfacturals $M_{a,p,i}$ and $M_{a^*,p,i}$ from the regression models in step 3.
-    + Simulate $M_{a,p,i}$ by randomly drawing a value from the distribution of $M_{p}$ given $A=a,M_1=M_{a,1,i},...,M_{p-1}=M_{a,p-1,i},L=L_{a,i},C=C_i$. Denote $M_{a,i}=(M_{a,1,i},...,M_{a,k,i})^T$.
-    + Simulate $M_{a^*,p,i}$ by randomly drawing a value from the distribution of $M_{p}$ given $A=a^*,M_1=M_{a^*,1,i},...,M_{p-1}=M_{a^*,p-1,i},L=L_{a^*,i},C=C_i$. Denote $M_{a^*,i}=(M_{a^*,1,i},...,M_{a^*,k,i})^T$.
+4. For $p=1,...,k$ and $i=1,...,n$, simulate the counterfactuals $M_{a,p,i}$ and $M_{a^*,p,i}$ from the regression models in step 3.
+    + Simulate $M_{a,p,i}$ by randomly drawing a value from the distribution of $M_{p}$ given $A=a,L=L_{a,i},C=C_i$. Denote $M_{a,i}=(M_{a,1,i},...,M_{a,k,i})^T$.
+    + Simulate $M_{a^*,p,i}$ by randomly drawing a value from the distribution of $M_{p}$ given $A=a^*,L=L_{a^*,i},C=C_i$. Denote $M_{a^*,i}=(M_{a^*,1,i},...,M_{a^*,k,i})^T$.
 
 5. Obtain $\{G_{a,i}\}_{i=1,...,n}$ by randomly permuting $\{M_{a,i}\}_{i=1,...,n}$ and obtain $\{G_{a^*,i}\}_{i=1,...,n}$ by randomly permuting $\{M_{a^*,i}\}_{i=1,...,n}$.
 
@@ -592,12 +594,12 @@ With the $g$-formula approach, `cmest` estimates causal effects through direct c
 
 7. For $i=1,...,n$, obtain $E[Y_i|A=a^*,M=m,L=L_{a^*,i},C=C_i]$, $E[Y_i|A=a,M=m,L=L_{a,i},C=C_i]$, $E[Y_i|A=a^*,M=G_{a^*,i},L=L_{a^*,i},C=C_i]$, $E[Y_i|A=a^*,M=G_{a,i},L=L_{a^*,i},C=C_i]$, $E[Y_i|A=a,M=G_{a^*,i},L=L_{a,i},C=C_i]$ and $E[Y_i|A=a,M=G_{a,i},L=L_{a,i},C=C_i]$ from the regression model in step 5.
 
-8. Impute the counterfacturals $E[Y_{a^*m}]$, $E[Y_{am}]$, $E[Y_{a^*Ga^*}]$, $E[Y_{aGa}]$, $E[Y_{aGa^*}]$ and $E[Y_{a^*Ga}]$.
-    + Impute $E[Y_{a^*m}]$ by taking a weighted average of $\{E[Y_i|A=a^*,M=m,L=L_{a^*,i},C=C_i]\}_{i=1,...,n}$;
-    + Impute $E[Y_{am}]$ by taking a weighted average of $\{E[Y_i|A=a,M=m,L=L_{a,i},C=C_i]\}_{i=1,...,n}$;
-    + Impute $E[Y_{a^*Ga^*}]$ by taking a weighted average of $\{E[Y_i|A=a^*,M=G_{a^*,i},L=L_{a^*,i},C=C_i]\}_{i=1,...,n}$;
-    + Impute $E[Y_{aGa}]$ by taking a weighted average of $\{E[Y_i|A=a,M=G_{a,i},L=L_{a,i},C=C_i]\}_{i=1,...,n}$;
-    + Impute $E[Y_{aGa^*}]$ by taking a weighted average of $\{E[Y_i|A=a,M=G_{a^*,i},L=L_{a,i},C=C_i]\}_{i=1,...,n}$;
-    + Impute $E[Y_{a^*Ga}]$ by taking a weighted average of $\{E[Y_i|A=a^*,M=G_{a,i},L=L_{a^*,i},C=C_i]\}_{i=1,...,n}$,
+8. Impute the counterfactuals $E[Y_{a^*m}]$, $E[Y_{am}]$, $E[Y_{a^*Ga^*}]$, $E[Y_{aGa}]$, $E[Y_{aGa^*}]$ and $E[Y_{a^*Ga}]$.
+    + Impute $E[Y_{a^*m}]$ by taking an average of $\{E[Y_i|A=a^*,M=m,L=L_{a^*,i},C=C_i]\}_{i=1,...,n}$;
+    + Impute $E[Y_{am}]$ by taking an average of $\{E[Y_i|A=a,M=m,L=L_{a,i},C=C_i]\}_{i=1,...,n}$;
+    + Impute $E[Y_{a^*Ga^*}]$ by taking an average of $\{E[Y_i|A=a^*,M=G_{a^*,i},L=L_{a^*,i},C=C_i]\}_{i=1,...,n}$;
+    + Impute $E[Y_{aGa}]$ by taking an average of $\{E[Y_i|A=a,M=G_{a,i},L=L_{a,i},C=C_i]\}_{i=1,...,n}$;
+    + Impute $E[Y_{aGa^*}]$ by taking an average of $\{E[Y_i|A=a,M=G_{a^*,i},L=L_{a,i},C=C_i]\}_{i=1,...,n}$;
+    + Impute $E[Y_{a^*Ga}]$ by taking an average of $\{E[Y_i|A=a^*,M=G_{a,i},L=L_{a^*,i},C=C_i]\}_{i=1,...,n}$,
 
 9. Calculate causal effects with formulas in table 3 or table 4.

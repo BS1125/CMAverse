@@ -109,12 +109,13 @@
 
       
 
-      </header><script src="overview_files/kePrint-0.0.1/kePrint.js"></script><div class="row">
+      </header><script src="overview_files/accessible-code-block-0.0.1/empty-anchor.js"></script><script src="overview_files/kePrint-0.0.1/kePrint.js"></script><link href="overview_files/lightable-0.0.1/lightable.css" rel="stylesheet">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Overview of Modeling Approaches for Causal Mediation Analysis</h1>
             
-            <h4 class="date">2020-09-14</h4>
+            <h4 class="date">2020-09-29</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BS1125/CMAverse/blob/master/vignettes/overview.Rmd"><code>vignettes/overview.Rmd</code></a></small>
       <div class="hidden name"><code>overview.Rmd</code></div>
@@ -123,10 +124,11 @@
 
     
     
-<p>This document describes how the six causal mediation analysis approaches including <em>the regression-based approach</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3659198/">Valeri et al. (2013)</a> and <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/">VanderWeele et al. (2014)</a>, <em>the weighting-based approach</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/">VanderWeele et al. (2014)</a>, <em>the inverse odd-ratio weighting approach</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3954805/">Tchetgen Tchetgen (2013)</a>, <em>the natural effect model</em> by <a href="https://www.degruyter.com/view/journals/em/1/1/article-p131.xml?language=en">Vansteelandt et al. (2012)</a>, <em>the marginal structural model</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5560424/">VanderWeele et al. (2017)</a>, and <em>the <span class="math inline">\(g\)</span>-formula approach</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5285457/">Lin et al. (2017)</a> are implemented by <code>cmest</code> in the <code>CMAverse</code> package. See publications of these approaches for methodological details .</p>
-<p>We categorize these approaches based on whether the approach can deal with mediator-outcome confounders affected by the exposure. Among the six approaches, only <em>The marginal structural model</em> and <em>the <span class="math inline">\(g\)</span>-formula approach</em> are able to deal with mediator-outcome confounders affected by the exposure.</p>
-<p>The outcome and the exposure are denoted as <span class="math inline">\(Y\)</span> and <span class="math inline">\(A\)</span> respectively. The set of exposure-mediator confounders, exposure-outcome confounders and mediator-outcome confounders not affected by the exposure is denoted as <span class="math inline">\(C\)</span>. The set of mediators is denoted as <span class="math inline">\(M\)</span> and <span class="math inline">\(M=(M_1,...,M_k)\)</span> follows the temporal order. The set of mediator-outcome confounders affected by the exposure is denoted as <span class="math inline">\(L\)</span> and <span class="math inline">\(L=(L_1,...,L_s)\)</span> follows the temporal order.</p>
-<p>Since weights calculated from noncategorical variables are unstable which hurts the performance of effect estimation and inference, we require all variables used to calculate weights be categorical.</p>
+<p>This document describes how the six causal mediation analysis approaches including <em>the regression-based approach</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3659198/">Valeri et al. (2013)</a> and <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/">VanderWeele et al. (2014)</a>, <em>the weighting-based approach</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/">VanderWeele et al. (2014)</a>, <em>the inverse odd-ratio weighting approach</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3954805/">Tchetgen Tchetgen (2013)</a>, <em>the natural effect model</em> by <a href="https://www.degruyter.com/view/journals/em/1/1/article-p131.xml?language=en">Vansteelandt et al. (2012)</a>, <em>the marginal structural model</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5560424/">VanderWeele et al. (2017)</a>, and <em>the <span class="math inline">\(g\)</span>-formula approach</em> by <a href="https://www.sciencedirect.com/science/article/pii/0270025586900886">Robins (1986)</a> are implemented by the <code>CMAverse</code> package. See publications of these approaches for methodological details .</p>
+<p><code>CMAverse</code> currently supports a single exposure, multiple sequential mediators and a single outcome. When multiple mediators are of interest, <code>CMAverse</code> estimates the joint mediated effect through the set of mediators. <code>CMAverse</code> also supports time varying confounders preceding the mediators.</p>
+<p>We categorize the causal mediation analysis approaches based on whether the approach can deal with mediator-outcome confounders affected by the exposure. Among the six approaches, only <em>The marginal structural model</em> and <em>the <span class="math inline">\(g\)</span>-formula approach</em> are able to deal with mediator-outcome confounders affected by the exposure.</p>
+<p>In this document, the outcome and the exposure are denoted as <span class="math inline">\(Y\)</span> and <span class="math inline">\(A\)</span> respectively. The set of exposure-mediator confounders, exposure-outcome confounders and mediator-outcome confounders not affected by the exposure is denoted as <span class="math inline">\(C\)</span>. The set of mediators is denoted as <span class="math inline">\(M\)</span> and <span class="math inline">\(M=(M_1,...,M_k)\)</span> follows the temporal order. The set of mediator-outcome confounders affected by the exposure is denoted as <span class="math inline">\(L\)</span> and <span class="math inline">\(L=(L_1,...,L_s)\)</span> follows the temporal order.</p>
+<p>Since weights calculated from noncategorical variables are unstable, which hurts the performance of effect estimation and inference, weighted approaches can be implemented only for categorical exposure and mediator(s).</p>
 <div id="no-confounders-affected-by-the-exposure" class="section level1">
 <h1 class="hasAnchor">
 <a href="#no-confounders-affected-by-the-exposure" class="anchor"></a>No Confounders Affected by the Exposure</h1>
@@ -218,7 +220,7 @@ Total Effect
 <span class="math inline">\(TE\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
-<span class="math inline">\(PNDE+TNIE\)</span>
+<span class="math inline">\(PNDE+TNIE\)</span> or <span class="math inline">\(TNDE+PNIE\)</span>
 </td>
 </tr>
 <tr>
@@ -329,7 +331,7 @@ Proportion Eliminated
 </tr>
 <tr>
 <td style="padding: 0; border: 0;" colspan="100%">
-<sup></sup><span class="math inline">\(a\)</span> and <span class="math inline">\(a^*\)</span> are two reference values for <span class="math inline">\(A\)</span>. <span class="math inline">\(m\)</span> is the reference value for <span class="math inline">\(M\)</span>. <span class="math inline">\(M_a\)</span> denotes the counterfactual value of <span class="math inline">\(M\)</span> that would have been observed had <span class="math inline">\(A\)</span> been set to be <span class="math inline">\(a\)</span>. <span class="math inline">\(Y_{am}\)</span> denotes the counterfactual value of <span class="math inline">\(Y\)</span> that would have been observed had <span class="math inline">\(A\)</span> been set to be <span class="math inline">\(a\)</span>, and <span class="math inline">\(M\)</span> to be <span class="math inline">\(m\)</span>. <span class="math inline">\(Y_{aMa*}\)</span> denotes the counterfactual value of <span class="math inline">\(Y\)</span> that would have been observed had <span class="math inline">\(A\)</span> been set to be <span class="math inline">\(a\)</span>, and <span class="math inline">\(M\)</span> to be <span class="math inline">\(M_{a*}\)</span>.
+<sup></sup><span class="math inline">\(a\)</span> and <span class="math inline">\(a^*\)</span> are the active and control values for <span class="math inline">\(A\)</span> respectively. <span class="math inline">\(m\)</span> is the value at which <span class="math inline">\(M\)</span> is controlled. <span class="math inline">\(M_a\)</span> denotes the counterfactual value of <span class="math inline">\(M\)</span> that would have been observed had <span class="math inline">\(A\)</span> been set to be <span class="math inline">\(a\)</span>. <span class="math inline">\(Y_{am}\)</span> denotes the counterfactual value of <span class="math inline">\(Y\)</span> that would have been observed had <span class="math inline">\(A\)</span> been set to be <span class="math inline">\(a\)</span>, and <span class="math inline">\(M\)</span> to be <span class="math inline">\(m\)</span>. <span class="math inline">\(Y_{aMa*}\)</span> denotes the counterfactual value of <span class="math inline">\(Y\)</span> that would have been observed had <span class="math inline">\(A\)</span> been set to be <span class="math inline">\(a\)</span>, and <span class="math inline">\(M\)</span> to be the counterfactual value <span class="math inline">\(M_{a*}\)</span>.
 </td>
 </tr>
 </tfoot>
@@ -413,7 +415,7 @@ Total Effect
 <span class="math inline">\(R^{TE}\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
-<span class="math inline">\(R^{PNDE}\times R^{TNIE}\)</span>
+<span class="math inline">\(R^{PNDE}\times R^{TNIE}\)</span> or <span class="math inline">\(R^{TNDE}\times R^{PNIE}\)</span>
 </td>
 </tr>
 <tr>
@@ -546,7 +548,7 @@ Proportion Eliminated
 </tr>
 <tr>
 <td style="padding: 0; border: 0;" colspan="100%">
-<sup></sup><span class="math inline">\(a\)</span> and <span class="math inline">\(a^*\)</span> are two reference values for <span class="math inline">\(A\)</span>. <span class="math inline">\(m\)</span> is the reference value for <span class="math inline">\(M\)</span>. <span class="math inline">\(M_a\)</span> denotes the counterfactual value of <span class="math inline">\(M\)</span> that would have been observed had <span class="math inline">\(A\)</span> been set to be <span class="math inline">\(a\)</span>. <span class="math inline">\(Y_{am}\)</span> denotes the counterfactual value of <span class="math inline">\(Y\)</span> that would have been observed had <span class="math inline">\(A\)</span> been set to be <span class="math inline">\(a\)</span>, and <span class="math inline">\(M\)</span> to be <span class="math inline">\(m\)</span>. <span class="math inline">\(Y_{aMa*}\)</span> denotes the counterfactual value of <span class="math inline">\(Y\)</span> that would have been observed had <span class="math inline">\(A\)</span> been set to be <span class="math inline">\(a\)</span>, and <span class="math inline">\(M\)</span> to be <span class="math inline">\(M_{a*}\)</span>. If <span class="math inline">\(Y\)</span> is categorical, a reference value of <span class="math inline">\(Y\)</span>, denoted as <span class="math inline">\(y\)</span>, is needed and <span class="math inline">\(E[Y]\)</span> represents the probability of <span class="math inline">\(Y=y\)</span>.
+<sup></sup><span class="math inline">\(a\)</span> and <span class="math inline">\(a^*\)</span> are the active and control values for <span class="math inline">\(A\)</span> respectively. <span class="math inline">\(m\)</span> is the value at which <span class="math inline">\(M\)</span> is controlled. <span class="math inline">\(M_a\)</span> denotes the counterfactual value of <span class="math inline">\(M\)</span> that would have been observed had <span class="math inline">\(A\)</span> been set to be <span class="math inline">\(a\)</span>. <span class="math inline">\(Y_{am}\)</span> denotes the counterfactual value of <span class="math inline">\(Y\)</span> that would have been observed had <span class="math inline">\(A\)</span> been set to be <span class="math inline">\(a\)</span>, and <span class="math inline">\(M\)</span> to be <span class="math inline">\(m\)</span>. <span class="math inline">\(Y_{aMa*}\)</span> denotes the counterfactual value of <span class="math inline">\(Y\)</span> that would have been observed had <span class="math inline">\(A\)</span> been set to be <span class="math inline">\(a\)</span>, and <span class="math inline">\(M\)</span> to be the counterfactual value <span class="math inline">\(M_{a*}\)</span>. If <span class="math inline">\(Y\)</span> is categorical, a reference value of <span class="math inline">\(Y\)</span>, denoted as <span class="math inline">\(y\)</span>, is needed and <span class="math inline">\(E[Y]\)</span> represents the probability of <span class="math inline">\(Y=y\)</span>.
 </td>
 </tr>
 </tfoot>
@@ -559,11 +561,11 @@ Proportion Eliminated
 <div id="closed-form-parameter-function-estimation" class="section level3">
 <h3 class="hasAnchor">
 <a href="#closed-form-parameter-function-estimation" class="anchor"></a>Closed-form Parameter Function Estimation</h3>
-<p>Closed-form parameter function estimation is available when there is only a single mediator, i.e., <span class="math inline">\(M=M_1\)</span>. Also, <code>yreg</code> must be chosen from <code>linear</code>, <code>logistic</code>, <code>loglinear</code>, <code>poisson</code>, <code>quasipoisson</code>, <code>negbin</code>, <code>coxph</code>, <code>aft_exp</code> and <code>aft_weibull</code>. <code>mreg</code> must be chosen from <code>linear</code>, <code>logistic</code> and <code>multinomial</code>. To use <code>yreg = "logistic"</code> in closed-form parameter function estimation, the outcome must be rare. To use <code>yreg = "coxph"</code> in closed-form parameter function estimation, the outcome at the end of follow-up must be rare. Additionally, the causal effects estimated through closed-form parameter function estimation are conditional on the value of <span class="math inline">\(C\)</span> specified by the <code>precval</code> argument. Closed-form parameter functions are summarized below.</p>
+<p>Closed-form parameter function estimation is available when there is only a single mediator, i.e., <span class="math inline">\(M=M_1\)</span>. Also, <code>yreg</code> must be chosen from <code>linear</code>, <code>logistic</code>, <code>loglinear</code>, <code>poisson</code>, <code>quasipoisson</code>, <code>negbin</code>, <code>coxph</code>, <code>aft_exp</code> and <code>aft_weibull</code>. <code>mreg</code> must be chosen from <code>linear</code>, <code>logistic</code> and <code>multinomial</code>. To use <code>yreg = "logistic"</code> and <code>yreg = "coxph"</code> in closed-form parameter function estimation, the outcome must be rare. Additionally, the causal effects estimated through closed-form parameter function estimation are conditional on the value of <span class="math inline">\(C\)</span> specified by the <code>precval</code> argument. Closed-form parameter functions are summarized below.</p>
 <div id="linear-yreg-linear-mreg-and-noncategorical-exposure" class="section level4">
 <h4 class="hasAnchor">
 <a href="#linear-yreg-linear-mreg-and-noncategorical-exposure" class="anchor"></a>Linear <code>yreg</code>, Linear <code>mreg</code> and Noncategorical Exposure</h4>
-<p>If the exposure is not categorical, <code>yreg="linear"</code> and <code>mreg=list("linear")</code>, <code>cmest</code> estimates the causal effects by the following steps:</p>
+<p>If the exposure is not categorical, <code>yreg="linear"</code> and <code>mreg=list("linear")</code>, <code>CMAverse</code> estimates the causal effects by the following steps:</p>
 <ol style="list-style-type: decimal">
 <li><p>Fit a linear regression model for the mediator: <span class="math display">\[E[M|A,C]=\beta_0+\beta_1A+\beta_2'C\]</span></p></li>
 <li><p>Fit a linear regression model for the outcome: <span class="math display">\[E[Y|A,M,C]=\theta_0+\theta_1A+\theta_2M+\theta_3AM+\theta_4'C\]</span></p></li>
@@ -583,7 +585,7 @@ Proportion Eliminated
 <div id="linear-yreg-linear-mreg-and-categorical-exposure" class="section level4">
 <h4 class="hasAnchor">
 <a href="#linear-yreg-linear-mreg-and-categorical-exposure" class="anchor"></a>Linear <code>yreg</code>, Linear <code>mreg</code> and Categorical Exposure</h4>
-<p>If the exposure is categorical, <code>yreg="linear"</code> and <code>mreg=list("linear")</code>, <code>cmest</code> estimates the causal effects by the following steps:</p>
+<p>If the exposure is categorical, <code>yreg="linear"</code> and <code>mreg=list("linear")</code>, <code>CMAverse</code> estimates the causal effects by the following steps:</p>
 <ol style="list-style-type: decimal">
 <li><p>Fit a linear regression model for the mediator: <span class="math display">\[E[M|A,C]=\beta_0+\sum_{h=1}^H\beta_{1h}I\{A=h\}+\beta_2'C\]</span></p></li>
 <li><p>Fit a linear regression model for the outcome: <span class="math display">\[E[Y|A,M,C]=\theta_0+\sum_{h=1}^H\theta_{1h}I\{A=h\}+\theta_2M+\sum_{h=1}^H\theta_{3h}I\{A=h\}M+\theta_4'C\]</span></p></li>
@@ -603,7 +605,7 @@ Proportion Eliminated
 <div id="linear-yreg-logistic-mreg-and-noncategorical-exposure" class="section level4">
 <h4 class="hasAnchor">
 <a href="#linear-yreg-logistic-mreg-and-noncategorical-exposure" class="anchor"></a>Linear <code>yreg</code>, Logistic <code>mreg</code> and Noncategorical Exposure</h4>
-<p>If the exposure is not categorical, <code>yreg="linear"</code> and <code>mreg=list("logistic")</code>, <code>cmest</code> estimates the causal effects by the following steps:</p>
+<p>If the exposure is not categorical, <code>yreg="linear"</code> and <code>mreg=list("logistic")</code>, <code>CMAverse</code> estimates the causal effects by the following steps:</p>
 <ol style="list-style-type: decimal">
 <li><p>Fit a logistic regression model for the mediator: <span class="math display">\[logitE[M|A,C]=\beta_0+\beta_1A+\beta_2'C\]</span></p></li>
 <li><p>Fit a linear regression model for the outcome: <span class="math display">\[E[Y|A,M,C]=\theta_0+\theta_1A+\theta_2M+\theta_3AM+\theta_4'C\]</span></p></li>
@@ -623,7 +625,7 @@ Proportion Eliminated
 <div id="linear-yreg-logistic-mreg-and-categorical-exposure" class="section level4">
 <h4 class="hasAnchor">
 <a href="#linear-yreg-logistic-mreg-and-categorical-exposure" class="anchor"></a>Linear <code>yreg</code>, Logistic <code>mreg</code> and Categorical Exposure</h4>
-<p>If the exposure is categorical, <code>yreg="linear"</code> and <code>mreg=list("logistic")</code>, <code>cmest</code> estimates the causal effects by the following steps:</p>
+<p>If the exposure is categorical, <code>yreg="linear"</code> and <code>mreg=list("logistic")</code>, <code>CMAverse</code> estimates the causal effects by the following steps:</p>
 <ol style="list-style-type: decimal">
 <li><p>Fit a logistic regression model for the mediator: <span class="math display">\[logitE[M|A,C]=\beta_0+\sum_{h=1}^H\beta_{1h}I\{A=h\}+\beta_2'C\]</span></p></li>
 <li><p>Fit a linear regression model for the outcome: <span class="math display">\[E[Y|A,M,C]=\theta_0+\sum_{h=1}^H\theta_{1h}I\{A=h\}+\theta_2M+\sum_{h=1}^H\theta_{3h}I\{A=h\}M+\theta_4'C\]</span></p></li>
@@ -643,7 +645,7 @@ Proportion Eliminated
 <div id="linear-yreg-multinomial-mreg-and-noncategorical-exposure" class="section level4">
 <h4 class="hasAnchor">
 <a href="#linear-yreg-multinomial-mreg-and-noncategorical-exposure" class="anchor"></a>Linear <code>yreg</code>, Multinomial <code>mreg</code> and Noncategorical Exposure</h4>
-<p>If the exposure is not categorical, <code>yreg="linear"</code> and <code>mreg=list("multinomial")</code>, <code>cmest</code> estimates the causal effects by the following steps:</p>
+<p>If the exposure is not categorical, <code>yreg="linear"</code> and <code>mreg=list("multinomial")</code>, <code>CMAverse</code> estimates the causal effects by the following steps:</p>
 <ol style="list-style-type: decimal">
 <li><p>Fit a multinomial regression model for the mediator: <span class="math display">\[log\frac{E[M=j|A,C]}{E[M=0|A,C]}=\beta_{0j}+\beta_{1j}A+\beta_{2j}'C, j=1,2,...,J\]</span></p></li>
 <li><p>Fit a linear regression model for the outcome: <span class="math display">\[E[Y|A,M,C]=\theta_0+\theta_1A+\sum_{j=1}^J\theta_{2j}I\{M=j\}+A\sum_{j=1}^J\theta_{3j}I\{M=j\}+\theta_4'C\]</span></p></li>
@@ -663,7 +665,7 @@ Proportion Eliminated
 <div id="linear-yreg-multinomial-mreg-and-categorical-exposure" class="section level4">
 <h4 class="hasAnchor">
 <a href="#linear-yreg-multinomial-mreg-and-categorical-exposure" class="anchor"></a>Linear <code>yreg</code>, Multinomial <code>mreg</code> and Categorical Exposure</h4>
-<p>If the exposure is categorical, <code>yreg="linear"</code> and <code>mreg=list("multinomial")</code>, <code>cmest</code> estimates the causal effects by the following steps:</p>
+<p>If the exposure is categorical, <code>yreg="linear"</code> and <code>mreg=list("multinomial")</code>, <code>CMAverse</code> estimates the causal effects by the following steps:</p>
 <ol style="list-style-type: decimal">
 <li><p>Fit a multinomial regression model for the mediator: <span class="math display">\[log\frac{E[M=j|A,C]}{E[M=0|A,C]}=\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{A=h\}+\beta_{2j}'C, j=1,2,...,J\]</span></p></li>
 <li><p>Fit a linear regression model for the outcome: <span class="math display">\[E[Y|A,M,C]=\theta_0+\sum_{h=1}^H\theta_{1h}I\{A=h\}+\sum_{j=1}^J\theta_{2j}I\{M=j\}+\sum_{j=1}^J\sum_{h=1}^H\theta_{3jh}I\{M=j\}I\{A=h\}+\theta_4'C\]</span></p></li>
@@ -683,7 +685,7 @@ Proportion Eliminated
 <div id="nonlinear-yreg-linear-mreg-and-noncategorical-exposure" class="section level4">
 <h4 class="hasAnchor">
 <a href="#nonlinear-yreg-linear-mreg-and-noncategorical-exposure" class="anchor"></a>Nonlinear <code>yreg</code>, Linear <code>mreg</code> and Noncategorical Exposure</h4>
-<p>If the exposure is not categorical, <code>yreg!="linear"</code> and <code>mreg=list("linear")</code>, <code>cmest</code> estimates the causal effects by the following steps:</p>
+<p>If the exposure is not categorical, <code>yreg!="linear"</code> and <code>mreg=list("linear")</code>, <code>CMAverse</code> estimates the causal effects by the following steps:</p>
 <ol style="list-style-type: decimal">
 <li><p>Fit a linear regression model for the mediator: <span class="math display">\[E[M|A,C]=\beta_0+\beta_1A+\beta_2'C+\epsilon_M,\epsilon_M\sim N(0,\sigma^2)\]</span></p></li>
 <li><p>Fit the specified regression model for the outcome: <span class="math display">\[g(E[Y|A,M,C])=\theta_0+\theta_1A+\theta_2M+\theta_3AM+\theta_4'C\]</span></p></li>
@@ -704,7 +706,7 @@ Proportion Eliminated
 <div id="nonlinear-yreg-linear-mreg-and-categorical-exposure" class="section level4">
 <h4 class="hasAnchor">
 <a href="#nonlinear-yreg-linear-mreg-and-categorical-exposure" class="anchor"></a>Nonlinear <code>yreg</code>, Linear <code>mreg</code> and Categorical Exposure</h4>
-<p>If the exposure is categorical, <code>yreg!="linear"</code> and <code>mreg=list("linear")</code>, <code>cmest</code> estimates the causal effects by the following steps:</p>
+<p>If the exposure is categorical, <code>yreg!="linear"</code> and <code>mreg=list("linear")</code>, <code>CMAverse</code> estimates the causal effects by the following steps:</p>
 <ol style="list-style-type: decimal">
 <li><p>Fit a linear regression model for the mediator: <span class="math display">\[E[M|A,C]=\beta_0+\sum_{h=1}^H\beta_{1h}I\{A=h\}+\beta_2'C+\epsilon_M,\epsilon_M\sim N(0,\sigma^2)\]</span></p></li>
 <li><p>Fit the specified regression model for the outcome: <span class="math display">\[g(E[Y|A,M,C])=\theta_0+\sum_{h=1}^H\theta_{1h}I\{A=h\}+\theta_2M+\sum_{h=1}^H\theta_{3h}I\{A=h\}M+\theta_4'C\]</span></p></li>
@@ -725,7 +727,7 @@ Proportion Eliminated
 <div id="nonlinear-yreg-logistic-mreg-and-noncategorical-exposure" class="section level4">
 <h4 class="hasAnchor">
 <a href="#nonlinear-yreg-logistic-mreg-and-noncategorical-exposure" class="anchor"></a>Nonlinear <code>yreg</code>, Logistic <code>mreg</code> and Noncategorical Exposure</h4>
-<p>If the exposure is not categorical, <code>yreg!="linear"</code> and <code>mreg=list("logistic")</code>, <code>cmest</code> estimates the causal effects by the following steps:</p>
+<p>If the exposure is not categorical, <code>yreg!="linear"</code> and <code>mreg=list("logistic")</code>, <code>CMAverse</code> estimates the causal effects by the following steps:</p>
 <ol style="list-style-type: decimal">
 <li><p>Fit a logistic regression model for the mediator: <span class="math display">\[logitE[M|A,C]=\beta_0+\beta_1A+\beta_2'C\]</span></p></li>
 <li><p>Fit the specified regression model for the outcome: <span class="math display">\[g(E[Y|A,M,C])=\theta_0+\theta_1A+\theta_2M+\theta_3AM+\theta_4'C\]</span></p></li>
@@ -746,7 +748,7 @@ Proportion Eliminated
 <div id="nonlinear-yreg-logistic-mreg-and-categorical-exposure" class="section level4">
 <h4 class="hasAnchor">
 <a href="#nonlinear-yreg-logistic-mreg-and-categorical-exposure" class="anchor"></a>Nonlinear <code>yreg</code>, Logistic <code>mreg</code> and Categorical Exposure</h4>
-<p>If the exposure is categorical, <code>yreg!="linear"</code> and <code>mreg=list("logistic")</code>, <code>cmest</code> estimates the causal effects by the following steps:</p>
+<p>If the exposure is categorical, <code>yreg!="linear"</code> and <code>mreg=list("logistic")</code>, <code>CMAverse</code> estimates the causal effects by the following steps:</p>
 <ol style="list-style-type: decimal">
 <li><p>Fit a logistic regression model for the mediator: <span class="math display">\[logitE[M|A,C]=\beta_0+\sum_{h=1}^H\beta_{1h}I\{A=h\}+\beta_2'C\]</span></p></li>
 <li><p>Fit the specified regression model for the outcome: <span class="math display">\[g(E[Y|A,M,C])=\theta_0+\sum_{h=1}^H\theta_{1h}I\{A=h\}+\theta_2M+\sum_{h=1}^H\theta_{3h}I\{A=h\}M+\theta_4'C\]</span></p></li>
@@ -767,7 +769,7 @@ Proportion Eliminated
 <div id="nonlinear-yreg-multinomial-mreg-and-noncategorical-exposure" class="section level4">
 <h4 class="hasAnchor">
 <a href="#nonlinear-yreg-multinomial-mreg-and-noncategorical-exposure" class="anchor"></a>Nonlinear <code>yreg</code>, Multinomial <code>mreg</code> and Noncategorical Exposure</h4>
-<p>If the exposure is not categorical, <code>yreg!="linear"</code> and <code>mreg=list("multinomial")</code>, <code>cmest</code> estimates the causal effects by the following steps:</p>
+<p>If the exposure is not categorical, <code>yreg!="linear"</code> and <code>mreg=list("multinomial")</code>, <code>CMAverse</code> estimates the causal effects by the following steps:</p>
 <ol style="list-style-type: decimal">
 <li><p>Fit a multinomial regression model for the mediator: <span class="math display">\[log\frac{E[M=j|A,C]}{E[M=0|A,C]}=\beta_{0j}+\beta_{1j}A+\beta_{2j}'C, j=1,2,...,J\]</span></p></li>
 <li><p>Fit the specified regression model for the outcome: <span class="math display">\[g(E[Y|A,M,C])=\theta_0+\theta_1A+\sum_{j=1}^J\theta_{2j}I\{M=j\}+A\sum_{j=1}^J\theta_{3j}I\{M=j\}+\theta_4'C\]</span></p></li>
@@ -788,7 +790,7 @@ Proportion Eliminated
 <div id="nonlinear-yreg-multinomial-mreg-and-categorical-exposure" class="section level4">
 <h4 class="hasAnchor">
 <a href="#nonlinear-yreg-multinomial-mreg-and-categorical-exposure" class="anchor"></a>Nonlinear <code>yreg</code>, Multinomial <code>mreg</code> and Categorical Exposure</h4>
-<p>If the exposure is categorical, <code>yreg!="linear"</code> and <code>mreg=list("multinomial")</code>, <code>cmest</code> estimates the causal effects by the following steps:</p>
+<p>If the exposure is categorical, <code>yreg!="linear"</code> and <code>mreg=list("multinomial")</code>, <code>CMAverse</code> estimates the causal effects by the following steps:</p>
 <ol style="list-style-type: decimal">
 <li><p>Fit a multinomial regression model for the mediator: <span class="math display">\[log\frac{E[M=j|A,C]}{E[M=0|A,C]}=\beta_{0j}+\sum_{h=1}^H\beta_{1jh}I\{A=h\}+\beta_{2j}'C, j=1,2,...,J\]</span></p></li>
 <li><p>Fit the specified regression model for the outcome: <span class="math display">\[g(E[Y|A,M,C])=\theta_0+\sum_{h=1}^H\theta_{1h}I\{A=h\}+\sum_{j=1}^J\theta_{2j}I\{M=j\}+\sum_{j=1}^J\sum_{h=1}^H\theta_{3jh}I\{M=j\}I\{A=h\}+\theta_4'C\]</span></p></li>
@@ -807,23 +809,23 @@ Proportion Eliminated
 </ol>
 </div>
 </div>
-<div id="direct-counterfactural-imputation-estimation" class="section level3">
+<div id="direct-counterfactual-imputation-estimation" class="section level3">
 <h3 class="hasAnchor">
-<a href="#direct-counterfactural-imputation-estimation" class="anchor"></a>Direct Counterfactural Imputation Estimation</h3>
-<p><code>cmest</code> conducts direct counterfactural imputation estimation by the following steps:</p>
+<a href="#direct-counterfactual-imputation-estimation" class="anchor"></a>Direct Counterfactual Imputation Estimation</h3>
+<p><code>CMAverse</code> conducts direct counterfactual imputation estimation by the following steps:</p>
 <ol style="list-style-type: decimal">
 <li><p>Fit a regression model for <span class="math inline">\(E(Y|A,M,C)\)</span>. This regression model is specified by the <code>yreg</code> argument.</p></li>
-<li><p>For <span class="math inline">\(p=1,...,k\)</span>, fit a regression model for the distribution of <span class="math inline">\(M_p\)</span> given <span class="math inline">\(A\)</span>, <span class="math inline">\(M_1\)</span>, …, <span class="math inline">\(M_{p-1}\)</span> and <span class="math inline">\(C\)</span>. These regression models are specified by the <code>mreg</code> argument.</p></li>
+<li><p>For <span class="math inline">\(p=1,...,k\)</span>, fit a regression model for the distribution of <span class="math inline">\(M_p\)</span> given <span class="math inline">\(A\)</span> and <span class="math inline">\(C\)</span>. These regression models are specified by the <code>mreg</code> argument.</p></li>
 <li>
-<p>For <span class="math inline">\(p=1,...,k\)</span> and <span class="math inline">\(i=1,...,n\)</span>, simulate the counterfacturals <span class="math inline">\(M_{a,p,i}\)</span> and <span class="math inline">\(M_{a^*,p,i}\)</span>.</p>
+<p>For <span class="math inline">\(p=1,...,k\)</span> and <span class="math inline">\(i=1,...,n\)</span>, simulate the counterfactuals <span class="math inline">\(M_{a,p,i}\)</span> and <span class="math inline">\(M_{a^*,p,i}\)</span>.</p>
 <ul>
-<li>Simulate <span class="math inline">\(M_{a,p,i}\)</span> by randomly drawing a value from the distribution of <span class="math inline">\(M_{p}\)</span> given <span class="math inline">\(A=a,M_1=M_{a,1,i},...,M_{p-1}=M_{a,p-1,i},C=C_i\)</span>. Denote <span class="math inline">\(M_{a,i}=(M_{a,1,i},...,M_{a,k,i})^T\)</span>.</li>
-<li>Simulate <span class="math inline">\(M_{a^*,p,i}\)</span> by randomly drawing a value from the distribution of <span class="math inline">\(M_{p}\)</span> given <span class="math inline">\(A=a^*,M_1=M_{a^*,1,i},...,M_{p-1}=M_{a^*,p-1,i},C=C_i\)</span>. Denote <span class="math inline">\(M_{a^*,i}=(M_{a^*,1,i},...,M_{a^*,k,i})^T\)</span>.</li>
+<li>Simulate <span class="math inline">\(M_{a,p,i}\)</span> by randomly drawing a value from the distribution of <span class="math inline">\(M_{p}\)</span> given <span class="math inline">\(A=a,C=C_i\)</span>. Denote <span class="math inline">\(M_{a,i}=(M_{a,1,i},...,M_{a,k,i})^T\)</span>.</li>
+<li>Simulate <span class="math inline">\(M_{a^*,p,i}\)</span> by randomly drawing a value from the distribution of <span class="math inline">\(M_{p}\)</span> given <span class="math inline">\(A=a^*,C=C_i\)</span>. Denote <span class="math inline">\(M_{a^*,i}=(M_{a^*,1,i},...,M_{a^*,k,i})^T\)</span>.</li>
 </ul>
 </li>
 <li><p>For <span class="math inline">\(i=1,...,n\)</span>, obtain <span class="math inline">\(E[Y_i|A=a^*,M=m,C=C_i]\)</span>, <span class="math inline">\(E[Y_i|A=a,M=m,C=C_i]\)</span>, <span class="math inline">\(E[Y_i|A=a^*,M=M_{a^*,i},C=C_i]\)</span>, <span class="math inline">\(E[Y_i|A=a^*,M=M_{a,i},C=C_i]\)</span>, <span class="math inline">\(E[Y_i|A=a,M=M_{a^*,i},C=C_i]\)</span> and <span class="math inline">\(E[Y_i|A=a,M=M_{a,i},C=C_i]\)</span> from the regression model in step 1.</p></li>
 <li>
-<p>Impute the counterfacturals <span class="math inline">\(E[Y_{a^*m}]\)</span>, <span class="math inline">\(E[Y_{am}]\)</span>, <span class="math inline">\(E[Y_{a^*Ma^*}]\)</span>, <span class="math inline">\(E[Y_{aMa}]\)</span>, <span class="math inline">\(E[Y_{aMa^*}]\)</span> and <span class="math inline">\(E[Y_{a^*Ma}]\)</span>.</p>
+<p>Impute the counterfactuals <span class="math inline">\(E[Y_{a^*m}]\)</span>, <span class="math inline">\(E[Y_{am}]\)</span>, <span class="math inline">\(E[Y_{a^*Ma^*}]\)</span>, <span class="math inline">\(E[Y_{aMa}]\)</span>, <span class="math inline">\(E[Y_{aMa^*}]\)</span> and <span class="math inline">\(E[Y_{a^*Ma}]\)</span>.</p>
 <ul>
 <li>Impute <span class="math inline">\(E[Y_{a^*m}]\)</span> by taking an average of <span class="math inline">\(\{E[Y_i|A=a^*,M=m,C=C_i]\}_{i=1,...,n}\)</span>.</li>
 <li>Impute <span class="math inline">\(E[Y_{am}]\)</span> by taking an average of <span class="math inline">\(\{E[Y_i|A=a,M=m,C=C_i]\}_{i=1,...,n}\)</span>.</li>
@@ -840,13 +842,13 @@ Proportion Eliminated
 <div id="the-weighting-based-approach" class="section level2">
 <h2 class="hasAnchor">
 <a href="#the-weighting-based-approach" class="anchor"></a>The Weighting-based Approach</h2>
-<p>With the weighting-based approach, <code>cmest</code> estimates causal effects through direct counterfactural imputation estimation by the following steps:</p>
+<p>With the weighting-based approach, <code>CMAverse</code> estimates causal effects through direct counterfactual imputation estimation by the following steps:</p>
 <ol style="list-style-type: decimal">
 <li><p>Fit a regression model for the distribution of <span class="math inline">\(E(Y|A,M,C)\)</span>. This regression model is specified by the <code>yreg</code> argument.</p></li>
 <li><p>If <span class="math inline">\(C\)</span> is not empty, fit a regression model for <span class="math inline">\(P(A|C)\)</span> and obtain <span class="math inline">\(P(A=A_i|C=C_i)\)</span> for <span class="math inline">\(i=1,...,n\)</span>. This regression model is specified by the <code>ereg</code> argument.</p></li>
 <li><p>For <span class="math inline">\(i=1,...,n\)</span>, obtain <span class="math inline">\(E[Y_i|A=a^*,M=m,C=C_i]\)</span>, <span class="math inline">\(E[Y_i|A=a,M=m,C=C_i]\)</span>, <span class="math inline">\(E[Y_i|A=a^*,M=M_i,C=C_i]\)</span> and <span class="math inline">\(E[Y_i|A=a,M=M_i,C=C_i]\)</span> from the regression model in step 1.</p></li>
 <li>
-<p>Impute the counterfacturals <span class="math inline">\(E[Y_{a^*m}]\)</span>, <span class="math inline">\(E[Y_{am}]\)</span>, <span class="math inline">\(E[Y_{a^*Ma^*}]\)</span>, <span class="math inline">\(E[Y_{aMa}]\)</span>, <span class="math inline">\(E[Y_{aMa^*}]\)</span> and <span class="math inline">\(E[Y_{a^*Ma}]\)</span>.</p>
+<p>Impute the counterfactuals <span class="math inline">\(E[Y_{a^*m}]\)</span>, <span class="math inline">\(E[Y_{am}]\)</span>, <span class="math inline">\(E[Y_{a^*Ma^*}]\)</span>, <span class="math inline">\(E[Y_{aMa}]\)</span>, <span class="math inline">\(E[Y_{aMa^*}]\)</span> and <span class="math inline">\(E[Y_{a^*Ma}]\)</span>.</p>
 <ul>
 <li>Impute <span class="math inline">\(E[Y_{a^*m}]\)</span> by taking an average of <span class="math inline">\(\{E[Y_i|A=a^*,M=m,C=C_i]\}_{i=1,...,n}\)</span>.</li>
 <li>Impute <span class="math inline">\(E[Y_{am}]\)</span> by taking an average of <span class="math inline">\(\{E[Y_i|A=a,M=m,C=C_i]\}_{i=1,...,n}\)</span>.</li>
@@ -862,13 +864,13 @@ Proportion Eliminated
 <div id="the-inverse-odds-ratio-weighting-approach" class="section level2">
 <h2 class="hasAnchor">
 <a href="#the-inverse-odds-ratio-weighting-approach" class="anchor"></a>The Inverse Odds Ratio Weighting Approach</h2>
-<p>With the inverse odds ratio weighting approach, <code>cmest</code> estimates causal effects through direct counterfactural imputation estimation by the following steps:</p>
+<p>With the inverse odds ratio weighting approach, <code>CMAverse</code> estimates causal effects through direct counterfactual imputation estimation by the following steps:</p>
 <ol style="list-style-type: decimal">
 <li><p>Fit a regression model for <span class="math inline">\(P(A|M,C)\)</span> and obtain <span class="math inline">\(\frac{P(A=0|M=M_i,C=C_i)}{P(A=A_i|M=M_i,C=C_i)}\)</span> for <span class="math inline">\(i=1,...,n\)</span>. This regression model is specified by the <code>ereg</code> argument.</p></li>
 <li><p>Fit a regression model for <span class="math inline">\(E(Y|A,C)\)</span>. This regression model is specified by the <code>yreg</code> argument.</p></li>
 <li><p>Fit a weighted regression model for <span class="math inline">\(E(Y|A,C)\)</span> and each subject <span class="math inline">\(i\)</span> is given a weight <span class="math inline">\(\frac{P(A=0|M=M_i,C=C_i)}{P(A=A_i|M=M_i,C=C_i)}\)</span>. This regression model is obtained by adding the weights to the regression model in step 2.</p></li>
 <li>
-<p>Impute the counterfacturals <span class="math inline">\(E_{tot}[Y_{a}]\)</span>, <span class="math inline">\(E_{tot}[Y_{a^*}]\)</span>, <span class="math inline">\(E_{dir}[Y_{a}]\)</span> and <span class="math inline">\(E_{dir}[Y_{a^*}]\)</span>.</p>
+<p>Impute the counterfactuals <span class="math inline">\(E_{tot}[Y_{a}]\)</span>, <span class="math inline">\(E_{tot}[Y_{a^*}]\)</span>, <span class="math inline">\(E_{dir}[Y_{a}]\)</span> and <span class="math inline">\(E_{dir}[Y_{a^*}]\)</span>.</p>
 <ul>
 <li>Impute <span class="math inline">\(E_{tot}[Y_{a}]\)</span> by taking an average of <span class="math inline">\(\{E[Y_i|A=a,C=C_i]\}_{i=1,...,n}\)</span> obtained from the regression model in step 2.</li>
 <li>Impute <span class="math inline">\(E_{tot}[Y_{a^*}]\)</span> by taking an average of <span class="math inline">\(\{E[Y_i|A=a^*,C=C_i]\}_{i=1,...,n}\)</span> obtained from the regression model in step 2.</li>
@@ -885,21 +887,21 @@ Proportion Eliminated
 <div id="the-natural-effect-model" class="section level2">
 <h2 class="hasAnchor">
 <a href="#the-natural-effect-model" class="anchor"></a>The Natural Effect Model</h2>
-<p>With the natural effect model, <code>cmest</code> estimates causal effects through direct counterfactural imputation estimation by the following steps:</p>
+<p>With the natural effect model, <code>CMAverse</code> estimates causal effects through direct counterfactual imputation estimation by the following steps:</p>
 <ol style="list-style-type: decimal">
 <li><p>Fit a regression model for <span class="math inline">\(E(Y|A,M,C)\)</span>. This regression model is specified by the <code>yreg</code> argument.</p></li>
-<li><p>Expand the dataset using the regression model in step 1 and the <code>neImpute</code> function in the <code>medflex</code> package.</p></li>
+<li><p>Expand the dataset using the regression model in step 1 and the <code>neImpute</code> function in the <code>medflex</code> package. The expanded dataset gives <span class="math inline">\(A0\)</span> for the direct effect and <span class="math inline">\(A1\)</span> for the indirect effect.</p></li>
 <li><p>Fit the regression model in step 1 by the expanded dataset in step 2 with the exposure in the regression formula replaced by <span class="math inline">\(A0\)</span> and mediators in the regression formula replaced by <span class="math inline">\(A1\)</span>, i.e., <span class="math inline">\(Y\sim A0+A1+A0*A1+C\)</span> if the regression formula in step 1 is <span class="math inline">\(Y\sim A+M_1+M_2+A*M_1+C\)</span>.</p></li>
 <li><p>For <span class="math inline">\(i=1,...,n\)</span>, obtain <span class="math inline">\(E[Y_i|A=a^*,M=m,C=C_i]\)</span> and <span class="math inline">\(E[Y_i|A=a,M=m,C=C_i]\)</span> from the regression model in step 1; obtain <span class="math inline">\(E[Y_i|A0=a^*,A1=a^*,C=C_i]\)</span>, <span class="math inline">\(E[Y_i|A0=a^*,A1=a,C=C_i]\)</span>, <span class="math inline">\(E[Y_i|A0=a,A1=a^*,C=C_i]\)</span> and <span class="math inline">\(E[Y_i|A0=a,A1=a,C=C_i]\)</span> from the regression model in step 3.</p></li>
 <li>
-<p>Impute the counterfacturals <span class="math inline">\(E[Y_{a^*m}]\)</span>, <span class="math inline">\(E[Y_{am}]\)</span>, <span class="math inline">\(E[Y_{a^*Ma^*}]\)</span>, <span class="math inline">\(E[Y_{aMa}]\)</span>, <span class="math inline">\(E[Y_{aMa^*}]\)</span> and <span class="math inline">\(E[Y_{a^*Ma}]\)</span>.</p>
+<p>Impute the counterfactuals <span class="math inline">\(E[Y_{a^*m}]\)</span>, <span class="math inline">\(E[Y_{am}]\)</span>, <span class="math inline">\(E[Y_{a^*Ma^*}]\)</span>, <span class="math inline">\(E[Y_{aMa}]\)</span>, <span class="math inline">\(E[Y_{aMa^*}]\)</span> and <span class="math inline">\(E[Y_{a^*Ma}]\)</span>.</p>
 <ul>
 <li>Impute <span class="math inline">\(E[Y_{a^*m}]\)</span> by taking an average of <span class="math inline">\(\{E[Y_i|A=a^*,M=m,C=C_i]\}_{i=1,...,n}\)</span>.</li>
 <li>Impute <span class="math inline">\(E[Y_{am}]\)</span> by taking an average of <span class="math inline">\(\{E[Y_i|A=a,M=m,C=C_i]\}_{i=1,...,n}\)</span>.</li>
-<li>Impute <span class="math inline">\(E[Y_{a^*Ma^*}]\)</span> by taking an average of <span class="math inline">\(\{E[Y_i|A=a^*,A1=a^*,C=C_i]\}_{i=1,...,n}\)</span>.</li>
-<li>Impute <span class="math inline">\(E[Y_{aMa}]\)</span> by taking an average of <span class="math inline">\(\{E[Y_i|A=a,A1=a,C=C_i]\}_{i=1,...,n}\)</span>.</li>
-<li>Impute <span class="math inline">\(E[Y_{aMa^*}]\)</span> by taking an average of <span class="math inline">\(\{E[Y_i|A=a,A1=a^*,C=C_i]\}_{i=1,...,n}\)</span>.</li>
-<li>Impute <span class="math inline">\(E[Y_{a^*Ma}]\)</span> by taking an average of <span class="math inline">\(\{E[Y_i|A=a^*,A1=a,C=C_i]\}_{i=1,...,n}\)</span>.</li>
+<li>Impute <span class="math inline">\(E[Y_{a^*Ma^*}]\)</span> by taking an average of <span class="math inline">\(\{E[Y_i|A0=a^*,A1=a^*,C=C_i]\}_{i=1,...,n}\)</span>.</li>
+<li>Impute <span class="math inline">\(E[Y_{aMa}]\)</span> by taking an average of <span class="math inline">\(\{E[Y_i|A0=a,A1=a,C=C_i]\}_{i=1,...,n}\)</span>.</li>
+<li>Impute <span class="math inline">\(E[Y_{aMa^*}]\)</span> by taking an average of <span class="math inline">\(\{E[Y_i|A0=a,A1=a^*,C=C_i]\}_{i=1,...,n}\)</span>.</li>
+<li>Impute <span class="math inline">\(E[Y_{a^*Ma}]\)</span> by taking an average of <span class="math inline">\(\{E[Y_i|A0=a^*,A1=a,C=C_i]\}_{i=1,...,n}\)</span>.</li>
 </ul>
 </li>
 <li><p>Calculate causal effects with formulas in table 1 or table 2.</p></li>
@@ -997,7 +999,7 @@ Total Effect
 <span class="math inline">\(TE\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
-<span class="math inline">\(rPNDE+rTNIE\)</span>
+<span class="math inline">\(rPNDE+rTNIE\)</span> or <span class="math inline">\(rTNDE+rPNIE\)</span>
 </td>
 </tr>
 <tr>
@@ -1108,7 +1110,7 @@ Randomized Analogue of <span class="math inline">\(PE\)</span>
 </tr>
 <tr>
 <td style="padding: 0; border: 0;" colspan="100%">
-<sup></sup><span class="math inline">\(a\)</span> and <span class="math inline">\(a^*\)</span> are two reference values for <span class="math inline">\(A\)</span>. <span class="math inline">\(m\)</span> is the reference value for <span class="math inline">\(M\)</span>. <span class="math inline">\(G_{a}\)</span> denotes a random draw from the distribution of <span class="math inline">\(M\)</span> among those with <span class="math inline">\(A=a\)</span>. <span class="math inline">\(Y_{am}\)</span> denotes the counterfactual value of <span class="math inline">\(Y\)</span> that would have been observed had <span class="math inline">\(A\)</span> been set to be <span class="math inline">\(a\)</span>, and <span class="math inline">\(M\)</span> to be <span class="math inline">\(m\)</span>. <span class="math inline">\(Y_{aG_{a*}}\)</span> denotes the counterfactual value of <span class="math inline">\(Y\)</span> that would have been observed had <span class="math inline">\(A\)</span> been set to be <span class="math inline">\(a\)</span>, and <span class="math inline">\(M\)</span> to be <span class="math inline">\(G_{a*}\)</span>.
+<sup></sup><span class="math inline">\(a\)</span> and <span class="math inline">\(a^*\)</span> are the active and control values for <span class="math inline">\(A\)</span>. <span class="math inline">\(m\)</span> is the value at which <span class="math inline">\(M\)</span> is controlled. <span class="math inline">\(G_{a}\)</span> denotes a random draw from the distribution of <span class="math inline">\(M\)</span> had <span class="math inline">\(A=a\)</span>. <span class="math inline">\(Y_{am}\)</span> denotes the counterfactual value of <span class="math inline">\(Y\)</span> that would have been observed had <span class="math inline">\(A\)</span> been set to be <span class="math inline">\(a\)</span>, and <span class="math inline">\(M\)</span> to be <span class="math inline">\(m\)</span>. <span class="math inline">\(Y_{aG_{a*}}\)</span> denotes the counterfactual value of <span class="math inline">\(Y\)</span> that would have been observed had <span class="math inline">\(A\)</span> been set to be <span class="math inline">\(a\)</span>, and <span class="math inline">\(M\)</span> to be the counterfactual value <span class="math inline">\(G_{a*}\)</span>.
 </td>
 </tr>
 </tfoot>
@@ -1192,7 +1194,7 @@ Total Effect
 <span class="math inline">\(R^{TE}\)</span>
 </td>
 <td style="text-align:left;width: 10em; ">
-<span class="math inline">\(rR^{PNDE}\times rR^{TNIE}\)</span>
+<span class="math inline">\(rR^{PNDE}\times rR^{TNIE}\)</span> or <span class="math inline">\(rR^{TNDE}\times rR^{PNIE}\)</span>
 </td>
 </tr>
 <tr>
@@ -1325,7 +1327,7 @@ Randomized Analogue of <span class="math inline">\(PE\)</span>
 </tr>
 <tr>
 <td style="padding: 0; border: 0;" colspan="100%">
-<sup></sup><span class="math inline">\(a\)</span> and <span class="math inline">\(a^*\)</span> are two reference values for <span class="math inline">\(A\)</span>. <span class="math inline">\(m\)</span> is the reference value for <span class="math inline">\(M\)</span>. <span class="math inline">\(G_{a}\)</span> denotes a random draw from the distribution of <span class="math inline">\(M\)</span> among those with <span class="math inline">\(A=a\)</span>. <span class="math inline">\(Y_{am}\)</span> denotes the counterfactual value of <span class="math inline">\(Y\)</span> that would have been observed had <span class="math inline">\(A\)</span> been set to be <span class="math inline">\(a\)</span>, and <span class="math inline">\(M\)</span> to be <span class="math inline">\(m\)</span>. <span class="math inline">\(Y_{aG_{a*}}\)</span> denotes the counterfactual value of <span class="math inline">\(Y\)</span> that would have been observed had <span class="math inline">\(A\)</span> been set to be <span class="math inline">\(a\)</span>, and <span class="math inline">\(M\)</span> to be <span class="math inline">\(G_{a*}\)</span>. If <span class="math inline">\(Y\)</span> is categorical, a reference value of <span class="math inline">\(Y\)</span>, denoted as <span class="math inline">\(y\)</span>, is needed and <span class="math inline">\(E[Y]\)</span> represents the probability of <span class="math inline">\(Y=y\)</span>.
+<sup></sup><span class="math inline">\(a\)</span> and <span class="math inline">\(a^*\)</span> are the active and control values for <span class="math inline">\(A\)</span>. <span class="math inline">\(m\)</span> is the value at which <span class="math inline">\(M\)</span> is controlled. <span class="math inline">\(G_{a}\)</span> denotes a random draw from the distribution of <span class="math inline">\(M\)</span> among those with <span class="math inline">\(A=a\)</span>. <span class="math inline">\(Y_{am}\)</span> denotes the counterfactual value of <span class="math inline">\(Y\)</span> that would have been observed had <span class="math inline">\(A\)</span> been set to be <span class="math inline">\(a\)</span>, and <span class="math inline">\(M\)</span> to be <span class="math inline">\(m\)</span>. <span class="math inline">\(Y_{aG_{a*}}\)</span> denotes the counterfactual value of <span class="math inline">\(Y\)</span> that would have been observed had <span class="math inline">\(A\)</span> been set to be <span class="math inline">\(a\)</span>, and <span class="math inline">\(M\)</span> to be the counterfactual value <span class="math inline">\(G_{a*}\)</span>. If <span class="math inline">\(Y\)</span> is categorical, a reference value of <span class="math inline">\(Y\)</span>, denoted as <span class="math inline">\(y\)</span>, is needed and <span class="math inline">\(E[Y]\)</span> represents the probability of <span class="math inline">\(Y=y\)</span>.
 </td>
 </tr>
 </tfoot>
@@ -1334,23 +1336,23 @@ Randomized Analogue of <span class="math inline">\(PE\)</span>
 <div id="the-marginal-structural-model" class="section level2">
 <h2 class="hasAnchor">
 <a href="#the-marginal-structural-model" class="anchor"></a>The Marginal Structural Model</h2>
-<p>With the marginal structural model, <code>cmest</code> estimates causal effects through direct counterfactural imputation estimation by the following steps:</p>
+<p>With the marginal structural model, <code>CMAverse</code> estimates causal effects through direct counterfactual imputation estimation by the following steps:</p>
 <ol style="list-style-type: decimal">
-<li><p>For <span class="math inline">\(p=1,...,k\)</span>, fit the regression model specified by <code>wmreg[p]</code> for <span class="math inline">\(P(M_p|A,M_1, ...,M_{p-1},L,C)\)</span> and obtain <span class="math inline">\(P(M_p=M_{p,i}|A=A_i,M_1=M_{1,i},...,M_{p-1}=M_{p-1,i},L=L_i,C=C_i)\)</span> for <span class="math inline">\(i=1,...,n\)</span>.</p></li>
-<li><p>For <span class="math inline">\(p=1,...,k\)</span>, fit the regression model specified by <code>mreg[p]</code> for <span class="math inline">\(P(M_p|A,M_1, ...,M_{p-1})\)</span> and obtain <span class="math inline">\(P(M_p=M_{p,i}|A=A_i,M_1=M_{1,i},...,M_{p-1}=M_{p-1,i})\)</span> for <span class="math inline">\(i=1,...,n\)</span>.</p></li>
+<li><p>For <span class="math inline">\(p=1,...,k\)</span>, fit the regression model specified by <code>wmnomreg[p]</code> for <span class="math inline">\(P(M_p|A,M_1, ...,M_{p-1})\)</span> and obtain <span class="math inline">\(P(M_p=M_{p,i}|A=A_i,M_1=M_{1,i},...,M_{p-1}=M_{p-1,i})\)</span> for <span class="math inline">\(i=1,...,n\)</span>.</p></li>
+<li><p>For <span class="math inline">\(p=1,...,k\)</span>, fit the regression model specified by <code>wmdenomreg[p]</code> for <span class="math inline">\(P(M_p|A,M_1, ...,M_{p-1},L,C)\)</span> and obtain <span class="math inline">\(P(M_p=M_{p,i}|A=A_i,M_1=M_{1,i},...,M_{p-1}=M_{p-1,i},L=L_i,C=C_i)\)</span> for <span class="math inline">\(i=1,...,n\)</span>.</p></li>
 <li><p>If <span class="math inline">\(C\)</span> is not empty, fit the regression model specified by <code>ereg</code> for <span class="math inline">\(P(A|C)\)</span> and obtain <span class="math inline">\(P(A=A_i|C=C_i)\)</span> for <span class="math inline">\(i=1,...,n\)</span>.</p></li>
 <li><p>Add weights to the regression model specified by <code>yreg</code> for <span class="math inline">\(E(Y|A,M)\)</span> and each subject <span class="math inline">\(i,i=1,...,n\)</span> is given a weight <span class="math inline">\(\frac{P(A=A_i)}{P(A=A_i|C=C_i)}\frac{P(M_1=M_{1,i}|A=A_i)}{P(M_1=M_{1,i}|A=A_i,C=C_i,L=L_i)}...\frac{P(M_k=M_{k,i}|A=A_i,M_1=M_{1,i},...,M_{k-1}=M_{k-1,i})}{P(M_k=M_{k,i}|A=A_i,M_1=M_{1,i},...,M_{k-1}=M_{k-1,i},C=C_i,L=L_i)}\)</span>.</p></li>
-<li><p>For <span class="math inline">\(p=1,...,k\)</span>, add weights to the regression model specified by <code>mreg[p]</code> for the distribution of <span class="math inline">\(M_p\)</span> given <span class="math inline">\(A\)</span>, <span class="math inline">\(M_1\)</span>,…,<span class="math inline">\(M_{p-1}\)</span> and each subject <span class="math inline">\(i,i=1,...,n\)</span> is given a weight <span class="math inline">\(\frac{P(A=A_i)}{P(A=A_i|C=C_i)}\)</span>.</p></li>
+<li><p>For <span class="math inline">\(p=1,...,k\)</span>, add weights to the regression model specified by <code>mreg[p]</code> for the distribution of <span class="math inline">\(M_p\)</span> given <span class="math inline">\(A\)</span> and each subject <span class="math inline">\(i,i=1,...,n\)</span> is given a weight <span class="math inline">\(\frac{P(A=A_i)}{P(A=A_i|C=C_i)}\)</span>.</p></li>
 <li>
-<p>For <span class="math inline">\(p=1,...,k\)</span> and <span class="math inline">\(i=1,...,n\)</span>, simulate the counterfacturals <span class="math inline">\(M_{a,p,i}\)</span> and <span class="math inline">\(M_{a^*,p,i}\)</span> from the regression models in step 5.</p>
+<p>For <span class="math inline">\(p=1,...,k\)</span> and <span class="math inline">\(i=1,...,n\)</span>, simulate the counterfactuals <span class="math inline">\(M_{a,p,i}\)</span> and <span class="math inline">\(M_{a^*,p,i}\)</span> from the regression models in step 5.</p>
 <ul>
-<li>Simulate <span class="math inline">\(M_{a,p,i}\)</span> by randomly drawing a value from the distribution of <span class="math inline">\(M_{p}\)</span> given <span class="math inline">\(A=a,M_1=M_{a,1,i},...,M_{p-1}=M_{a,p-1,i}\)</span>. Denote <span class="math inline">\(M_{a,i}=(M_{a,1,i},...,M_{a,k,i})^T\)</span>.</li>
-<li>Simulate <span class="math inline">\(M_{a^*,p,i}\)</span> by randomly drawing a value from the distribution of <span class="math inline">\(M_{p}\)</span> given <span class="math inline">\(A=a^*,M_1=M_{a^*,1,i},...,M_{p-1}=M_{a^*,p-1,i}\)</span>. Denote <span class="math inline">\(M_{a^*,i}=(M_{a^*,1,i},...,M_{a^*,k,i})^T\)</span>.</li>
+<li>Simulate <span class="math inline">\(M_{a,p,i}\)</span> by randomly drawing a value from the distribution of <span class="math inline">\(M_{p}\)</span> given <span class="math inline">\(A=a\)</span>. Denote <span class="math inline">\(M_{a,i}=(M_{a,1,i},...,M_{a,k,i})^T\)</span>.</li>
+<li>Simulate <span class="math inline">\(M_{a^*,p,i}\)</span> by randomly drawing a value from the distribution of <span class="math inline">\(M_{p}\)</span> given <span class="math inline">\(A=a^*\)</span>. Denote <span class="math inline">\(M_{a^*,i}=(M_{a^*,1,i},...,M_{a^*,k,i})^T\)</span>.</li>
 </ul>
 </li>
 <li><p>For <span class="math inline">\(i=1,...,n\)</span>, obtain <span class="math inline">\(E[Y_i|A=a^*,M=m]\)</span>, <span class="math inline">\(E[Y_i|A=a,M=m]\)</span>, <span class="math inline">\(E[Y_i|A=a^*,M=M_{a^*,i}]\)</span>, <span class="math inline">\(E[Y_i|A=a^*,M=M_{a,i}]\)</span>, <span class="math inline">\(E[Y_i|A=a,M=M_{a^*,i}]\)</span> and <span class="math inline">\(E[Y_i|A=a,M=M_{a,i}]\)</span> from the regression model in step 4.</p></li>
 <li>
-<p>Impute the counterfacturals <span class="math inline">\(E[Y_{a^*m}]\)</span>, <span class="math inline">\(E[Y_{am}]\)</span>, <span class="math inline">\(E[Y_{a^*Ga^*}]\)</span>, <span class="math inline">\(E[Y_{aGa}]\)</span>, <span class="math inline">\(E[Y_{aGa^*}]\)</span> and <span class="math inline">\(E[Y_{a^*Ga}]\)</span>.</p>
+<p>Impute the counterfactuals <span class="math inline">\(E[Y_{a^*m}]\)</span>, <span class="math inline">\(E[Y_{am}]\)</span>, <span class="math inline">\(E[Y_{a^*Ga^*}]\)</span>, <span class="math inline">\(E[Y_{aGa}]\)</span>, <span class="math inline">\(E[Y_{aGa^*}]\)</span> and <span class="math inline">\(E[Y_{a^*Ga}]\)</span>.</p>
 <ul>
 <li>Impute <span class="math inline">\(E[Y_{a^*m}]\)</span> by taking a weighted average of <span class="math inline">\(\{E[Y_i|A=a^*,M=m]\}_{i=1,...,n}\)</span>;</li>
 <li>Impute <span class="math inline">\(E[Y_{am}]\)</span> by taking a weighted average of <span class="math inline">\(\{E[Y_i|A=a,M=m]\}_{i=1,...,n}\)</span>;</li>
@@ -1367,36 +1369,36 @@ Randomized Analogue of <span class="math inline">\(PE\)</span>
 <div id="the-g-formula-approach" class="section level2">
 <h2 class="hasAnchor">
 <a href="#the-g-formula-approach" class="anchor"></a>The G-formula Approach</h2>
-<p>With the <span class="math inline">\(g\)</span>-formula approach, <code>cmest</code> estimates causal effects through direct counterfactural imputation estimation by the following steps:</p>
+<p>With the <span class="math inline">\(g\)</span>-formula approach, <code>CMAverse</code> estimates causal effects through direct counterfactual imputation estimation by the following steps:</p>
 <ol style="list-style-type: decimal">
-<li><p>For <span class="math inline">\(q=1,...,s\)</span>, fit the regression model specified by <code>postcreg[q]</code> for the distribution of <span class="math inline">\(L_q\)</span> given <span class="math inline">\(A\)</span>, <span class="math inline">\(L_1\)</span>, …, <span class="math inline">\(L_{q-1}\)</span> and <span class="math inline">\(C\)</span>.</p></li>
+<li><p>For <span class="math inline">\(q=1,...,s\)</span>, fit the regression model specified by <code>postcreg[q]</code> for the distribution of <span class="math inline">\(L_q\)</span> given <span class="math inline">\(A\)</span> and <span class="math inline">\(C\)</span>.</p></li>
 <li>
-<p>For <span class="math inline">\(q=1,...,s\)</span> and <span class="math inline">\(i=1,...,n\)</span>, simulate the counterfacturals <span class="math inline">\(L_{a,q,i}\)</span> and <span class="math inline">\(L_{a^*,q,i}\)</span> from the regression models in step 1.</p>
+<p>For <span class="math inline">\(q=1,...,s\)</span> and <span class="math inline">\(i=1,...,n\)</span>, simulate the counterfactuals <span class="math inline">\(L_{a,q,i}\)</span> and <span class="math inline">\(L_{a^*,q,i}\)</span> from the regression models in step 1.</p>
 <ul>
-<li>Simulate <span class="math inline">\(L_{a,q,i}\)</span> by randomly drawing a value from the distribution of <span class="math inline">\(L_{q}\)</span> given <span class="math inline">\(A=a,L_1=L_{a,1,i},...,L_{q-1}=L_{a,q-1,i},C=C_i\)</span>. Denote <span class="math inline">\(L_{a,i}=(L_{a,1,i},...,L_{a,s,i})^T\)</span>.</li>
-<li>Simulate <span class="math inline">\(L_{a^*,q,i}\)</span> by randomly drawing a value from the distribution of <span class="math inline">\(L_{q}\)</span> given <span class="math inline">\(A=a^*,L_1=L_{a^*,1,i},...,L_{q-1}=L_{a^*,q-1,i},C=C_i\)</span>. Denote <span class="math inline">\(L_{a^*,i}=(L_{a^*,1,i},...,L_{a^*,s,i})^T\)</span>.</li>
+<li>Simulate <span class="math inline">\(L_{a,q,i}\)</span> by randomly drawing a value from the distribution of <span class="math inline">\(L_{q}\)</span> given <span class="math inline">\(A=a,C=C_i\)</span>. Denote <span class="math inline">\(L_{a,i}=(L_{a,1,i},...,L_{a,s,i})^T\)</span>.</li>
+<li>Simulate <span class="math inline">\(L_{a^*,q,i}\)</span> by randomly drawing a value from the distribution of <span class="math inline">\(L_{q}\)</span> given <span class="math inline">\(A=a^*,C=C_i\)</span>. Denote <span class="math inline">\(L_{a^*,i}=(L_{a^*,1,i},...,L_{a^*,s,i})^T\)</span>.</li>
 </ul>
 </li>
-<li><p>For <span class="math inline">\(p=1,...,k\)</span>, fit the regression model specified by <code>mreg[p]</code> for the distribution of <span class="math inline">\(M_p\)</span> given <span class="math inline">\(A\)</span>, <span class="math inline">\(M_1\)</span>, …, <span class="math inline">\(M_{p-1}\)</span>, <span class="math inline">\(L\)</span> and <span class="math inline">\(C\)</span>.</p></li>
+<li><p>For <span class="math inline">\(p=1,...,k\)</span>, fit the regression model specified by <code>mreg[p]</code> for the distribution of <span class="math inline">\(M_p\)</span> given <span class="math inline">\(A\)</span>, <span class="math inline">\(L\)</span> and <span class="math inline">\(C\)</span>.</p></li>
 <li>
-<p>For <span class="math inline">\(p=1,...,k\)</span> and <span class="math inline">\(i=1,...,n\)</span>, simulate the counterfacturals <span class="math inline">\(M_{a,p,i}\)</span> and <span class="math inline">\(M_{a^*,p,i}\)</span> from the regression models in step 3.</p>
+<p>For <span class="math inline">\(p=1,...,k\)</span> and <span class="math inline">\(i=1,...,n\)</span>, simulate the counterfactuals <span class="math inline">\(M_{a,p,i}\)</span> and <span class="math inline">\(M_{a^*,p,i}\)</span> from the regression models in step 3.</p>
 <ul>
-<li>Simulate <span class="math inline">\(M_{a,p,i}\)</span> by randomly drawing a value from the distribution of <span class="math inline">\(M_{p}\)</span> given <span class="math inline">\(A=a,M_1=M_{a,1,i},...,M_{p-1}=M_{a,p-1,i},L=L_{a,i},C=C_i\)</span>. Denote <span class="math inline">\(M_{a,i}=(M_{a,1,i},...,M_{a,k,i})^T\)</span>.</li>
-<li>Simulate <span class="math inline">\(M_{a^*,p,i}\)</span> by randomly drawing a value from the distribution of <span class="math inline">\(M_{p}\)</span> given <span class="math inline">\(A=a^*,M_1=M_{a^*,1,i},...,M_{p-1}=M_{a^*,p-1,i},L=L_{a^*,i},C=C_i\)</span>. Denote <span class="math inline">\(M_{a^*,i}=(M_{a^*,1,i},...,M_{a^*,k,i})^T\)</span>.</li>
+<li>Simulate <span class="math inline">\(M_{a,p,i}\)</span> by randomly drawing a value from the distribution of <span class="math inline">\(M_{p}\)</span> given <span class="math inline">\(A=a,L=L_{a,i},C=C_i\)</span>. Denote <span class="math inline">\(M_{a,i}=(M_{a,1,i},...,M_{a,k,i})^T\)</span>.</li>
+<li>Simulate <span class="math inline">\(M_{a^*,p,i}\)</span> by randomly drawing a value from the distribution of <span class="math inline">\(M_{p}\)</span> given <span class="math inline">\(A=a^*,L=L_{a^*,i},C=C_i\)</span>. Denote <span class="math inline">\(M_{a^*,i}=(M_{a^*,1,i},...,M_{a^*,k,i})^T\)</span>.</li>
 </ul>
 </li>
 <li><p>Obtain <span class="math inline">\(\{G_{a,i}\}_{i=1,...,n}\)</span> by randomly permuting <span class="math inline">\(\{M_{a,i}\}_{i=1,...,n}\)</span> and obtain <span class="math inline">\(\{G_{a^*,i}\}_{i=1,...,n}\)</span> by randomly permuting <span class="math inline">\(\{M_{a^*,i}\}_{i=1,...,n}\)</span>.</p></li>
 <li><p>Fit the regression model specified by <code>yreg</code> for <span class="math inline">\(E(Y|A,M,L,C)\)</span>.</p></li>
 <li><p>For <span class="math inline">\(i=1,...,n\)</span>, obtain <span class="math inline">\(E[Y_i|A=a^*,M=m,L=L_{a^*,i},C=C_i]\)</span>, <span class="math inline">\(E[Y_i|A=a,M=m,L=L_{a,i},C=C_i]\)</span>, <span class="math inline">\(E[Y_i|A=a^*,M=G_{a^*,i},L=L_{a^*,i},C=C_i]\)</span>, <span class="math inline">\(E[Y_i|A=a^*,M=G_{a,i},L=L_{a^*,i},C=C_i]\)</span>, <span class="math inline">\(E[Y_i|A=a,M=G_{a^*,i},L=L_{a,i},C=C_i]\)</span> and <span class="math inline">\(E[Y_i|A=a,M=G_{a,i},L=L_{a,i},C=C_i]\)</span> from the regression model in step 5.</p></li>
 <li>
-<p>Impute the counterfacturals <span class="math inline">\(E[Y_{a^*m}]\)</span>, <span class="math inline">\(E[Y_{am}]\)</span>, <span class="math inline">\(E[Y_{a^*Ga^*}]\)</span>, <span class="math inline">\(E[Y_{aGa}]\)</span>, <span class="math inline">\(E[Y_{aGa^*}]\)</span> and <span class="math inline">\(E[Y_{a^*Ga}]\)</span>.</p>
+<p>Impute the counterfactuals <span class="math inline">\(E[Y_{a^*m}]\)</span>, <span class="math inline">\(E[Y_{am}]\)</span>, <span class="math inline">\(E[Y_{a^*Ga^*}]\)</span>, <span class="math inline">\(E[Y_{aGa}]\)</span>, <span class="math inline">\(E[Y_{aGa^*}]\)</span> and <span class="math inline">\(E[Y_{a^*Ga}]\)</span>.</p>
 <ul>
-<li>Impute <span class="math inline">\(E[Y_{a^*m}]\)</span> by taking a weighted average of <span class="math inline">\(\{E[Y_i|A=a^*,M=m,L=L_{a^*,i},C=C_i]\}_{i=1,...,n}\)</span>;</li>
-<li>Impute <span class="math inline">\(E[Y_{am}]\)</span> by taking a weighted average of <span class="math inline">\(\{E[Y_i|A=a,M=m,L=L_{a,i},C=C_i]\}_{i=1,...,n}\)</span>;</li>
-<li>Impute <span class="math inline">\(E[Y_{a^*Ga^*}]\)</span> by taking a weighted average of <span class="math inline">\(\{E[Y_i|A=a^*,M=G_{a^*,i},L=L_{a^*,i},C=C_i]\}_{i=1,...,n}\)</span>;</li>
-<li>Impute <span class="math inline">\(E[Y_{aGa}]\)</span> by taking a weighted average of <span class="math inline">\(\{E[Y_i|A=a,M=G_{a,i},L=L_{a,i},C=C_i]\}_{i=1,...,n}\)</span>;</li>
-<li>Impute <span class="math inline">\(E[Y_{aGa^*}]\)</span> by taking a weighted average of <span class="math inline">\(\{E[Y_i|A=a,M=G_{a^*,i},L=L_{a,i},C=C_i]\}_{i=1,...,n}\)</span>;</li>
-<li>Impute <span class="math inline">\(E[Y_{a^*Ga}]\)</span> by taking a weighted average of <span class="math inline">\(\{E[Y_i|A=a^*,M=G_{a,i},L=L_{a^*,i},C=C_i]\}_{i=1,...,n}\)</span>,</li>
+<li>Impute <span class="math inline">\(E[Y_{a^*m}]\)</span> by taking an average of <span class="math inline">\(\{E[Y_i|A=a^*,M=m,L=L_{a^*,i},C=C_i]\}_{i=1,...,n}\)</span>;</li>
+<li>Impute <span class="math inline">\(E[Y_{am}]\)</span> by taking an average of <span class="math inline">\(\{E[Y_i|A=a,M=m,L=L_{a,i},C=C_i]\}_{i=1,...,n}\)</span>;</li>
+<li>Impute <span class="math inline">\(E[Y_{a^*Ga^*}]\)</span> by taking an average of <span class="math inline">\(\{E[Y_i|A=a^*,M=G_{a^*,i},L=L_{a^*,i},C=C_i]\}_{i=1,...,n}\)</span>;</li>
+<li>Impute <span class="math inline">\(E[Y_{aGa}]\)</span> by taking an average of <span class="math inline">\(\{E[Y_i|A=a,M=G_{a,i},L=L_{a,i},C=C_i]\}_{i=1,...,n}\)</span>;</li>
+<li>Impute <span class="math inline">\(E[Y_{aGa^*}]\)</span> by taking an average of <span class="math inline">\(\{E[Y_i|A=a,M=G_{a^*,i},L=L_{a,i},C=C_i]\}_{i=1,...,n}\)</span>;</li>
+<li>Impute <span class="math inline">\(E[Y_{a^*Ga}]\)</span> by taking an average of <span class="math inline">\(\{E[Y_i|A=a^*,M=G_{a,i},L=L_{a^*,i},C=C_i]\}_{i=1,...,n}\)</span>,</li>
 </ul>
 </li>
 <li><p>Calculate causal effects with formulas in table 3 or table 4.</p></li>
@@ -1406,6 +1408,7 @@ Randomized Analogue of <span class="math inline">\(PE\)</span>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+
         <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
     </nav>
 </div>
@@ -1419,7 +1422,7 @@ Randomized Analogue of <span class="math inline">\(PE\)</span>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

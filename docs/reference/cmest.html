@@ -15,10 +15,12 @@
 <link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png" />
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png" />
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
+
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/sandstone/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
 
@@ -43,17 +45,15 @@
 
 
 
-<meta property="og:title" content="Causal Mediation Analysis — cmest" />
 
+<meta property="og:title" content="Causal Mediation Analysis — cmest" />
 <meta property="og:description" content="cmest is used to implement six causal mediation analysis approaches including 
 the regression-based approach by Valeri et al. (2013) and VanderWeele 
 et al. (2014), the weighting-based approach by VanderWeele et al. (2014), 
 the inverse odd-ratio weighting approach by Tchetgen Tchetgen (2013), 
 the natural effect model by Vansteelandt et al. (2012), the marginal structural 
-model by VanderWeele et al. (2017), and the g-formula approach by Lin et al. (2017)." />
-
+model by VanderWeele et al. (2017), and the g-formula approach by Robins (1986)." />
 <meta property="og:image" content="https://bs1125.github.io/CMAverse/logo.png" />
-
 
 
 
@@ -131,7 +131,6 @@ model by VanderWeele et al. (2017), and the g-formula approach by Lin et al. (20
   </ul>
 </li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="../reference/index.html">
@@ -166,57 +165,56 @@ model by VanderWeele et al. (2017), and the g-formula approach by Lin et al. (20
     </div>
 
     <div class="ref-description">
-    
     <p><code>cmest</code> is used to implement six causal mediation analysis approaches including 
 <em>the regression-based approach</em> by Valeri et al. (2013) and VanderWeele 
 et al. (2014), <em>the weighting-based approach</em> by VanderWeele et al. (2014), 
 <em>the inverse odd-ratio weighting approach</em> by Tchetgen Tchetgen (2013), 
 <em>the natural effect model</em> by Vansteelandt et al. (2012), <em>the marginal structural 
-model</em> by VanderWeele et al. (2017), and <em>the g-formula approach</em> by Lin et al. (2017).</p>
-    
+model</em> by VanderWeele et al. (2017), and <em>the g-formula approach</em> by Robins (1986).</p>
     </div>
 
-    <pre class="usage"><span class='fu'>cmest</span>(
-  <span class='kw'>data</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>model</span> <span class='kw'>=</span> <span class='st'>"rb"</span>,
-  <span class='kw'>full</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-  <span class='kw'>casecontrol</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='kw'>yrare</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>yprevalence</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>estimation</span> <span class='kw'>=</span> <span class='st'>"imputation"</span>,
-  <span class='kw'>inference</span> <span class='kw'>=</span> <span class='st'>"bootstrap"</span>,
-  <span class='kw'>outcome</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>event</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>exposure</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>mediator</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>EMint</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>basec</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>postc</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>yreg</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>mreg</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>wmreg</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>ereg</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>postcreg</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>astar</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>a</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>mval</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>yref</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>basecval</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>nboot</span> <span class='kw'>=</span> <span class='fl'>200</span>,
-  <span class='kw'>nRep</span> <span class='kw'>=</span> <span class='fl'>5</span>,
-  <span class='kw'>multimp</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
-  <span class='no'>...</span>
-)
+    <pre class="usage"><span class='fu'>cmest</span><span class='op'>(</span>
+  data <span class='op'>=</span> <span class='cn'>NULL</span>,
+  model <span class='op'>=</span> <span class='st'>"rb"</span>,
+  full <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  casecontrol <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  yrare <span class='op'>=</span> <span class='cn'>NULL</span>,
+  yprevalence <span class='op'>=</span> <span class='cn'>NULL</span>,
+  estimation <span class='op'>=</span> <span class='st'>"imputation"</span>,
+  inference <span class='op'>=</span> <span class='st'>"bootstrap"</span>,
+  outcome <span class='op'>=</span> <span class='cn'>NULL</span>,
+  event <span class='op'>=</span> <span class='cn'>NULL</span>,
+  exposure <span class='op'>=</span> <span class='cn'>NULL</span>,
+  mediator <span class='op'>=</span> <span class='cn'>NULL</span>,
+  EMint <span class='op'>=</span> <span class='cn'>NULL</span>,
+  basec <span class='op'>=</span> <span class='cn'>NULL</span>,
+  postc <span class='op'>=</span> <span class='cn'>NULL</span>,
+  yreg <span class='op'>=</span> <span class='cn'>NULL</span>,
+  mreg <span class='op'>=</span> <span class='cn'>NULL</span>,
+  wmnomreg <span class='op'>=</span> <span class='cn'>NULL</span>,
+  wmdenomreg <span class='op'>=</span> <span class='cn'>NULL</span>,
+  ereg <span class='op'>=</span> <span class='cn'>NULL</span>,
+  postcreg <span class='op'>=</span> <span class='cn'>NULL</span>,
+  astar <span class='op'>=</span> <span class='fl'>0</span>,
+  a <span class='op'>=</span> <span class='fl'>1</span>,
+  mval <span class='op'>=</span> <span class='cn'>NULL</span>,
+  yref <span class='op'>=</span> <span class='cn'>NULL</span>,
+  basecval <span class='op'>=</span> <span class='cn'>NULL</span>,
+  nboot <span class='op'>=</span> <span class='fl'>200</span>,
+  nRep <span class='op'>=</span> <span class='fl'>5</span>,
+  multimp <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span>
 
 <span class='co'># S3 method for cmest</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>x</span>, <span class='no'>...</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for cmest</span>
-<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span>(<span class='no'>object</span>, <span class='no'>...</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for summary.cmest</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>x</span>, <span class='kw'>digits</span> <span class='kw'>=</span> <span class='fl'>4</span>, <span class='no'>...</span>)</pre>
-    
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>x</span>, digits <span class='op'>=</span> <span class='fl'>4</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
@@ -306,10 +304,18 @@ when <code>model</code> is <code>rb</code>, <code>msm</code> or <code>gformula</
 must follow the order of variables in <code>mediator</code>. See <code>Details</code>.</p></td>
     </tr>
     <tr>
-      <th>wmreg</th>
-      <td><p>a list specifying a regression model for calculating weights with respect to 
-each variable in <code>mediator</code> (used when <code>model</code> is <code>msm</code>). The order of regression 
-models must follow the order of variables in <code>mediator</code>. See <code>Details</code>.</p></td>
+      <th>wmnomreg</th>
+      <td><p>a list specifying a regression model for calculating the nominators of 
+weights with respect to each variable in <code>mediator</code> (used when <code>model</code> is <code>msm</code>). 
+The order of regression models must follow the order of variables in <code>mediator</code>. See 
+<code>Details</code>.</p></td>
+    </tr>
+    <tr>
+      <th>wmdenomreg</th>
+      <td><p>a list specifying a regression model for calculating the denominators of 
+weights with respect to each variable in <code>mediator</code> (used when <code>model</code> is <code>msm</code>). 
+The order of regression models must follow the order of variables in <code>mediator</code>. See 
+<code>Details</code>.</p></td>
     </tr>
     <tr>
       <th>ereg</th>
@@ -381,7 +387,7 @@ for details.</p></td>
       <td><p>minimal number of significant digits. See <a href='https://rdrr.io/r/base/print.default.html'>print.default</a>.</p></td>
     </tr>
     </table>
-    
+
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>An object of class <code>cmest</code> is returned:</p>
@@ -403,11 +409,10 @@ for details.</p></td>
 <dt>effect.pval</dt><dd><p>p-values of causal effects,</p></dd>
 ...
 
-    
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p><strong>Regressions</strong></p>
-<p>Each regression in <code>yreg</code>, <code>mreg</code>, <code>wmreg</code>,
+<p>Each regression in <code>yreg</code>, <code>mreg</code>, <code>wmnomreg</code>, <code>wmdenomreg</code>,
 <code>ereg</code> and <code>postcreg</code> can be specified by a user-defined regression 
 object or the character name of the regression.</p>
 <p><em>The Character Name of A Regression</em></p>
@@ -429,12 +434,12 @@ with <code>dist = "exponential"</code></p></li>
 <li><p><code>aft_weibull</code>: accelerated failure time model fitted by <a href='https://rdrr.io/pkg/survival/man/survreg.html'>survreg</a>
 with <code>dist = "weibull"</code></p></li>
 </ul><p><code>coxph</code>, <code>aft_exp</code> and <code>aft_weibull</code> are currently not implemented for 
-<code>mreg</code>, <code>wmreg</code>, <code>ereg</code> and <code>postcreg</code>.</p>
+<code>mreg</code>, <code>wmnomreg</code>, <code>wmdenomreg</code>, <code>ereg</code> and <code>postcreg</code>.</p>
 <p><em>The User-defined Regression Object</em></p>
 <p>A user-defined regression object can be fitted by <a href='https://rdrr.io/r/stats/lm.html'>lm</a>, <a href='https://rdrr.io/r/stats/glm.html'>glm</a>, glm.nb, 
 <a href='https://rdrr.io/pkg/mgcv/man/gam.html'>gam</a>, <a href='https://rdrr.io/pkg/nnet/man/multinom.html'>multinom</a>, <a href='https://rdrr.io/pkg/MASS/man/polr.html'>polr</a>, <a href='https://rdrr.io/pkg/survival/man/coxph.html'>coxph</a> and
 <a href='https://rdrr.io/pkg/survival/man/survreg.html'>survreg</a>. Objects fitted by <a href='https://rdrr.io/pkg/survival/man/coxph.html'>coxph</a> and <a href='https://rdrr.io/pkg/survival/man/survreg.html'>survreg</a> 
-are currently not supported for <code>mreg</code>, <code>wmreg</code>, 
+are currently not supported for <code>mreg</code>, <code>wmnomreg</code>, <code>wmdenomreg</code>, 
 <code>ereg</code> and <code>postcreg</code>.</p>
 <p>The <code>cmest</code> function calculates weights for regressions when weighting is required. If a 
 user-defined regression object is fitted with prior weights, the final weights for this 
@@ -448,8 +453,8 @@ denote <code>mediator</code>, <code>C</code> denote <code>basec</code>, <code>L=
 <li><p><code>rb</code>: <em>the regression-based approach</em> by Valeri et al. (2013) and
       VanderWeele et al. (2014). <code>yreg</code> and <code>mreg</code> are required. If specified as
       a user-defined regression object, <code>yreg</code> should regress <code>Y</code> on <code>A</code>,
-<code>M</code> and <code>C</code> and <code>mreg[p]</code> should regress <code>M_p</code> on <code>A</code>,
-<code>M_1</code>, ..., <code>M_{p-1}</code> and <code>C</code> for <code>p=1,...,k</code>.</p></li>
+<code>M</code> and <code>C</code> and <code>mreg[p]</code> should regress <code>M_p</code> on <code>A</code> and <code>C</code> 
+for <code>p=1,...,k</code>.</p></li>
 <li><p><code>wb</code>: <em>the weighting-based approach</em> by VanderWeele et al. (2014).
     <code>yreg</code> is required. When <code>basec</code> is not empty, <code>ereg</code> is also required 
     and <code>A</code> must be categorical. If specified as a user-defined regression object, 
@@ -467,22 +472,22 @@ denote <code>mediator</code>, <code>C</code> denote <code>basec</code>, <code>L=
     the first variable must point to the exposure, the variable(s) right after the 
     exposure must point to the mediator(s), e.g., <code>Y ~ A + M_1 + M_2 + A*M_1 + C</code>.</p></li>
 <li><p><code>msm</code>: <em>the marginal structural model</em> by VanderWeele et al. (2017).
-    <code>yreg</code>, <code>mreg</code> and <code>wmreg</code> are required and all 
+    <code>yreg</code>, <code>mreg</code>, <code>wmnomreg</code> and <code>wmdenomreg</code> are required and all 
     mediators must be categorical. When <code>basec</code> is not empty, <code>ereg</code> is also 
     required and <code>A</code> must be categorical. If specified as a user-defined regression 
-    object, <code>yreg</code> should regress <code>Y</code> on <code>A</code> and <code>M</code>, 
-    <code>mreg[p]</code> should regress <code>M_p</code> on <code>A</code>, <code>M_1</code>, ..., and 
-    <code>M_{p-1}</code> for <code>p=1,...,k</code>, 
-    <code>wmreg[p]</code> should regress <code>M_p</code> on <code>A</code>, <code>M_1</code>, ..., <code>M_{p-1}</code>,
-    <code>C</code> and <code>L</code> for <code>p=1,...,k</code>, and <code>ereg</code> should regress <code>A</code> on 
+    object, <code>yreg</code> should regress <code>Y</code> on <code>A</code> and <code>M</code>; <code>mreg[p]</code> 
+    should regress <code>M_p</code> on <code>A</code> for <code>p=1,...,k</code>; <code>wmnomreg[p]</code> should 
+    regress <code>M_p</code> on <code>A</code>, <code>M_1</code>, ..., <code>M_{p-1}</code> for <code>p=1,...,k</code>;
+    <code>wmdenomreg[p]</code> should regress <code>M_p</code> on <code>A</code>, <code>M_1</code>, ..., <code>M_{p-1}</code>,
+    <code>C</code> and <code>L</code> for <code>p=1,...,k</code>; and <code>ereg</code> should regress <code>A</code> on 
     <code>C</code>.</p></li>
-<li><p><code>gformula</code>: <em>the g-formula approach</em> by Lin et al. (2017). 
+<li><p><code>gformula</code>: <em>the g-formula approach</em> by Robins (1986). 
     <code>yreg</code>, <code>mreg</code> are required. <code>postcreg</code> is also required when <code>postc</code>
     is not empty. If specified as a user-defined regression object, <code>yreg</code> should 
     regress <code>Y</code> on <code>A</code>, <code>M</code>, <code>C</code> and <code>L</code>, <code>mreg[p]</code> should 
-    regress <code>M_p</code> on <code>A</code>, <code>M_1</code>, ..., <code>M_{p-1}</code>, <code>C</code> and <code>L</code>
-    for <code>p=1,...,k</code>, <code>postcreg[q]</code> should regress <code>L_q</code> on <code>A</code>, 
-    <code>L_1</code>, ..., <code>L_{q-1}</code> and <code>C</code> for <code>q=1,...,s</code>.</p></li>
+    regress <code>M_p</code> on <code>A</code>, <code>C</code> and <code>L</code>
+    for <code>p=1,...,k</code>, <code>postcreg[q]</code> should regress <code>L_q</code> on <code>A</code> and <code>C</code> 
+    for <code>q=1,...,s</code>.</p></li>
 </ul>
   
 <p>When <code>postc</code> is not empty, only <code>msm</code> and <code>gformula</code> can be used.</p>  
@@ -555,7 +560,6 @@ ratio due to <code>cde</code>), <code>ERintref</code> (excess ratio due to <code
 <code>rRtnie</code>, <code>rERintref</code>, <code>rERintmed</code>, <code>rERpnie</code>, <code>rERintref(prop)</code>, 
 <code>rERintmed(prop)</code>, <code>rERpnie(prop)</code>, <code>rpm</code>, <code>rint</code> and <code>rpe</code>.</p>
 <p>When <code>model = "iorw"</code>, <code>Rte</code>, <code>Rpnde</code>, <code>Rtnie</code> and <code>pm</code> are estimated.</p>
-    
     <h2 class="hasAnchor" id="methods-by-generic-"><a class="anchor" href="#methods-by-generic-"></a>Methods (by generic)</h2>
 
     
@@ -564,7 +568,6 @@ ratio due to <code>cde</code>), <code>ERintref</code> (excess ratio due to <code
 <li><p><code>summary</code>: Summarize the results of <code>cmest</code> nicely</p></li>
 <li><p><code>print</code>: Print the summary of <code>cmest</code> nicely</p></li>
 </ul>
-    
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Valeri L, VanderWeele TJ (2013). Mediation analysis allowing for
@@ -580,9 +583,9 @@ weighting (2015). American Journal of Epidemiology. 181(5): 349 - 356.</p>
 <p>VanderWeele TJ, Tchetgen Tchetgen EJ (2017). Mediation analysis with time varying
 exposures and mediators. Journal of the Royal Statistical Society: Series B (Statistical
 Methodology). 79(3): 917 - 938.</p>
-<p>Lin SH, Young J, Logan R, Tchetgen Tchetgen EJ, VanderWeele TJ (2017). Parametric
-mediational g-formula approach to mediation analysis with time-varying exposures,
-mediators, and confounders. Epidemiology. 28: 266 - 274.</p>
+<p>Robins JM (1986). A new approach to causal inference in mortality studies with a sustained 
+exposure period-Application to control of the healthy worker survivor effect. Mathematical 
+Modelling. 7: 1393 - 1512.</p>
 <p>Vansteelandt S, Bekaert M, Lange T. (2012). Imputation Strategies for the Estimation 
 of Natural Direct and Indirect Effects. Epidemiologic Methods. 1(1): 131 - 158.</p>
 <p>Steen J, Loeys T, Moerkerke B, Vansteelandt S (2017). Medflex: an R package for
@@ -594,51 +597,53 @@ Epidemiology. 25(5): 749 - 61.</p>
 Psychological Methods. 15(4): 309 - 334.</p>
 <p>Schomaker M, Heumann C. Bootstrap inference when using multiple 
 imputation (2018). Statistics in Medicine. 37(14): 2252 - 2266.</p>
-    
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><a href='ggcmest.html'>ggcmest</a>, <a href='cmdag.html'>cmdag</a>, <a href='cmsens.html'>cmsens</a>, <a href='svymultinom.html'>svymultinom</a>.</p></div>
-    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-<span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>CMAverse</span>)
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://bs1125.github.io/CMAverse/'>CMAverse</a></span><span class='op'>)</span>
 
 <span class='co'># single-mediator case with rb</span>
-<span class='no'>exp1</span> <span class='kw'>&lt;-</span> <span class='fu'>cmest</span>(<span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>cma2020</span>, <span class='kw'>model</span> <span class='kw'>=</span> <span class='st'>"rb"</span>, <span class='kw'>outcome</span> <span class='kw'>=</span> <span class='st'>"contY"</span>,
-<span class='kw'>exposure</span> <span class='kw'>=</span> <span class='st'>"A"</span>, <span class='kw'>mediator</span> <span class='kw'>=</span> <span class='st'>"M2"</span>, <span class='kw'>basec</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"C1"</span>, <span class='st'>"C2"</span>),
-<span class='kw'>EMint</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>mreg</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='st'>"multinomial"</span>), <span class='kw'>yreg</span> <span class='kw'>=</span> <span class='st'>"linear"</span>,
-<span class='kw'>astar</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>a</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>mval</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='st'>"M2_0"</span>), <span class='kw'>estimation</span> <span class='kw'>=</span> <span class='st'>"paramfunc"</span>,
-<span class='kw'>inference</span> <span class='kw'>=</span> <span class='st'>"delta"</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span>(<span class='no'>exp1</span>)
+<span class='va'>exp1</span> <span class='op'>&lt;-</span> <span class='fu'>cmest</span><span class='op'>(</span>data <span class='op'>=</span> <span class='va'>cma2020</span>, model <span class='op'>=</span> <span class='st'>"rb"</span>, outcome <span class='op'>=</span> <span class='st'>"contY"</span>, 
+exposure <span class='op'>=</span> <span class='st'>"A"</span>, mediator <span class='op'>=</span> <span class='st'>"M2"</span>, basec <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"C1"</span>, <span class='st'>"C2"</span><span class='op'>)</span>, 
+EMint <span class='op'>=</span> <span class='cn'>TRUE</span>, mreg <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='st'>"multinomial"</span><span class='op'>)</span>, yreg <span class='op'>=</span> <span class='st'>"linear"</span>, 
+astar <span class='op'>=</span> <span class='fl'>0</span>, a <span class='op'>=</span> <span class='fl'>1</span>, mval <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='st'>"M2_0"</span><span class='op'>)</span>, estimation <span class='op'>=</span> <span class='st'>"paramfunc"</span>, 
+inference <span class='op'>=</span> <span class='st'>"delta"</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>exp1</span><span class='op'>)</span>
 
 <span class='co'># multiple-mediator case with rb</span>
 <span class='co'># 10 boots are used for illustration</span>
-<span class='no'>exp2</span> <span class='kw'>&lt;-</span> <span class='fu'>cmest</span>(<span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>cma2020</span>, <span class='kw'>model</span> <span class='kw'>=</span> <span class='st'>"rb"</span>, <span class='kw'>outcome</span> <span class='kw'>=</span> <span class='st'>"contY"</span>,
-<span class='kw'>exposure</span> <span class='kw'>=</span> <span class='st'>"A"</span>, <span class='kw'>mediator</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"M1"</span>, <span class='st'>"M2"</span>), <span class='kw'>basec</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"C1"</span>, <span class='st'>"C2"</span>),
-<span class='kw'>EMint</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>mreg</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='st'>"logistic"</span>, <span class='st'>"multinomial"</span>),
-<span class='kw'>yreg</span> <span class='kw'>=</span> <span class='st'>"linear"</span>, <span class='kw'>astar</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>a</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>mval</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fl'>0</span>, <span class='st'>"M2_0"</span>),
-<span class='kw'>estimation</span> <span class='kw'>=</span> <span class='st'>"imputation"</span>, <span class='kw'>inference</span> <span class='kw'>=</span> <span class='st'>"bootstrap"</span>, <span class='kw'>nboot</span> <span class='kw'>=</span> <span class='fl'>10</span>)
+<span class='va'>exp2</span> <span class='op'>&lt;-</span> <span class='fu'>cmest</span><span class='op'>(</span>data <span class='op'>=</span> <span class='va'>cma2020</span>, model <span class='op'>=</span> <span class='st'>"rb"</span>, outcome <span class='op'>=</span> <span class='st'>"contY"</span>, 
+exposure <span class='op'>=</span> <span class='st'>"A"</span>, mediator <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"M1"</span>, <span class='st'>"M2"</span><span class='op'>)</span>, basec <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"C1"</span>, <span class='st'>"C2"</span><span class='op'>)</span>, 
+EMint <span class='op'>=</span> <span class='cn'>TRUE</span>, mreg <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='st'>"logistic"</span>, <span class='st'>"multinomial"</span><span class='op'>)</span>, 
+yreg <span class='op'>=</span> <span class='st'>"linear"</span>, astar <span class='op'>=</span> <span class='fl'>0</span>, a <span class='op'>=</span> <span class='fl'>1</span>, mval <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='st'>"M2_0"</span><span class='op'>)</span>, 
+estimation <span class='op'>=</span> <span class='st'>"imputation"</span>, inference <span class='op'>=</span> <span class='st'>"bootstrap"</span>, nboot <span class='op'>=</span> <span class='fl'>10</span><span class='op'>)</span>
 
 <span class='co'># multiple-mediator case with ne</span>
-<span class='no'>exp3</span> <span class='kw'>&lt;-</span> <span class='fu'>cmest</span>(<span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>cma2020</span>, <span class='kw'>model</span> <span class='kw'>=</span> <span class='st'>"ne"</span>, <span class='kw'>outcome</span> <span class='kw'>=</span> <span class='st'>"contY"</span>,
-<span class='kw'>exposure</span> <span class='kw'>=</span> <span class='st'>"A"</span>, <span class='kw'>mediator</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"M1"</span>, <span class='st'>"M2"</span>), <span class='kw'>basec</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"C1"</span>, <span class='st'>"C2"</span>),
-<span class='kw'>yreg</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/glm.html'>glm</a></span>(<span class='no'>contY</span> ~ <span class='no'>A</span> + <span class='no'>M1</span> + <span class='no'>M2</span> + <span class='no'>A</span>*<span class='no'>M1</span> + <span class='no'>A</span>*<span class='no'>M2</span> + <span class='no'>C1</span> + <span class='no'>C2</span>, <span class='kw'>family</span> <span class='kw'>=</span> <span class='no'>gaussian</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>cma2020</span>),
-<span class='kw'>astar</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>a</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>mval</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fl'>0</span>, <span class='st'>"M2_0"</span>), <span class='kw'>estimation</span> <span class='kw'>=</span> <span class='st'>"imputation"</span>,
-<span class='kw'>inference</span> <span class='kw'>=</span> <span class='st'>"bootstrap"</span>, <span class='kw'>nboot</span> <span class='kw'>=</span> <span class='fl'>10</span>)
+<span class='va'>exp3</span> <span class='op'>&lt;-</span> <span class='fu'>cmest</span><span class='op'>(</span>data <span class='op'>=</span> <span class='va'>cma2020</span>, model <span class='op'>=</span> <span class='st'>"ne"</span>, outcome <span class='op'>=</span> <span class='st'>"contY"</span>, 
+exposure <span class='op'>=</span> <span class='st'>"A"</span>, mediator <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"M1"</span>, <span class='st'>"M2"</span><span class='op'>)</span>, basec <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"C1"</span>, <span class='st'>"C2"</span><span class='op'>)</span>, 
+yreg <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/glm.html'>glm</a></span><span class='op'>(</span><span class='va'>contY</span> <span class='op'>~</span> <span class='va'>A</span> <span class='op'>+</span> <span class='va'>M1</span> <span class='op'>+</span> <span class='va'>M2</span> <span class='op'>+</span> <span class='va'>A</span><span class='op'>*</span><span class='va'>M1</span> <span class='op'>+</span> <span class='va'>A</span><span class='op'>*</span><span class='va'>M2</span> <span class='op'>+</span> <span class='va'>C1</span> <span class='op'>+</span> <span class='va'>C2</span>, family <span class='op'>=</span> <span class='va'>gaussian</span>, data <span class='op'>=</span> <span class='va'>cma2020</span><span class='op'>)</span>, 
+astar <span class='op'>=</span> <span class='fl'>0</span>, a <span class='op'>=</span> <span class='fl'>1</span>, mval <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='st'>"M2_0"</span><span class='op'>)</span>, estimation <span class='op'>=</span> <span class='st'>"imputation"</span>, 
+inference <span class='op'>=</span> <span class='st'>"bootstrap"</span>, nboot <span class='op'>=</span> <span class='fl'>10</span><span class='op'>)</span>
 
 <span class='co'># case control study with msm</span>
-<span class='no'>exp4</span> <span class='kw'>&lt;-</span> <span class='fu'>cmest</span>(<span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>cma2020</span>, <span class='kw'>model</span> <span class='kw'>=</span> <span class='st'>"msm"</span>, <span class='kw'>casecontrol</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-<span class='kw'>yrare</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>outcome</span> <span class='kw'>=</span> <span class='st'>"binY"</span>, <span class='kw'>exposure</span> <span class='kw'>=</span> <span class='st'>"A"</span>,
-<span class='kw'>mediator</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"M1"</span>, <span class='st'>"M2"</span>), <span class='kw'>EMint</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>basec</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"C1"</span>, <span class='st'>"C2"</span>), <span class='kw'>yreg</span> <span class='kw'>=</span> <span class='st'>"logistic"</span>,
-<span class='kw'>ereg</span> <span class='kw'>=</span> <span class='st'>"logistic"</span>, <span class='kw'>mreg</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/glm.html'>glm</a></span>(<span class='no'>M1</span> ~ <span class='no'>A</span>, <span class='kw'>family</span> <span class='kw'>=</span> <span class='no'>binomial</span>,
-<span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>cma2020</span>), <span class='kw pkg'>nnet</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/nnet/man/multinom.html'>multinom</a></span>(<span class='no'>M2</span> ~ <span class='no'>A</span> + <span class='no'>M1</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>cma2020</span>, <span class='kw'>trace</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)),
-<span class='kw'>wmreg</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/glm.html'>glm</a></span>(<span class='no'>M1</span> ~ <span class='no'>A</span> + <span class='no'>C1</span> + <span class='no'>C2</span>, <span class='kw'>family</span> <span class='kw'>=</span> <span class='no'>binomial</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>cma2020</span>),
-<span class='kw pkg'>nnet</span><span class='kw ns'>::</span><span class='fu'><a href='https://rdrr.io/pkg/nnet/man/multinom.html'>multinom</a></span>(<span class='no'>M2</span> ~ <span class='no'>A</span> + <span class='no'>M1</span> + <span class='no'>C1</span> + <span class='no'>C2</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>cma2020</span>, <span class='kw'>trace</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)), <span class='kw'>astar</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>a</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-<span class='kw'>mval</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fl'>0</span>, <span class='st'>"M2_0"</span>), <span class='kw'>estimation</span> <span class='kw'>=</span> <span class='st'>"imputation"</span>,
-<span class='kw'>inference</span> <span class='kw'>=</span> <span class='st'>"bootstrap"</span>, <span class='kw'>nboot</span> <span class='kw'>=</span> <span class='fl'>10</span>)
-}</div></pre>
+<span class='va'>exp4</span> <span class='op'>&lt;-</span> <span class='fu'>cmest</span><span class='op'>(</span>data <span class='op'>=</span> <span class='va'>cma2020</span>, model <span class='op'>=</span> <span class='st'>"msm"</span>, casecontrol <span class='op'>=</span> <span class='cn'>TRUE</span>, 
+yrare <span class='op'>=</span> <span class='cn'>TRUE</span>, outcome <span class='op'>=</span> <span class='st'>"binY"</span>, exposure <span class='op'>=</span> <span class='st'>"A"</span>, 
+mediator <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"M1"</span>, <span class='st'>"M2"</span><span class='op'>)</span>, EMint <span class='op'>=</span> <span class='cn'>TRUE</span>, basec <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"C1"</span>, <span class='st'>"C2"</span><span class='op'>)</span>, yreg <span class='op'>=</span> <span class='st'>"logistic"</span>, 
+ereg <span class='op'>=</span> <span class='st'>"logistic"</span>, mreg <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/glm.html'>glm</a></span><span class='op'>(</span><span class='va'>M1</span> <span class='op'>~</span> <span class='va'>A</span>, family <span class='op'>=</span> <span class='va'>binomial</span>, 
+data <span class='op'>=</span> <span class='va'>cma2020</span><span class='op'>)</span>, <span class='fu'>nnet</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/nnet/man/multinom.html'>multinom</a></span><span class='op'>(</span><span class='va'>M2</span> <span class='op'>~</span> <span class='va'>A</span>, data <span class='op'>=</span> <span class='va'>cma2020</span>, trace <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span><span class='op'>)</span>, 
+wmnomreg <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/glm.html'>glm</a></span><span class='op'>(</span><span class='va'>M1</span> <span class='op'>~</span> <span class='va'>A</span>, family <span class='op'>=</span> <span class='va'>binomial</span>, data <span class='op'>=</span> <span class='va'>cma2020</span><span class='op'>)</span>, 
+<span class='fu'>nnet</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/nnet/man/multinom.html'>multinom</a></span><span class='op'>(</span><span class='va'>M2</span> <span class='op'>~</span> <span class='va'>A</span> <span class='op'>+</span> <span class='va'>M1</span>, data <span class='op'>=</span> <span class='va'>cma2020</span>, trace <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span><span class='op'>)</span>,
+wmdenomreg <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/stats/glm.html'>glm</a></span><span class='op'>(</span><span class='va'>M1</span> <span class='op'>~</span> <span class='va'>A</span> <span class='op'>+</span> <span class='va'>C1</span> <span class='op'>+</span> <span class='va'>C2</span>, family <span class='op'>=</span> <span class='va'>binomial</span>, data <span class='op'>=</span> <span class='va'>cma2020</span><span class='op'>)</span>, 
+<span class='fu'>nnet</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/nnet/man/multinom.html'>multinom</a></span><span class='op'>(</span><span class='va'>M2</span> <span class='op'>~</span> <span class='va'>A</span> <span class='op'>+</span> <span class='va'>M1</span> <span class='op'>+</span> <span class='va'>C1</span> <span class='op'>+</span> <span class='va'>C2</span>, data <span class='op'>=</span> <span class='va'>cma2020</span>, trace <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span><span class='op'>)</span>, astar <span class='op'>=</span> <span class='fl'>0</span>, a <span class='op'>=</span> <span class='fl'>1</span>, 
+mval <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='st'>"M2_0"</span><span class='op'>)</span>, estimation <span class='op'>=</span> <span class='st'>"imputation"</span>, 
+inference <span class='op'>=</span> <span class='st'>"bootstrap"</span>, nboot <span class='op'>=</span> <span class='fl'>10</span><span class='op'>)</span>
+<span class='op'>}</span>
+
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -654,7 +659,7 @@ imputation (2018). Statistics in Medicine. 37(14): 2252 - 2266.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

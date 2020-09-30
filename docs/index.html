@@ -26,14 +26,16 @@
     &lt;doi: 10.1515/em-2012-0010&gt;, the inverse odd-ratio weighting approach by Tchetgen Tchetgen 
     (2013) &lt;doi: 10.1002/sim.5864&gt;, the natural effect model by Vansteelandt et al. (2012) 
     &lt;doi: 10.1515/2161-962X.1014&gt;, the marginal structural model by VanderWeele 
-    et al. (2017) &lt;doi: 10.1111/rssb.12194&gt;, and the g-formula approach by Lin et al. (2017) 
-    &lt;doi: 10.1097/EDE.0000000000000609&gt;. Moreover, CMAverse conducts sensitivity analysis for
+    et al. (2017) &lt;doi: 10.1111/rssb.12194&gt;, and the g-formula approach for a single time point 
+    exposure and multiple mediators allowing for time varying confounders by Robins (1986)
+    &lt;doi: 10.1016/0270-0255(86)90088-6&gt;. Moreover, CMAverse conducts sensitivity analysis for
     unmeasured confounding via the E-value approach by VanderWeele et al. (2017) 
     &lt;doi: 10.7326/M16-2607&gt; and Smith et al. (2019) &lt;doi: 10.1097/EDE.0000000000001064&gt;, and 
     sensitivity analysis for measurement error via regression calibration by Carroll et al. (1995) 
     &lt;doi: 10.1201/9781420010138&gt; and SIMEX by Cook et al. (1994) &lt;doi: 10.2307/2290994&gt; and 
-    Küchenhoff et al. (2006) &lt;doi: 10.1111/j.1541-0420.2005.00396.x&gt;. CMAverse also performs
-    multiple imputation for a dataset with missing data.">
+    Küchenhoff et al. (2006) &lt;doi: 10.1111/j.1541-0420.2005.00396.x&gt;. CMAverse also supports 
+    causal mediation analysis for a case control study. When the dataset contains missing values,
+    CMAverse can conduct multiple imputations for causal mediation analysis.">
 <meta property="og:image" content="https://bs1125.github.io/CMAverse/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -144,7 +146,16 @@
 <div id="statistical-modeling" class="section level3">
 <h3 class="hasAnchor">
 <a href="#statistical-modeling" class="anchor"></a>Statistical Modeling</h3>
-<p><code>cmest</code> implements six causal mediation analysis approaches including <em>the regression-based approach</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3659198/">Valeri et al. (2013)</a> and <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/">VanderWeele et al. (2014)</a>, <em>the weighting-based approach</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/">VanderWeele et al. (2014)</a>, <em>the inverse odd-ratio weighting approach</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3954805/">Tchetgen Tchetgen (2013)</a>, <em>the natural effect model</em> by <a href="https://www.degruyter.com/view/journals/em/1/1/article-p131.xml?language=en">Vansteelandt et al. (2012)</a>, <em>the marginal structural model</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5560424/">VanderWeele et al. (2017)</a>, and <em>the g-formula approach</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5285457/">Lin et al. (2017)</a>.</p>
+<p><code>cmest</code> implements six causal mediation analysis approaches including <em>the regression-based approach</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3659198/">Valeri et al. (2013)</a> and <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/">VanderWeele et al. (2014)</a>, <em>the weighting-based approach</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/">VanderWeele et al. (2014)</a>, <em>the inverse odd-ratio weighting approach</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3954805/">Tchetgen Tchetgen (2013)</a>, <em>the natural effect model</em> by <a href="https://www.degruyter.com/view/journals/em/1/1/article-p131.xml?language=en">Vansteelandt et al. (2012)</a>, <em>the marginal structural model</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5560424/">VanderWeele et al. (2017)</a>, and <em>the g-formula approach</em> by <a href="https://www.sciencedirect.com/science/article/pii/0270025586900886">Robins (1986)</a>.</p>
+<p><code>cmest</code> currently supports a single exposure, multiple sequential mediators and a single outcome. When multiple mediators are of interest, <code>cmest</code> estimates the joint mediated effect through the set of mediators. <code>cmest</code> also allows for time varying confounders preceding mediators. The two causal scenarios supported are:</p>
+<ol>
+1. There are no confounders affected by the exposure:
+</ol>
+<p><img src="reference/figures/unnamed-chunk-1-1.png"></p>
+<ol>
+2. There are mediator-outcome confounders affected by the exposure and these confounders precede all of the mediators:
+</ol>
+<p><img src="reference/figures/unnamed-chunk-2-1.png"></p>
 <table class="table">
 <caption>
 Table: Supported Data Types and Functionalities of <code>cmest</code>
@@ -565,19 +576,19 @@ Count A
 </tr>
 <tr class="even">
 <td>
-Multiple Mediators
+Mediator-outcome Confounder(s) Affected by A
 </td>
 <td style="text-align: center;">
-√
+×
 </td>
 <td style="text-align: center;">
-√
+×
 </td>
 <td style="text-align: center;">
-√
+×
 </td>
 <td style="text-align: center;">
-√
+×
 </td>
 <td style="text-align: center;">
 √
@@ -587,29 +598,6 @@ Multiple Mediators
 </td>
 </tr>
 <tr class="odd">
-<td>
-Mediator-outcome Confounder(s) affected by A
-</td>
-<td style="text-align: center;">
-×
-</td>
-<td style="text-align: center;">
-×
-</td>
-<td style="text-align: center;">
-×
-</td>
-<td style="text-align: center;">
-×
-</td>
-<td style="text-align: center;">
-√
-</td>
-<td style="text-align: center;">
-√
-</td>
-</tr>
-<tr class="even">
 <td>
 2-way Decomposition
 </td>
@@ -632,7 +620,7 @@ Mediator-outcome Confounder(s) affected by A
 √
 </td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>
 4-way Decomposition
 </td>
@@ -655,7 +643,7 @@ Mediator-outcome Confounder(s) affected by A
 √
 </td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>
 Estimation: Closed-form Parameter Function
 </td>
@@ -678,7 +666,7 @@ Estimation: Closed-form Parameter Function
 ×
 </td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>
 Estimation: Direct Counterfactual Imputation
 </td>
@@ -701,7 +689,7 @@ Estimation: Direct Counterfactual Imputation
 √
 </td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>
 Inference: Delta Method
 </td>
@@ -724,7 +712,7 @@ Inference: Delta Method
 ×
 </td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>
 Inference: Bootstrapping
 </td>
@@ -747,7 +735,7 @@ Inference: Bootstrapping
 √
 </td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>
 Marginal Effects
 </td>
@@ -770,9 +758,9 @@ Marginal Effects
 √
 </td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>
-Effects Conditional On C
+Effects Conditional on C
 </td>
 <td style="text-align: center;">
 √<a href="#fn10" class="footnote-ref" id="fnref10" role="doc-noteref"><sup>10</sup></a>
@@ -856,7 +844,7 @@ conditional effects are estimated when closed-form parameter function estimation
 <div id="sensitivity-analysis" class="section level3">
 <h3 class="hasAnchor">
 <a href="#sensitivity-analysis" class="anchor"></a>Sensitivity Analysis</h3>
-<p><code>cmsens</code> conducts sensitivity analysis for unmeasured confounding via the <em>E-value</em> approach by <a href="https://pubmed.ncbi.nlm.nih.gov/28693043/">VanderWeele et al. (2017)</a> and <a href="https://pubmed.ncbi.nlm.nih.gov/31348008/">Smith et al. (2019)</a>, and sensitivity analysis for measurement error via <em>regression calibration</em> by <a href="https://www.taylorfrancis.com/books/9780429139635">Carroll et al. (1995)</a> and <em>SIMEX</em> by <a href="https://www.jstor.org/stable/2290994?seq=1#metadata_info_tab_contents">Cook et al. (1994)</a> and <a href="https://pubmed.ncbi.nlm.nih.gov/16542233/">Küchenhoff et al. (2006)</a>. The sensitivity analysis for measurement error is currently available for <em>the regression-based approach</em> and <em>the g-formula approach</em>.</p>
+<p><code>cmsens</code> conducts sensitivity analysis for unmeasured confounding via the <em>E-value</em> approach by <a href="https://pubmed.ncbi.nlm.nih.gov/28693043/">VanderWeele et al. (2017)</a> and <a href="https://pubmed.ncbi.nlm.nih.gov/31348008/">Smith et al. (2019)</a>, and sensitivity analysis for measurement error via <em>regression calibration</em> by <a href="https://www.taylorfrancis.com/books/9780429139635">Carroll et al. (1995)</a> and <em>SIMEX</em> by <a href="https://www.jstor.org/stable/2290994?seq=1#metadata_info_tab_contents">Cook et al. (1994)</a> and <a href="https://pubmed.ncbi.nlm.nih.gov/16542233/">Küchenhoff et al. (2006)</a>. Sensitivity analysis for measurement error is currently available for <em>the regression-based approach</em> and <em>the g-formula approach</em>.</p>
 </div>
 </div>
 <div id="installation" class="section level2">
@@ -875,7 +863,7 @@ conditional effects are estimated when closed-form parameter function estimation
 <p>Tchetgen Tchetgen EJ (2013). Inverse odds ratio-weighted estimation for causal mediation analysis. Statistics in medicine. 32: 4567 - 4580.</p>
 <p>Nguyen QC, Osypuk TL, Schmidt NM, Glymour MM, Tchetgen Tchetgen EJ. Practical guidance for conducting mediation analysis with multiple mediators using inverse odds ratio weighting (2015). American Journal of Epidemiology. 181(5): 349 - 356.</p>
 <p>VanderWeele TJ, Tchetgen Tchetgen EJ (2017). Mediation analysis with time varying exposures and mediators. Journal of the Royal Statistical Society: Series B (Statistical Methodology). 79(3): 917 - 938.</p>
-<p>Lin SH, Young J, Logan R, Tchetgen Tchetgen EJ, VanderWeele TJ (2017). Parametric mediational g-formula approach to mediation analysis with time-varying exposures, mediators, and confounders. Epidemiology. 28: 266 - 274.</p>
+<p>Robins JM (1986). A new approach to causal inference in mortality studies with a sustained exposure period-Application to control of the healthy worker survivor effect. Mathematical Modelling. 7: 1393 - 1512.</p>
 <p>Vansteelandt S, Bekaert M, Lange T. (2012). Imputation Strategies for the Estimation of Natural Direct and Indirect Effects. Epidemiologic Methods. 1(1): 131 - 158.</p>
 <p>Steen J, Loeys T, Moerkerke B, Vansteelandt S (2017). Medflex: an R package for flexible mediation analysis using natural effect models. Journal of Statistical Software. 76(11).</p>
 <p>VanderWeele TJ. A unification of mediation and interaction: a 4-way decomposition (2014). Epidemiology. 25(5): 749 - 61.</p>
@@ -937,7 +925,7 @@ conditional effects are estimated when closed-form parameter function estimation
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

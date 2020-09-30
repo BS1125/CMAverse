@@ -15,10 +15,12 @@
 <link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png" />
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png" />
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
+
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/sandstone/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
 
@@ -43,15 +45,13 @@
 
 
 
-<meta property="og:title" content="Sensitivity Analysis For Unmeasured Confounding and Measurement Error — cmsens" />
 
+<meta property="og:title" content="Sensitivity Analysis For Unmeasured Confounding and Measurement Error — cmsens" />
 <meta property="og:description" content="cmsens is used to conduct sensitivity analysis for unmeasured confounding via 
 the E-value approach by Vanderweele et al. (2017) and Smith et al. (2019), and 
 sensitivity analysis for measurement error via regression calibration by Carroll 
 et al. (1995) and SIMEX by Cook et al. (1994) and Küchenhoff et al. (2006)." />
-
 <meta property="og:image" content="https://bs1125.github.io/CMAverse/logo.png" />
-
 
 
 
@@ -129,7 +129,6 @@ et al. (1995) and SIMEX by Cook et al. (1994) and Küchenhoff et al. (2006)." />
   </ul>
 </li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="../reference/index.html">
@@ -164,38 +163,36 @@ et al. (1995) and SIMEX by Cook et al. (1994) and Küchenhoff et al. (2006)." />
     </div>
 
     <div class="ref-description">
-    
     <p><code>cmsens</code> is used to conduct sensitivity analysis for unmeasured confounding via 
 the <em>E-value</em> approach by Vanderweele et al. (2017) and Smith et al. (2019), and 
 sensitivity analysis for measurement error via <em>regression calibration</em> by Carroll 
 et al. (1995) and <em>SIMEX</em> by Cook et al. (1994) and Küchenhoff et al. (2006).</p>
-    
     </div>
 
-    <pre class="usage"><span class='fu'>cmsens</span>(
-  <span class='kw'>object</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>sens</span> <span class='kw'>=</span> <span class='st'>"uc"</span>,
-  <span class='kw'>MEmethod</span> <span class='kw'>=</span> <span class='st'>"simex"</span>,
-  <span class='kw'>MEvariable</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>MEvartype</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>MEerror</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>lambda</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.5</span>, <span class='fl'>1</span>, <span class='fl'>1.5</span>, <span class='fl'>2</span>),
-  <span class='kw'>B</span> <span class='kw'>=</span> <span class='fl'>200</span>,
-  <span class='kw'>nboot.rc</span> <span class='kw'>=</span> <span class='fl'>400</span>
-)
+    <pre class="usage"><span class='fu'>cmsens</span><span class='op'>(</span>
+  object <span class='op'>=</span> <span class='cn'>NULL</span>,
+  sens <span class='op'>=</span> <span class='st'>"uc"</span>,
+  MEmethod <span class='op'>=</span> <span class='st'>"simex"</span>,
+  MEvariable <span class='op'>=</span> <span class='cn'>NULL</span>,
+  MEvartype <span class='op'>=</span> <span class='cn'>NULL</span>,
+  MEerror <span class='op'>=</span> <span class='cn'>NULL</span>,
+  lambda <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.5</span>, <span class='fl'>1</span>, <span class='fl'>1.5</span>, <span class='fl'>2</span><span class='op'>)</span>,
+  B <span class='op'>=</span> <span class='fl'>200</span>,
+  nboot.rc <span class='op'>=</span> <span class='fl'>400</span>
+<span class='op'>)</span>
 
 <span class='co'># S3 method for cmsens.uc</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>x</span>, <span class='no'>...</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for cmsens.me</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>x</span>, <span class='no'>...</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>x</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for cmsens.me</span>
-<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span>(<span class='no'>object</span>, <span class='no'>...</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>...</span><span class='op'>)</span>
 
 <span class='co'># S3 method for summary.cmsens.me</span>
-<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='no'>x</span>, <span class='kw'>digits</span> <span class='kw'>=</span> <span class='fl'>4</span>, <span class='no'>...</span>)</pre>
-    
+<span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='va'>x</span>, digits <span class='op'>=</span> <span class='fl'>4</span>, <span class='va'>...</span><span class='op'>)</span></pre>
+
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
@@ -255,7 +252,7 @@ with regression calibration. Default is <code>400</code>.</p></td>
       <td><p>minimal number of significant digits. See <a href='https://rdrr.io/r/base/print.default.html'>print.default</a>.</p></td>
     </tr>
     </table>
-    
+
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>If <code>sens</code> is <code>uc</code>, an object of class <code>cmsens.uc</code> is returned:</p>
@@ -274,7 +271,6 @@ by <code>1 - MEerror[i]/sd(data[, MEvariable])</code> for <code>i=1,...,length(M
 <dt>sens</dt><dd><p>a list of causal mediation analysis results after correcting errors in <code>MEerror</code>,</p></dd>
 ...
 
-    
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p><strong>Sensitivity Analysis for Unmeasured Confounding</strong></p>
@@ -297,7 +293,6 @@ Regression calibration requires that the variable measured with error be an inde
 continuous variable in the regression it's involved in. SIMEX supports a continuous or 
 categorical variable measured with error. Quadratic extrapolation method is implemented for
 SIMEX.</p>
-    
     <h2 class="hasAnchor" id="methods-by-generic-"><a class="anchor" href="#methods-by-generic-"></a>Methods (by generic)</h2>
 
     
@@ -307,7 +302,6 @@ SIMEX.</p>
 <li><p><code>summary</code>: Summarize results of <code>cmsens.me</code> nicely</p></li>
 <li><p><code>print</code>: Print the summary of <code>cmsens.me</code> nicely</p></li>
 </ul>
-    
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>VanderWeele TJ, Ding P. Sensitivity analysis in observational research: introducing the 
@@ -325,38 +319,38 @@ Journal of the American Statistical Association. 90(432): 1247 - 56.</p>
 <p>Valeri L, Lin X, VanderWeele TJ. Mediation analysis when a continuous mediator is measured 
 with error and the outcome follows a generalized linear model (2014). Statistics in 
 medicine, 33(28): 4875 – 4890.</p>
-    
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><a href='ggcmsens.html'>ggcmsens</a>, <a href='cmdag.html'>cmdag</a>, <a href='cmest.html'>cmest</a>, <a href='rcreg.html'>rcreg</a>, <a href='simexreg.html'>simexreg</a>.</p></div>
-    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-<span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>CMAverse</span>)
+<span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://bs1125.github.io/CMAverse/'>CMAverse</a></span><span class='op'>)</span>
 
 <span class='co'># 10 boots are used for illustration</span>
-<span class='no'>naive</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='cmest.html'>cmest</a></span>(<span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>cma2020</span>, <span class='kw'>model</span> <span class='kw'>=</span> <span class='st'>"rb"</span>, <span class='kw'>outcome</span> <span class='kw'>=</span> <span class='st'>"contY"</span>,
-<span class='kw'>exposure</span> <span class='kw'>=</span> <span class='st'>"A"</span>, <span class='kw'>mediator</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"M1"</span>, <span class='st'>"M2"</span>),
-<span class='kw'>basec</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"C1"</span>, <span class='st'>"C2"</span>), <span class='kw'>EMint</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
-<span class='kw'>mreg</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='st'>"logistic"</span>, <span class='st'>"multinomial"</span>), <span class='kw'>yreg</span> <span class='kw'>=</span> <span class='st'>"linear"</span>,
-<span class='kw'>astar</span> <span class='kw'>=</span> <span class='fl'>0</span>, <span class='kw'>a</span> <span class='kw'>=</span> <span class='fl'>1</span>, <span class='kw'>mval</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fl'>0</span>, <span class='st'>"M2_0"</span>),
-<span class='kw'>estimation</span> <span class='kw'>=</span> <span class='st'>"imputation"</span>, <span class='kw'>inference</span> <span class='kw'>=</span> <span class='st'>"bootstrap"</span>, <span class='kw'>nboot</span> <span class='kw'>=</span> <span class='fl'>10</span>)
+<span class='va'>naive</span> <span class='op'>&lt;-</span> <span class='fu'><a href='cmest.html'>cmest</a></span><span class='op'>(</span>data <span class='op'>=</span> <span class='va'>cma2020</span>, model <span class='op'>=</span> <span class='st'>"rb"</span>, outcome <span class='op'>=</span> <span class='st'>"contY"</span>, 
+exposure <span class='op'>=</span> <span class='st'>"A"</span>, mediator <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"M1"</span>, <span class='st'>"M2"</span><span class='op'>)</span>, 
+basec <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"C1"</span>, <span class='st'>"C2"</span><span class='op'>)</span>, EMint <span class='op'>=</span> <span class='cn'>TRUE</span>,
+mreg <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='st'>"logistic"</span>, <span class='st'>"multinomial"</span><span class='op'>)</span>, yreg <span class='op'>=</span> <span class='st'>"linear"</span>,
+astar <span class='op'>=</span> <span class='fl'>0</span>, a <span class='op'>=</span> <span class='fl'>1</span>, mval <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fl'>0</span>, <span class='st'>"M2_0"</span><span class='op'>)</span>,
+estimation <span class='op'>=</span> <span class='st'>"imputation"</span>, inference <span class='op'>=</span> <span class='st'>"bootstrap"</span>, nboot <span class='op'>=</span> <span class='fl'>10</span><span class='op'>)</span>
 
-<span class='no'>exp1</span> <span class='kw'>&lt;-</span> <span class='fu'>cmsens</span>(<span class='kw'>object</span> <span class='kw'>=</span> <span class='no'>naive</span>, <span class='kw'>sens</span> <span class='kw'>=</span> <span class='st'>"uc"</span>)
-<span class='no'>exp2</span> <span class='kw'>&lt;-</span> <span class='fu'>cmsens</span>(<span class='kw'>object</span> <span class='kw'>=</span> <span class='no'>naive</span>, <span class='kw'>sens</span> <span class='kw'>=</span> <span class='st'>"me"</span>, <span class='kw'>MEmethod</span> <span class='kw'>=</span> <span class='st'>"rc"</span>,
-<span class='kw'>MEvariable</span> <span class='kw'>=</span> <span class='st'>"C1"</span>, <span class='kw'>MEvartype</span> <span class='kw'>=</span> <span class='st'>"con"</span>,
-<span class='kw'>MEerror</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.1</span>, <span class='fl'>0.2</span>))
-<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span>(<span class='no'>exp2</span>)
+<span class='va'>exp1</span> <span class='op'>&lt;-</span> <span class='fu'>cmsens</span><span class='op'>(</span>object <span class='op'>=</span> <span class='va'>naive</span>, sens <span class='op'>=</span> <span class='st'>"uc"</span><span class='op'>)</span>
+<span class='va'>exp2</span> <span class='op'>&lt;-</span> <span class='fu'>cmsens</span><span class='op'>(</span>object <span class='op'>=</span> <span class='va'>naive</span>, sens <span class='op'>=</span> <span class='st'>"me"</span>, MEmethod <span class='op'>=</span> <span class='st'>"rc"</span>, 
+MEvariable <span class='op'>=</span> <span class='st'>"C1"</span>, MEvartype <span class='op'>=</span> <span class='st'>"con"</span>,
+MEerror <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='fl'>0.2</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>exp2</span><span class='op'>)</span>
 
 <span class='co'># B = 10 is used for illustration</span>
-<span class='no'>exp3</span> <span class='kw'>&lt;-</span> <span class='fu'>cmsens</span>(<span class='kw'>object</span> <span class='kw'>=</span> <span class='no'>naive</span>, <span class='kw'>sens</span> <span class='kw'>=</span> <span class='st'>"me"</span>, <span class='kw'>MEmethod</span> <span class='kw'>=</span> <span class='st'>"simex"</span>,
-<span class='kw'>MEvariable</span> <span class='kw'>=</span> <span class='st'>"M1"</span>, <span class='kw'>MEvartype</span> <span class='kw'>=</span> <span class='st'>"cat"</span>,
-<span class='kw'>MEerror</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.95</span>,<span class='fl'>0.05</span>,<span class='fl'>0.05</span>,<span class='fl'>0.95</span>), <span class='kw'>nrow</span> <span class='kw'>=</span> <span class='fl'>2</span>),
-<span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='fl'>0.9</span>,<span class='fl'>0.1</span>,<span class='fl'>0.1</span>,<span class='fl'>0.9</span>), <span class='kw'>nrow</span> <span class='kw'>=</span> <span class='fl'>2</span>)), <span class='kw'>B</span> <span class='kw'>=</span> <span class='fl'>10</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span>(<span class='no'>exp3</span>)
-}</div></pre>
+<span class='va'>exp3</span> <span class='op'>&lt;-</span> <span class='fu'>cmsens</span><span class='op'>(</span>object <span class='op'>=</span> <span class='va'>naive</span>, sens <span class='op'>=</span> <span class='st'>"me"</span>, MEmethod <span class='op'>=</span> <span class='st'>"simex"</span>, 
+MEvariable <span class='op'>=</span> <span class='st'>"M1"</span>, MEvartype <span class='op'>=</span> <span class='st'>"cat"</span>,
+MEerror <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.95</span>,<span class='fl'>0.05</span>,<span class='fl'>0.05</span>,<span class='fl'>0.95</span><span class='op'>)</span>, nrow <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>, 
+<span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.9</span>,<span class='fl'>0.1</span>,<span class='fl'>0.1</span>,<span class='fl'>0.9</span><span class='op'>)</span>, nrow <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>, B <span class='op'>=</span> <span class='fl'>10</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>exp3</span><span class='op'>)</span>
+<span class='op'>}</span>
+
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -372,7 +366,7 @@ medicine, 33(28): 4875 – 4890.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

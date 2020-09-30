@@ -15,10 +15,12 @@
 <link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png" />
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png" />
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
+
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/sandstone/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
 
@@ -43,12 +45,10 @@
 
 
 
+
 <meta property="og:title" content="DAG Visualization — cmdag" />
-
 <meta property="og:description" content="Plot the directed acyclic graph (DAG) for causal mediation analysis." />
-
 <meta property="og:image" content="https://bs1125.github.io/CMAverse/logo.png" />
-
 
 
 
@@ -126,7 +126,6 @@
   </ul>
 </li>
       </ul>
-      
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="../reference/index.html">
@@ -161,32 +160,30 @@
     </div>
 
     <div class="ref-description">
-    
     <p>Plot the directed acyclic graph (DAG) for causal mediation analysis.</p>
-    
     </div>
 
-    <pre class="usage"><span class='fu'>cmdag</span>(
-  <span class='kw'>outcome</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>exposure</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>mediator</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>basec</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>postc</span> <span class='kw'>=</span> <span class='kw'>NULL</span>,
-  <span class='kw'>x.outcome</span> <span class='kw'>=</span> <span class='fl'>4</span>,
-  <span class='kw'>x.exposure</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>x.mediator</span> <span class='kw'>=</span> <span class='fl'>2</span>,
-  <span class='kw'>x.basec</span> <span class='kw'>=</span> <span class='fl'>2</span>,
-  <span class='kw'>x.postc</span> <span class='kw'>=</span> <span class='fl'>2</span>,
-  <span class='kw'>y.outcome</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>y.exposure</span> <span class='kw'>=</span> <span class='fl'>0</span>,
-  <span class='kw'>y.mediator</span> <span class='kw'>=</span> <span class='fl'>1</span>,
-  <span class='kw'>y.basec</span> <span class='kw'>=</span> <span class='fl'>2</span>,
-  <span class='kw'>y.postc</span> <span class='kw'>=</span> -<span class='fl'>0.5</span>,
-  <span class='kw'>caption.width</span> <span class='kw'>=</span> <span class='fl'>50</span>,
-  <span class='kw'>caption.size</span> <span class='kw'>=</span> <span class='fl'>10</span>,
-  <span class='no'>...</span>
-)</pre>
-    
+    <pre class="usage"><span class='fu'>cmdag</span><span class='op'>(</span>
+  outcome <span class='op'>=</span> <span class='cn'>NULL</span>,
+  exposure <span class='op'>=</span> <span class='cn'>NULL</span>,
+  mediator <span class='op'>=</span> <span class='cn'>NULL</span>,
+  basec <span class='op'>=</span> <span class='cn'>NULL</span>,
+  postc <span class='op'>=</span> <span class='cn'>NULL</span>,
+  x.outcome <span class='op'>=</span> <span class='fl'>4</span>,
+  x.exposure <span class='op'>=</span> <span class='fl'>0</span>,
+  x.mediator <span class='op'>=</span> <span class='fl'>2</span>,
+  x.basec <span class='op'>=</span> <span class='fl'>2</span>,
+  x.postc <span class='op'>=</span> <span class='fl'>2</span>,
+  y.outcome <span class='op'>=</span> <span class='fl'>0</span>,
+  y.exposure <span class='op'>=</span> <span class='fl'>0</span>,
+  y.mediator <span class='op'>=</span> <span class='fl'>1</span>,
+  y.basec <span class='op'>=</span> <span class='fl'>2</span>,
+  y.postc <span class='op'>=</span> <span class='op'>-</span><span class='fl'>0.5</span>,
+  caption.width <span class='op'>=</span> <span class='fl'>50</span>,
+  caption.size <span class='op'>=</span> <span class='fl'>10</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span></pre>
+
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
@@ -266,26 +263,29 @@ confounder(s) affected by the exposure</p></td>
       <td><p>additional arguments passed to <code>ggdag()</code>. See <a href='https://rdrr.io/pkg/ggdag/man/ggdag.html'>ggdag</a> for details.</p></td>
     </tr>
     </table>
-    
+
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><a href='cmest.html'>cmest</a>, <a href='cmsens.html'>cmsens</a>.</p></div>
-    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
 <span class='co'>## basec and postc are empty</span>
-<span class='fu'>cmdag</span>(<span class='kw'>outcome</span> <span class='kw'>=</span> <span class='st'>"Y"</span>, <span class='kw'>exposure</span> <span class='kw'>=</span> <span class='st'>"A"</span>, <span class='kw'>mediator</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"M1"</span>, <span class='st'>"M2"</span>),
-     <span class='kw'>basec</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>postc</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>node</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>text_col</span> <span class='kw'>=</span> <span class='st'>"white"</span>)</div><div class='img'><img src='cmdag-1.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='fu'>cmdag</span><span class='op'>(</span>outcome <span class='op'>=</span> <span class='st'>"Y"</span>, exposure <span class='op'>=</span> <span class='st'>"A"</span>, mediator <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"M1"</span>, <span class='st'>"M2"</span><span class='op'>)</span>,
+     basec <span class='op'>=</span> <span class='cn'>NULL</span>, postc <span class='op'>=</span> <span class='cn'>NULL</span>, node <span class='op'>=</span> <span class='cn'>TRUE</span>, text_col <span class='op'>=</span> <span class='st'>"white"</span><span class='op'>)</span>
+</div><div class='img'><img src='cmdag-1.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'>## postc is empty</span>
-<span class='fu'>cmdag</span>(<span class='kw'>outcome</span> <span class='kw'>=</span> <span class='st'>"Y"</span>, <span class='kw'>exposure</span> <span class='kw'>=</span> <span class='st'>"A"</span>, <span class='kw'>mediator</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"M1"</span>, <span class='st'>"M2"</span>),
-     <span class='kw'>basec</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"C1"</span>, <span class='st'>"C2"</span>, <span class='st'>"C3"</span>), <span class='kw'>postc</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>node</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>text_col</span> <span class='kw'>=</span> <span class='st'>"black"</span>)</div><div class='img'><img src='cmdag-2.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='fu'>cmdag</span><span class='op'>(</span>outcome <span class='op'>=</span> <span class='st'>"Y"</span>, exposure <span class='op'>=</span> <span class='st'>"A"</span>, mediator <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"M1"</span>, <span class='st'>"M2"</span><span class='op'>)</span>,
+     basec <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"C1"</span>, <span class='st'>"C2"</span>, <span class='st'>"C3"</span><span class='op'>)</span>, postc <span class='op'>=</span> <span class='cn'>NULL</span>, node <span class='op'>=</span> <span class='cn'>FALSE</span>, text_col <span class='op'>=</span> <span class='st'>"black"</span><span class='op'>)</span>
+</div><div class='img'><img src='cmdag-2.png' alt='' width='700' height='433' /></div><div class='input'>     
 <span class='co'>## basec is empty</span>
-<span class='fu'>cmdag</span>(<span class='kw'>outcome</span> <span class='kw'>=</span> <span class='st'>"Y"</span>, <span class='kw'>exposure</span> <span class='kw'>=</span> <span class='st'>"A"</span>, <span class='kw'>mediator</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"M1"</span>, <span class='st'>"M2"</span>),
-     <span class='kw'>basec</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>postc</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"L1"</span>, <span class='st'>"L2"</span>), <span class='kw'>node</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>text_col</span> <span class='kw'>=</span> <span class='st'>"black"</span>)</div><div class='img'><img src='cmdag-3.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='fu'>cmdag</span><span class='op'>(</span>outcome <span class='op'>=</span> <span class='st'>"Y"</span>, exposure <span class='op'>=</span> <span class='st'>"A"</span>, mediator <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"M1"</span>, <span class='st'>"M2"</span><span class='op'>)</span>,
+     basec <span class='op'>=</span> <span class='cn'>NULL</span>, postc <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"L1"</span>, <span class='st'>"L2"</span><span class='op'>)</span>, node <span class='op'>=</span> <span class='cn'>FALSE</span>, text_col <span class='op'>=</span> <span class='st'>"black"</span><span class='op'>)</span>
+</div><div class='img'><img src='cmdag-3.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'>## basec and postc aren't empty</span>
-<span class='fu'>cmdag</span>(<span class='kw'>outcome</span> <span class='kw'>=</span> <span class='st'>"Y"</span>, <span class='kw'>exposure</span> <span class='kw'>=</span> <span class='st'>"A"</span>, <span class='kw'>mediator</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"M1"</span>, <span class='st'>"M2"</span>),
-     <span class='kw'>basec</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"C1"</span>, <span class='st'>"C2"</span>, <span class='st'>"C3"</span>), <span class='kw'>postc</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"L1"</span>, <span class='st'>"L2"</span>), <span class='kw'>node</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>text_col</span> <span class='kw'>=</span> <span class='st'>"black"</span>)</div><div class='img'><img src='cmdag-4.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='fu'>cmdag</span><span class='op'>(</span>outcome <span class='op'>=</span> <span class='st'>"Y"</span>, exposure <span class='op'>=</span> <span class='st'>"A"</span>, mediator <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"M1"</span>, <span class='st'>"M2"</span><span class='op'>)</span>,
+     basec <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"C1"</span>, <span class='st'>"C2"</span>, <span class='st'>"C3"</span><span class='op'>)</span>, postc <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"L1"</span>, <span class='st'>"L2"</span><span class='op'>)</span>, node <span class='op'>=</span> <span class='cn'>FALSE</span>, text_col <span class='op'>=</span> <span class='st'>"black"</span><span class='op'>)</span>
+</div><div class='img'><img src='cmdag-4.png' alt='' width='700' height='433' /></div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -302,7 +302,7 @@ confounder(s) affected by the exposure</p></td>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

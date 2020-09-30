@@ -109,12 +109,12 @@
 
       
 
-      </header><div class="row">
+      </header><script src="case_control_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Statistical Modeling for a Case Control Study</h1>
             
-            <h4 class="date">2020-09-13</h4>
+            <h4 class="date">2020-09-29</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BS1125/CMAverse/blob/master/vignettes/case_control.Rmd"><code>vignettes/case_control.Rmd</code></a></small>
       <div class="hidden name"><code>case_control.Rmd</code></div>
@@ -124,57 +124,61 @@
     
     
 <p>This example demonstrates how to use <code>cmest</code> for a case control study. For this purpose, we simulate some data containing a continuous baseline confounder <span class="math inline">\(C_1\)</span>, a binary baseline confounder <span class="math inline">\(C_2\)</span>, a binary exposure <span class="math inline">\(A\)</span>, a binary mediator <span class="math inline">\(M\)</span> and a binary outcome <span class="math inline">\(Y\)</span>. We sample 2000 cases out of all cases and sample 2000 controls out of all controls. The true regression models for <span class="math inline">\(A\)</span>, <span class="math inline">\(M\)</span> and <span class="math inline">\(Y\)</span> are: <span class="math display">\[logit(E(A|C_1,C_2))=0.2+0.5C_1+0.1C_2\]</span> <span class="math display">\[logit(E(M|A,C_1,C_2))=1+2A+1.5C_1+0.8C_2\]</span> <span class="math display">\[logit(E(Y|A,M,C_1,C_2)))=-5+0.8A-1.8M+0.5AM+0.3C_1-0.6C_2\]</span></p>
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span>(<span class="fl">1</span>)
+<div class="sourceCode" id="cb1"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
 <span class="co"># data simulation</span>
-<span class="no">expit</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">x</span>) <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="no">x</span>)/(<span class="fl">1</span>+<span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="no">x</span>))
-<span class="no">n</span> <span class="kw">&lt;-</span> <span class="fl">1000000</span>
-<span class="no">C1</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span>(<span class="no">n</span>, <span class="kw">mean</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">sd</span> <span class="kw">=</span> <span class="fl">0.1</span>)
-<span class="no">C2</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html">rbinom</a></span>(<span class="no">n</span>, <span class="fl">1</span>, <span class="fl">0.6</span>)
-<span class="no">A</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html">rbinom</a></span>(<span class="no">n</span>, <span class="fl">1</span>, <span class="fu">expit</span>(<span class="fl">0.2</span> + <span class="fl">0.5</span>*<span class="no">C1</span> + <span class="fl">0.1</span>*<span class="no">C2</span>))
-<span class="no">M</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html">rbinom</a></span>(<span class="no">n</span>, <span class="fl">1</span>, <span class="fu">expit</span>(<span class="fl">1</span> + <span class="fl">2</span>*<span class="no">A</span> + <span class="fl">1.5</span>*<span class="no">C1</span> + <span class="fl">0.8</span>*<span class="no">C2</span>))
-<span class="no">Y</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html">rbinom</a></span>(<span class="no">n</span>, <span class="fl">1</span>, <span class="fu">expit</span>(-<span class="fl">5</span> + <span class="fl">0.8</span>*<span class="no">A</span> - <span class="fl">1.8</span>*<span class="no">M</span> + <span class="fl">0.5</span>*<span class="no">A</span>*<span class="no">M</span> + <span class="fl">0.3</span>*<span class="no">C1</span> - <span class="fl">0.6</span>*<span class="no">C2</span>))
-<span class="no">yprevalence</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span>(<span class="no">Y</span>)/<span class="no">n</span>
-<span class="no">data</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="no">A</span>, <span class="no">M</span>, <span class="no">Y</span>, <span class="no">C1</span>, <span class="no">C2</span>)
-<span class="no">case_indice</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span>(<span class="no">data</span>$<span class="no">Y</span> <span class="kw">==</span> <span class="fl">1</span>), <span class="fl">2000</span>, <span class="kw">replace</span> <span class="kw">=</span> <span class="fl">FALSE</span>)
-<span class="no">control_indice</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span>(<span class="no">data</span>$<span class="no">Y</span> <span class="kw">==</span> <span class="fl">0</span>), <span class="fl">2000</span>, <span class="kw">replace</span> <span class="kw">=</span> <span class="fl">FALSE</span>)
-<span class="no">data</span> <span class="kw">&lt;-</span> <span class="no">data</span>[<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="no">case_indice</span>, <span class="no">control_indice</span>), ]</pre></body></html></div>
+<span class="va">expit</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span><span class="op">+</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span>
+<span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">1000000</span>
+<span class="va">C1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="va">n</span>, mean <span class="op">=</span> <span class="fl">1</span>, sd <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span>
+<span class="va">C2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html">rbinom</a></span><span class="op">(</span><span class="va">n</span>, <span class="fl">1</span>, <span class="fl">0.6</span><span class="op">)</span>
+<span class="va">A</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html">rbinom</a></span><span class="op">(</span><span class="va">n</span>, <span class="fl">1</span>, <span class="fu">expit</span><span class="op">(</span><span class="fl">0.2</span> <span class="op">+</span> <span class="fl">0.5</span><span class="op">*</span><span class="va">C1</span> <span class="op">+</span> <span class="fl">0.1</span><span class="op">*</span><span class="va">C2</span><span class="op">)</span><span class="op">)</span>
+<span class="va">M</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html">rbinom</a></span><span class="op">(</span><span class="va">n</span>, <span class="fl">1</span>, <span class="fu">expit</span><span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fl">2</span><span class="op">*</span><span class="va">A</span> <span class="op">+</span> <span class="fl">1.5</span><span class="op">*</span><span class="va">C1</span> <span class="op">+</span> <span class="fl">0.8</span><span class="op">*</span><span class="va">C2</span><span class="op">)</span><span class="op">)</span>
+<span class="va">Y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html">rbinom</a></span><span class="op">(</span><span class="va">n</span>, <span class="fl">1</span>, <span class="fu">expit</span><span class="op">(</span><span class="op">-</span><span class="fl">5</span> <span class="op">+</span> <span class="fl">0.8</span><span class="op">*</span><span class="va">A</span> <span class="op">-</span> <span class="fl">1.8</span><span class="op">*</span><span class="va">M</span> <span class="op">+</span> <span class="fl">0.5</span><span class="op">*</span><span class="va">A</span><span class="op">*</span><span class="va">M</span> <span class="op">+</span> <span class="fl">0.3</span><span class="op">*</span><span class="va">C1</span> <span class="op">-</span> <span class="fl">0.6</span><span class="op">*</span><span class="va">C2</span><span class="op">)</span><span class="op">)</span>
+<span class="va">yprevalence</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">Y</span><span class="op">)</span><span class="op">/</span><span class="va">n</span>
+<span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span><span class="va">A</span>, <span class="va">M</span>, <span class="va">Y</span>, <span class="va">C1</span>, <span class="va">C2</span><span class="op">)</span>
+<span class="va">case_indice</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">Y</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span>, <span class="fl">2000</span>, replace <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
+<span class="va">control_indice</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">Y</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span>, <span class="fl">2000</span>, replace <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
+<span class="va">data</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">case_indice</span>, <span class="va">control_indice</span><span class="op">)</span>, <span class="op">]</span></pre></div>
 <p>The DAG for this scientific setting is:</p>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">CMAverse</span>)
-<span class="fu"><a href="../reference/cmdag.html">cmdag</a></span>(<span class="kw">outcome</span> <span class="kw">=</span> <span class="st">"Y"</span>, <span class="kw">exposure</span> <span class="kw">=</span> <span class="st">"A"</span>, <span class="kw">mediator</span> <span class="kw">=</span> <span class="st">"M"</span>,
-      <span class="kw">basec</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"C1"</span>, <span class="st">"C2"</span>), <span class="kw">postc</span> <span class="kw">=</span> <span class="kw">NULL</span>, <span class="kw">node</span> <span class="kw">=</span> <span class="fl">TRUE</span>, <span class="kw">text_col</span> <span class="kw">=</span> <span class="st">"white"</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb2"><pre class="downlit">
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://bs1125.github.io/CMAverse/">CMAverse</a></span><span class="op">)</span>
+<span class="fu"><a href="../reference/cmdag.html">cmdag</a></span><span class="op">(</span>outcome <span class="op">=</span> <span class="st">"Y"</span>, exposure <span class="op">=</span> <span class="st">"A"</span>, mediator <span class="op">=</span> <span class="st">"M"</span>,
+      basec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C1"</span>, <span class="st">"C2"</span><span class="op">)</span>, postc <span class="op">=</span> <span class="cn">NULL</span>, node <span class="op">=</span> <span class="cn">TRUE</span>, text_col <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span></pre></div>
 <p><img src="case_control_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
 <p>For a case control study, we set the <code>casecontrol</code> argument to be <code>TRUE</code>. It requires that either the prevalence of the case be known or the case be rare. We use the regression-based approach for illustration.</p>
 <p>If the prevalence of the case is known, we specify it by the <code>yprevalence</code> argument. The results are:</p>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="no">res_yprevelence</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span>(<span class="kw">data</span> <span class="kw">=</span> <span class="no">data</span>, <span class="kw">model</span> <span class="kw">=</span> <span class="st">"rb"</span>, <span class="kw">casecontrol</span> <span class="kw">=</span> <span class="fl">TRUE</span>, <span class="kw">yprevalence</span> <span class="kw">=</span> <span class="no">yprevalence</span>,
-                         <span class="kw">outcome</span> <span class="kw">=</span> <span class="st">"Y"</span>, <span class="kw">exposure</span> <span class="kw">=</span> <span class="st">"A"</span>,
-                         <span class="kw">mediator</span> <span class="kw">=</span> <span class="st">"M"</span>, <span class="kw">basec</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"C1"</span>, <span class="st">"C2"</span>), <span class="kw">EMint</span> <span class="kw">=</span> <span class="fl">TRUE</span>,
-                         <span class="kw">mreg</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="st">"logistic"</span>), <span class="kw">yreg</span> <span class="kw">=</span> <span class="st">"logistic"</span>,
-                         <span class="kw">astar</span> <span class="kw">=</span> <span class="fl">0</span>, <span class="kw">a</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">mval</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fl">1</span>), <span class="kw">yref</span> <span class="kw">=</span> <span class="fl">1</span>,
-                         <span class="kw">estimation</span> <span class="kw">=</span> <span class="st">"paramfunc"</span>, <span class="kw">inference</span> <span class="kw">=</span> <span class="st">"delta"</span>)</pre></body></html></div>
-<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">res_yprevelence</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb3"><pre class="downlit">
+<span class="va">res_yprevelence</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data</span>, model <span class="op">=</span> <span class="st">"rb"</span>, casecontrol <span class="op">=</span> <span class="cn">TRUE</span>, yprevalence <span class="op">=</span> <span class="va">yprevalence</span>,
+                         outcome <span class="op">=</span> <span class="st">"Y"</span>, exposure <span class="op">=</span> <span class="st">"A"</span>,
+                         mediator <span class="op">=</span> <span class="st">"M"</span>, basec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C1"</span>, <span class="st">"C2"</span><span class="op">)</span>, EMint <span class="op">=</span> <span class="cn">TRUE</span>,
+                         mreg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">"logistic"</span><span class="op">)</span>, yreg <span class="op">=</span> <span class="st">"logistic"</span>,
+                         astar <span class="op">=</span> <span class="fl">0</span>, a <span class="op">=</span> <span class="fl">1</span>, mval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>, yref <span class="op">=</span> <span class="fl">1</span>,
+                         estimation <span class="op">=</span> <span class="st">"paramfunc"</span>, inference <span class="op">=</span> <span class="st">"delta"</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">res_yprevelence</span><span class="op">)</span></pre></div>
 <pre><code>## Causal Mediation Analysis for a Case Control Study via the Regression-based Approach
 ##  
 ## Closed-form parameter function estimation with 
 ##  delta method standard errors, confidence intervals and p-values 
 ##  
 ##                Estimate Std.error  95% CIL 95% CIU    P.val    
-## Rcde            3.59399   0.31883  3.02041   4.276  &lt; 2e-16 ***
-## Rpnde           3.36071   0.32411  2.78189   4.060  &lt; 2e-16 ***
-## Rtnde           3.54873   0.30590  2.99708   4.202  &lt; 2e-16 ***
-## Rpnie           0.86627   0.03947  0.79226   0.947  0.00163 ** 
-## Rtnie           0.91474   0.03944  0.84060   0.995  0.03876 *  
-## Rte             3.07416   0.27397  2.58148   3.661  &lt; 2e-16 ***
-## ERcde           2.17701   0.07050  2.03883   2.315  &lt; 2e-16 ***
-## ERintref        0.18369   0.25870 -0.32336   0.691  0.47767    
-## ERintmed       -0.15282   0.17242 -0.49076   0.185  0.37546    
-## ERpnie         -0.13373   0.14438 -0.41670   0.149  0.35432    
-## ERcde(prop)     1.04959   0.03947  0.97223   1.127  &lt; 2e-16 ***
-## ERintref(prop)  0.08856   0.02977  0.03021   0.147  0.00293 ** 
-## ERintmed(prop) -0.07368   0.08146 -0.23333   0.086  0.36573    
-## ERpnie(prop)   -0.06447   0.06834 -0.19842   0.069  0.34549    
-## pm             -0.13815   0.02319 -0.18361  -0.093 2.58e-09 ***
-## int             0.01489   0.01400 -0.01256   0.042  0.28769    
-## pe             -0.04959   0.02977 -0.10794   0.009  0.09581 .  
+## Rcde            3.59054   0.31733  3.01948   4.270  &lt; 2e-16 ***
+## Rpnde           3.44231   0.37396  2.78213   4.259  &lt; 2e-16 ***
+## Rtnde           3.56427   0.30685  3.01087   4.219  &lt; 2e-16 ***
+## Rpnie           0.83794   0.04473  0.75471   0.930 0.000925 ***
+## Rtnie           0.86763   0.05490  0.76644   0.982 0.024823 *  
+## Rte             2.98666   0.27610  2.49171   3.580  &lt; 2e-16 ***
+## ERcde           2.09752   0.11082  1.88031   2.315  &lt; 2e-16 ***
+## ERintref        0.34479   0.25249 -0.15008   0.840 0.172079    
+## ERintmed       -0.29359   0.25148 -0.78647   0.199 0.243020    
+## ERpnie         -0.16206   0.21623 -0.58586   0.262 0.453579    
+## ERcde(prop)     1.05580   0.04473  0.96814   1.143  &lt; 2e-16 ***
+## ERintref(prop)  0.17355   0.03792  0.09923   0.248 4.73e-06 ***
+## ERintmed(prop) -0.14778   0.12318 -0.38921   0.094 0.230251    
+## ERpnie(prop)   -0.08157   0.10636 -0.29003   0.127 0.443095    
+## pm             -0.22935   0.02901 -0.28621  -0.173 2.66e-15 ***
+## int             0.02577   0.01922 -0.01190   0.063 0.179931    
+## pe             -0.05580   0.03792 -0.13013   0.019 0.141133    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
@@ -195,41 +199,43 @@
 ## 
 ## $basecval
 ## $basecval[[1]]
-## [1] 1.001532
+## [1] 1.002184
 ## 
 ## $basecval[[2]]
-## [1] 0.51675</code></pre>
+## [1] 0.5255</code></pre>
 <p>If the prevalence of the case is unknown but we know the case is rare, we set the <code>yrare</code> argument to be <code>TRUE</code>. The results are:</p>
-<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="no">res_yrare</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span>(<span class="kw">data</span> <span class="kw">=</span> <span class="no">data</span>, <span class="kw">model</span> <span class="kw">=</span> <span class="st">"rb"</span>, <span class="kw">casecontrol</span> <span class="kw">=</span> <span class="fl">TRUE</span>, <span class="kw">yrare</span> <span class="kw">=</span> <span class="fl">TRUE</span>,
-                   <span class="kw">outcome</span> <span class="kw">=</span> <span class="st">"Y"</span>, <span class="kw">exposure</span> <span class="kw">=</span> <span class="st">"A"</span>,
-                   <span class="kw">mediator</span> <span class="kw">=</span> <span class="st">"M"</span>, <span class="kw">basec</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"C1"</span>, <span class="st">"C2"</span>), <span class="kw">EMint</span> <span class="kw">=</span> <span class="fl">TRUE</span>,
-                   <span class="kw">mreg</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="st">"logistic"</span>), <span class="kw">yreg</span> <span class="kw">=</span> <span class="st">"logistic"</span>,
-                   <span class="kw">astar</span> <span class="kw">=</span> <span class="fl">0</span>, <span class="kw">a</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">mval</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="fl">1</span>), <span class="kw">yref</span> <span class="kw">=</span> <span class="fl">1</span>,
-                   <span class="kw">estimation</span> <span class="kw">=</span> <span class="st">"paramfunc"</span>, <span class="kw">inference</span> <span class="kw">=</span> <span class="st">"delta"</span>)</pre></body></html></div>
-<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span>(<span class="no">res_yrare</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb6"><pre class="downlit">
+<span class="va">res_yrare</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data</span>, model <span class="op">=</span> <span class="st">"rb"</span>, casecontrol <span class="op">=</span> <span class="cn">TRUE</span>, yrare <span class="op">=</span> <span class="cn">TRUE</span>,
+                   outcome <span class="op">=</span> <span class="st">"Y"</span>, exposure <span class="op">=</span> <span class="st">"A"</span>,
+                   mediator <span class="op">=</span> <span class="st">"M"</span>, basec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C1"</span>, <span class="st">"C2"</span><span class="op">)</span>, EMint <span class="op">=</span> <span class="cn">TRUE</span>,
+                   mreg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">"logistic"</span><span class="op">)</span>, yreg <span class="op">=</span> <span class="st">"logistic"</span>,
+                   astar <span class="op">=</span> <span class="fl">0</span>, a <span class="op">=</span> <span class="fl">1</span>, mval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>, yref <span class="op">=</span> <span class="fl">1</span>,
+                   estimation <span class="op">=</span> <span class="st">"paramfunc"</span>, inference <span class="op">=</span> <span class="st">"delta"</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb7"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">res_yrare</span><span class="op">)</span></pre></div>
 <pre><code>## Causal Mediation Analysis for a Case Control Study via the Regression-based Approach
 ##  
 ## Closed-form parameter function estimation with 
 ##  delta method standard errors, confidence intervals and p-values 
 ##  
 ##                Estimate Std.error  95% CIL 95% CIU    P.val    
-## Rcde            3.62465   0.32005  3.04863   4.309  &lt; 2e-16 ***
-## Rpnde           3.39056   0.32623  2.80784   4.094  &lt; 2e-16 ***
-## Rtnde           3.57922   0.30687  3.02559   4.234  &lt; 2e-16 ***
-## Rpnie           0.86188   0.04000  0.78694   0.944  0.00136 ** 
-## Rtnie           0.90984   0.03986  0.83497   0.991  0.03103 *  
-## Rte             3.08485   0.27445  2.59122   3.673  &lt; 2e-16 ***
-## ERcde           2.18932   0.07199  2.04823   2.330  &lt; 2e-16 ***
-## ERintref        0.20124   0.25833 -0.30507   0.708  0.43597    
-## ERintmed       -0.16759   0.17574 -0.51204   0.177  0.34029    
-## ERpnie         -0.13812   0.14745 -0.42712   0.151  0.34890    
-## ERcde(prop)     1.05011   0.04000  0.97171   1.129  &lt; 2e-16 ***
-## ERintref(prop)  0.09653   0.03018  0.03737   0.156  0.00138 ** 
-## ERintmed(prop) -0.08038   0.08251 -0.24210   0.081  0.32995    
-## ERpnie(prop)   -0.06625   0.06940 -0.20227   0.070  0.33975    
-## pm             -0.14663   0.02354 -0.19278  -0.100 4.73e-10 ***
-## int             0.01614   0.01418 -0.01164   0.044  0.25476    
-## pe             -0.05011   0.03018 -0.10926   0.009  0.09689 .  
+## Rcde            3.65329   0.32168  3.07422   4.341  &lt; 2e-16 ***
+## Rpnde           3.40407   0.35328  2.77754   4.172  &lt; 2e-16 ***
+## Rtnde           3.60919   0.30906  3.05155   4.269  &lt; 2e-16 ***
+## Rpnie           0.83319   0.04532  0.74893   0.927 0.000794 ***
+## Rtnie           0.88340   0.04962  0.79131   0.986 0.027294 *  
+## Rte             3.00715   0.27763  2.50939   3.604  &lt; 2e-16 ***
+## ERcde           2.13416   0.09648  1.94506   2.323  &lt; 2e-16 ***
+## ERintref        0.26991   0.25499 -0.22987   0.770 0.289829    
+## ERintmed       -0.23012   0.21978 -0.66088   0.201 0.295084    
+## ERpnie         -0.16681   0.18887 -0.53699   0.203 0.377131    
+## ERcde(prop)     1.06328   0.04532  0.97445   1.152  &lt; 2e-16 ***
+## ERintref(prop)  0.13447   0.03649  0.06295   0.206 0.000229 ***
+## ERintmed(prop) -0.11465   0.10691 -0.32419   0.095 0.283547    
+## ERpnie(prop)   -0.08311   0.09217 -0.26376   0.098 0.367237    
+## pm             -0.19776   0.02927 -0.25512  -0.140 1.41e-11 ***
+## int             0.01983   0.01642 -0.01235   0.052 0.227195    
+## pe             -0.06328   0.03649 -0.13481   0.008 0.082916 .  
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
@@ -250,13 +256,14 @@
 ## 
 ## $basecval
 ## $basecval[[1]]
-## [1] 1.001532
+## [1] 1.002184
 ## 
 ## $basecval[[2]]
-## [1] 0.51675</code></pre>
+## [1] 0.5255</code></pre>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+
       </div>
 
 </div>
@@ -268,7 +275,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>
