@@ -113,7 +113,7 @@ est.gformula <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRU
   # simulate C
   basec_sim <- data[, basec]
   
-  # design matrices for simulating postc[1]
+  # design matrices for simulating postc[p]
   postcdesign_a <- data.frame(a_sim, basec_sim)
   postcdesign_astar <- data.frame(astar_sim, basec_sim)
   colnames(postcdesign_a) <- colnames(postcdesign_astar) <- c(exposure, basec)
@@ -123,9 +123,6 @@ est.gformula <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRU
   if (length(postc) != 0) {
     # simulating postc[p]
     for (p in 1:length(postc)) {
-      # design matrices for simulating postc[p]
-      postcdesign_a <- cbind(postcdesign_a, postc_a[, p - 1, drop = FALSE])
-      postcdesign_astar <- cbind(postcdesign_astar, postc_astar[, p - 1, drop = FALSE])
       # predict postc[p]
       type <- ifelse(is_multinom_postcreg[p] | is_polr_postcreg[p], "probs", "response")
       postcpred_a <- predict(postcreg[[p]], newdata = postcdesign_a, type = type)
@@ -198,7 +195,7 @@ est.gformula <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRU
     rm(postcdesign_a, postcdesign_astar, type, postcpred_a, postcpred_astar, mid_a, mid_astar)
   }
   
-  # design matrices for simulating mediator[1]
+  # design matrices for simulating mediator[p]
   mdesign_a <- data.frame(a_sim, basec_sim, postc_a)
   mdesign_astar <- data.frame(astar_sim, basec_sim, postc_astar)
   colnames(mdesign_a) <- colnames(mdesign_astar) <- c(exposure, basec, postc)
@@ -207,9 +204,6 @@ est.gformula <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRU
   
   # simulating mediator[p]
   for (p in 1:length(mediator)) {
-    # design matrices for simulating mediator[p]
-    mdesign_a <- cbind(mdesign_a, m_a[, p - 1, drop = FALSE])
-    mdesign_astar <- cbind(mdesign_astar, m_astar[, p - 1, drop = FALSE])
     # predict mediator[p]
     type <- ifelse(is_multinom_mreg[p] | is_polr_mreg[p], "probs", "response")
     mpred_a <- predict(mreg[[p]], newdata = mdesign_a, type = type)

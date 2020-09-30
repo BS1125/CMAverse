@@ -5,7 +5,7 @@
 #' et al. (2014), \emph{the weighting-based approach} by VanderWeele et al. (2014), 
 #' \emph{the inverse odd-ratio weighting approach} by Tchetgen Tchetgen (2013), 
 #' \emph{the natural effect model} by Vansteelandt et al. (2012), \emph{the marginal structural 
-#' model} by VanderWeele et al. (2017), and \emph{the g-formula approach} by Lin et al. (2017).
+#' model} by VanderWeele et al. (2017), and \emph{the g-formula approach} by Robins (1986).
 #'
 #' @param data dataset
 #' @param model causal mediation analysis approach. \code{rb}, \code{wb}, \code{iorw}, 
@@ -41,9 +41,14 @@
 #' @param mreg a list specifying a regression model for each variable in \code{mediator} (used 
 #' when \code{model} is \code{rb}, \code{msm} or \code{gformula}). The order of regression models 
 #' must follow the order of variables in \code{mediator}. See \code{Details}.
-#' @param wmreg a list specifying a regression model for calculating weights with respect to 
-#' each variable in \code{mediator} (used when \code{model} is \code{msm}). The order of regression 
-#' models must follow the order of variables in \code{mediator}. See \code{Details}.
+#' @param wmnomreg a list specifying a regression model for calculating the nominators of 
+#' weights with respect to each variable in \code{mediator} (used when \code{model} is \code{msm}). 
+#' The order of regression models must follow the order of variables in \code{mediator}. See 
+#' \code{Details}.
+#' @param wmdenomreg a list specifying a regression model for calculating the denominators of 
+#' weights with respect to each variable in \code{mediator} (used when \code{model} is \code{msm}). 
+#' The order of regression models must follow the order of variables in \code{mediator}. See 
+#' \code{Details}.
 #' @param ereg exposure regression model for calculating weights with respect to the exposure (used 
 #' when \code{model} is \code{wb} or \code{msm} with a non-empty \code{basec} or when 
 #' \code{model} is \code{iorw}). See \code{Details}.
@@ -76,7 +81,7 @@
 #' 
 #' \strong{Regressions}
 #'
-#' Each regression in \code{yreg}, \code{mreg}, \code{wmreg},
+#' Each regression in \code{yreg}, \code{mreg}, \code{wmnomreg}, \code{wmdenomreg},
 #' \code{ereg} and \code{postcreg} can be specified by a user-defined regression 
 #' object or the character name of the regression. 
 #' 
@@ -101,14 +106,14 @@
 #' with \code{dist = "weibull"}}
 #' }
 #' \code{coxph}, \code{aft_exp} and \code{aft_weibull} are currently not implemented for 
-#' \code{mreg}, \code{wmreg}, \code{ereg} and \code{postcreg}.
+#' \code{mreg}, \code{wmnomreg}, \code{wmdenomreg}, \code{ereg} and \code{postcreg}.
 #' 
 #' \emph{The User-defined Regression Object} 
 #' 
 #' A user-defined regression object can be fitted by \link{lm}, \link{glm}, \link{glm.nb}, 
 #' \link[mgcv]{gam}, \link[nnet]{multinom}, \link[MASS]{polr}, \link[survival]{coxph} and
 #' \link[survival]{survreg}. Objects fitted by \link[survival]{coxph} and \link[survival]{survreg} 
-#' are currently not supported for \code{mreg}, \code{wmreg}, 
+#' are currently not supported for \code{mreg}, \code{wmnomreg}, \code{wmdenomreg}, 
 #' \code{ereg} and \code{postcreg}.
 #' 
 #' The \code{cmest} function calculates weights for regressions when weighting is required. If a 
@@ -126,8 +131,8 @@
 #'     \item{\code{rb}: }{\emph{the regression-based approach} by Valeri et al. (2013) and
 #'       VanderWeele et al. (2014). \code{yreg} and \code{mreg} are required. If specified as
 #'       a user-defined regression object, \code{yreg} should regress \code{Y} on \code{A},
-#' \code{M} and \code{C} and \code{mreg[p]} should regress \code{M_p} on \code{A},
-#' \code{M_1}, ..., \code{M_{p-1}} and \code{C}} for \code{p=1,...,k}.
+#' \code{M} and \code{C} and \code{mreg[p]} should regress \code{M_p} on \code{A} and \code{C}} 
+#' for \code{p=1,...,k}.
 #' 
 #'     \item{\code{wb}: }{\emph{the weighting-based approach} by VanderWeele et al. (2014).
 #'     \code{yreg} is required. When \code{basec} is not empty, \code{ereg} is also required 
@@ -149,23 +154,23 @@
 #'     exposure must point to the mediator(s), e.g., \code{Y ~ A + M_1 + M_2 + A*M_1 + C}.}
 #'       
 #'     \item{\code{msm}: }{\emph{the marginal structural model} by VanderWeele et al. (2017).
-#'     \code{yreg}, \code{mreg} and \code{wmreg} are required and all 
+#'     \code{yreg}, \code{mreg}, \code{wmnomreg} and \code{wmdenomreg} are required and all 
 #'     mediators must be categorical. When \code{basec} is not empty, \code{ereg} is also 
 #'     required and \code{A} must be categorical. If specified as a user-defined regression 
-#'     object, \code{yreg} should regress \code{Y} on \code{A} and \code{M}, 
-#'     \code{mreg[p]} should regress \code{M_p} on \code{A}, \code{M_1}, ..., and 
-#'     \code{M_{p-1}} for \code{p=1,...,k}, 
-#'     \code{wmreg[p]} should regress \code{M_p} on \code{A}, \code{M_1}, ..., \code{M_{p-1}},
-#'     \code{C} and \code{L} for \code{p=1,...,k}, and \code{ereg} should regress \code{A} on 
+#'     object, \code{yreg} should regress \code{Y} on \code{A} and \code{M}; \code{mreg[p]} 
+#'     should regress \code{M_p} on \code{A} for \code{p=1,...,k}; \code{wmnomreg[p]} should 
+#'     regress \code{M_p} on \code{A}, \code{M_1}, ..., \code{M_{p-1}} for \code{p=1,...,k};
+#'     \code{wmdenomreg[p]} should regress \code{M_p} on \code{A}, \code{M_1}, ..., \code{M_{p-1}},
+#'     \code{C} and \code{L} for \code{p=1,...,k}; and \code{ereg} should regress \code{A} on 
 #'     \code{C}.}
 #'     
-#'     \item{\code{gformula}: }{\emph{the g-formula approach} by Lin et al. (2017). 
+#'     \item{\code{gformula}: }{\emph{the g-formula approach} by Robins (1986). 
 #'     \code{yreg}, \code{mreg} are required. \code{postcreg} is also required when \code{postc}
 #'     is not empty. If specified as a user-defined regression object, \code{yreg} should 
 #'     regress \code{Y} on \code{A}, \code{M}, \code{C} and \code{L}, \code{mreg[p]} should 
-#'     regress \code{M_p} on \code{A}, \code{M_1}, ..., \code{M_{p-1}}, \code{C} and \code{L}
-#'     for \code{p=1,...,k}, \code{postcreg[q]} should regress \code{L_q} on \code{A}, 
-#'     \code{L_1}, ..., \code{L_{q-1}} and \code{C} for \code{q=1,...,s}.}
+#'     regress \code{M_p} on \code{A}, \code{C} and \code{L}
+#'     for \code{p=1,...,k}, \code{postcreg[q]} should regress \code{L_q} on \code{A} and \code{C} 
+#'     for \code{q=1,...,s}.}
 #'   }
 #'   
 #' When \code{postc} is not empty, only \code{msm} and \code{gformula} can be used.
@@ -294,9 +299,9 @@
 #' exposures and mediators. Journal of the Royal Statistical Society: Series B (Statistical
 #' Methodology). 79(3): 917 - 938.
 #' 
-#' Lin SH, Young J, Logan R, Tchetgen Tchetgen EJ, VanderWeele TJ (2017). Parametric
-#' mediational g-formula approach to mediation analysis with time-varying exposures,
-#' mediators, and confounders. Epidemiology. 28: 266 - 274.
+#' Robins JM (1986). A new approach to causal inference in mortality studies with a sustained 
+#' exposure period-Application to control of the healthy worker survivor effect. Mathematical 
+#' Modelling. 7: 1393 - 1512.
 #' 
 #' Vansteelandt S, Bekaert M, Lange T. (2012). Imputation Strategies for the Estimation 
 #' of Natural Direct and Indirect Effects. Epidemiologic Methods. 1(1): 131 - 158.
@@ -347,8 +352,10 @@
 #' yrare = TRUE, outcome = "binY", exposure = "A", 
 #' mediator = c("M1", "M2"), EMint = TRUE, basec = c("C1", "C2"), yreg = "logistic", 
 #' ereg = "logistic", mreg = list(glm(M1 ~ A, family = binomial, 
-#' data = cma2020), nnet::multinom(M2 ~ A + M1, data = cma2020, trace = FALSE)), 
-#' wmreg = list(glm(M1 ~ A + C1 + C2, family = binomial, data = cma2020), 
+#' data = cma2020), nnet::multinom(M2 ~ A, data = cma2020, trace = FALSE)), 
+#' wmnomreg = list(glm(M1 ~ A, family = binomial, data = cma2020), 
+#' nnet::multinom(M2 ~ A + M1, data = cma2020, trace = FALSE)),
+#' wmdenomreg = list(glm(M1 ~ A + C1 + C2, family = binomial, data = cma2020), 
 #' nnet::multinom(M2 ~ A + M1 + C1 + C2, data = cma2020, trace = FALSE)), astar = 0, a = 1, 
 #' mval = list(0, "M2_0"), estimation = "imputation", 
 #' inference = "bootstrap", nboot = 10)
@@ -381,7 +388,8 @@ cmest <- function(data = NULL, model = "rb",
                   estimation = "imputation", inference = "bootstrap",
                   outcome = NULL, event = NULL,
                   exposure = NULL, mediator = NULL, EMint = NULL, basec = NULL, postc = NULL,
-                  yreg = NULL, mreg = NULL, wmreg = NULL, ereg = NULL, postcreg = NULL,
+                  yreg = NULL, mreg = NULL, wmnomreg = NULL, wmdenomreg = NULL, ereg = NULL, 
+                  postcreg = NULL,
                   astar = 0, a = 1, mval = NULL, yref = NULL, basecval = NULL,
                   nboot = 200, nRep = 5, multimp = FALSE, ...) {
   # function call
@@ -468,7 +476,7 @@ cmest <- function(data = NULL, model = "rb",
   if (model == "rb") out$reg.input <- list(yreg = yreg, mreg = mreg)
   if (model == "wb") out$reg.input <- list(yreg = yreg)
   if (model == "gformula") out$reg.input <- list(yreg = yreg, mreg = mreg)
-  if (model == "msm") out$reg.input <- list(yreg = yreg, mreg = mreg, wmreg = wmreg)
+  if (model == "msm") out$reg.input <- list(yreg = yreg, mreg = mreg, wmnomreg = wmnomreg, wmdenomreg = wmdenomreg)
   if (model == "iorw") out$reg.input <- list(yreg = yreg, ereg = ereg)
   if (model == "ne") out$reg.input <- list(yreg = yreg) 
   if (length(basec) != 0 && model %in% c("wb", "msm")) out$reg.input$ereg <- ereg
@@ -509,7 +517,8 @@ cmest <- function(data = NULL, model = "rb",
   yreg <- regs$yreg
   ereg <- regs$ereg
   mreg <- regs$mreg
-  wmreg <- regs$wmreg
+  wmnomreg <- regs$wmnomreg
+  wmdenomreg <- regs$wmdenomreg
   postcreg <- regs$postcreg
   
   ###################################################################################################

@@ -274,7 +274,7 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     # simulate C
     basec_sim <- data[, basec]
     
-    # design matrices for simulating mediator[1]
+    # design matrices for simulating mediator[p]
     mdesign_a <- data.frame(a_sim, basec_sim)
     mdesign_astar <- data.frame(astar_sim, basec_sim)
     colnames(mdesign_a) <- colnames(mdesign_astar) <- c(exposure, basec)
@@ -282,9 +282,6 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     colnames(m_a) <- colnames(m_astar) <- mediator
     # simulating mediator[p]
     for (p in 1:length(mediator)) {
-      # design matrices for simulating mediator[p]
-      mdesign_a <- cbind(mdesign_a, m_a[, p - 1, drop = FALSE])
-      mdesign_astar <- cbind(mdesign_astar, m_astar[, p - 1, drop = FALSE])
       # predict mediator[p]
       type <- ifelse(is_multinom_mreg[p] | is_polr_mreg[p], "probs", "response")
       mpred_a <- predict(mreg[[p]], newdata = mdesign_a, type = type)

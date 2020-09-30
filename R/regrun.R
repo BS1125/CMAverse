@@ -19,11 +19,10 @@ regrun <- function() {
              multinomial = ereg <- eval(bquote(nnet::multinom(.(as.formula(exposure_formula)), data = .(data), trace = FALSE))),
              ordinal = ereg <- eval(bquote(MASS::polr(.(as.formula(exposure_formula)), data = .(data)))))
     } else if (!(identical(class(ereg), "lm") | identical(class(ereg), c("glm", "lm")) |
-                  identical(class(ereg), c("negbin", "glm", "lm")) | identical(class(ereg), c("multinom", "nnet")) |
-                  identical(class(ereg), c("gam", "glm", "lm")) | identical(class(ereg), "polr"))) {
+                 identical(class(ereg), c("negbin", "glm", "lm")) | identical(class(ereg), c("multinom", "nnet")) |
+                 identical(class(ereg), c("gam", "glm", "lm")) | identical(class(ereg), "polr"))) {
       stop("Fit ereg by lm, glm, glm.nb, gam, multinom, polr")
-    }
-      
+    } 
   } else {
     if (!is.null(ereg)) warning("ereg is ignored when model is 'wb' or 'msm' with length(basec) = 0 or model is 'rb', 'ne' or 'gformula'")
     ereg <- NULL
@@ -31,31 +30,52 @@ regrun <- function() {
   
   # Mediator Regression For Weighting
   # for msm, a mediator regression for weighting is required for each mediator
+  # w_{m_p,i}=P(M_p=M_{p,i}|A=A_i,M_1=M_{1,i},...,M_{p-1}=M_{p-1,i})/P(M_p=M_{p,i}|A=A_i,C=C_i,L=L_i,M_1=M_{1,i},...,M_{p-1}=M_{p-1,i})
   if (model == "msm") {
-    if (!is.list(wmreg)) stop("wmreg should be a list")
-    if (length(wmreg) != length(mediator)) stop("length(wmreg) != length(mediator)")
-    for (p in 1:length(wmreg)) {
-      if (is.null(wmreg[[p]])) stop(paste0("Unspecified wmreg[[", p, "]]"))
-      if (is.character(wmreg[[p]])) {
-        if (wmreg[[p]] == "loglinear" && length(unique(data[, mediator[p]])) != 2) stop(paste0("When wmreg[[", p, "]] is 'loglinear', mediator[[", p, "]] should be binary"))
-        if (!wmreg[[p]] %in% c("logistic", "loglinear", "multinomial", "ordinal")) stop(paste0("Select character wmreg[[", p, "]] from 'logistic', 'loglinear', 'multinomial', 'ordinal'"))
-        # w_{m_p,i}=P(M_p=M_{p,i}|A=A_i,M_1=M_{1,i},...,M_{p-1}=M_{p-1,i})/P(M_p=M_{p,i}|A=A_i,C=C_i,L=L_i,M_1=M_{1,i},...,M_{p-1}=M_{p-1,i})
-        wmreg_formula <- paste0(mediator[p], "~", paste(c(exposure, mediator[0:(p-1)], basec, postc), collapse = "+"))
+    if (!is.list(wmnomreg)) stop("wmnomreg should be a list")
+    if (length(wmnomreg) != length(mediator)) stop("length(wmnomreg) != length(mediator)")
+    for (p in 1:length(wmnomreg)) {
+      if (is.null(wmnomreg[[p]])) stop(paste0("Unspecified wmnomreg[[", p, "]]"))
+      if (is.character(wmnomreg[[p]])) {
+        if (wmnomreg[[p]] == "loglinear" && length(unique(data[, mediator[p]])) != 2) stop(paste0("When wmnomreg[[", p, "]] is 'loglinear', mediator[[", p, "]] should be binary"))
+        if (!wmnomreg[[p]] %in% c("logistic", "loglinear", "multinomial", "ordinal")) stop(paste0("Select character wmnomreg[[", p, "]] from 'logistic', 'loglinear', 'multinomial', 'ordinal'"))
+        wmnomreg_formula <- paste0(mediator[p], "~", paste(c(exposure, mediator[0:(p-1)]), collapse = "+"))
+        # regression for the nominator of w_{m_p,i}
+        switch(wmnomreg[[p]],
+               logistic = wmnomreg[[p]] <- eval(bquote(glm(.(as.formula(wmnomreg_formula)), family = binomial(), data = .(data)))),
+               loglinear = wmnomreg[[p]] <- eval(bquote(glm(.(as.formula(wmnomreg_formula)), family = poisson(), data = .(data)))),
+               multinomial = wmnomreg[[p]] <- eval(bquote(nnet::multinom(.(as.formula(wmnomreg_formula)), data = .(data), trace = FALSE))),
+               ordinal = wmnomreg[[p]] <- eval(bquote(MASS::polr(.(as.formula(wmnomreg_formula)), data = .(data)))))
+      } else if (!(identical(class(wmnomreg[[p]]), "lm") | identical(class(wmnomreg[[p]]), c("glm", "lm")) |
+                   identical(class(wmnomreg[[p]]), c("negbin", "glm", "lm")) | identical(class(wmnomreg[[p]]), c("multinom", "nnet")) |
+                   identical(class(wmnomreg[[p]]), c("gam", "glm", "lm")) | identical(class(wmnomreg[[p]]), "polr"))) {
+        stop(paste0("Fit wmnomreg[[", p, "]] by lm, glm, glm.nb, gam, multinom, polr"))
+      }
+    }
+    if (!is.list(wmdenomreg)) stop("wmdenomreg should be a list")
+    if (length(wmdenomreg) != length(mediator)) stop("length(wmdenomreg) != length(mediator)")
+    for (p in 1:length(wmdenomreg)) {
+      if (is.null(wmdenomreg[[p]])) stop(paste0("Unspecified wmdenomreg[[", p, "]]"))
+      if (is.character(wmdenomreg[[p]])) {
+        if (wmdenomreg[[p]] == "loglinear" && length(unique(data[, mediator[p]])) != 2) stop(paste0("When wmdenomreg[[", p, "]] is 'loglinear', mediator[[", p, "]] should be binary"))
+        if (!wmdenomreg[[p]] %in% c("logistic", "loglinear", "multinomial", "ordinal")) stop(paste0("Select character wmdenomreg[[", p, "]] from 'logistic', 'loglinear', 'multinomial', 'ordinal'"))
+        wmdenomreg_formula <- paste0(mediator[p], "~", paste(c(exposure, mediator[0:(p-1)], basec, postc), collapse = "+"))
         # regression for the denominator of w_{m_p,i}
-        switch(wmreg[[p]],
-               logistic = wmreg[[p]] <- eval(bquote(glm(.(as.formula(wmreg_formula)), family = binomial(), data = .(data)))),
-               loglinear = wmreg[[p]] <- eval(bquote(glm(.(as.formula(wmreg_formula)), family = poisson(), data = .(data)))),
-               multinomial = wmreg[[p]] <- eval(bquote(nnet::multinom(.(as.formula(wmreg_formula)), data = .(data), trace = FALSE))),
-               ordinal = wmreg[[p]] <- eval(bquote(MASS::polr(.(as.formula(wmreg_formula)), data = .(data)))))
-      } else if (!(identical(class(wmreg[[p]]), "lm") | identical(class(wmreg[[p]]), c("glm", "lm")) |
-                   identical(class(wmreg[[p]]), c("negbin", "glm", "lm")) | identical(class(wmreg[[p]]), c("multinom", "nnet")) |
-                   identical(class(wmreg[[p]]), c("gam", "glm", "lm")) | identical(class(wmreg[[p]]), "polr"))) {
-        stop(paste0("Fit wmreg[[", p, "]] by lm, glm, glm.nb, gam, multinom, polr"))
+        switch(wmdenomreg[[p]],
+               logistic = wmdenomreg[[p]] <- eval(bquote(glm(.(as.formula(wmdenomreg_formula)), family = binomial(), data = .(data)))),
+               loglinear = wmdenomreg[[p]] <- eval(bquote(glm(.(as.formula(wmdenomreg_formula)), family = poisson(), data = .(data)))),
+               multinomial = wmdenomreg[[p]] <- eval(bquote(nnet::multinom(.(as.formula(wmdenomreg_formula)), data = .(data), trace = FALSE))),
+               ordinal = wmdenomreg[[p]] <- eval(bquote(MASS::polr(.(as.formula(wmdenomreg_formula)), data = .(data)))))
+      } else if (!(identical(class(wmdenomreg[[p]]), "lm") | identical(class(wmdenomreg[[p]]), c("glm", "lm")) |
+                   identical(class(wmdenomreg[[p]]), c("negbin", "glm", "lm")) | identical(class(wmdenomreg[[p]]), c("multinom", "nnet")) |
+                   identical(class(wmdenomreg[[p]]), c("gam", "glm", "lm")) | identical(class(wmdenomreg[[p]]), "polr"))) {
+        stop(paste0("Fit wmdenomreg[[", p, "]] by lm, glm, glm.nb, gam, multinom, polr"))
       }
     }
   } else {
-    if (!is.null(wmreg)) warning("wmreg is ignored when model is not 'msm'")
-    wmreg <- NULL
+    if (!is.null(wmnomreg)) warning("wmnomreg is ignored when model is not 'msm'")
+    if (!is.null(wmdenomreg)) warning("wmdenomreg is ignored when model is not 'msm'")
+    wmnomreg <- wmdenomreg <- NULL
   }
   
   # Mediator Regression
@@ -71,13 +91,13 @@ regrun <- function() {
                               "negbin", "multinomial", "ordinal")) stop(
                                 paste0("Select character mreg[[", p, "]] from 'linear', 'logistic',
                                        'loglinear', 'poisson', 'quasipoisson', 'negbin', 'multinomial', 'ordinal'"))
-        # for rb, regress each mediator on A, C and previous mediators
-        # for msm, regress each mediator on A and previous mediators
-        # for gformula, regress each mediator on A, C, L and previous mediators
+        # for rb, regress each mediator on A, C
+        # for msm, regress each mediator on A
+        # for gformula, regress each mediator on A, C, L
         switch(model,
-               rb = mediator_formula <- paste0(mediator[p], "~", paste(c(exposure, mediator[0:(p-1)], basec), collapse = "+")),
-               msm = mediator_formula <- paste0(mediator[p], "~", paste(c(exposure, mediator[0:(p-1)]), collapse = "+")),
-               gformula = mediator_formula <- paste0(mediator[p], "~", paste(c(exposure, mediator[0:(p-1)], basec, postc), collapse = "+")))
+               rb = mediator_formula <- paste0(mediator[p], "~", paste(c(exposure, basec), collapse = "+")),
+               msm = mediator_formula <- paste0(mediator[p], "~", exposure),
+               gformula = mediator_formula <- paste0(mediator[p], "~", paste(c(exposure, basec, postc), collapse = "+")))
         switch(mreg[[p]],
                linear = mreg[[p]] <- eval(bquote(glm(.(as.formula(mediator_formula)), family = gaussian(), data = .(data)))),
                logistic = mreg[[p]] <- eval(bquote(glm(.(as.formula(mediator_formula)), family = binomial(), data = .(data)))),
@@ -111,7 +131,7 @@ regrun <- function() {
                                   "negbin", "multinomial", "ordinal"))  stop(
                                     paste0("Select character postcreg[[", p, "]] from 'linear', 'logistic',
                                            'loglinear', 'poisson', 'quasipoisson', 'negbin', 'multinomial', 'ordinal'"))
-        # regress each L on A, C and previous Ls
+        # regress each L on A, C
         postc_formula <- paste0(postc[p], "~", paste(c(exposure, basec, postc[0:(p-1)]), collapse = "+"))
         switch(postcreg[[p]],
                linear = postcreg[[p]] <- eval(bquote(glm(.(as.formula(postc_formula)), family = gaussian(), data = .(data)))),
@@ -198,15 +218,16 @@ regrun <- function() {
   # for delta method inference, use survey regressions for yreg and mreg when weights are applied
   if (inference == "delta" && casecontrol && !is.null(yprevalence)) {
     yreg <- eval(bquote(survey::svyglm(formula = .(formula(yreg)), family = .(family(yreg)),
-                               design = survey::svydesign(~ 1, data = .(data)))))
+                                       design = survey::svydesign(~ 1, data = .(data)))))
   }
   if (inference == "delta" && casecontrol && !is.null(yprevalence)) {
     if (inherits(mreg[[1]], "glm")) mreg[[1]] <- eval(bquote(survey::svyglm(formula = .(formula(mreg[[1]])), 
-                                                                    family = .(family(mreg[[1]])),
-                                                                    design = survey::svydesign(~ 1, data = .(data)))))
+                                                                            family = .(family(mreg[[1]])),
+                                                                            design = survey::svydesign(~ 1, data = .(data)))))
     if (inherits(mreg[[1]], "multinom")) mreg[[1]] <- eval(bquote(svymultinom(formula = .(formula(mreg[[1]])), 
                                                                               data = .(data))))
   }
-  out <- list(yreg = yreg, ereg = ereg, mreg = mreg, wmreg = wmreg, postcreg = postcreg)
+  out <- list(yreg = yreg, ereg = ereg, mreg = mreg, wmnomreg = wmnomreg, 
+              wmdenomreg = wmdenomreg, postcreg = postcreg)
   return(out)
 }

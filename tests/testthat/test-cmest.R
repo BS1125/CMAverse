@@ -47,7 +47,7 @@ test_that("cmest works correctly for binary Y and binary M", {
   res_binbin_msm <- cmest(data = data, model = "msm", outcome = "Y", exposure = "A",
                           mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                           ereg = "logistic", yreg = "logistic", mreg = list("logistic"),
-                          wmreg = list("logistic"),
+                          wmdenomreg = list("logistic"), wmnomreg = list("logistic"),
                           astar = 0, a = 1, mval = list(1),
                           estimation = "imputation", inference = "bootstrap")
   res_binbin_ne <- cmest(data = data, model = "ne", outcome = "Y", exposure = "A",
@@ -317,7 +317,7 @@ test_that("cmest works correctly for continuous Y and binary M", {
   res_contbin_msm <- cmest(data = data, model = "msm", outcome = "Y", exposure = "A",
                            mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                            ereg = "logistic", yreg = "linear", mreg = list("logistic"),
-                           wmreg = list("logistic"),
+                           wmnomreg = list("logistic"), wmdenomreg = list("logistic"),
                            astar = 0, a = 1, mval = list(1),
                            estimation = "imputation", inference = "bootstrap")
   res_contbin_ne <- cmest(data = data, model = "ne", outcome = "Y", exposure = "A",
@@ -555,7 +555,7 @@ test_that("cmest works correctly for survival Y and ordinal M", {
                           outcome = "Y", exposure = "A",
                           mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                           ereg = "ordinal", yreg = "aft_exp", mreg = list("ordinal"),
-                          wmreg = list("ordinal"),
+                          wmnomreg = list("ordinal"), wmdenomreg = list("ordinal"),
                           astar = 0, a = 1, mval = list(1),
                           estimation = "imputation", inference = "bootstrap")
   res_survordinal_gformula <- cmest(data = data, model = "gformula", outcome = "Y", exposure = "A",
@@ -637,7 +637,7 @@ test_that("cmest works correctly for ordinal Y and ordinal M", {
                              outcome = "Y", exposure = "A",
                              mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                              ereg = "ordinal", yreg = "ordinal", mreg = list("ordinal"),
-                             wmreg = list("ordinal"),
+                             wmnomreg = list("ordinal"), wmdenomreg = list("ordinal"),
                              astar = 0, a = 1, mval = list(1), yref = "1",
                              estimation = "imputation", inference = "bootstrap")
   res_ordinalordinal_gformula <- cmest(data = data, model = "gformula", outcome = "Y", exposure = "A",
@@ -824,7 +824,7 @@ test_that("cmest works correctly for binary Y and binary M in a case control stu
                           outcome = "Y", exposure = "A",
                           mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                           ereg = "logistic", yreg = "logistic", mreg = list("logistic"),
-                          wmreg = list("logistic"),
+                          wmnomreg = list("logistic"), wmdenomreg = list("logistic"),
                           astar = 0, a = 1, mval = list(1),
                           estimation = "imputation", inference = "bootstrap")
   res_binbin_ne <- cmest(data = data, model = "ne", casecontrol = TRUE, yrare = TRUE,
@@ -944,7 +944,7 @@ test_that("cmest works correctly for binary Y and binary M in a case control stu
                           outcome = "Y", exposure = "A",
                           mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                           ereg = "logistic", yreg = "logistic", mreg = list("logistic"),
-                          wmreg = list("logistic"),
+                          wmnomreg = list("logistic"), wmdenomreg = list("logistic"),
                           astar = 0, a = 1, mval = list(1),
                           estimation = "imputation", inference = "bootstrap")
   res_binbin_ne <- cmest(data = data, model = "ne", casecontrol = TRUE, yprevalence = yprevalence,
@@ -1045,9 +1045,9 @@ test_that("cmest works correctly for regressions with prior weights", {
   control_indice <- sample(which(data$Y == 0), 2000, replace = FALSE)
   data <- data[c(case_indice, control_indice), ]
   mreg1 <- glm(M1 ~ A + C1 + C2, data = data, family = binomial, weights = rep(2, 4000))
-  mreg2 <- glm(M2 ~ A + M1 + C1 + C2, data = data, family = binomial, weights = rep(2, 4000))
+  mreg2 <- glm(M2 ~ A + C1 + C2, data = data, family = binomial, weights = rep(2, 4000))
   mreg1_msm <- glm(M1 ~ A, data = data, family = binomial, weights = rep(2, 4000))
-  mreg2_msm <- glm(M2 ~ A + M1, data = data, family = binomial, weights = rep(2, 4000))
+  mreg2_msm <- glm(M2 ~ A, data = data, family = binomial, weights = rep(2, 4000))
   
   # yrare = TRUE
   # results of cmest
@@ -1073,7 +1073,7 @@ test_that("cmest works correctly for regressions with prior weights", {
                           outcome = "Y", exposure = "A",
                           mediator = c("M1", "M2"), basec = c("C1", "C2"), EMint = TRUE,
                           ereg = "logistic", yreg = "logistic", mreg = list(mreg1_msm, mreg2_msm),
-                          wmreg = list("logistic", "logistic"),
+                          wmnomreg = list("logistic", "logistic"), wmdenomreg = list("logistic", "logistic"),
                           astar = 0, a = 1, mval = list(1, 1),
                           estimation = "imputation", inference = "bootstrap")
   res_binbin_ne <- cmest(data = data, model = "ne", casecontrol = TRUE, yrare = TRUE,
@@ -1126,7 +1126,7 @@ test_that("cmest works correctly for regressions with prior weights", {
                           outcome = "Y", exposure = "A",
                           mediator = c("M1", "M2"), basec = c("C1", "C2"), EMint = TRUE,
                           ereg = "logistic", yreg = "logistic", mreg = list(mreg1_msm, mreg2_msm),
-                          wmreg = list("logistic", "logistic"),
+                          wmnomreg = list("logistic", "logistic"), wmdenomreg = list("logistic", "logistic"),
                           astar = 0, a = 1, mval = list(1, 1),
                           estimation = "imputation", inference = "bootstrap")
   res_binbin_ne <- cmest(data = data, model = "ne", casecontrol = TRUE, yprevalence = yprevalence,
@@ -1204,7 +1204,7 @@ test_that("multiple imputation works correctly for binary Y and binary M ", {
   res_binbin_msm <- cmest(data = data, model = "msm", outcome = "Y", exposure = "A",
                           mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                           ereg = "logistic", yreg = "logistic", mreg = list("logistic"),
-                          wmreg = list("logistic"),
+                          wmnomreg = list("logistic"), wmdenomreg = list("logistic"),
                           astar = 0, a = 1, mval = list(1),
                           estimation = "imputation", inference = "bootstrap", multimp = TRUE)
   res_binbin_ne <- cmest(data = data, model = "ne", outcome = "Y", exposure = "A",
@@ -1352,7 +1352,7 @@ test_that("cmest works correctly for binary Y and binary M with postc", {
   res_binbin_msm <- cmest(data = data, model = "msm", outcome = "Y", exposure = "A",
                           mediator = "M", basec = c("C1", "C2"), postc = "L", EMint = TRUE,
                           ereg = "logistic", yreg = "logistic", mreg = list("logistic"),
-                          wmreg = list("logistic"),
+                          wmnomreg = list("logistic"), wmdenomreg = list("logistic"),
                           astar = 0, a = 1, mval = list(1),
                           estimation = "imputation", inference = "bootstrap")
   expect_error(cmest(data = data, model = "ne", outcome = "Y", exposure = "A",
@@ -1378,7 +1378,7 @@ test_that("cmest works correctly for binary Y and binary M with postc", {
   res_binbin_msm <- cmest(data = data, model = "msm", outcome = "Y", exposure = "A",
                           mediator = "M", basec = c("C1", "C2"), postc = "L", EMint = TRUE,
                           ereg = "logistic", yreg = "logistic", mreg = list("logistic"),
-                          wmreg = list("logistic"),
+                          wmnomreg = list("logistic"), wmdenomreg = list("logistic"),
                           astar = 0, a = 1, mval = list(1),
                           estimation = "imputation", inference = "bootstrap", multimp = TRUE)
   res_binbin_gformula <- cmest(data = data, model = "gformula", outcome = "Y", exposure = "A",

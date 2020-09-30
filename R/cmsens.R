@@ -232,7 +232,8 @@ cmsens <- function(object = NULL, sens = "uc", MEmethod = "simex",
     yreg <- reg.input$yreg
     ereg <- reg.input$ereg
     mreg <- reg.input$mreg
-    wmreg <- reg.input$wmreg
+    wmnomreg <- reg.input$wmnomreg
+    wmdenomreg <- reg.input$wmdenomreg
     postcreg <- reg.input$postcreg
     a <- object$ref$a
     astar <- object$ref$astar
@@ -296,7 +297,8 @@ cmsens <- function(object = NULL, sens = "uc", MEmethod = "simex",
       yreg <- regs_mid$yreg
       mreg <- regs_mid$mreg
       ereg <- regs_mid$ereg
-      wmreg <- regs_mid$wmreg
+      wmnomreg <- regs_mid$wmnomreg
+      wmdenomreg <- regs_mid$wmdenomreg
       postcreg <- regs_mid$postcreg
       # add a progress bar for bootstrap inference
       if (inference == "bootstrap") {
