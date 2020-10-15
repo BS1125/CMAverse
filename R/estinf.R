@@ -169,13 +169,13 @@ estinf <- function() {
                        startsWith(family_yreg$family, "Ordered Categorical"))) |
       is_multinom_yreg | is_polr_yreg) {
     y_lev <- levels(droplevels(as.factor(data[, outcome])))
-    # if yref is not provided or yref provided is not a value of the outcome, use the last level of the outcome
+    # if yref is not provided or yref provided is not a value of the outcome, use the first level of the outcome
     if (is.null(yref)) {
-      yref <- y_lev[length(y_lev)]
+      yref <- y_lev[1]
       warning(paste0("yref is not specified; ", yref, " is used"))
     }
     if (!yref %in% y_lev) {
-      yref <- y_lev[length(y_lev)]
+      yref <- y_lev[1]
       warning(paste0("yref is not a value of the outcome; ", yref, " is used"))
     }
     out$ref$yref <- yref

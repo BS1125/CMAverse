@@ -51,7 +51,7 @@ Firstly, we assume $C1$ was measured with error. $C_1$ is continuous, so the mea
 res_naive_cont <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
                         mediator = "M", basec = c("C1_error", "C2"), EMint = TRUE,
                         mreg = list("logistic"), yreg = "logistic",
-                        astar = 0, a = 1, mval = list(1), yref = 1,
+                        astar = 0, a = 1, mval = list(1), yref = 0,
                         estimation = "paramfunc", inference = "delta")
 ```
 
@@ -90,7 +90,7 @@ Then, we assume $A$ was measured with error. $A$ is categorical, so only SIMEX c
 res_naive_cat <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A_error",
                        mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                        mreg = list("logistic"), yreg = "logistic",
-                       astar = 0, a = 1, mval = list(1), yref = 1,
+                       astar = 0, a = 1, mval = list(1), yref = 0,
                        estimation = "paramfunc", inference = "delta")
 ```
 
@@ -116,7 +116,7 @@ Compare the error-corrected results with the true results:
 res_true <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
                        mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                        mreg = list("logistic"), yreg = "logistic",
-                       astar = 0, a = 1, mval = list(1), yref = 1,
+                       astar = 0, a = 1, mval = list(1), yref = 0,
                        estimation = "paramfunc", inference = "delta")
 ```
 

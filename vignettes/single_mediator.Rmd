@@ -43,7 +43,7 @@ In this setting, we can use all of the six statistical modeling approaches. The 
 res_rb_param_delta <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
                             mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                             mreg = list("logistic"), yreg = "logistic",
-                            astar = 0, a = 1, mval = list(1), yref = 1,
+                            astar = 0, a = 1, mval = list(1), yref = 0,
                             estimation = "paramfunc", inference = "delta")
 ```
 
@@ -57,7 +57,7 @@ summary(res_rb_param_delta)
 res_rb_param_bootstrap <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
                                 mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                                 mreg = list("logistic"), yreg = "logistic",
-                                astar = 0, a = 1, mval = list(1), yref = 1,
+                                astar = 0, a = 1, mval = list(1), yref = 0,
                                 estimation = "paramfunc", inference = "bootstrap", nboot = 2)
 ```
 
@@ -71,7 +71,7 @@ summary(res_rb_param_bootstrap)
 res_rb_impu_bootstrap <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
                                mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                                mreg = list("logistic"), yreg = "logistic",
-                               astar = 0, a = 1, mval = list(1), yref = 1,
+                               astar = 0, a = 1, mval = list(1), yref = 0,
                                estimation = "imputation", inference = "bootstrap", nboot = 2)
 ```
 
@@ -85,7 +85,7 @@ summary(res_rb_impu_bootstrap)
 res_wb <- cmest(data = data, model = "wb", outcome = "Y", exposure = "A",
                 mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                 ereg = "logistic", yreg = "logistic",
-                astar = 0, a = 1, mval = list(1), yref = 1,
+                astar = 0, a = 1, mval = list(1), yref = 0,
                 estimation = "imputation", inference = "bootstrap", nboot = 2)
 ```
 
@@ -99,7 +99,7 @@ summary(res_wb)
 res_iorw <- cmest(data = data, model = "iorw", outcome = "Y", exposure = "A",
                   mediator = "M", basec = c("C1", "C2"), 
                   ereg = "logistic", yreg = "logistic",
-                  astar = 0, a = 1, mval = list(1), yref = 1,
+                  astar = 0, a = 1, mval = list(1), yref = 0,
                   estimation = "imputation", inference = "bootstrap", nboot = 2)
 ```
 
@@ -113,7 +113,7 @@ summary(res_iorw)
 res_ne <- cmest(data = data, model = "ne", outcome = "Y", exposure = "A",
                 mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                 yreg = "logistic",
-                astar = 0, a = 1, mval = list(1), yref = 1,
+                astar = 0, a = 1, mval = list(1), yref = 0,
                 estimation = "imputation", inference = "bootstrap", nboot = 2)
 ```
 
@@ -128,7 +128,7 @@ res_msm <- cmest(data = data, model = "msm", outcome = "Y", exposure = "A",
                  mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                  ereg = "logistic", yreg = "logistic", mreg = list("logistic"),
                  wmnomreg = list("logistic"), wmdenomreg = list("logistic"),
-                 astar = 0, a = 1, mval = list(1), yref = 1,
+                 astar = 0, a = 1, mval = list(1), yref = 0,
                  estimation = "imputation", inference = "bootstrap", nboot = 2)
 ```
 
@@ -142,7 +142,7 @@ summary(res_msm)
 res_gformula <- cmest(data = data, model = "gformula", outcome = "Y", exposure = "A",
                       mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                       mreg = list("logistic"), yreg = "logistic",
-                      astar = 0, a = 1, mval = list(1), yref = 1,
+                      astar = 0, a = 1, mval = list(1), yref = 0,
                       estimation = "imputation", inference = "bootstrap", nboot = 2)
 ```
 

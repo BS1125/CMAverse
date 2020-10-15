@@ -48,7 +48,7 @@ To conduct multiple imputations, we set the `multimp` argument to be `TRUE`. The
 res_multimp <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
                      mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                      mreg = list("logistic"), yreg = "logistic",
-                     astar = 0, a = 1, mval = list(1), yref = 1,
+                     astar = 0, a = 1, mval = list(1), yref = 0,
                      estimation = "paramfunc", inference = "delta", 
                      multimp = TRUE, m = 10)
 ```
@@ -63,7 +63,7 @@ Compare the multiple imputation results with true results:
 res_noNA <- cmest(data = data_noNA, model = "rb", outcome = "Y", exposure = "A",
                   mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                   mreg = list("logistic"), yreg = "logistic",
-                  astar = 0, a = 1, mval = list(1), yref = 1,
+                  astar = 0, a = 1, mval = list(1), yref = 0,
                   estimation = "paramfunc", inference = "delta")
 ```
 
