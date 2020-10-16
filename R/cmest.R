@@ -55,11 +55,12 @@
 #' @param postcreg a list specifying a regression model for each variable in \code{postc} (used 
 #' when \code{model} is \code{gformula}). The order of regression models must follow the order of 
 #' variables in \code{postc}. See \code{Details}.
-#' @param astar the first reference value for the exposure. Default is \code{0}.
-#' @param a the second reference value for the exposure. Default is \code{1}.
-#' @param mval a list specifying a reference value for each variable in \code{mediator} (used when 
-#' \code{model} is \code{rb}, \code{wb}, \code{ne}, \code{msm} or \code{gformula}).
-#' @param yref reference value for the outcome (used when the outcome is categorical).
+#' @param astar the control value for the exposure. Default is \code{0}.
+#' @param a the active value for the exposure. Default is \code{1}.
+#' @param mval a list specifying a value for each variable in \code{mediator} at which the variable is 
+#' controlled (used when \code{model} is \code{rb}, \code{wb}, \code{ne}, \code{msm} or \code{gformula}).
+#' @param yval the value of the outcome at which causal effects on the risk/odds ratio 
+#' scale are estimated (used when the outcome is categorical).
 #' @param basecval a list specifying a conditional value for each variable in \code{basec} conditional 
 #' on which causal effects are estimated (used when \code{estimation} is \code{paramfunc}). The order 
 #' of conditional values must follow the order of variables in \code{basec}. If \code{NULL}, 
@@ -269,7 +270,8 @@
 #' \code{exposure}, \code{mediator}, \code{EMint}, \code{basec} and \code{postc},}
 #' \item{reg.input}{a list of regressions input,}
 #' \item{multimp}{a list of arguments used for multiple imputation,}
-#' \item{ref}{reference values used,}
+#' \item{ref}{reference values used which may include \code{a}, \code{astar}, \code{mval}, 
+#' \code{yval} and \code{basecval},}
 #' \item{reg.output}{a list of regressions output,}
 #' \item{effect.pe}{point estimates of causal effects,}
 #' \item{effect.se}{standard errors of causal effects,}
@@ -390,7 +392,7 @@ cmest <- function(data = NULL, model = "rb",
                   exposure = NULL, mediator = NULL, EMint = NULL, basec = NULL, postc = NULL,
                   yreg = NULL, mreg = NULL, wmnomreg = NULL, wmdenomreg = NULL, ereg = NULL, 
                   postcreg = NULL,
-                  astar = 0, a = 1, mval = NULL, yref = NULL, basecval = NULL,
+                  astar = 0, a = 1, mval = NULL, yval = NULL, basecval = NULL,
                   nboot = 200, nRep = 5, multimp = FALSE, ...) {
   # function call
   cl <- match.call()

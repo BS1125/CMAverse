@@ -50,7 +50,7 @@ est.ne <- function(data = NULL, indices = NULL, outReg = FALSE, full = NULL) {
                        startsWith(family_yreg$family, "Ordered Categorical"))) |
       is_multinom_yreg | is_polr_yreg) {
     y_lev <- levels(droplevels(as.factor(data[, outcome])))
-    yref_index <- switch((yref %in% y_lev) + 1, "1" = NULL, "2" = which(y_lev == yref))
+    yval_index <- switch((yval %in% y_lev) + 1, "1" = NULL, "2" = which(y_lev == yval))
     rm(y_lev)
   }
   
@@ -98,13 +98,13 @@ est.ne <- function(data = NULL, indices = NULL, outReg = FALSE, full = NULL) {
   
   # categorical Y
   if (family_yreg$family %in% c("binomial", "quasibinomial")) {
-    if (!is.null(yref_index)) {
-      EY0m <- weighted.mean(cbind(1 - EY0m_pred, EY0m_pred)[, yref_index], na.rm = TRUE, w = weightsEY)
-      EY1m <- weighted.mean(cbind(1 - EY1m_pred, EY1m_pred)[, yref_index], na.rm = TRUE, w = weightsEY)
-      EY00 <- weighted.mean(cbind(1 - EY00_pred, EY00_pred)[, yref_index], na.rm = TRUE, w = weightsEY)
-      EY01 <- weighted.mean(cbind(1 - EY01_pred, EY01_pred)[, yref_index], na.rm = TRUE, w = weightsEY)
-      EY10 <- weighted.mean(cbind(1 - EY10_pred, EY10_pred)[, yref_index], na.rm = TRUE, w = weightsEY)
-      EY11 <- weighted.mean(cbind(1 - EY11_pred, EY11_pred)[, yref_index], na.rm = TRUE, w = weightsEY)
+    if (!is.null(yval_index)) {
+      EY0m <- weighted.mean(cbind(1 - EY0m_pred, EY0m_pred)[, yval_index], na.rm = TRUE, w = weightsEY)
+      EY1m <- weighted.mean(cbind(1 - EY1m_pred, EY1m_pred)[, yval_index], na.rm = TRUE, w = weightsEY)
+      EY00 <- weighted.mean(cbind(1 - EY00_pred, EY00_pred)[, yval_index], na.rm = TRUE, w = weightsEY)
+      EY01 <- weighted.mean(cbind(1 - EY01_pred, EY01_pred)[, yval_index], na.rm = TRUE, w = weightsEY)
+      EY10 <- weighted.mean(cbind(1 - EY10_pred, EY10_pred)[, yval_index], na.rm = TRUE, w = weightsEY)
+      EY11 <- weighted.mean(cbind(1 - EY11_pred, EY11_pred)[, yval_index], na.rm = TRUE, w = weightsEY)
     } else EY0m <- EY1m <- EY00 <- EY01 <- EY10 <- EY11 <- 0
   } else {
     # non-categorical Y

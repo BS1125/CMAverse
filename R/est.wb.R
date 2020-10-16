@@ -124,7 +124,7 @@ est.wb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
                        startsWith(family_yreg$family, "Ordered Categorical"))) |
       is_multinom_yreg | is_polr_yreg) {
     y_lev <- levels(droplevels(as.factor(data[, outcome])))
-    yref_index <- switch((yref %in% y_lev) + 1, "1" = NULL, "2" = which(y_lev == yref))
+    yval_index <- switch((yval %in% y_lev) + 1, "1" = NULL, "2" = which(y_lev == yval))
     rm(y_lev)
   }
 
@@ -180,21 +180,21 @@ est.wb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
   if ((is_glm_yreg && ((family_yreg$family %in% c("binomial", "quasibinomial", "multinom")) |
                        startsWith(family_yreg$family, "Ordered Categorical")))|
       is_multinom_yreg | is_polr_yreg) {
-    if (!is.null(yref_index)) {
+    if (!is.null(yval_index)) {
       if (dim(EY0m_pred)[2] == 1) {
-        EY0m <- weighted.mean(cbind(1 - EY0m_pred, EY0m_pred)[, yref_index], na.rm = TRUE, w = weightsEY_cde)
-        EY1m <- weighted.mean(cbind(1 - EY1m_pred, EY1m_pred)[, yref_index], na.rm = TRUE, w = weightsEY_cde)
-        EY00 <- weighted.mean(as.numeric(y_obs[subj_astar] == yref), na.rm = TRUE, w = weightsEY[subj_astar])
-        EY01 <- weighted.mean(cbind(1 - EY01_pred, EY01_pred)[, yref_index], na.rm = TRUE, w = weightsEY[subj_a])
-        EY10 <- weighted.mean(cbind(1 - EY10_pred, EY10_pred)[, yref_index], na.rm = TRUE, w = weightsEY[subj_astar])
-        EY11 <- weighted.mean(as.numeric(y_obs[subj_a] == yref), na.rm = TRUE, w = weightsEY[subj_a])
+        EY0m <- weighted.mean(cbind(1 - EY0m_pred, EY0m_pred)[, yval_index], na.rm = TRUE, w = weightsEY_cde)
+        EY1m <- weighted.mean(cbind(1 - EY1m_pred, EY1m_pred)[, yval_index], na.rm = TRUE, w = weightsEY_cde)
+        EY00 <- weighted.mean(as.numeric(y_obs[subj_astar] == yval), na.rm = TRUE, w = weightsEY[subj_astar])
+        EY01 <- weighted.mean(cbind(1 - EY01_pred, EY01_pred)[, yval_index], na.rm = TRUE, w = weightsEY[subj_a])
+        EY10 <- weighted.mean(cbind(1 - EY10_pred, EY10_pred)[, yval_index], na.rm = TRUE, w = weightsEY[subj_astar])
+        EY11 <- weighted.mean(as.numeric(y_obs[subj_a] == yval), na.rm = TRUE, w = weightsEY[subj_a])
       } else {
-        EY0m <- weighted.mean(EY0m_pred[, yref_index], na.rm = TRUE, w = weightsEY_cde)
-        EY1m <- weighted.mean(EY1m_pred[, yref_index], na.rm = TRUE, w = weightsEY_cde)
-        EY00 <- weighted.mean(as.numeric(y_obs[subj_astar] == yref), na.rm = TRUE, w = weightsEY[subj_astar])
-        EY01 <- weighted.mean(EY01_pred[, yref_index], na.rm = TRUE, w = weightsEY[subj_a])
-        EY10 <- weighted.mean(EY10_pred[, yref_index], na.rm = TRUE, w = weightsEY[subj_astar])
-        EY11 <- weighted.mean(as.numeric(y_obs[subj_a] == yref), na.rm = TRUE, w = weightsEY[subj_a])
+        EY0m <- weighted.mean(EY0m_pred[, yval_index], na.rm = TRUE, w = weightsEY_cde)
+        EY1m <- weighted.mean(EY1m_pred[, yval_index], na.rm = TRUE, w = weightsEY_cde)
+        EY00 <- weighted.mean(as.numeric(y_obs[subj_astar] == yval), na.rm = TRUE, w = weightsEY[subj_astar])
+        EY01 <- weighted.mean(EY01_pred[, yval_index], na.rm = TRUE, w = weightsEY[subj_a])
+        EY10 <- weighted.mean(EY10_pred[, yval_index], na.rm = TRUE, w = weightsEY[subj_astar])
+        EY11 <- weighted.mean(as.numeric(y_obs[subj_a] == yval), na.rm = TRUE, w = weightsEY[subj_a])
       }
     } else EY0m <- EY1m <- EY00 <- EY01 <- EY10 <- EY11 <- 0
   } else {

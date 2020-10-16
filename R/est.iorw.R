@@ -139,7 +139,7 @@ est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
                        startsWith(family_yreg$family, "Ordered Categorical"))) |
       is_multinom_yreg | is_polr_yreg) {
     y_lev <- levels(droplevels(as.factor(data[, outcome])))
-    yref_index <- switch((yref %in% y_lev) + 1, "1" = NULL, "2" = which(y_lev == yref))
+    yval_index <- switch((yval %in% y_lev) + 1, "1" = NULL, "2" = which(y_lev == yval))
     rm(y_lev)
   }
 
@@ -181,17 +181,17 @@ est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
   if ((is_glm_yreg && ((family_yreg$family %in% c("binomial", "quasibinomial", "multinom")) |
                        startsWith(family_yreg$family, "Ordered Categorical")))|
       is_multinom_yreg | is_polr_yreg) {
-    if (!is.null(yref_index)) {
+    if (!is.null(yval_index)) {
       if (dim(tot0_pred)[2] == 1) {
-        EYtot0 <- weighted.mean(cbind(1 - tot0_pred, tot0_pred)[, yref_index], na.rm = TRUE, w = weightsEY_tot)
-        EYtot1 <- weighted.mean(cbind(1 - tot1_pred, tot1_pred)[, yref_index], na.rm = TRUE, w = weightsEY_tot)
-        EYdir0 <- weighted.mean(cbind(1 - dir0_pred, dir0_pred)[, yref_index], na.rm = TRUE, w = weightsEY_dir)
-        EYdir1 <- weighted.mean(cbind(1 - dir1_pred, dir1_pred)[, yref_index], na.rm = TRUE, w = weightsEY_dir)
+        EYtot0 <- weighted.mean(cbind(1 - tot0_pred, tot0_pred)[, yval_index], na.rm = TRUE, w = weightsEY_tot)
+        EYtot1 <- weighted.mean(cbind(1 - tot1_pred, tot1_pred)[, yval_index], na.rm = TRUE, w = weightsEY_tot)
+        EYdir0 <- weighted.mean(cbind(1 - dir0_pred, dir0_pred)[, yval_index], na.rm = TRUE, w = weightsEY_dir)
+        EYdir1 <- weighted.mean(cbind(1 - dir1_pred, dir1_pred)[, yval_index], na.rm = TRUE, w = weightsEY_dir)
       } else {
-        EYtot0 <- weighted.mean(tot0_pred[, yref_index], na.rm = TRUE, w = weightsEY_tot)
-        EYtot1 <- weighted.mean(tot1_pred[, yref_index], na.rm = TRUE, w = weightsEY_tot)
-        EYdir0 <- weighted.mean(dir0_pred[, yref_index], na.rm = TRUE, w = weightsEY_dir)
-        EYdir1 <- weighted.mean(dir1_pred[, yref_index], na.rm = TRUE, w = weightsEY_dir)
+        EYtot0 <- weighted.mean(tot0_pred[, yval_index], na.rm = TRUE, w = weightsEY_tot)
+        EYtot1 <- weighted.mean(tot1_pred[, yval_index], na.rm = TRUE, w = weightsEY_tot)
+        EYdir0 <- weighted.mean(dir0_pred[, yval_index], na.rm = TRUE, w = weightsEY_dir)
+        EYdir1 <- weighted.mean(dir1_pred[, yval_index], na.rm = TRUE, w = weightsEY_dir)
       }
     } else EYtot0 <- EYtot1 <- EYdir0 <- EYdir1 <- 0
   } else {

@@ -114,7 +114,7 @@
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Statistical Modeling with Multiple Mediators</h1>
             
-            <h4 class="date">2020-10-14</h4>
+            <h4 class="date">2020-10-16</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BS1125/CMAverse/blob/master/vignettes/multiple_mediators.Rmd"><code>vignettes/multiple_mediators.Rmd</code></a></small>
       <div class="hidden name"><code>multiple_mediators.Rmd</code></div>
@@ -158,7 +158,7 @@
 <span class="va">res_rb</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data</span>, model <span class="op">=</span> <span class="st">"rb"</span>, outcome <span class="op">=</span> <span class="st">"Y"</span>, exposure <span class="op">=</span> <span class="st">"A"</span>,
                 mediator <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"M1"</span>, <span class="st">"M2"</span><span class="op">)</span>, basec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C1"</span>, <span class="st">"C2"</span><span class="op">)</span>, EMint <span class="op">=</span> <span class="cn">TRUE</span>,
                 mreg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">"poisson"</span>, <span class="st">"multinomial"</span><span class="op">)</span>, yreg <span class="op">=</span> <span class="st">"logistic"</span>,
-                astar <span class="op">=</span> <span class="fl">0</span>, a <span class="op">=</span> <span class="fl">1</span>, mval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">2</span><span class="op">)</span>, yref <span class="op">=</span> <span class="fl">0</span>,
+                astar <span class="op">=</span> <span class="fl">0</span>, a <span class="op">=</span> <span class="fl">1</span>, mval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">2</span><span class="op">)</span>, 
                 estimation <span class="op">=</span> <span class="st">"imputation"</span>, inference <span class="op">=</span> <span class="st">"bootstrap"</span>, nboot <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></pre></div>
 <div class="sourceCode" id="cb4"><pre class="downlit">
 <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">res_rb</span><span class="op">)</span></pre></div>
@@ -168,16 +168,16 @@
 ##  bootstrap standard errors, percentile confidence intervals and p-values 
 ##  
 ##                 Estimate Std.error   95% CIL 95% CIU  P.val    
-## Rcde            2.226944  3.156516  2.100702   6.319 &lt;2e-16 ***
-## Rpnde           0.966843  0.002459  0.967998   0.971 &lt;2e-16 ***
-## Rtnde           0.824508  0.117908  0.812884   0.971 &lt;2e-16 ***
-## Rpnie           0.541631  0.069656  0.459956   0.554 &lt;2e-16 ***
-## Rtnie           0.461894  0.003636  0.459942   0.465 &lt;2e-16 ***
-## Rte             0.446579  0.002389  0.446743   0.450 &lt;2e-16 ***
-## ERcde           0.143902  0.055516  0.133402   0.208 &lt;2e-16 ***
-## ERintref       -0.177059  0.053057 -0.236686  -0.165 &lt;2e-16 ***
-## ERintmed       -0.061895  0.064809 -0.071812   0.015      1    
-## ERpnie         -0.458369  0.069656 -0.539817  -0.446 &lt;2e-16 ***
+## Rcde            0.840859  0.046685  0.788612   0.851 &lt;2e-16 ***
+## Rpnde           2.540010  0.249404  2.203176   2.538 &lt;2e-16 ***
+## Rtnde           1.198066  0.147841  1.024302   1.223 &lt;2e-16 ***
+## Rpnie          22.289482  0.880313 22.434122  23.617 &lt;2e-16 ***
+## Rtnie          10.513453  0.127523 10.808614  10.980 &lt;2e-16 ***
+## Rte            26.704271  2.414681 24.190746  27.435 &lt;2e-16 ***
+## ERcde          -6.683714  1.717727 -8.708034  -6.400 &lt;2e-16 ***
+## ERintref        8.223724  1.468323  7.939139   9.912 &lt;2e-16 ***
+## ERintmed        2.874780  3.045590 -0.625298   3.466      1    
+## ERpnie         21.289482  0.880313 21.434936  22.618 &lt;2e-16 ***
 ## ERcde(prop)    -0.260023  0.099297 -0.375913  -0.243 &lt;2e-16 ***
 ## ERintref(prop)  0.319936  0.094601  0.300688   0.428 &lt;2e-16 ***
 ## ERintmed(prop)  0.111841  0.117704 -0.027554   0.131      1    
@@ -195,8 +195,8 @@
 ## $astar
 ## [1] 0
 ## 
-## $yref
-## [1] 0
+## $yval
+## [1] "1"
 ## 
 ## $mval
 ## $mval[[1]]
@@ -212,7 +212,7 @@
 <span class="va">res_wb</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data</span>, model <span class="op">=</span> <span class="st">"wb"</span>, outcome <span class="op">=</span> <span class="st">"Y"</span>, exposure <span class="op">=</span> <span class="st">"A"</span>,
                 mediator <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"M1"</span>, <span class="st">"M2"</span><span class="op">)</span>, basec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C1"</span>, <span class="st">"C2"</span><span class="op">)</span>, EMint <span class="op">=</span> <span class="cn">TRUE</span>,
                 ereg <span class="op">=</span> <span class="st">"logistic"</span>, yreg <span class="op">=</span> <span class="st">"logistic"</span>,
-                astar <span class="op">=</span> <span class="fl">0</span>, a <span class="op">=</span> <span class="fl">1</span>, mval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">2</span><span class="op">)</span>, yref <span class="op">=</span> <span class="fl">0</span>,
+                astar <span class="op">=</span> <span class="fl">0</span>, a <span class="op">=</span> <span class="fl">1</span>, mval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">2</span><span class="op">)</span>, 
                 estimation <span class="op">=</span> <span class="st">"imputation"</span>, inference <span class="op">=</span> <span class="st">"bootstrap"</span>, nboot <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></pre></div>
 <div class="sourceCode" id="cb7"><pre class="downlit">
 <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">res_wb</span><span class="op">)</span></pre></div>
@@ -221,24 +221,24 @@
 ## Direct counterfactual imputation estimation with 
 ##  bootstrap standard errors, percentile confidence intervals and p-values 
 ##  
-##                  Estimate  Std.error    95% CIL 95% CIU  P.val    
-## Rcde            2.2269438  0.1231119  2.0817241   2.247 &lt;2e-16 ***
-## Rpnde           0.9722339  0.0007672  0.9698089   0.971 &lt;2e-16 ***
-## Rtnde           0.8272497  0.0140466  0.8491555   0.868 &lt;2e-16 ***
-## Rpnie           0.5465193  0.0039512  0.5213692   0.527 &lt;2e-16 ***
-## Rtnie           0.4650197  0.0037231  0.4611539   0.466 &lt;2e-16 ***
-## Rte             0.4521079  0.0039683  0.4472312   0.453 &lt;2e-16 ***
-## ERcde           0.1441716  0.0023882  0.1394552   0.143 &lt;2e-16 ***
-## ERintref       -0.1719377  0.0031554 -0.1728548  -0.169 &lt;2e-16 ***
-## ERintmed       -0.0666452  0.0071523 -0.0492553  -0.040 &lt;2e-16 ***
-## ERpnie         -0.4534807  0.0039512 -0.4786301  -0.473 &lt;2e-16 ***
-## ERcde(prop)    -0.2631387  0.0024917 -0.2580890  -0.255 &lt;2e-16 ***
-## ERintref(prop)  0.3138168  0.0034972  0.3080081   0.313 &lt;2e-16 ***
-## ERintmed(prop)  0.1216394  0.0124192  0.0724170   0.089 &lt;2e-16 ***
-## ERpnie(prop)    0.8276825  0.0134247  0.8562802   0.874 &lt;2e-16 ***
-## pm              0.9493219  0.0010055  0.9453824   0.947 &lt;2e-16 ***
-## int             0.4354562  0.0159164  0.3804251   0.402 &lt;2e-16 ***
-## pe              1.2631387  0.0024917  1.2547414   1.258 &lt;2e-16 ***
+##                 Estimate Std.error   95% CIL 95% CIU  P.val    
+## Rcde            0.840859  0.001153  0.843270   0.845 &lt;2e-16 ***
+## Rpnde           2.184496  0.124689  2.056035   2.224 &lt;2e-16 ***
+## Rtnde           1.197960  0.017578  1.135918   1.160 &lt;2e-16 ***
+## Rpnie          20.345349  1.376126 18.331408  20.180 &lt;2e-16 ***
+## Rtnie          11.157227  0.294594 10.127728  10.524 &lt;2e-16 ***
+## Rte            24.372911  1.917943 20.822968  23.400 &lt;2e-16 ***
+## ERcde          -6.150317  0.544402 -5.782384  -5.051 &lt;2e-16 ***
+## ERintref        7.334812  0.669092  6.107188   7.006 &lt;2e-16 ***
+## ERintmed        2.843066  0.417128  1.436970   1.997 &lt;2e-16 ***
+## ERpnie         19.345349  1.376126 17.333768  19.183 &lt;2e-16 ***
+## ERcde(prop)    -0.263139  0.002492 -0.258089  -0.255 &lt;2e-16 ***
+## ERintref(prop)  0.313817  0.003497  0.308008   0.313 &lt;2e-16 ***
+## ERintmed(prop)  0.121639  0.012419  0.072417   0.089 &lt;2e-16 ***
+## ERpnie(prop)    0.827682  0.013425  0.856280   0.874 &lt;2e-16 ***
+## pm              0.949322  0.001005  0.945382   0.947 &lt;2e-16 ***
+## int             0.435456  0.015916  0.380425   0.402 &lt;2e-16 ***
+## pe              1.263139  0.002492  1.254741   1.258 &lt;2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
@@ -249,8 +249,8 @@
 ## $astar
 ## [1] 0
 ## 
-## $yref
-## [1] 0
+## $yval
+## [1] "1"
 ## 
 ## $mval
 ## $mval[[1]]
@@ -266,7 +266,7 @@
 <span class="va">res_iorw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data</span>, model <span class="op">=</span> <span class="st">"iorw"</span>, outcome <span class="op">=</span> <span class="st">"Y"</span>, exposure <span class="op">=</span> <span class="st">"A"</span>,
                   mediator <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"M1"</span>, <span class="st">"M2"</span><span class="op">)</span>, basec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C1"</span>, <span class="st">"C2"</span><span class="op">)</span>, EMint <span class="op">=</span> <span class="cn">TRUE</span>,
                   ereg <span class="op">=</span> <span class="st">"logistic"</span>, yreg <span class="op">=</span> <span class="st">"logistic"</span>,
-                  astar <span class="op">=</span> <span class="fl">0</span>, a <span class="op">=</span> <span class="fl">1</span>, mval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">2</span><span class="op">)</span>, yref <span class="op">=</span> <span class="fl">0</span>,
+                  astar <span class="op">=</span> <span class="fl">0</span>, a <span class="op">=</span> <span class="fl">1</span>, mval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">2</span><span class="op">)</span>, 
                   estimation <span class="op">=</span> <span class="st">"imputation"</span>, inference <span class="op">=</span> <span class="st">"bootstrap"</span>, nboot <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></pre></div>
 <div class="sourceCode" id="cb10"><pre class="downlit">
 <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">res_iorw</span><span class="op">)</span></pre></div>
@@ -275,11 +275,11 @@
 ## Direct counterfactual imputation estimation with 
 ##  bootstrap standard errors, percentile confidence intervals and p-values 
 ##  
-##       Estimate Std.error  95% CIL 95% CIU  P.val    
-## Rte   0.452260  0.006784 0.451034   0.460 &lt;2e-16 ***
-## Rpnde 0.901301  0.005279 0.907108   0.914 &lt;2e-16 ***
-## Rtnie 0.501786  0.004549 0.497222   0.503 &lt;2e-16 ***
-## pm    0.819807  0.007652 0.830793   0.841 &lt;2e-16 ***
+##        Estimate Std.error   95% CIL 95% CIU  P.val    
+## Rte   23.713831  1.745561 24.962887  27.308 &lt;2e-16 ***
+## Rpnde  4.483896  0.448867  4.168979   4.772 &lt;2e-16 ***
+## Rtnie  5.288667  0.197403  5.722561   5.988 &lt;2e-16 ***
+## pm     0.846618  0.008286  0.856622   0.868 &lt;2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
@@ -290,8 +290,8 @@
 ## $astar
 ## [1] 0
 ## 
-## $yref
-## [1] 0</code></pre>
+## $yval
+## [1] "1"</code></pre>
 </div>
 <div id="the-natural-effect-model" class="section level2">
 <h2 class="hasAnchor">
@@ -300,7 +300,7 @@
 <span class="va">res_ne</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data</span>, model <span class="op">=</span> <span class="st">"ne"</span>, outcome <span class="op">=</span> <span class="st">"Y"</span>, exposure <span class="op">=</span> <span class="st">"A"</span>,
                 mediator <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"M1"</span>, <span class="st">"M2"</span><span class="op">)</span>, basec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C1"</span>, <span class="st">"C2"</span><span class="op">)</span>, EMint <span class="op">=</span> <span class="cn">TRUE</span>,
                 yreg <span class="op">=</span> <span class="st">"logistic"</span>,
-                astar <span class="op">=</span> <span class="fl">0</span>, a <span class="op">=</span> <span class="fl">1</span>, mval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">2</span><span class="op">)</span>, yref <span class="op">=</span> <span class="fl">0</span>,
+                astar <span class="op">=</span> <span class="fl">0</span>, a <span class="op">=</span> <span class="fl">1</span>, mval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">2</span><span class="op">)</span>, 
                 estimation <span class="op">=</span> <span class="st">"imputation"</span>, inference <span class="op">=</span> <span class="st">"bootstrap"</span>, nboot <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></pre></div>
 <div class="sourceCode" id="cb13"><pre class="downlit">
 <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">res_ne</span><span class="op">)</span></pre></div>
@@ -310,16 +310,16 @@
 ##  bootstrap standard errors, percentile confidence intervals and p-values 
 ##  
 ##                 Estimate Std.error   95% CIL 95% CIU  P.val    
-## Rcde            2.226944  0.379648  0.970669   1.480      1    
-## Rpnde           0.968214  0.001172  0.967880   0.969 &lt;2e-16 ***
-## Rtnde           0.817003  0.038128  0.713492   0.765 &lt;2e-16 ***
-## Rpnie           0.549337  0.027582  0.595953   0.633 &lt;2e-16 ***
-## Rtnie           0.463545  0.003708  0.465878   0.471 &lt;2e-16 ***
-## Rte             0.448810  0.003043  0.451647   0.456 &lt;2e-16 ***
-## ERcde           0.144075  0.071379 -0.008294   0.088      1    
-## ERintref       -0.175861  0.072550 -0.119723  -0.022 &lt;2e-16 ***
-## ERintmed       -0.068741  0.031797 -0.150846  -0.108 &lt;2e-16 ***
-## ERpnie         -0.450663  0.027582 -0.404017  -0.367 &lt;2e-16 ***
+## Rcde            0.840859  0.086137  0.895442   1.011      1    
+## Rpnde           2.397002  0.104623  2.429955   2.571 &lt;2e-16 ***
+## Rtnde           1.212344  0.101779  1.330542   1.467 &lt;2e-16 ***
+## Rpnie          20.806505  1.917377 18.176285  20.752 &lt;2e-16 ***
+## Rtnie          10.523413  0.173974 10.741630  10.975 &lt;2e-16 ***
+## Rte            25.224641  0.701059 26.669640  27.612 &lt;2e-16 ***
+## ERcde          -6.332043  3.477253 -4.288821   0.383      1    
+## ERintref        7.729045  3.581876  1.047182   5.859 &lt;2e-16 ***
+## ERintmed        3.021133  1.320940  5.284538   7.059 &lt;2e-16 ***
+## ERpnie         19.806505  1.917377 17.180793  19.757 &lt;2e-16 ***
 ## ERcde(prop)    -0.261389  0.131063 -0.160993   0.015      1    
 ## ERintref(prop)  0.319057  0.133527  0.040616   0.220 &lt;2e-16 ***
 ## ERintmed(prop)  0.124713  0.056884  0.198651   0.275 &lt;2e-16 ***
@@ -337,8 +337,8 @@
 ## $astar
 ## [1] 0
 ## 
-## $yref
-## [1] 0
+## $yval
+## [1] "1"
 ## 
 ## $mval
 ## $mval[[1]]
@@ -354,7 +354,7 @@
 <span class="va">res_gformula</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data</span>, model <span class="op">=</span> <span class="st">"gformula"</span>, outcome <span class="op">=</span> <span class="st">"Y"</span>, exposure <span class="op">=</span> <span class="st">"A"</span>,
                       mediator <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"M1"</span>, <span class="st">"M2"</span><span class="op">)</span>, basec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C1"</span>, <span class="st">"C2"</span><span class="op">)</span>, EMint <span class="op">=</span> <span class="cn">TRUE</span>,
                       mreg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">"poisson"</span>, <span class="st">"multinomial"</span><span class="op">)</span>, yreg <span class="op">=</span> <span class="st">"logistic"</span>,
-                      astar <span class="op">=</span> <span class="fl">0</span>, a <span class="op">=</span> <span class="fl">1</span>, mval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">2</span><span class="op">)</span>, yref <span class="op">=</span> <span class="fl">0</span>,
+                      astar <span class="op">=</span> <span class="fl">0</span>, a <span class="op">=</span> <span class="fl">1</span>, mval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">2</span><span class="op">)</span>, 
                       estimation <span class="op">=</span> <span class="st">"imputation"</span>, inference <span class="op">=</span> <span class="st">"bootstrap"</span>, nboot <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></pre></div>
 <div class="sourceCode" id="cb16"><pre class="downlit">
 <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">res_gformula</span><span class="op">)</span></pre></div>
@@ -364,16 +364,16 @@
 ##  bootstrap standard errors, percentile confidence intervals and p-values 
 ##  
 ##                 Estimate Std.error   95% CIL 95% CIU  P.val    
-## Rcde            2.226944  2.717382  1.872101   5.504 &lt;2e-16 ***
-## Rpnde           0.967093  0.003973  0.969022   0.974 &lt;2e-16 ***
-## Rtnde           0.818795  0.151169  0.794358   0.997      1    
-## Rpnie           0.543792  0.082906  0.455400   0.567 &lt;2e-16 ***
-## Rtnie           0.460405  0.001168  0.464603   0.466 &lt;2e-16 ***
-## Rte             0.445254  0.002983  0.450211   0.454 &lt;2e-16 ***
-## ERcde           0.143715  0.073785  0.122707   0.222 &lt;2e-16 ***
-## ERintref       -0.176622  0.069812 -0.247477  -0.154 &lt;2e-16 ***
-## ERintmed       -0.065631  0.081917 -0.085913   0.024      1    
-## ERpnie         -0.456208  0.082906 -0.544283  -0.433 &lt;2e-16 ***
+## Rcde            0.840859  0.065592  0.771998   0.860 &lt;2e-16 ***
+## Rpnde           2.628791  0.301244  2.110514   2.515 &lt;2e-16 ***
+## Rtnde           1.206834  0.190209  1.003274   1.259      1    
+## Rpnie          23.580908  1.786324 22.156678  24.556 &lt;2e-16 ***
+## Rtnie          10.825600  0.435251 11.088659  11.673 &lt;2e-16 ***
+## Rte            28.458238  2.421510 24.636897  27.890 &lt;2e-16 ***
+## ERcde          -7.113482  2.684539 -9.594347  -5.988 &lt;2e-16 ***
+## ERintref        8.742273  2.383294  7.503828  10.706 &lt;2e-16 ***
+## ERintmed        3.248539  3.906589 -1.029096   4.219      1    
+## ERpnie         22.580908  1.786324 21.159954  23.560 &lt;2e-16 ***
 ## ERcde(prop)    -0.259065  0.136412 -0.406495  -0.223 &lt;2e-16 ***
 ## ERintref(prop)  0.318384  0.129441  0.279567   0.453 &lt;2e-16 ***
 ## ERintmed(prop)  0.118308  0.149237 -0.044273   0.156      1    
@@ -391,8 +391,8 @@
 ## $astar
 ## [1] 0
 ## 
-## $yref
-## [1] 0
+## $yval
+## [1] "1"
 ## 
 ## $mval
 ## $mval[[1]]

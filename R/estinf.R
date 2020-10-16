@@ -164,21 +164,21 @@ estinf <- function() {
   out$ref$a <- a
   out$ref$astar <- astar
   
-  # yref: the reference level for a categorical outcome
+  # yval: the reference level for a categorical outcome
   if ((is_glm_yreg && (family_yreg$family %in% c("binomial", "quasibinomial", "multinom") |
                        startsWith(family_yreg$family, "Ordered Categorical"))) |
       is_multinom_yreg | is_polr_yreg) {
     y_lev <- levels(droplevels(as.factor(data[, outcome])))
-    # if yref is not provided or yref provided is not a value of the outcome, use the first level of the outcome
-    if (is.null(yref)) {
-      yref <- y_lev[1]
-      warning(paste0("yref is not specified; ", yref, " is used"))
+    # if yval is not provided or yval provided is not a value of the outcome, use the last level of the outcome
+    if (is.null(yval)) {
+      yval <- y_lev[length(y_lev)]
+      warning(paste0("yval is not specified; ", yval, " is used"))
     }
-    if (!yref %in% y_lev) {
-      yref <- y_lev[1]
-      warning(paste0("yref is not a value of the outcome; ", yref, " is used"))
+    if (!yval %in% y_lev) {
+      yval <- y_lev[length(y_lev)]
+      warning(paste0("yval is not a value of the outcome; ", yval, " is used"))
     }
-    out$ref$yref <- yref
+    out$ref$yval <- yval
   }
   
   # reference values for the mediators

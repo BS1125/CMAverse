@@ -32,7 +32,7 @@ cmest(
   astar = 0,
   a = 1,
   mval = NULL,
-  yref = NULL,
+  yval = NULL,
   basecval = NULL,
   nboot = 200,
   nRep = 5,
@@ -116,14 +116,15 @@ when \code{model} is \code{wb} or \code{msm} with a non-empty \code{basec} or wh
 when \code{model} is \code{gformula}). The order of regression models must follow the order of 
 variables in \code{postc}. See \code{Details}.}
 
-\item{astar}{the first reference value for the exposure. Default is \code{0}.}
+\item{astar}{the control value for the exposure. Default is \code{0}.}
 
-\item{a}{the second reference value for the exposure. Default is \code{1}.}
+\item{a}{the active value for the exposure. Default is \code{1}.}
 
-\item{mval}{a list specifying a reference value for each variable in \code{mediator} (used when 
-\code{model} is \code{rb}, \code{wb}, \code{ne}, \code{msm} or \code{gformula}).}
+\item{mval}{a list specifying a value for each variable in \code{mediator} at which the variable is 
+controlled (used when \code{model} is \code{rb}, \code{wb}, \code{ne}, \code{msm} or \code{gformula}).}
 
-\item{yref}{reference value for the outcome (used when the outcome is categorical).}
+\item{yval}{the value of the outcome at which causal effects on the risk/odds ratio 
+scale are estimated (used when the outcome is categorical).}
 
 \item{basecval}{a list specifying a conditional value for each variable in \code{basec} conditional 
 on which causal effects are estimated (used when \code{estimation} is \code{paramfunc}). The order 
@@ -160,7 +161,8 @@ An object of class \code{cmest} is returned:
 \code{exposure}, \code{mediator}, \code{EMint}, \code{basec} and \code{postc},}
 \item{reg.input}{a list of regressions input,}
 \item{multimp}{a list of arguments used for multiple imputation,}
-\item{ref}{reference values used,}
+\item{ref}{reference values used which may include \code{a}, \code{astar}, \code{mval}, 
+\code{yval} and \code{basecval},}
 \item{reg.output}{a list of regressions output,}
 \item{effect.pe}{point estimates of causal effects,}
 \item{effect.se}{standard errors of causal effects,}

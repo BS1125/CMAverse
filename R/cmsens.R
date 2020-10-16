@@ -238,7 +238,7 @@ cmsens <- function(object = NULL, sens = "uc", MEmethod = "simex",
     a <- object$ref$a
     astar <- object$ref$astar
     mval <- object$ref$mval
-    yref <- object$ref$yref
+    yval <- object$ref$yval
     basecval <- object$ref$basecval
     nboot <- object$methods$nboot
     nRep <- object$methods$nRep    
