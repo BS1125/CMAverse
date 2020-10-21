@@ -344,8 +344,8 @@ model.frame.rcreg <- function(formula, ...) {
 print.rcreg <- function(x, ...) {
   cat("Call:\n")
   print(x$call)
-  cat(paste("\nNaive regression object: \n"))
-  print(x$NAIVEreg)
+  cat(paste("\nNaive coefficient estimates: \n"))
+  print(coef(x$NAIVEreg))
   cat("\nVariable measured with error:\n")
   cat(x$ME$MEvariable)
   cat("\nMeasurement error:\n")
@@ -377,8 +377,10 @@ summary.rcreg <- function(object, ...) {
 print.summary.rcreg <- function(x, digits = 4, ...) {
   cat("Call:\n")
   print(x$call)
-  cat(paste("\nNaive regression object: \n"))
-  print(x$NAIVEreg)
+  cat(paste("\nNaive coefficient estimates: \n"))
+  print(coef(x$NAIVEreg))
+  cat(paste("\nNaive var-cov estimates: \n"))
+  print(vcov(x$NAIVEreg))
   cat("\nVariable measured with error:\n")
   cat(x$ME$MEvariable)
   cat("\nMeasurement error:\n")

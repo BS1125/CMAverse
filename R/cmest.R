@@ -647,12 +647,12 @@ print.cmest <- function(x, ...) {
         if (name == "yreg") {
           cat("## Outcome Regression: \n")
           if (inherits(x$reg.output[[m]]$yreg, "svyglm")) {
-            x$reg.output[[m]]$yreg$call <- update(x$reg.output$yreg,design = getCall(x$reg.output[[m]]$yreg)$design,
-                                             family = getCall(x$reg.output[[m]]$yreg)$family, evaluate = FALSE)
-            x$reg.output[[m]]$yreg$survey.design$call <- as.call(update(summary(x$reg.output[[m]]$yreg)$survey.design,
-                                                                   data = getCall(summary(x$reg.output[[m]]$yreg)$survey.design)$data,
-                                                                   weights = getCall(summary(x$reg.output[[m]]$yreg)$survey.design)$weights, 
-                                                                   evaluate = FALSE))
+            x$reg.output[[m]]$yreg$call <- eval(bquote(update(x$reg.output[[.(m)]]$yreg,design = getCall(x$reg.output[[.(m)]]$yreg)$design,
+                                             family = getCall(x$reg.output[[.(m)]]$yreg)$family, evaluate = FALSE)))
+            x$reg.output[[m]]$yreg$survey.design$call <- eval(bquote(as.call(update(summary(x$reg.output[[.(m)]]$yreg)$survey.design,
+                                                                   data = getCall(summary(x$reg.output[[.(m)]]$yreg)$survey.design)$data,
+                                                                   weights = getCall(summary(x$reg.output[[.(m)]]$yreg)$survey.design)$weights, 
+                                                                   evaluate = FALSE))))
             print(x$reg.output[[m]]$yreg)
           } else {
             x$reg.output[[m]]$yreg$call <- eval(bquote(update(x$reg.output[[.(m)]]$yreg,
@@ -772,7 +772,7 @@ print.cmest <- function(x, ...) {
   cat(paste(" with \n", inf_str, "\n \n"))
   print(x$effect.pe)
   cat("\n")
-  cat("Reference values: \n")
+  cat("Relevant parameter values: \n")
   print(x$ref)
 }
 
@@ -1060,7 +1060,7 @@ print.summary.cmest <- function(x, digits = 4, ...) {
   cat(paste(" with \n", inf_str, "\n \n"))
   printCoefmat(x$summarydf, digits = digits, has.Pvalue = TRUE)
   cat("\n")
-  cat("Reference values: \n")
+  cat("Relevant parameter values: \n")
   print(x$ref)
 }
 

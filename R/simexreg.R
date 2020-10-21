@@ -411,8 +411,8 @@ model.frame.simexreg <- function(formula, ...) {
 print.simexreg <- function(x, ...) {
   cat("Call:\n")
   print(x$call)
-  cat(paste("\nNaive regression object: \n"))
-  print(x$NAIVEreg)
+  cat(paste("\nNaive coefficient estimates: \n"))
+  print(coef(x$NAIVEreg))
   cat("\nVariable measured with error:\n")
   cat(x$ME$MEvariable)
   cat("\nMeasurement error:\n")
