@@ -272,7 +272,8 @@
 #' \item{multimp}{a list of arguments used for multiple imputation,}
 #' \item{ref}{reference values used which may include \code{a}, \code{astar}, \code{mval}, 
 #' \code{yval} and \code{basecval},}
-#' \item{reg.output}{a list of regressions output,}
+#' \item{reg.output}{a list of regressions output. If \code{multimp} is \code{TRUE}, 
+#' reg.output contains regressions fitted by each of the imputed dataset,}
 #' \item{effect.pe}{point estimates of causal effects,}
 #' \item{effect.se}{standard errors of causal effects,}
 #' \item{effect.ci.low}{the lower limits of 95\% confidence intervals of causal effects,}
@@ -550,13 +551,13 @@ print.cmest <- function(x, ...) {
       if (name == "yreg") {
         cat("# Outcome Regression:\n")
         if (inherits(x$reg.output$yreg, "svyglm")) {
-          cat("\nCall:\n")
-          print(update(x$reg.output$yreg,design = getCall(x$reg.output$yreg)$design,
-                       family = getCall(x$reg.output$yreg)$family, evaluate = FALSE))
-          cat("\nCoefficients:\n")
-          print(x$reg.output$yreg$coefficients)
-          cat("\nVar-cov matrix of coefficients:\n")
-          print(vcov(x$reg.output$yreg))
+          x$reg.output$yreg$call <- update(x$reg.output$yreg,design = getCall(x$reg.output$yreg)$design,
+                                           family = getCall(x$reg.output$yreg)$family, evaluate = FALSE)
+          x$reg.output$yreg$survey.design$call <- as.call(update(summary(x$reg.output$yreg)$survey.design,
+                                                                 data = getCall(summary(x$reg.output$yreg)$survey.design)$data,
+                                                                 weights = getCall(summary(x$reg.output$yreg)$survey.design)$weights, 
+                                                                 evaluate = FALSE))
+          print(x$reg.output$yreg)
         } else {
           x$reg.output$yreg$call <- update(x$reg.output$yreg,data=getCall(x$reg.output$yreg)$data,
                                            weights=getCall(x$reg.output$yreg)$weights, evaluate = FALSE)
@@ -585,14 +586,14 @@ print.cmest <- function(x, ...) {
         cat("# Mediator Regressions: \n")
         for (i in 1:length(x$reg.output$mreg)) {
           if (inherits(x$reg.output$mreg[[i]], "svyglm")) {
-            cat("\nCall:\n")
-            print(eval(bquote(update(x$reg.output$mreg[[.(i)]],
-                                     design = getCall(x$reg.output$mreg[[.(i)]])$design,
-                                     family = getCall(x$reg.output$mreg[[.(i)]])$family, evaluate = FALSE))))
-            cat("\nCoefficients:\n")
-            print(x$reg.output$mreg[[i]]$coefficients)
-            cat("\nVar-cov matrix of coefficients:\n")
-            print(vcov(x$reg.output$mreg[[i]]))
+            x$reg.output$mreg[[i]]$call <- eval(bquote(update(x$reg.output$mreg[[.(i)]],
+                                                         design = getCall(x$reg.output$mreg[[.(i)]])$design,
+                                                         family = getCall(x$reg.output$mreg[[.(i)]])$family, evaluate = FALSE)))
+            x$reg.output$mreg[[i]]$survey.design$call <- eval(bquote(as.call(update(summary(x$reg.output$mreg[[.(i)]])$survey.design,
+                                                                   data = getCall(summary(x$reg.output$mreg[[.(i)]])$survey.design)$data,
+                                                                   weights = getCall(summary(x$reg.output$mreg[[.(i)]])$survey.design)$weights, 
+                                                                   evaluate = FALSE))))
+            print(x$reg.output$mreg[[i]])
           } else {
             x$reg.output$mreg[[i]]$call <- eval(bquote(update(x$reg.output$mreg[[.(i)]], 
                                                               data=getCall(x$reg.output$mreg[[.(i)]])$data, 
@@ -646,14 +647,13 @@ print.cmest <- function(x, ...) {
         if (name == "yreg") {
           cat("## Outcome Regression: \n")
           if (inherits(x$reg.output[[m]]$yreg, "svyglm")) {
-            cat("\nCall:\n")
-            print(eval(bquote(update(x$reg.output[[.(m)]]$yreg,
-                                     design = getCall(x$reg.output[[.(m)]]$yreg)$design,
-                                     family = getCall(x$reg.output[[.(m)]]$yreg)$family, evaluate = FALSE))))
-            cat("\nCoefficients:\n")
-            print(x$reg.output[[m]]$yreg$coefficients)
-            cat("\nVar-cov matrix of coefficients:\n")
-            print(vcov(x$reg.output[[m]]$yreg))
+            x$reg.output[[m]]$yreg$call <- update(x$reg.output$yreg,design = getCall(x$reg.output[[m]]$yreg)$design,
+                                             family = getCall(x$reg.output[[m]]$yreg)$family, evaluate = FALSE)
+            x$reg.output[[m]]$yreg$survey.design$call <- as.call(update(summary(x$reg.output[[m]]$yreg)$survey.design,
+                                                                   data = getCall(summary(x$reg.output[[m]]$yreg)$survey.design)$data,
+                                                                   weights = getCall(summary(x$reg.output[[m]]$yreg)$survey.design)$weights, 
+                                                                   evaluate = FALSE))
+            print(x$reg.output[[m]]$yreg)
           } else {
             x$reg.output[[m]]$yreg$call <- eval(bquote(update(x$reg.output[[.(m)]]$yreg,
                                                               data = getCall(x$reg.output[[.(m)]]$yreg)$data,
@@ -690,15 +690,14 @@ print.cmest <- function(x, ...) {
           cat("## Mediator Regressions: \n")
           for (i in 1:length(x$reg.output[[m]]$mreg)) {
             if (inherits(x$reg.output[[m]]$mreg[[i]], "svyglm")) {
-              cat("\nCall:\n")
-              print(eval(bquote(update(x$reg.output[[.(m)]]$mreg[[.(i)]],
-                                       design = getCall(x$reg.output[[.(m)]]$mreg[[.(i)]])$design,
-                                       family = getCall(x$reg.output[[.(m)]]$mreg[[.(i)]])$family, 
-                                       evaluate = FALSE))))
-              cat("\nCoefficients:\n")
-              print(x$reg.output[[m]]$mreg[[i]]$coefficients)
-              cat("\nVar-cov matrix of coefficients:\n")
-              print(vcov(x$reg.output[[m]]$mreg[[i]]))
+              x$reg.output[[m]]$mreg[[i]]$call <- eval(bquote(update(x$reg.output[[.(m)]]$mreg[[.(i)]],
+                                                                design = getCall(x$reg.output[[.(m)]]$mreg[[.(i)]])$design,
+                                                                family = getCall(x$reg.output[[.(m)]]$mreg[[.(i)]])$family, evaluate = FALSE)))
+              x$reg.output[[m]]$mreg[[i]]$survey.design$call <- eval(bquote(as.call(update(summary(x$reg.output[[.(m)]]$mreg[[.(i)]])$survey.design,
+                                                                                      data = getCall(summary(x$reg.output[[.(m)]]$mreg[[.(i)]])$survey.design)$data,
+                                                                                      weights = getCall(summary(x$reg.output[[.(m)]]$mreg[[.(i)]])$survey.design)$weights, 
+                                                                                      evaluate = FALSE))))
+              print(x$reg.output[[m]]$mreg[[i]])
             } else {
               x$reg.output[[m]]$mreg[[i]]$call <- eval(bquote(update(x$reg.output[[.(m)]]$mreg[[.(i)]], 
                                                                      data=getCall(x$reg.output[[.(m)]]$mreg[[.(i)]])$data, 
@@ -752,6 +751,7 @@ print.cmest <- function(x, ...) {
       }
     }
   }
+  
   # print causal mediation analysis results
   if (x$methods$model == "rb") model_str <- "Regression-based Approach"
   if (x$methods$model == "wb") model_str <- "Weighting-based Approach"
@@ -780,11 +780,50 @@ print.cmest <- function(x, ...) {
 #' @describeIn cmest Summarize the results of \code{cmest} nicely
 #' @export
 summary.cmest <- function(object, ...) {
+  # summarize regressions
+  # print regression models used
+  out <- object
+  out$reg.output.summary <- out$reg.output
+  if (!object$multimp$multimp) {
+    regnames <- names(object$reg.output)
+    for (name in regnames) {
+      if (name == "yreg") out$reg.output.summary$yreg <- summary(object$reg.output$yreg)
+      if (name == "yregTot") out$reg.output.summary$yregTot <- summary(object$reg.output$yregTot)
+      if (name == "yregDir") out$reg.output.summary$yregDir <- summary(object$reg.output$yregDir)
+      if (name == "ereg") out$reg.output.summary$ereg <- summary(object$reg.output$ereg)
+      if (name == "mreg") out$reg.output.summary$mreg <- lapply(1:length(object$reg.output$mreg), function(i) 
+          summary(object$reg.output$mreg[[i]]))
+      if (name == "wmnomreg") out$reg.output.summary$wmnomreg <- lapply(1:length(object$reg.output$wmnomreg), function(i) 
+        summary(object$reg.output$wmnomreg[[i]]))
+      if (name == "wmdenomreg") out$reg.output.summary$wmdenomreg <- lapply(1:length(object$reg.output$wmdenomreg), function(i) 
+        summary(object$reg.output$wmdenomreg[[i]]))
+      if (name == "postcreg") out$reg.output.summary$postcreg <- lapply(1:length(object$reg.output$postcreg), function(i) 
+        summary(object$reg.output$postcreg[[i]]))
+    }
+  } else {
+    for (m in 1:length(object$reg.output)){ 
+      regnames <- names(object$reg.output[[m]])
+      for (name in regnames) {
+        if (name == "yreg") out$reg.output.summary[[m]]$yreg <- summary(object$reg.output[[m]]$yreg)
+        if (name == "yregTot") out$reg.output.summary[[m]]$yregTot <- summary(object$reg.output[[m]]$yregTot)
+        if (name == "yregDir") out$reg.output.summary[[m]]$yregDir <- summary(object$reg.output[[m]]$yregDir)
+        if (name == "ereg") out$reg.output.summary[[m]]$ereg <- summary(object$reg.output[[m]]$ereg)
+        if (name == "mreg") out$reg.output.summary[[m]]$mreg <- lapply(1:length(object$reg.output[[m]]$mreg), function(i) 
+          summary(object$reg.output[[m]]$mreg[[i]]))
+        if (name == "wmnomreg") out$reg.output.summary[[m]]$wmnomreg <- lapply(1:length(object$reg.output[[m]]$wmnomreg), function(i) 
+          summary(object$reg.output[[m]]$wmnomreg[[i]]))
+        if (name == "wmdenomreg") out$reg.output.summary[[m]]$wmdenomreg <- lapply(1:length(object$reg.output[[m]]$wmdenomreg), function(i) 
+          summary(object$reg.output[[m]]$wmdenomreg[[i]]))
+        if (name == "postcreg") out$reg.output.summary[[m]]$postcreg <- lapply(1:length(object$reg.output[[m]]$postcreg), function(i) 
+          summary(object$reg.output[[m]]$postcreg[[i]]))
+      }
+    }
+  }
+  
   # summarize causal mediation analysis results
   summarydf <- data.frame(object$effect.pe, object$effect.se, object$effect.ci.low, 
                           object$effect.ci.high, object$effect.pval)
   colnames(summarydf) <- c("Estimate", "Std.error", "95% CIL", "95% CIU", "P.val")
-  out <- object
   out$summarydf <- summarydf
   class(out) <- c("summary.cmest")
   return(out)
@@ -794,6 +833,213 @@ summary.cmest <- function(object, ...) {
 #' @describeIn cmest Print the summary of \code{cmest} nicely
 #' @export
 print.summary.cmest <- function(x, digits = 4, ...) {
+  # print summary of regression models used
+  if (!x$multimp$multimp) {
+    regnames <- names(x$reg.output.summary)
+    for (name in regnames) {
+      if (name == "yreg") {
+        cat("# Outcome Regression:\n")
+        if (inherits(x$reg.output$yreg, "svyglm")) {
+          x$reg.output.summary$yreg$call <- update(x$reg.output$yreg,design = getCall(x$reg.output$yreg)$design,
+                                                   family = getCall(x$reg.output$yreg)$family, evaluate = FALSE)
+          x$reg.output.summary$yreg$survey.design$call <- as.call(update(x$reg.output.summary$yreg$survey.design,
+                                                                         data = getCall(x$reg.output.summary$yreg$survey.design)$data,
+                                                                         weights = getCall(x$reg.output.summary$yreg$survey.design)$weights, 
+                                                                         evaluate = FALSE)) 
+          print(x$reg.output.summary$yreg)
+        } else {
+          x$reg.output.summary$yreg$call <- update(x$reg.output$yreg,data=getCall(x$reg.output$yreg)$data,
+                                           weights=getCall(x$reg.output$yreg)$weights, evaluate = FALSE)
+          print(x$reg.output.summary$yreg)
+        }
+      }
+      if (name == "yregTot") {
+        cat("# Outcome Regression for the Total Effect: \n")
+        x$reg.output.summary$yregTot$call <- update(x$reg.output$yregTot,data=getCall(x$reg.output$yregTot)$data,
+                                                 weights=getCall(x$reg.output$yregTot)$weights, evaluate = FALSE)
+        print(x$reg.output.summary$yregTot)
+      }
+      if (name == "yregDir") {
+        cat("# Outcome Regression for the Direct Effect: \n")
+        x$reg.output.summary$yregDir$call <- update(x$reg.output$yregDir,data=getCall(x$reg.output$yregDir)$data,
+                                                    weights=getCall(x$reg.output$yregDir)$weights, evaluate = FALSE)
+        print(x$reg.output.summary$yregDir)
+      }
+      if (name == "ereg") {
+        cat("# Exposure Regression for Weighting: \n")
+        x$reg.output.summary$ereg$call <- update(x$reg.output$ereg,data=getCall(x$reg.output$ereg)$data,
+                                                    weights=getCall(x$reg.output$ereg)$weights, evaluate = FALSE)
+        print(x$reg.output.summary$ereg)
+      }
+      if (name == "mreg") {
+        cat("# Mediator Regressions: \n")
+        for (i in 1:length(x$reg.output.summary$mreg)) {
+          if (inherits(x$reg.output$mreg[[i]], "svyglm")) {
+            x$reg.output.summary$mreg[[i]]$call <- eval(bquote(update(x$reg.output$mreg[[.(i)]],design = getCall(x$reg.output$mreg[[.(i)]])$design,
+                                                     family = getCall(x$reg.output$mreg[[.(i)]])$family, evaluate = FALSE)))
+            x$reg.output.summary$mreg[[i]]$survey.design$call <- eval(bquote(as.call(update(x$reg.output.summary$mreg[[.(i)]]$survey.design,
+                                                                           data = getCall(x$reg.output.summary$mreg[[.(i)]]$survey.design)$data,
+                                                                           weights = getCall(x$reg.output.summary$mreg[[.(i)]]$survey.design)$weights, 
+                                                                           evaluate = FALSE))))
+            print(x$reg.output.summary$mreg[[i]])
+          } else {
+            x$reg.output.summary$mreg[[i]]$call <- eval(bquote(update(x$reg.output$mreg[[.(i)]], 
+                                                              data=getCall(x$reg.output$mreg[[.(i)]])$data, 
+                                                              weights=getCall(x$reg.output$mreg[[.(i)]])$weights,
+                                                              evaluate = FALSE)))
+            print(x$reg.output.summary$mreg[[i]])
+          }
+          if (i < length(x$reg.output$mreg)) cat("\n")
+        }
+      }
+      if (name == "wmdenomreg") {
+        cat("# Mediator Regressions for Weighting (Denominator): \n")
+        for (i in 1:length(x$reg.output.summary$wmdenomreg)) {
+          x$reg.output.summary$wmdenomreg[[i]]$call <- eval(bquote(update(x$reg.output$wmdenomreg[[i]], 
+                                                                  data=getCall(x$reg.output$wmdenomreg[[.(i)]])$data, 
+                                                                  weights=getCall(x$reg.output$wmdenomreg[[.(i)]])$weights,
+                                                                  evaluate = FALSE)))
+          print(x$reg.output.summary$wmdenomreg[[i]])
+          if (i < length(x$reg.output.summary$wmdenomreg)) cat("\n")
+        }
+      }
+      if (name == "wmnomreg") {
+        cat("# Mediator Regressions for Weighting (Nominator): \n")
+        for (i in 1:length(x$reg.output.summary$wmnomreg)) {
+          x$reg.output.summary$wmnomreg[[i]]$call <- eval(bquote(update(x$reg.output$wmnomreg[[i]], 
+                                                                data=getCall(x$reg.output$wmnomreg[[.(i)]])$data, 
+                                                                weights=getCall(x$reg.output$wmnomreg[[.(i)]])$weights,
+                                                                evaluate = FALSE)))
+          print(x$reg.output.summary$wmnomreg[[i]])
+          if (i < length(x$reg.output.summary$wmnomreg)) cat("\n")
+        }
+      }
+      if (name == "postcreg") {
+        cat("# Regressions for Mediator-outcome Confounders Affected by the Exposure: \n")
+        for (i in 1:length(x$reg.output.summary$postcreg)) {
+          x$reg.output.summary$postcreg[[i]]$call <- eval(bquote(update(x$reg.output$postcreg[[i]], 
+                                                                data=getCall(x$reg.output$postcreg[[.(i)]])$data, 
+                                                                weights=getCall(x$reg.output$postcreg[[.(i)]])$weights,
+                                                                evaluate = FALSE)))
+          print(x$reg.output.summary$postcreg[[i]])
+          if (i < length(x$reg.output.summary$postcreg)) cat("\n")
+        }
+      }
+      cat("\n")
+    }
+  } else {
+    for (m in 1:length(x$reg.output.summary)){ 
+      cat(paste("# Regressions with Imputed Dataset", m, "\n\n"))
+      regnames <- names(x$reg.output.summary[[m]])
+      for (name in regnames) {
+        if (name == "yreg") {
+          cat("## Outcome Regression: \n")
+          if (inherits(x$reg.output[[m]]$yreg, "svyglm")) {
+            x$reg.output.summary[[m]]$yreg$call <- eval(bquote(update(x$reg.output[[.(m)]]$yreg,design = getCall(x$reg.output[[.(m)]]$yreg)$design,
+                                                     family = getCall(x$reg.output[[.(m)]]$yreg)$family, evaluate = FALSE)))
+            x$reg.output.summary[[m]]$yreg$survey.design$call <- eval(bquote(as.call(update(x$reg.output.summary[[.(m)]]$yreg$survey.design,
+                                                                           data = getCall(x$reg.output.summary[[.(m)]]$yreg$survey.design)$data,
+                                                                           weights = getCall(x$reg.output.summary[[.(m)]]$yreg$survey.design)$weights, 
+                                                                           evaluate = FALSE))))
+            print(x$reg.output.summary[[m]]$yreg)
+          } else {
+            x$reg.output.summary[[m]]$yreg$call <- eval(bquote(update(x$reg.output[[.(m)]]$yreg,
+                                                              data = getCall(x$reg.output[[.(m)]]$yreg)$data,
+                                                              weights = getCall(x$reg.output[[.(m)]]$yreg)$weights, 
+                                                              evaluate = FALSE)))
+            print(x$reg.output.summary[[m]]$yreg)
+          }
+        }
+        if (name == "yregTot") {
+          cat("## Outcome Regression for the Total Effect: \n")
+          x$reg.output.summary[[m]]$yregTot$call <- eval(bquote(update(x$reg.output[[.(m)]]$yregTot,
+                                                               data=getCall(x$reg.output[[.(m)]]$yregTot)$data,
+                                                               weights=getCall(x$reg.output[[.(m)]]$yregTot)$weights, 
+                                                               evaluate = FALSE)))
+          print(x$reg.output.summary[[m]]$yregTot)
+        }
+        if (name == "yregDir") {
+          cat("## Outcome Regression for the Direct Effect: \n")
+          x$reg.output.summary[[m]]$yregDir$call <- eval(bquote(update(x$reg.output[[.(m)]]$yregDir,
+                                                               data=getCall(x$reg.output[[.(m)]]$yregDir)$data,
+                                                               weights=getCall(x$reg.output[[.(m)]]$yregDir)$weights, 
+                                                               evaluate = FALSE)))
+          print(x$reg.output.summary[[m]]$yregDir)
+        }
+        if (name == "ereg") {
+          cat("## Exposure Regression for Weighting: \n")
+          x$reg.output.summary[[m]]$ereg$call <- eval(bquote(update(x$reg.output[[.(m)]]$ereg,
+                                                            data=getCall(x$reg.output[[.(m)]]$ereg)$data,
+                                                            weights=getCall(x$reg.output[[.(m)]]$ereg)$weights, 
+                                                            evaluate = FALSE)))
+          print(x$reg.output.summary[[m]]$ereg)
+        }
+        if (name == "mreg") {
+          cat("## Mediator Regressions: \n")
+          for (i in 1:length(x$reg.output.summary[[m]]$mreg)) {
+            if (inherits(x$reg.output[[m]]$mreg[[i]], "svyglm")) {
+              x$reg.output.summary[[m]]$mreg[[i]]$call <- eval(bquote(update(x$reg.output[[.(m)]]$mreg[[.(i)]],
+                                                                     design = getCall(x$reg.output[[.(m)]]$mreg[[.(i)]])$design,
+                                                                     family = getCall(x$reg.output[[.(m)]]$mreg[[.(i)]])$family, evaluate = FALSE)))
+              x$reg.output.summary[[m]]$mreg[[i]]$survey.design$call <- eval(bquote(as.call(update(x$reg.output.summary[[.(m)]]$mreg[[.(i)]]$survey.design,
+                                                                                           data = getCall(x$reg.output.summary[[.(m)]]$mreg[[.(i)]]$survey.design)$data,
+                                                                                           weights = getCall(x$reg.output.summary[[.(m)]]$mreg[[.(i)]]$survey.design)$weights, 
+                                                                                           evaluate = FALSE))))
+              print(x$reg.output.summary[[m]]$mreg[[i]])
+            } else {
+              x$reg.output.summary[[m]]$mreg[[i]]$call <- eval(bquote(update(x$reg.output[[.(m)]]$mreg[[.(i)]], 
+                                                                     data=getCall(x$reg.output[[.(m)]]$mreg[[.(i)]])$data, 
+                                                                     weights=getCall(x$reg.output[[.(m)]]$mreg[[.(i)]])$weights, 
+                                                                     evaluate = FALSE)))
+              print(x$reg.output.summary[[m]]$mreg[[i]])
+            }
+            if (i < length(x$reg.output.summary[[m]]$mreg)) cat("\n")
+          }
+        }
+        if (name == "wmdenomreg") {
+          if (!is.null(x$reg.output.summary[[m]]$wmdenomreg)) {
+            cat("## Mediator Regressions for Weighting (Denominator): \n")
+            for (i in 1:length(x$reg.output.summary[[m]]$wmdenomreg)) {
+              x$reg.output.summary[[m]]$wmdenomreg[[i]]$call <- eval(bquote(update(x$reg.output[[.(m)]]$wmdenomreg[[i]], 
+                                                                           data=getCall(x$reg.output[[.(m)]]$wmdenomreg[[.(i)]])$data, 
+                                                                           weights=getCall(x$reg.output[[.(m)]]$wmdenomreg[[.(i)]])$weights, 
+                                                                           evaluate = FALSE)))
+              print(x$reg.output.summary[[m]]$wmdenomreg[[i]])
+              if (i < length(x$reg.output.summary[[m]]$wmdenomreg)) cat("\n")
+            }
+          }
+        }
+        if (name == "wmnomreg") {
+          if (!is.null(x$reg.output.summary[[m]]$wmnomreg)) {
+            cat("## Mediator Regressions for Weighting (Nominator): \n")
+            for (i in 1:length(x$reg.output.summary[[m]]$wmnomreg)) {
+              x$reg.output.summary[[m]]$wmnomreg[[i]]$call <- eval(bquote(update(x$reg.output[[.(m)]]$wmnomreg[[i]], 
+                                                                         data=getCall(x$reg.output[[.(m)]]$wmnomreg[[.(i)]])$data, 
+                                                                         weights=getCall(x$reg.output[[.(m)]]$wmnomreg[[.(i)]])$weights, 
+                                                                         evaluate = FALSE)))
+              print(x$reg.output.summary[[m]]$wmnomreg[[i]])
+              if (i < length(x$reg.output.summary[[m]]$wmnomreg)) cat("\n")
+            }
+          }
+        }
+        if (name == "postcreg") {
+          if (!is.null(x$reg.output.summary[[m]]$postcreg)) {
+            cat("## Regressions for Mediator-outcome Confounders Affected by the Exposure: \n")
+            for (i in 1:length(x$reg.output.summary[[m]]$postcreg)) {
+              x$reg.output.summary[[m]]$postcreg[[i]]$call <- eval(bquote(update(x$reg.output[[.(m)]]$postcreg[[i]], 
+                                                                         data=getCall(x$reg.output[[.(m)]]$postcreg[[.(i)]])$data, 
+                                                                         weights=getCall(x$reg.output[[.(m)]]$postcreg[[.(i)]])$weights, 
+                                                                         evaluate = FALSE)))
+              print(x$reg.output.summary[[m]]$postcreg[[i]])
+              if (i < length(x$reg.output.summary[[m]]$postcreg)) cat("\n")
+            }
+          }
+        }
+        cat("\n")
+      }
+    }
+  }
+  
   # print summary of causal mediation analysis results
   if (x$methods$model == "rb") model_str <- "Regression-based Approach"
   if (x$methods$model == "wb") model_str <- "Weighting-based Approach"

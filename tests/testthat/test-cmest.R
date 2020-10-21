@@ -1019,6 +1019,7 @@ test_that("cmest works correctly for binary Y and binary M in a case control stu
   expect_equal(unname(res_binbin_ne$effect.pe), ref, tolerance = 0.1)
   expect_equal(unname(res_binbin_iorw$effect.pe), ref[c(6,2,5,15)], tolerance = 0.1)
   expect_equal(unname(res_binbin_gformula$effect.pe), ref, tolerance = 0.1)
+  expect_equal(class(print(summary(res_binbin_rb_param_delta_multinom))), "list")
 
 })
 
