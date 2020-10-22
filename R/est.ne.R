@@ -12,11 +12,13 @@ est.ne <- function(data = NULL, indices = NULL, outReg = FALSE, full = NULL) {
     # update yreg
     call_yreg$weights <- weights_yreg
     call_yreg$data <- data
+    if (outReg && (inherits(yreg, "rcreg") | inherits(yreg, "simexreg"))) call_yreg$variance <- TRUE
     yreg <- eval.parent(call_yreg)
     rm(prob1, w4casecon)
   } else {
     call_yreg$weights <- weights_yreg[indices]
     call_yreg$data <- data
+    if (outReg && (inherits(yreg, "rcreg") | inherits(yreg, "simexreg"))) call_yreg$variance <- TRUE
     yreg <- eval.parent(call_yreg)
   }
   
@@ -35,6 +37,7 @@ est.ne <- function(data = NULL, indices = NULL, outReg = FALSE, full = NULL) {
   if (!is.null(weights_yreg_new)) call_nereg$weights <- rep(weights_yreg_new, rep(nRep, length(weights_yreg_new)))
   call_nereg$formula <- as.formula(ne_formula)
   call_nereg$data <- expdata
+  if (outReg && (inherits(yreg, "rcreg") | inherits(yreg, "simexreg"))) call_nereg$variance <- TRUE
   nereg <- eval.parent(call_nereg)
   rm(expdata, formula_yreg, ne_formula)
   

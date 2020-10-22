@@ -20,6 +20,7 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       # update ereg
       call_ereg$weights <- weights_ereg
       call_ereg$data <- data
+      if (outReg && (inherits(ereg, "rcreg") | inherits(ereg, "simexreg"))) call_ereg$variance <- TRUE
       ereg <- eval.parent(call_ereg)
       # calculate w_{a,i}=P(A=A_i)/P(A=A_i|C_i)
       wanom <- left_join(select(data, exposure), count(data, !!as.name(exposure)), by = exposure)[, "n"]/n
@@ -51,8 +52,10 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       # update wmdenomreg[[p]] and wmnomreg[[p]]
       call_wmdenomreg[[p]]$weights <- weights_wmdenomreg[[p]]
       call_wmdenomreg[[p]]$data <- data
+      if (outReg && (inherits(wmdenomreg[[p]], "rcreg") | inherits(wmdenomreg[[p]], "simexreg"))) call_wmdenomreg[[p]]$variance <- TRUE
       call_wmnomreg[[p]]$weights <- weights_wmnomreg[[p]]
       call_wmnomreg[[p]]$data <- data
+      if (outReg && (inherits(wmnomreg[[p]], "rcreg") | inherits(wmnomreg[[p]], "simexreg"))) call_wmnomreg[[p]]$variance <- TRUE
       wmdenomreg[[p]] <- eval.parent(call_wmdenomreg[[p]])
       wmnomreg[[p]] <- eval.parent(call_wmnomreg[[p]])
       
@@ -85,6 +88,7 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     # update yreg
     call_yreg$weights <- weights_yreg
     call_yreg$data <- data
+    if (outReg && (inherits(yreg, "rcreg") | inherits(yreg, "simexreg"))) call_yreg$variance <- TRUE
     yreg <- eval.parent(call_yreg)
     # weights for mreg[[p]]
     for (p in 1:length(mediator)) {
@@ -93,6 +97,7 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       # update mreg[[p]]
       call_mreg[[p]]$weights <- weights_mreg[[p]]
       call_mreg[[p]]$data <- data
+      if (outReg && (inherits(mreg[[p]], "rcreg") | inherits(mreg[[p]], "simexreg"))) call_mreg[[p]]$variance <- TRUE
       mreg[[p]] <- eval.parent(call_mreg[[p]])
     }
     rm(prob1, w4casecon)
@@ -106,6 +111,7 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       # update ereg
       call_ereg$weights <- weights_ereg[indices][control_indices]
       call_ereg$data <- data[control_indices, ]
+      if (outReg && (inherits(ereg, "rcreg") | inherits(ereg, "simexreg"))) call_ereg$variance <- TRUE
       ereg <- eval.parent(call_ereg)
       # calculate w_{a,i}=P(A=A_i)/P(A=A_i|C_i)
       wanom <- left_join(select(data, exposure), count(data, !!as.name(exposure)), by = exposure)[, "n"]/n
@@ -132,8 +138,10 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       # update wmdenomreg[[p]] and wmnomreg[[p]]
       call_wmdenomreg[[p]]$weights <- weights_wmdenomreg[[p]][indices][control_indices]
       call_wmdenomreg[[p]]$data <- data[control_indices, ]
+      if (outReg && (inherits(wmdenomreg[[p]], "rcreg") | inherits(wmdenomreg[[p]], "simexreg"))) call_wmdenomreg[[p]]$variance <- TRUE
       call_wmnomreg[[p]]$weights <- weights_wmnomreg[[p]][indices][control_indices]
       call_wmnomreg[[p]]$data <- data[control_indices, ]
+      if (outReg && (inherits(wmnomreg[[p]], "rcreg") | inherits(wmnomreg[[p]], "simexreg"))) call_wmnomreg[[p]]$variance <- TRUE
       wmdenomreg[[p]] <- eval.parent(call_wmdenomreg[[p]])
       wmnomreg[[p]] <- eval.parent(call_wmnomreg[[p]])
       m_lev <- levels(droplevels(as.factor(data[, mediator[p]])))
@@ -164,6 +172,7 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     # update yreg
     call_yreg$weights <- weights_yreg
     call_yreg$data <- data
+    if (outReg && (inherits(yreg, "rcreg") | inherits(yreg, "simexreg"))) call_yreg$variance <- TRUE
     yreg <- eval.parent(call_yreg)
     # weights for mreg[[p]]
     for (p in 1:length(mediator)) {
@@ -172,6 +181,7 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       # update mreg[[p]]
       call_mreg[[p]]$weights <- weights_mreg[[p]]
       call_mreg[[p]]$data <- data[control_indices, ]
+      if (outReg && (inherits(mreg[[p]], "rcreg") | inherits(mreg[[p]], "simexreg"))) call_mreg[[p]]$variance <- TRUE
       mreg[[p]] <- eval.parent(call_mreg[[p]])
     }
     rm(control_indices)
@@ -182,6 +192,7 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       # update ereg
       call_ereg$weights <- weights_ereg[indices]
       call_ereg$data <- data
+      if (outReg && (inherits(ereg, "rcreg") | inherits(ereg, "simexreg"))) call_ereg$variance <- TRUE
       ereg <- eval.parent(call_ereg)
       # calculate w_{a,i}=P(A=A_i)/P(A=A_i|C_i)
       wanom <- left_join(select(data, exposure), count(data, !!as.name(exposure)), by = exposure)[, "n"]/n
@@ -208,8 +219,10 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       # update wmdenomreg[[p]] and wmnomreg[[p]]
       call_wmdenomreg[[p]]$weights <- weights_wmdenomreg[[p]][indices]
       call_wmdenomreg[[p]]$data <- data
+      if (outReg && (inherits(wmdenomreg[[p]], "rcreg") | inherits(wmdenomreg[[p]], "simexreg"))) call_wmdenomreg[[p]]$variance <- TRUE
       call_wmnomreg[[p]]$weights <- weights_wmnomreg[[p]][indices]
       call_wmnomreg[[p]]$data <- data
+      if (outReg && (inherits(wmnomreg[[p]], "rcreg") | inherits(wmnomreg[[p]], "simexreg"))) call_wmnomreg[[p]]$variance <- TRUE
       wmdenomreg[[p]] <- eval.parent(call_wmdenomreg[[p]])
       wmnomreg[[p]] <- eval.parent(call_wmnomreg[[p]])
       m_lev <- levels(droplevels(as.factor(data[, mediator[p]])))
@@ -241,6 +254,7 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     # update yreg
     call_yreg$weights <- weights_yreg
     call_yreg$data <- data
+    if (outReg && (inherits(yreg, "rcreg") | inherits(yreg, "simexreg"))) call_yreg$variance <- TRUE
     yreg <- eval.parent(call_yreg)
     # weights for mreg[[p]]
     for (p in 1:length(mediator)) {
@@ -249,6 +263,7 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       # update mreg[[p]]
       call_mreg[[p]]$weights <- weights_mreg[[p]]
       call_mreg[[p]]$data <- data
+      if (outReg && (inherits(mreg[[p]], "rcreg") | inherits(mreg[[p]], "simexreg"))) call_mreg[[p]]$variance <- TRUE
       mreg[[p]] <- eval.parent(call_mreg[[p]])
     }
   }

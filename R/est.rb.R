@@ -25,6 +25,7 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       call_yreg$weights <- weights_yreg
       call_yreg$data <- data
     }
+    if (outReg && (inherits(yreg, "rcreg") | inherits(yreg, "simexreg"))) call_yreg$variance <- TRUE
     yreg <- eval.parent(call_yreg)
     # update mreg
     for (p in 1:length(mediator)) {
@@ -39,6 +40,7 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
         call_mreg[[p]]$weights <- weights_mreg[[p]]
         call_mreg[[p]]$data <- data
       }
+      if (outReg && (inherits(mreg[[p]], "rcreg") | inherits(mreg[[p]], "simexreg"))) call_mreg[[p]]$variance <- TRUE
       mreg[[p]] <- eval.parent(call_mreg[[p]])
     }
     rm(prob1, w4casecon)
@@ -49,11 +51,13 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     # update yreg
     call_yreg$weights <- weights_yreg[indices]
     call_yreg$data <- data
+    if (outReg && (inherits(yreg, "rcreg") | inherits(yreg, "simexreg"))) call_yreg$variance <- TRUE
     yreg <- eval.parent(call_yreg)
     # update mreg
     for (p in 1:length(mediator)) {
       call_mreg[[p]]$weights <- weights_mreg[[p]][indices][control_indices]
       call_mreg[[p]]$data <- data[control_indices, ]
+      if (outReg && (inherits(mreg[[p]], "rcreg") | inherits(mreg[[p]], "simexreg"))) call_mreg[[p]]$variance <- TRUE
       mreg[[p]] <- eval.parent(call_mreg[[p]])
     }
     rm(control_indices)
@@ -62,11 +66,13 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     # update yreg
     call_yreg$weights <- weights_yreg[indices]
     call_yreg$data <- data
+    if (outReg && (inherits(yreg, "rcreg") | inherits(yreg, "simexreg"))) call_yreg$variance <- TRUE
     yreg <- eval.parent(call_yreg)
     # update mreg
     for (p in 1:length(mediator)) {
       call_mreg[[p]]$weights <- weights_mreg[[p]][indices]
       call_mreg[[p]]$data <- data
+      if (outReg && (inherits(mreg[[p]], "rcreg") | inherits(mreg[[p]], "simexreg"))) call_mreg[[p]]$variance <- TRUE
       mreg[[p]] <- eval.parent(call_mreg[[p]])
     }
   }

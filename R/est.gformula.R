@@ -18,6 +18,7 @@ est.gformula <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRU
     # update yreg
     call_yreg$weights <- weights_yreg
     call_yreg$data <- data
+    if (outReg && (inherits(yreg, "rcreg") | inherits(yreg, "simexreg"))) call_yreg$variance <- TRUE
     yreg <- eval.parent(call_yreg)
     # update mreg
     for (p in 1:length(mediator)) {
@@ -25,6 +26,7 @@ est.gformula <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRU
       if (is.null(weights_mreg[[p]])) weights_mreg[[p]] <- w4casecon
       call_mreg[[p]]$weights <- weights_mreg[[p]]
       call_mreg[[p]]$data <- data
+      if (outReg && (inherits(mreg[[p]], "rcreg") | inherits(mreg[[p]], "simexreg"))) call_mreg[[p]]$variance <- TRUE
       mreg[[p]] <- eval.parent(call_mreg[[p]])
     }
     if (length(postc) != 0) {
@@ -34,6 +36,7 @@ est.gformula <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRU
         if (is.null(weights_postcreg[[p]])) weights_postcreg[[p]] <- w4casecon
         call_postcreg[[p]]$weights <- weights_postcreg[[p]]
         call_postcreg[[p]]$data <- data
+        if (outReg && (inherits(postcreg[[p]], "rcreg") | inherits(postcreg[[p]], "simexreg"))) call_postcreg[[p]]$variance <- TRUE
         postcreg[[p]] <- eval.parent(call_postcreg[[p]])
       }
     }
@@ -45,11 +48,13 @@ est.gformula <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRU
     # update yreg
     call_yreg$weights <- weights_yreg[indices]
     call_yreg$data <- data
+    if (outReg && (inherits(yreg, "rcreg") | inherits(yreg, "simexreg"))) call_yreg$variance <- TRUE
     yreg <- eval.parent(call_yreg)
     # update mreg
     for (p in 1:length(mediator)) {
       call_mreg[[p]]$weights <- weights_mreg[[p]][indices][control_indices]
       call_mreg[[p]]$data <- data[control_indices, ]
+      if (outReg && (inherits(mreg[[p]], "rcreg") | inherits(mreg[[p]], "simexreg"))) call_mreg[[p]]$variance <- TRUE
       mreg[[p]] <- eval.parent(call_mreg[[p]])
     }
     # update postcreg
@@ -58,6 +63,7 @@ est.gformula <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRU
         # update postcreg[[p]]
         call_postcreg[[p]]$weights <- weights_postcreg[[p]][indices][control_indices]
         call_postcreg[[p]]$data <- data[control_indices, ]
+        if (outReg && (inherits(postcreg[[p]], "rcreg") | inherits(postcreg[[p]], "simexreg"))) call_postcreg[[p]]$variance <- TRUE
         postcreg[[p]] <- eval.parent(call_postcreg[[p]])
       }
     }
@@ -67,11 +73,13 @@ est.gformula <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRU
     # update yreg
     call_yreg$weights <- weights_yreg[indices]
     call_yreg$data <- data
+    if (outReg && (inherits(yreg, "rcreg") | inherits(yreg, "simexreg"))) call_yreg$variance <- TRUE
     yreg <- eval.parent(call_yreg)
     # update mreg
     for (p in 1:length(mediator)) {
       call_mreg[[p]]$weights <- weights_mreg[[p]][indices]
       call_mreg[[p]]$data <- data
+      if (outReg && (inherits(mreg[[p]], "rcreg") | inherits(mreg[[p]], "simexreg"))) call_mreg[[p]]$variance <- TRUE
       mreg[[p]] <- eval.parent(call_mreg[[p]])
     }
     # update postcreg
@@ -79,6 +87,7 @@ est.gformula <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRU
       for (p in 1:length(postc)) {
         call_postcreg[[p]]$weights <- weights_postcreg[[p]][indices]
         call_postcreg[[p]]$data <- data
+        if (outReg && (inherits(postcreg[[p]], "rcreg") | inherits(postcreg[[p]], "simexreg"))) call_postcreg[[p]]$variance <- TRUE
         postcreg[[p]] <- eval.parent(call_postcreg[[p]])
       }
     }

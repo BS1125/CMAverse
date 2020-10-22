@@ -19,6 +19,7 @@ est.wb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       # update ereg
       call_ereg$weights <- weights_ereg
       call_ereg$data <- data
+      if (outReg && (inherits(ereg, "rcreg") | inherits(ereg, "simexreg"))) call_ereg$variance <- TRUE
       ereg <- eval.parent(call_ereg)
       # calculate w_{a,i}=P(A=A_i)/P(A=A_i|C_i)
       wanom <- left_join(select(data, exposure), count(data, !!as.name(exposure)), by = exposure)[, "n"]/n
@@ -44,6 +45,7 @@ est.wb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     # update yreg
     call_yreg$weights <- weights_yreg
     call_yreg$data <- data
+    if (outReg && (inherits(yreg, "rcreg") | inherits(yreg, "simexreg"))) call_yreg$variance <- TRUE
     yreg <- eval.parent(call_yreg)
     rm(prob1, w4casecon, weights_ereg, weights_yreg)
 
@@ -56,6 +58,7 @@ est.wb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       # update ereg
       call_ereg$weights <- weights_ereg[indices][control_indices]
       call_ereg$data <- data[control_indices, ]
+      if (outReg && (inherits(ereg, "rcreg") | inherits(ereg, "simexreg"))) call_ereg$variance <- TRUE
       ereg <- eval.parent(call_ereg)
       # calculate w_{a,i}=P(A=A_i)/P(A=A_i|C_i)
       wanom <- left_join(select(data, exposure), count(data, !!as.name(exposure)), by = exposure)[, "n"]/n
@@ -78,6 +81,7 @@ est.wb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     # update yreg
     call_yreg$weights <- weights_yreg[indices]
     call_yreg$data <- data
+    if (outReg && (inherits(yreg, "rcreg") | inherits(yreg, "simexreg"))) call_yreg$variance <- TRUE
     yreg <- eval.parent(call_yreg)
     rm(control_indices)
 
@@ -87,6 +91,7 @@ est.wb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       # update ereg
       call_ereg$weights <- weights_ereg[indices]
       call_ereg$data <- data
+      if (outReg && (inherits(ereg, "rcreg") | inherits(ereg, "simexreg"))) call_ereg$variance <- TRUE
       ereg <- eval.parent(call_ereg)
       # calculate w_{a,i}=P(A=A_i)/P(A=A_i|C_i)
       wanom <- left_join(select(data, exposure), count(data, !!as.name(exposure)), by = exposure)[, "n"]/n
@@ -109,6 +114,7 @@ est.wb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     # update yreg
     call_yreg$weights <- weights_yreg[indices]
     call_yreg$data <- data
+    if (outReg && (inherits(yreg, "rcreg") | inherits(yreg, "simexreg"))) call_yreg$variance <- TRUE
     yreg <- eval.parent(call_yreg)
   }
 

@@ -19,6 +19,7 @@ est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     # update ereg
     call_ereg$weights <- weights_ereg
     call_ereg$data <- data
+    if (outReg && (inherits(ereg, "rcreg") | inherits(ereg, "simexreg"))) call_ereg$variance <- TRUE
     ereg <- eval.parent(call_ereg)
     # calculate w_{a,i}=P(A=0|M_i,C_i)/P(A=A_i|M_i,C_i)
     wadenom_prob <- as.matrix(predict(ereg, newdata = data,
@@ -45,10 +46,12 @@ est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     call_yreg_tot <- call_yreg
     call_yreg_tot$weights <- weights_yreg
     call_yreg_tot$data <- data
+    if (outReg && (inherits(yreg, "rcreg") | inherits(yreg, "simexreg"))) call_yreg_tot$variance <- TRUE
     yreg_tot <- eval.parent(call_yreg_tot)
     call_yreg_dir <- call_yreg
     call_yreg_dir$weights <- as.vector(weights_yreg * wa)
     call_yreg_dir$data <- data
+    if (outReg && (inherits(yreg, "rcreg") | inherits(yreg, "simexreg"))) call_yreg_dir$variance <- TRUE
     yreg_dir <- eval.parent(call_yreg_dir)
     rm(prob1, w4casecon, weights_ereg, weights_yreg)
 
@@ -59,6 +62,7 @@ est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     # update ereg
     call_ereg$weights <- as.vector(weights_ereg[indices][control_indices])
     call_ereg$data <- data[control_indices, ]
+    if (outReg && (inherits(ereg, "rcreg") | inherits(ereg, "simexreg"))) call_ereg$variance <- TRUE
     ereg <- eval.parent(call_ereg)
     # calculate w_{a,i}=P(A=0|M_i,C_i)/P(A=A_i|M_i,C_i)
     wadenom_prob <- as.matrix(predict(ereg, newdata = data, 
@@ -82,11 +86,13 @@ est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     call_yreg_tot <- call_yreg
     call_yreg_tot$weights <- weights_yreg[indices]
     call_yreg_tot$data <- data
+    if (outReg && (inherits(yreg, "rcreg") | inherits(yreg, "simexreg"))) call_yreg_tot$variance <- TRUE
     yreg_tot <- eval.parent(call_yreg_tot)
     call_yreg_dir <- call_yreg
     if (!is.null(weights_yreg)) call_yreg_dir$weights <- weights_yreg[indices] * wa
     if (is.null(weights_yreg)) call_yreg_dir$weights <- wa
     call_yreg_dir$data <- data
+    if (outReg && (inherits(yreg, "rcreg") | inherits(yreg, "simexreg"))) call_yreg_dir$variance <- TRUE
     yreg_dir <- eval.parent(call_yreg_dir)
     rm(control_indices)
 
@@ -95,6 +101,7 @@ est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     # update ereg
     call_ereg$weights <- weights_ereg[indices]
     call_ereg$data <- data
+    if (outReg && (inherits(ereg, "rcreg") | inherits(ereg, "simexreg"))) call_ereg$variance <- TRUE
     ereg <- eval.parent(call_ereg)
     # calculate w_{a,i}=P(A=0|M_i,C_i)/P(A=A_i|M_i,C_i)
     wadenom_prob <- as.matrix(predict(ereg, newdata = data,
@@ -118,11 +125,13 @@ est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     call_yreg_tot <- call_yreg
     call_yreg_tot$weights <- weights_yreg[indices]
     call_yreg_tot$data <- data
+    if (outReg && (inherits(yreg, "rcreg") | inherits(yreg, "simexreg"))) call_yreg_tot$variance <- TRUE
     yreg_tot <- eval.parent(call_yreg_tot)
     call_yreg_dir <- call_yreg
     if (!is.null(weights_yreg)) call_yreg_dir$weights <- weights_yreg[indices] * wa
     if (is.null(weights_yreg)) call_yreg_dir$weights <- wa
     call_yreg_dir$data <- data
+    if (outReg && (inherits(yreg, "rcreg") | inherits(yreg, "simexreg"))) call_yreg_dir$variance <- TRUE
     yreg_dir <- eval.parent(call_yreg_dir)
   }
 
