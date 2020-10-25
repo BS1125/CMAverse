@@ -244,6 +244,7 @@ estinf <- function() {
         # bootstrap results
         boots <- boot(data = data, statistic = est.rb, R = nboot, outReg = FALSE, full = full)
         # bootstrap CIs
+        environment(boot.ci) <- environment()
         effect.ci <- boot.ci(boots = boots)
         effect.ci.low <- effect.ci[, 1]
         effect.ci.high <- effect.ci[, 2]
@@ -291,6 +292,7 @@ estinf <- function() {
         # bootstrap results
         boots <- boot(data = data, statistic = boot.step, R = nboot)
         # bootstrap CIs
+        environment(boot.ci) <- environment()
         effect.ci <- boot.ci(boots = boots)
         effect.ci.low <- effect.ci[, 1]
         effect.ci.high <- effect.ci[, 2]
@@ -362,6 +364,7 @@ estinf <- function() {
       # bootstrap results
       boots <- boot(data = data, statistic = est.gformula, R = nboot, outReg = FALSE, full = full)
       # bootstrap CIs
+      environment(boot.ci) <- environment()
       effect.ci <- boot.ci(boots = boots)
       effect.ci.low <- effect.ci[, 1]
       effect.ci.high <- effect.ci[, 2]
@@ -393,6 +396,7 @@ estinf <- function() {
       # bootstrap results
       boots <- boot(data = data, statistic = boot.step, R = nboot)
       # bootstrap CIs
+      environment(boot.ci) <- environment()
       effect.ci <- boot.ci(boots = boots)
       effect.ci.low <- effect.ci[, 1]
       effect.ci.high <- effect.ci[, 2]
@@ -458,6 +462,7 @@ estinf <- function() {
       # bootstrap results
       boots <- boot(data = data, statistic = est.wb, R = nboot, outReg = FALSE, full = full)
       # bootstrap CIs
+      environment(boot.ci) <- environment()
       effect.ci <- boot.ci(boots = boots)
       effect.ci.low <- effect.ci[, 1]
       effect.ci.high <- effect.ci[, 2]
@@ -488,6 +493,7 @@ estinf <- function() {
       # bootstrap results
       boots <- boot(data = data, statistic = boot.step, R = nboot)
       # bootstrap CIs
+      environment(boot.ci) <- environment()
       effect.ci <- boot.ci(boots = boots)
       effect.ci.low <- effect.ci[, 1]
       effect.ci.high <- effect.ci[, 2]
@@ -545,6 +551,7 @@ estinf <- function() {
       # bootstrap results
       boots <- boot(data = data, statistic = est.iorw, R = nboot, outReg = FALSE, full = full)
       # bootstrap CIs
+      environment(boot.ci) <- environment()
       effect.ci <- boot.ci(boots = boots)
       effect.ci.low <- effect.ci[, 1]
       effect.ci.high <- effect.ci[, 2]
@@ -575,6 +582,7 @@ estinf <- function() {
       # bootstrap results
       boots <- boot(data = data, statistic = boot.step, R = nboot)
       # bootstrap CIs
+      environment(boot.ci) <- environment()
       effect.ci <- boot.ci(boots = boots)
       effect.ci.low <- effect.ci[, 1]
       effect.ci.high <- effect.ci[, 2]
@@ -642,6 +650,7 @@ estinf <- function() {
       # bootstrap results
       boots <- boot(data = data, statistic = est.msm, R = nboot, outReg = FALSE, full = full)
       # bootstrap CIs
+      environment(boot.ci) <- environment()
       effect.ci <- boot.ci(boots = boots)
       effect.ci.low <- effect.ci[, 1]
       effect.ci.high <- effect.ci[, 2]
@@ -673,6 +682,7 @@ estinf <- function() {
       # bootstrap results
       boots <- boot(data = data, statistic = boot.step, R = nboot)
       # bootstrap CIs
+      environment(boot.ci) <- environment()
       effect.ci <- boot.ci(boots = boots)
       effect.ci.low <- effect.ci[, 1]
       effect.ci.high <- effect.ci[, 2]
@@ -742,6 +752,7 @@ estinf <- function() {
       # bootstrap results
       boots <- boot(data = data, statistic = est.ne, R = nboot, outReg = FALSE, full = full)
       # bootstrap CIs
+      environment(boot.ci) <- environment()
       effect.ci <- boot.ci(boots = boots)
       effect.ci.low <- effect.ci[, 1]
       effect.ci.high <- effect.ci[, 2]
@@ -771,6 +782,7 @@ estinf <- function() {
       # bootstrap results
       boots <- boot(data = data, statistic = boot.step, R = nboot)
       # bootstrap CIs
+      environment(boot.ci) <- environment()
       effect.ci <- boot.ci(boots = boots)
       effect.ci.low <- effect.ci[, 1]
       effect.ci.high <- effect.ci[, 2]

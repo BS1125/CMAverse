@@ -56,7 +56,7 @@ mediators. The two causal scenarios supported are:
 
 ![](man/figures/unnamed-chunk-1-1.png)
 
-1.  There are mediator-outcome confounders affected by the exposure and
+2.  There are mediator-outcome confounders affected by the exposure and
     these confounders precede all of the mediators:
 
 ![](man/figures/unnamed-chunk-2-1.png)
