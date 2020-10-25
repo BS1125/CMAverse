@@ -192,16 +192,16 @@ reg_simex <- simexreg(reg = reg_naive, data = data, MEvariable = "x2_error",
                   
 }
 \references{
-Carrol RJ, Ruppert D, Stefanski LA, Crainiceanu C. Measurement Error in Nonlinear Models: 
-A Modern Perspective, Second Edition (2006). London: Chapman & Hall.
+Carrol RJ, Ruppert D, Stefanski LA, Crainiceanu C (2006). Measurement Error in Nonlinear Models: 
+A Modern Perspective, Second Edition. London: Chapman & Hall.
 
-Cook JR, Stefanski LA. Simulation-extrapolation estimation in parametric measurement error 
-models (1994). Journal of the American Statistical Association, 89(428): 1314 - 1328.
+Cook JR, Stefanski LA (1994). Simulation-extrapolation estimation in parametric measurement error 
+models. Journal of the American Statistical Association, 89(428): 1314 - 1328.
 
-Küchenhoff H, Mwalili SM, Lesaffre E. A general method for dealing with misclassification 
-in regression: the misclassification SIMEX (2006). Biometrics. 62(1): 85 - 96.
+Küchenhoff H, Mwalili SM, Lesaffre E (2006). A general method for dealing with misclassification 
+in regression: the misclassification SIMEX. Biometrics. 62(1): 85 - 96.
 
-Stefanski LA, Cook JR. Simulation-extrapolation: the measurement error jackknife (1995). 
+Stefanski LA, Cook JR (1995). Simulation-extrapolation: the measurement error jackknife. 
 Journal of the American Statistical Association. 90(432): 1247 - 56.
 }
 \seealso{

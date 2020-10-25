@@ -49,14 +49,14 @@ al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5560424/), and
 `cmest` currently supports a single exposure, multiple sequential
 mediators and a single outcome. When multiple mediators are of interest,
 `cmest` estimates the joint mediated effect through the set of
-mediators. `cmest` also allows for time varying confounders preceding mediators. The two
-causal scenarios supported are:
+mediators. `cmest` also allows for time varying confounders preceding
+mediators. The two causal scenarios supported are:
 
 1.  There are no confounders affected by the exposure:
 
 ![](man/figures/unnamed-chunk-1-1.png)
 
-2.  There are mediator-outcome confounders affected by the exposure and
+1.  There are mediator-outcome confounders affected by the exposure and
     these confounders precede all of the mediators:
 
 ![](man/figures/unnamed-chunk-2-1.png)
@@ -371,10 +371,10 @@ mediators. Epidemiologic Methods. 2(1): 95 - 115.
 Tchetgen Tchetgen EJ (2013). Inverse odds ratio-weighted estimation for
 causal mediation analysis. Statistics in medicine. 32: 4567 - 4580.
 
-Nguyen QC, Osypuk TL, Schmidt NM, Glymour MM, Tchetgen Tchetgen EJ.
-Practical guidance for conducting mediation analysis with multiple
-mediators using inverse odds ratio weighting (2015). American Journal of
-Epidemiology. 181(5): 349 - 356.
+Nguyen QC, Osypuk TL, Schmidt NM, Glymour MM, Tchetgen Tchetgen EJ
+(2015). Practical guidance for conducting mediation analysis with
+multiple mediators using inverse odds ratio weighting. American Journal
+of Epidemiology. 181(5): 349 - 356.
 
 VanderWeele TJ, Tchetgen Tchetgen EJ (2017). Mediation analysis with
 time varying exposures and mediators. Journal of the Royal Statistical
@@ -384,47 +384,50 @@ Robins JM (1986). A new approach to causal inference in mortality
 studies with a sustained exposure period-Application to control of the
 healthy worker survivor effect. Mathematical Modelling. 7: 1393 - 1512.
 
-Vansteelandt S, Bekaert M, Lange T. (2012). Imputation Strategies for
-the Estimation of Natural Direct and Indirect Effects. Epidemiologic
+Vansteelandt S, Bekaert M, Lange T (2012). Imputation Strategies for the
+Estimation of Natural Direct and Indirect Effects. Epidemiologic
 Methods. 1(1): 131 - 158.
 
 Steen J, Loeys T, Moerkerke B, Vansteelandt S (2017). Medflex: an R
 package for flexible mediation analysis using natural effect models.
 Journal of Statistical Software. 76(11).
 
-VanderWeele TJ. A unification of mediation and interaction: a 4-way
-decomposition (2014). Epidemiology. 25(5): 749 - 61.
+VanderWeele TJ (2014). A unification of mediation and interaction: a
+4-way decomposition. Epidemiology. 25(5): 749 - 61.
 
-Imai K, Keele L, Tingley D. A general approach to causal mediation
-analysis (2010). Psychological Methods. 15(4): 309 - 334.
+Imai K, Keele L, Tingley D (2010). A general approach to causal
+mediation analysis. Psychological Methods. 15(4): 309 - 334.
 
-Schomaker M, Heumann C. Bootstrap inference when using multiple
-imputation (2018). Statistics in Medicine. 37(14): 2252 - 2266.
+Schomaker M, Heumann C (2018). Bootstrap inference when using multiple
+imputation. Statistics in Medicine. 37(14): 2252 - 2266.
 
-VanderWeele TJ, Ding P. Sensitivity analysis in observational research:
-introducing the E-Value (2017). Annals of Internal Medicine. 167(4): 
+VanderWeele TJ, Ding P (2017). Sensitivity analysis in observational
+research: introducing the E-Value. Annals of Internal Medicine. 167(4):
 268 - 274.
 
-Smith LH, VanderWeele TJ. Mediational E-values: Approximate sensitivity
-analysis for unmeasured mediator-outcome confounding (2019).
+Smith LH, VanderWeele TJ (2019). Mediational E-values: Approximate
+sensitivity analysis for unmeasured mediator-outcome confounding.
 Epidemiology. 30(6): 835 - 837.
 
-Carrol RJ, Ruppert D, Stefanski LA, Crainiceanu C. Measurement Error in
-Nonlinear Models: A Modern Perspective, Second Edition (2006). London:
+Carrol RJ, Ruppert D, Stefanski LA, Crainiceanu C (2006). Measurement
+Error in Nonlinear Models: A Modern Perspective, Second Edition. London:
 Chapman & Hall.
 
-Cook JR, Stefanski LA. Simulation-extrapolation estimation in parametric
-measurement error models (1994). Journal of the American Statistical
+Cook JR, Stefanski LA (1994). Simulation-extrapolation estimation in
+parametric measurement error models. Journal of the American Statistical
 Association, 89(428): 1314 - 1328.
 
-Küchenhoff H, Mwalili SM, Lesaffre E. A general method for dealing with
-misclassification in regression: the misclassification SIMEX (2006).
-Biometrics. 62(1): 85 - 96.
+Küchenhoff H, Mwalili SM, Lesaffre E (2006). A general method for
+dealing with misclassification in regression: the misclassification
+SIMEX. Biometrics. 62(1): 85 - 96.
 
 Stefanski LA, Cook JR. Simulation-extrapolation: the measurement error
 jackknife (1995). Journal of the American Statistical Association.
 90(432): 1247 - 56.
 
-Valeri L, Lin X, VanderWeele TJ. Mediation analysis when a continuous
-mediator is measured with error and the outcome follows a generalized
-linear model (2014). Statistics in medicine, 33(28): 4875–4890.
+Valeri L, Lin X, VanderWeele TJ (2014). Mediation analysis when a
+continuous mediator is measured with error and the outcome follows a
+generalized linear model. Statistics in medicine, 33(28): 4875–4890.
+
+Efron B (1987). Better Bootstrap Confidence Intervals. Journal of the
+American Statistical Association. 82(397): 171-185.

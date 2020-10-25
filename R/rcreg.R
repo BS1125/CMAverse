@@ -43,8 +43,8 @@
 #'
 #' @references
 #' 
-#' Carrol RJ, Ruppert D, Stefanski LA, Crainiceanu C. Measurement Error in Nonlinear Models: 
-#' A Modern Perspective, Second Edition (2006). London: Chapman & Hall.
+#' Carrol RJ, Ruppert D, Stefanski LA, Crainiceanu C (2006). Measurement Error in Nonlinear Models: 
+#' A Modern Perspective, Second Edition. London: Chapman & Hall.
 #'
 #' @examples
 #' 

@@ -74,26 +74,26 @@
 #' @seealso \link{ggcmsens}, \link{cmdag}, \link{cmest}, \link{rcreg}, \link{simexreg}.
 #'
 #' @references
-#' VanderWeele TJ, Ding P. Sensitivity analysis in observational research: introducing the 
-#' E-Value (2017). Annals of Internal Medicine. 167(4): 268 - 274.
+#' VanderWeele TJ, Ding P (2017). Sensitivity analysis in observational research: introducing the 
+#' E-Value. Annals of Internal Medicine. 167(4): 268 - 274.
 #' 
-#' Smith LH, VanderWeele TJ. Mediational E-values: Approximate sensitivity analysis for 
-#' unmeasured mediator-outcome confounding (2019). Epidemiology. 30(6): 835 - 837.
+#' Smith LH, VanderWeele TJ (2019). Mediational E-values: Approximate sensitivity analysis for 
+#' unmeasured mediator-outcome confounding. Epidemiology. 30(6): 835 - 837.
 #' 
-#' Carrol RJ, Ruppert D, Stefanski LA, Crainiceanu C. Measurement Error in Nonlinear Models: 
-#' A Modern Perspective, Second Edition (2006). London: Chapman & Hall.
+#' Carrol RJ, Ruppert D, Stefanski LA, Crainiceanu C (2006). Measurement Error in Nonlinear Models: 
+#' A Modern Perspective, Second Edition. London: Chapman & Hall.
 #' 
-#' Cook JR, Stefanski LA. Simulation-extrapolation estimation in parametric measurement error 
-#' models (1994). Journal of the American Statistical Association, 89(428): 1314 - 1328.
+#' Cook JR, Stefanski LA (1994). Simulation-extrapolation estimation in parametric measurement error 
+#' models. Journal of the American Statistical Association, 89(428): 1314 - 1328.
 #' 
-#' Küchenhoff H, Mwalili SM, Lesaffre E. A general method for dealing with misclassification 
-#' in regression: the misclassification SIMEX (2006). Biometrics. 62(1): 85 - 96.
+#' Küchenhoff H, Mwalili SM, Lesaffre E (2006). A general method for dealing with misclassification 
+#' in regression: the misclassification SIMEX. Biometrics. 62(1): 85 - 96.
 #' 
-#' Stefanski LA, Cook JR. Simulation-extrapolation: the measurement error jackknife (1995). 
+#' Stefanski LA, Cook JR (1995). Simulation-extrapolation: the measurement error jackknife. 
 #' Journal of the American Statistical Association. 90(432): 1247 - 56.
 #' 
-#' Valeri L, Lin X, VanderWeele TJ. Mediation analysis when a continuous mediator is measured 
-#' with error and the outcome follows a generalized linear model (2014). Statistics in 
+#' Valeri L, Lin X, VanderWeele TJ (2014). Mediation analysis when a continuous mediator is measured 
+#' with error and the outcome follows a generalized linear model. Statistics in 
 #' medicine, 33(28): 4875 – 4890. 
 #'
 #' @examples
@@ -241,6 +241,7 @@ cmsens <- function(object = NULL, sens = "uc", MEmethod = "simex",
     yval <- object$ref$yval
     basecval <- object$ref$basecval
     nboot <- object$methods$nboot
+    boot.ci.type <- object$methods$boot.ci.type
     nRep <- object$methods$nRep    
     multimp <- object$multimp$multimp
     args_mice <- object$multimp$args_mice

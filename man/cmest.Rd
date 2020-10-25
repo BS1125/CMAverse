@@ -35,6 +35,7 @@ cmest(
   yval = NULL,
   basecval = NULL,
   nboot = 200,
+  boot.ci.type = "per",
   nRep = 5,
   multimp = FALSE,
   ...
@@ -134,6 +135,10 @@ mean values of variable(s) in \code{basec} are used.}
 \item{nboot}{the number of boots applied (used when \code{inference} is \code{bootstrap}). 
 Default is 200.}
 
+\item{boot.ci.type}{the type of bootstrap confidence interval. If \code{per}, percentile bootstrap
+confidence intervals are estimated; if \code{bca}, bias-corrected and accelerated (BCa) bootstrap 
+confidence intervals are estimated. Default is \code{per}.}
+
 \item{nRep}{number of replications or hypothetical values of the exposure to sample for 
 each observation unit (used when \code{model} is \code{ne}). Default is \code{5}.}
 
@@ -156,14 +161,15 @@ An object of class \code{cmest} is returned:
 \item{data}{the dataset,}
 \item{methods}{a list of methods used which may include \code{model}, \code{full}, 
 \code{casecontrol}, \code{yprevalence}, \code{yrare}, \code{estimation}, \code{inference}, 
-\code{nboot} and \code{nRep},}
+\code{nboot}, \code{boot.ci.type} and \code{nRep},}
 \item{variables}{a list of variables used which may include \code{outcome}, \code{event}, 
 \code{exposure}, \code{mediator}, \code{EMint}, \code{basec} and \code{postc},}
 \item{reg.input}{a list of regressions input,}
 \item{multimp}{a list of arguments used for multiple imputation,}
 \item{ref}{reference values used which may include \code{a}, \code{astar}, \code{mval}, 
 \code{yval} and \code{basecval},}
-\item{reg.output}{a list of regressions output,}
+\item{reg.output}{a list of regressions output. If \code{multimp} is \code{TRUE}, 
+reg.output contains regressions fitted by each of the imputed dataset,}
 \item{effect.pe}{point estimates of causal effects,}
 \item{effect.se}{standard errors of causal effects,}
 \item{effect.ci.low}{the lower limits of 95\% confidence intervals of causal effects,}
@@ -387,7 +393,8 @@ exp2 <- cmest(data = cma2020, model = "rb", outcome = "contY",
 exposure = "A", mediator = c("M1", "M2"), basec = c("C1", "C2"), 
 EMint = TRUE, mreg = list("logistic", "multinomial"), 
 yreg = "linear", astar = 0, a = 1, mval = list(0, "M2_0"), 
-estimation = "imputation", inference = "bootstrap", nboot = 10)
+estimation = "imputation", inference = "bootstrap", nboot = 10,
+boot.ci.type = "bca")
 
 # multiple-mediator case with ne
 exp3 <- cmest(data = cma2020, model = "ne", outcome = "contY", 
@@ -422,9 +429,9 @@ Epidemiologic Methods. 2(1): 95 - 115.
 Tchetgen Tchetgen EJ (2013). Inverse odds ratio-weighted estimation for causal
 mediation analysis. Statistics in medicine. 32: 4567 - 4580.
 
-Nguyen QC, Osypuk TL, Schmidt NM, Glymour MM, Tchetgen Tchetgen EJ. Practical guidance
+Nguyen QC, Osypuk TL, Schmidt NM, Glymour MM, Tchetgen Tchetgen EJ (2015). Practical guidance
 for conducting mediation analysis with multiple mediators using inverse odds ratio
-weighting (2015). American Journal of Epidemiology. 181(5): 349 - 356.
+weighting. American Journal of Epidemiology. 181(5): 349 - 356.
 
 VanderWeele TJ, Tchetgen Tchetgen EJ (2017). Mediation analysis with time varying
 exposures and mediators. Journal of the Royal Statistical Society: Series B (Statistical
@@ -434,21 +441,24 @@ Robins JM (1986). A new approach to causal inference in mortality studies with a
 exposure period-Application to control of the healthy worker survivor effect. Mathematical 
 Modelling. 7: 1393 - 1512.
 
-Vansteelandt S, Bekaert M, Lange T. (2012). Imputation Strategies for the Estimation 
+Vansteelandt S, Bekaert M, Lange T (2012). Imputation Strategies for the Estimation 
 of Natural Direct and Indirect Effects. Epidemiologic Methods. 1(1): 131 - 158.
 
 Steen J, Loeys T, Moerkerke B, Vansteelandt S (2017). Medflex: an R package for
 flexible mediation analysis using natural effect models. Journal of Statistical
 Software. 76(11).
 
-VanderWeele TJ. A unification of mediation and interaction: a 4-way decomposition (2014). 
+VanderWeele TJ (2014). A unification of mediation and interaction: a 4-way decomposition. 
 Epidemiology. 25(5): 749 - 61.
 
-Imai K, Keele L, Tingley D. A general approach to causal mediation analysis (2010).
+Imai K, Keele L, Tingley D (2010). A general approach to causal mediation analysis.
 Psychological Methods. 15(4): 309 - 334.
 
-Schomaker M, Heumann C. Bootstrap inference when using multiple 
-imputation (2018). Statistics in Medicine. 37(14): 2252 - 2266.
+Schomaker M, Heumann C (2018). Bootstrap inference when using multiple 
+imputation. Statistics in Medicine. 37(14): 2252 - 2266. 
+
+Efron B (1987). Better Bootstrap Confidence Intervals. Journal of the American Statistical 
+Association. 82(397): 171-185.
 }
 \seealso{
 \link{ggcmest}, \link{cmdag}, \link{cmsens}, \link{svymultinom}.

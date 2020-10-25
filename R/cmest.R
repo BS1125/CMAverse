@@ -66,7 +66,10 @@
 #' of conditional values must follow the order of variables in \code{basec}. If \code{NULL}, 
 #' mean values of variable(s) in \code{basec} are used.
 #' @param nboot the number of boots applied (used when \code{inference} is \code{bootstrap}). 
-#' Default is 200. 
+#' Default is 200.
+#' @param boot.ci.type the type of bootstrap confidence interval. If \code{per}, percentile bootstrap
+#' confidence intervals are estimated; if \code{bca}, bias-corrected and accelerated (BCa) bootstrap 
+#' confidence intervals are estimated. Default is \code{per}.
 #' @param nRep number of replications or hypothetical values of the exposure to sample for 
 #' each observation unit (used when \code{model} is \code{ne}). Default is \code{5}.
 #' @param multimp a logical value (used when \code{data} contains missing values). If 
@@ -265,7 +268,7 @@
 #' \item{data}{the dataset,}
 #' \item{methods}{a list of methods used which may include \code{model}, \code{full}, 
 #' \code{casecontrol}, \code{yprevalence}, \code{yrare}, \code{estimation}, \code{inference}, 
-#' \code{nboot} and \code{nRep},}
+#' \code{nboot}, \code{boot.ci.type} and \code{nRep},}
 #' \item{variables}{a list of variables used which may include \code{outcome}, \code{event}, 
 #' \code{exposure}, \code{mediator}, \code{EMint}, \code{basec} and \code{postc},}
 #' \item{reg.input}{a list of regressions input,}
@@ -294,9 +297,9 @@
 #' Tchetgen Tchetgen EJ (2013). Inverse odds ratio-weighted estimation for causal
 #' mediation analysis. Statistics in medicine. 32: 4567 - 4580.
 #' 
-#' Nguyen QC, Osypuk TL, Schmidt NM, Glymour MM, Tchetgen Tchetgen EJ. Practical guidance
+#' Nguyen QC, Osypuk TL, Schmidt NM, Glymour MM, Tchetgen Tchetgen EJ (2015). Practical guidance
 #' for conducting mediation analysis with multiple mediators using inverse odds ratio
-#' weighting (2015). American Journal of Epidemiology. 181(5): 349 - 356.
+#' weighting. American Journal of Epidemiology. 181(5): 349 - 356.
 #' 
 #' VanderWeele TJ, Tchetgen Tchetgen EJ (2017). Mediation analysis with time varying
 #' exposures and mediators. Journal of the Royal Statistical Society: Series B (Statistical
@@ -306,21 +309,24 @@
 #' exposure period-Application to control of the healthy worker survivor effect. Mathematical 
 #' Modelling. 7: 1393 - 1512.
 #' 
-#' Vansteelandt S, Bekaert M, Lange T. (2012). Imputation Strategies for the Estimation 
+#' Vansteelandt S, Bekaert M, Lange T (2012). Imputation Strategies for the Estimation 
 #' of Natural Direct and Indirect Effects. Epidemiologic Methods. 1(1): 131 - 158.
 #' 
 #' Steen J, Loeys T, Moerkerke B, Vansteelandt S (2017). Medflex: an R package for
 #' flexible mediation analysis using natural effect models. Journal of Statistical
 #' Software. 76(11).
 #' 
-#' VanderWeele TJ. A unification of mediation and interaction: a 4-way decomposition (2014). 
+#' VanderWeele TJ (2014). A unification of mediation and interaction: a 4-way decomposition. 
 #' Epidemiology. 25(5): 749 - 61.
 #' 
-#' Imai K, Keele L, Tingley D. A general approach to causal mediation analysis (2010).
+#' Imai K, Keele L, Tingley D (2010). A general approach to causal mediation analysis.
 #' Psychological Methods. 15(4): 309 - 334.
 #' 
-#' Schomaker M, Heumann C. Bootstrap inference when using multiple 
-#' imputation (2018). Statistics in Medicine. 37(14): 2252 - 2266. 
+#' Schomaker M, Heumann C (2018). Bootstrap inference when using multiple 
+#' imputation. Statistics in Medicine. 37(14): 2252 - 2266. 
+#' 
+#' Efron B (1987). Better Bootstrap Confidence Intervals. Journal of the American Statistical 
+#' Association. 82(397): 171-185.
 #'
 #' @examples
 #' 
@@ -341,7 +347,8 @@
 #' exposure = "A", mediator = c("M1", "M2"), basec = c("C1", "C2"), 
 #' EMint = TRUE, mreg = list("logistic", "multinomial"), 
 #' yreg = "linear", astar = 0, a = 1, mval = list(0, "M2_0"), 
-#' estimation = "imputation", inference = "bootstrap", nboot = 10)
+#' estimation = "imputation", inference = "bootstrap", nboot = 10,
+#' boot.ci.type = "bca")
 #' 
 #' # multiple-mediator case with ne
 #' exp3 <- cmest(data = cma2020, model = "ne", outcome = "contY", 
@@ -394,7 +401,7 @@ cmest <- function(data = NULL, model = "rb",
                   yreg = NULL, mreg = NULL, wmnomreg = NULL, wmdenomreg = NULL, ereg = NULL, 
                   postcreg = NULL,
                   astar = 0, a = 1, mval = NULL, yval = NULL, basecval = NULL,
-                  nboot = 200, nRep = 5, multimp = FALSE, ...) {
+                  nboot = 200, boot.ci.type = "per", nRep = 5, multimp = FALSE, ...) {
   # function call
   cl <- match.call()
   n <- nrow(data)
@@ -447,7 +454,9 @@ cmest <- function(data = NULL, model = "rb",
   out$methods$inference <- inference
   if (inference == "bootstrap") {
     if (!is.numeric(nboot)) stop("nboot should be numeric")
+    if (!boot.ci.type %in% c("per", "bca")) stop("Select boot.ci.type from 'per', 'bca'")
     out$methods$nboot <- nboot
+    out$methods$boot.ci.type <- boot.ci.type
   }
   # outcome
   if (length(outcome) == 0) stop("Unspecified outcome")
@@ -763,7 +772,10 @@ print.cmest <- function(x, ...) {
   if (x$methods$estimation == "paramfunc") est_str <- "Closed-form parameter function estimation"
   if (x$methods$estimation == "imputation") est_str <- "Direct counterfactual imputation estimation"
   if (x$methods$inference == "delta") inf_str <- "delta method standard errors, confidence intervals and p-values"
-  if (x$methods$inference == "bootstrap") inf_str <- "bootstrap standard errors, percentile confidence intervals and p-values"
+  if (x$methods$inference == "bootstrap") {
+    if (x$methods$boot.ci.type == "per") inf_str <- "bootstrap standard errors, percentile confidence intervals and p-values"
+    if (x$methods$boot.ci.type == "bca") inf_str <- "bootstrap standard errors, bias-corrected and accelerated confidence intervals and p-values"
+  }
   if (x$methods$model != "ne" && (x$methods$casecontrol)) cat("Causal Mediation Analysis for a Case Control Study via the ")
   if (!(x$methods$model != "ne" && (x$methods$casecontrol))) cat("Causal Mediation Analysis via the ")
   cat(model_str)
@@ -1051,7 +1063,10 @@ print.summary.cmest <- function(x, digits = 4, ...) {
   if (x$methods$estimation == "paramfunc") est_str <- "Closed-form parameter function estimation"
   if (x$methods$estimation == "imputation") est_str <- "Direct counterfactual imputation estimation"
   if (x$methods$inference == "delta") inf_str <- "delta method standard errors, confidence intervals and p-values"
-  if (x$methods$inference == "bootstrap") inf_str <- "bootstrap standard errors, percentile confidence intervals and p-values"
+  if (x$methods$inference == "bootstrap") {
+    if (x$methods$boot.ci.type == "per") inf_str <- "bootstrap standard errors, percentile confidence intervals and p-values"
+    if (x$methods$boot.ci.type == "bca") inf_str <- "bootstrap standard errors, bias-corrected and accelerated confidence intervals and p-values"
+  }
   if (x$methods$model != "ne" && (x$methods$casecontrol)) cat("Causal Mediation Analysis for a Case Control Study via the ")
   if (!(x$methods$model != "ne" && (x$methods$casecontrol))) cat("Causal Mediation Analysis via the ")
   cat(model_str)

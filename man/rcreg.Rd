@@ -196,8 +196,8 @@ reg_rc <- rcreg(reg = reg_naive, data = data, MEvariable = "x2_error",
 
 }
 \references{
-Carrol RJ, Ruppert D, Stefanski LA, Crainiceanu C. Measurement Error in Nonlinear Models: 
-A Modern Perspective, Second Edition (2006). London: Chapman & Hall.
+Carrol RJ, Ruppert D, Stefanski LA, Crainiceanu C (2006). Measurement Error in Nonlinear Models: 
+A Modern Perspective, Second Edition. London: Chapman & Hall.
 }
 \seealso{
 \code{\link{simexreg}}, \code{cmsens}, \code{\link{cmest}}

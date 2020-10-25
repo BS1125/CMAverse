@@ -243,9 +243,10 @@ estinf <- function() {
       if (inference == "bootstrap") {
         # bootstrap results
         boots <- boot(data = data, statistic = est.rb, R = nboot, outReg = FALSE, full = full)
-        # bootstrap percentile CIs
-        effect.ci.low <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 0.025, na.rm = TRUE))
-        effect.ci.high <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 0.975, na.rm = TRUE))
+        # bootstrap CIs
+        effect.ci <- boot.ci(boots = boots)
+        effect.ci.low <- effect.ci[, 1]
+        effect.ci.high <- effect.ci[, 2]
         # bootstrap p-values
         effect.pval <- sapply(1:n_effect, function(x) boot.pval(boots = boots$t[, x], pe = effect.pe[x]))
       } else if (inference == "delta") {
@@ -289,9 +290,10 @@ estinf <- function() {
         environment(boot.step) <- environment()
         # bootstrap results
         boots <- boot(data = data, statistic = boot.step, R = nboot)
-        # bootstrap percentile CIs
-        effect.ci.low <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 0.025, na.rm=TRUE))
-        effect.ci.high <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 0.975, na.rm=TRUE))
+        # bootstrap CIs
+        effect.ci <- boot.ci(boots = boots)
+        effect.ci.low <- effect.ci[, 1]
+        effect.ci.high <- effect.ci[, 2]
         # bootstrap p-values
         effect.pval <- sapply(1:n_effect, function(x) boot.pval(boots = boots$t[, x], pe = effect.pe[x]))
       } else if (inference == "delta") {
@@ -359,9 +361,10 @@ estinf <- function() {
       out$reg.output <- est$reg.output
       # bootstrap results
       boots <- boot(data = data, statistic = est.gformula, R = nboot, outReg = FALSE, full = full)
-      # bootstrap percentile CIs
-      effect.ci.low <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = (1 - 0.95)/2, na.rm = TRUE))
-      effect.ci.high <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 1 - (1 - 0.95)/2, na.rm = TRUE))
+      # bootstrap CIs
+      effect.ci <- boot.ci(boots = boots)
+      effect.ci.low <- effect.ci[, 1]
+      effect.ci.high <- effect.ci[, 2]
       # bootstrap p-values
       effect.pval <- sapply(1:n_effect, function(x) boot.pval(boots = boots$t[, x], pe = effect.pe[x]))
     } else {
@@ -389,9 +392,10 @@ estinf <- function() {
       environment(boot.step) <- environment()
       # bootstrap results
       boots <- boot(data = data, statistic = boot.step, R = nboot)
-      # bootstrap percentile CIs
-      effect.ci.low <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 0.025, na.rm=TRUE))
-      effect.ci.high <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 0.975, na.rm=TRUE))
+      # bootstrap CIs
+      effect.ci <- boot.ci(boots = boots)
+      effect.ci.low <- effect.ci[, 1]
+      effect.ci.high <- effect.ci[, 2]
       # bootstrap p-values
       effect.pval <- sapply(1:n_effect, function(x) boot.pval(boots = boots$t[, x], pe = effect.pe[x]))
     }
@@ -453,9 +457,10 @@ estinf <- function() {
       out$reg.output <- est$reg.output
       # bootstrap results
       boots <- boot(data = data, statistic = est.wb, R = nboot, outReg = FALSE, full = full)
-      # bootstrap percentile CIs
-      effect.ci.low <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = (1 - 0.95)/2, na.rm = TRUE))
-      effect.ci.high <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 1 - (1 - 0.95)/2, na.rm = TRUE))
+      # bootstrap CIs
+      effect.ci <- boot.ci(boots = boots)
+      effect.ci.low <- effect.ci[, 1]
+      effect.ci.high <- effect.ci[, 2]
       # bootstrap p-values
       effect.pval <- sapply(1:n_effect, function(x) boot.pval(boots = boots$t[, x], pe = effect.pe[x]))
     } else {
@@ -482,9 +487,10 @@ estinf <- function() {
       environment(boot.step) <- environment()
       # bootstrap results
       boots <- boot(data = data, statistic = boot.step, R = nboot)
-      # bootstrap percentile CIs
-      effect.ci.low <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 0.025, na.rm=TRUE))
-      effect.ci.high <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 0.975, na.rm=TRUE))
+      # bootstrap CIs
+      effect.ci <- boot.ci(boots = boots)
+      effect.ci.low <- effect.ci[, 1]
+      effect.ci.high <- effect.ci[, 2]
       # bootstrap p-values
       effect.pval <- sapply(1:n_effect, function(x) boot.pval(boots = boots$t[, x], pe = effect.pe[x]))
     }
@@ -538,9 +544,10 @@ estinf <- function() {
       out$reg.output <- est$reg.output
       # bootstrap results
       boots <- boot(data = data, statistic = est.iorw, R = nboot, outReg = FALSE, full = full)
-      # bootstrap percentile CIs
-      effect.ci.low <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 0.025, na.rm = TRUE))
-      effect.ci.high <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 0.975, na.rm = TRUE))
+      # bootstrap CIs
+      effect.ci <- boot.ci(boots = boots)
+      effect.ci.low <- effect.ci[, 1]
+      effect.ci.high <- effect.ci[, 2]
       # bootstrap p-values
       effect.pval <- sapply(1:n_effect, function(x) boot.pval(boots = boots$t[, x], pe = effect.pe[x]))
     } else {
@@ -567,9 +574,10 @@ estinf <- function() {
       environment(boot.step) <- environment()
       # bootstrap results
       boots <- boot(data = data, statistic = boot.step, R = nboot)
-      # bootstrap percentile CIs
-      effect.ci.low <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 0.025, na.rm=TRUE))
-      effect.ci.high <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 0.975, na.rm=TRUE))
+      # bootstrap CIs
+      effect.ci <- boot.ci(boots = boots)
+      effect.ci.low <- effect.ci[, 1]
+      effect.ci.high <- effect.ci[, 2]
       # bootstrap p-values
       effect.pval <- sapply(1:n_effect, function(x) boot.pval(boots = boots$t[, x], pe = effect.pe[x]))
     }
@@ -615,11 +623,11 @@ estinf <- function() {
             is_multinom_mreg[p] | is_polr_mreg[p])) stop(
               "model = 'msm' only supports categorical mediators")
       if (!((is_glm_wmnomreg[p] && (family_wmnomreg[[p]]$family %in% c("binomial", "quasibinomial", "multinom") |
-                                 startsWith(family_wmnomreg[[p]]$family, "Ordered Categorical"))) |
+                                    startsWith(family_wmnomreg[[p]]$family, "Ordered Categorical"))) |
             is_multinom_wmnomreg[p] | is_polr_wmnomreg[p])) stop(
               "model = 'msm' only supports categorical mediators")
       if (!((is_glm_wmdenomreg[p] && (family_wmdenomreg[[p]]$family %in% c("binomial", "quasibinomial", "multinom") |
-                                    startsWith(family_wmdenomreg[[p]]$family, "Ordered Categorical"))) |
+                                      startsWith(family_wmdenomreg[[p]]$family, "Ordered Categorical"))) |
             is_multinom_wmdenomreg[p] | is_polr_wmdenomreg[p])) stop(
               "model = 'msm' only supports categorical mediators")
     }
@@ -633,9 +641,10 @@ estinf <- function() {
       out$reg.output <- est$reg.output
       # bootstrap results
       boots <- boot(data = data, statistic = est.msm, R = nboot, outReg = FALSE, full = full)
-      # bootstrap percentile CIs
-      effect.ci.low <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 0.025, na.rm = TRUE))
-      effect.ci.high <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 0.975, na.rm = TRUE))
+      # bootstrap CIs
+      effect.ci <- boot.ci(boots = boots)
+      effect.ci.low <- effect.ci[, 1]
+      effect.ci.high <- effect.ci[, 2]
       # bootstrap p-values
       effect.pval <- sapply(1:n_effect, function(x) boot.pval(boots = boots$t[, x], pe = effect.pe[x]))
     } else {
@@ -663,9 +672,10 @@ estinf <- function() {
       environment(boot.step) <- environment()
       # bootstrap results
       boots <- boot(data = data, statistic = boot.step, R = nboot)
-      # bootstrap percentile CIs
-      effect.ci.low <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 0.025, na.rm=TRUE))
-      effect.ci.high <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 0.975, na.rm=TRUE))
+      # bootstrap CIs
+      effect.ci <- boot.ci(boots = boots)
+      effect.ci.low <- effect.ci[, 1]
+      effect.ci.high <- effect.ci[, 2]
       # bootstrap p-values
       effect.pval <- sapply(1:n_effect, function(x) boot.pval(boots = boots$t[, x], pe = effect.pe[x]))
     }
@@ -731,9 +741,10 @@ estinf <- function() {
       out$reg.output <- est$reg.output
       # bootstrap results
       boots <- boot(data = data, statistic = est.ne, R = nboot, outReg = FALSE, full = full)
-      # bootstrap percentile CIs
-      effect.ci.low <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 0.025, na.rm = TRUE))
-      effect.ci.high <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 0.975, na.rm = TRUE))
+      # bootstrap CIs
+      effect.ci <- boot.ci(boots = boots)
+      effect.ci.low <- effect.ci[, 1]
+      effect.ci.high <- effect.ci[, 2]
       # bootstrap p-values
       effect.pval <- sapply(1:n_effect, function(x) boot.pval(boots = boots$t[, x], pe = effect.pe[x]))
     } else {
@@ -759,9 +770,10 @@ estinf <- function() {
       environment(boot.step) <- environment()
       # bootstrap results
       boots <- boot(data = data, statistic = boot.step, R = nboot)
-      # bootstrap percentile CIs
-      effect.ci.low <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 0.025, na.rm=TRUE))
-      effect.ci.high <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 0.975, na.rm=TRUE))
+      # bootstrap CIs
+      effect.ci <- boot.ci(boots = boots)
+      effect.ci.low <- effect.ci[, 1]
+      effect.ci.high <- effect.ci[, 2]
       # bootstrap p-values
       effect.pval <- sapply(1:n_effect, function(x) boot.pval(boots = boots$t[, x], pe = effect.pe[x]))
     }
@@ -798,6 +810,26 @@ estinf <- function() {
     out$effect.pval <- effect.pval
   }
   
+  return(out)
+}
+
+
+boot.ci <- function(boots) {
+  if (boot.ci.type == "per") {
+    effect.ci.low <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 0.025, na.rm = TRUE))
+    effect.ci.high <- sapply(1:n_effect, function(x) quantile(x = boots$t[, x], probs = 0.975, na.rm = TRUE))
+    out <- cbind(effect.ci.low, effect.ci.high)
+  } else if (boot.ci.type == "bca") {
+    boot.ci.bca <- function(x) {
+      z0 <- qnorm(length(which(x < mean(x)))/nboot)
+      U <- x - mean(x)
+      a <- sum(U^3)/(6*(sum(U^2))^(3/2))
+      alpha1 <- pnorm(z0 + (z0 + qnorm(0.025))/(1 - a*(z0 + qnorm(0.025))))
+      alpha2 <- pnorm(z0 + (z0 + qnorm(0.975))/(1 - a*(z0 + qnorm(0.975))))
+      quantile(x, c(alpha1, alpha2)) 
+    }
+    out <- do.call(rbind, lapply(1:n_effect, function(x) boot.ci.bca(x = boots$t[, x])))
+  }
   return(out)
 }
 
