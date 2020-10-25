@@ -7,7 +7,7 @@ globalVariables(c("data", "CIlower", "CIupper", "EMint", "Effect", "MC", "PE", "
                   "is_multinom_yreg", "is_polr_ereg", "is_polr_mreg",
                   "is_polr_postcreg", "is_polr_yreg", "is_survreg_yreg",
                   "is_svymultinom_mreg", "is_svyglm_yreg", "is_svyglm_mreg", "mediator", "model", "multimp", "mval", 
-                  "n", "nboot", "boot.ci.type", "outcome", "postc",
+                  "n", "nboot", "n_effect", "boot.ci.type", "outcome", "postc",
                   "postcreg", "basec", "basecval", "event", "weights_yreg", "y_case",
                   "y_control", "yprevalence", "yrare", "yval", "nRep", "a_lev", "y_lev", "args_mice",
                   "family_wmdenomreg", "family_wmnomreg", "is_glm_wmdenomreg", "is_glm_wmnomreg",
