@@ -30,9 +30,11 @@
 #' or \code{aft_weibull}).
 #' @param exposure variable name of the exposure.
 #' @param mediator a vector of variable name(s) of the mediator(s) following the temporal order.
-#' @param EMint a logical value (used when \code{yreg} is character and \code{model} is not 
-#' \code{iorw}). If \code{TRUE}, the outcome regression formula includes the interaction(s) 
-#' between the exposure and each of the mediator(s).
+#' @param EMint a logical value indicating the existence of exposure-mediator interaction in 
+#' \code{yreg} (used when \code{model} is not \code{iorw}). \code{TRUE} when there is 
+#' exposure-mediator interaction in \code{yreg}. If \code{TRUE} and character \code{yreg} is 
+#' provided, the outcome regression includes exposure-mediator interaction(s) between the exposure 
+#' and each of the mediator(s). 
 #' @param basec a vector of variable name(s) of the exposure-outcome confounder(s), exposure-mediator 
 #' confounder(s) and mediator-outcome confounder(s) not affected by the exposure
 #' @param postc a vector of variable name(s) of the mediator-outcome confounder(s) affected 
@@ -178,6 +180,9 @@
 #'   }
 #'   
 #' When \code{postc} is not empty, only \code{msm} and \code{gformula} can be used.
+#' 
+#' When there are mediatior-mediator interactions in \code{yreg}, only \code{wb}, \code{iorw},
+#' \code{ne} and \code{msm} can be used.
 #'   
 #' 
 #' \strong{Estimation Methods} 
@@ -224,15 +229,19 @@
 #' 
 #' \emph{Continuous Outcome}
 #' 
-#' When \code{model = "rb", "wb", "ne", "msm" or "gformula"} with an empty \code{postc}, 
-#' \code{cde} (controlled direct effect), \code{pnde} (pure natural direct effect), 
-#' \code{tnde} (total natural direct effect), \code{pnie} (pure natural indirect effect), 
-#' \code{tnie} (total natural indirect effect), \code{te} (total effect),  \code{intref} 
+#' When \code{model = "rb", "wb", "ne", "msm" or "gformula"} with an empty \code{postc} and 
+#' \code{EMint} is \code{TRUE}, \code{cde} (controlled direct effect), \code{pnde} (pure natural 
+#' direct effect), \code{tnde} (total natural direct effect), \code{pnie} (pure natural indirect 
+#' effect), \code{tnie} (total natural indirect effect), \code{te} (total effect),  \code{intref} 
 #' (reference interaction), \code{intmed} (mediated interaction), 
 #' \code{cde(prop)} (proportion \code{cde}), \code{intref(prop)} (proportion 
 #' \code{intref}), \code{intmed(prop)} (proportion \code{intmed}), \code{pnie(prop)} 
 #' (proportion \code{pnie}), \code{pm} (proportion mediated), \code{int} (proportion 
-#' attributable to interaction) and \code{pe} (proportion eliminated) are estimated. 
+#' attributable to interaction) and \code{pe} (proportion eliminated) are estimated.
+#' 
+#' When \code{model = "rb", "wb", "ne", "msm" or "gformula"} with an empty \code{postc} and 
+#' \code{EMint} is \code{FALSE}, \code{cde}, \code{pnde}, \code{tnde}, \code{pnie}, \code{tnie}, 
+#' \code{te} and \code{pm} are estimated.
 #' 
 #' When \code{postc} is not empty, \code{pnde}, \code{tnde}, \code{pnie}, \code{tnie},  
 #' \code{intref}, \code{intmed}, \code{intref(prop)}, \code{intmed(prop)}, \code{pnie(prop)}, 
@@ -244,14 +253,18 @@
 #' 
 #' \emph{Categorical, Count or Survival Outcome}
 #' 
-#' When \code{model = "rb", "wb", "ne", "msm" or "gformula"} with an empty \code{postc}, 
-#' \code{Rcde} (\code{cde} ratio), \code{Rpnde} (\code{pnde} ratio), \code{Rtnde} (\code{tnde} 
-#' ratio), \code{Rtnie} (\code{tnie} ratio), \code{Rte} (\code{te} ratio), \code{ERcde} (excess 
-#' ratio due to \code{cde}), \code{ERintref} (excess ratio due to \code{intref}), 
-#' \code{ERintmed} (excess ratio due to \code{intmed}), \code{ERpnie} (excess ratio due to 
-#' \code{pnie}), \code{ERcde(prop)} (proportion \code{ERcde}), \code{ERintref(prop)} (proportion 
-#' \code{ERintref}), \code{ERintmed(prop)} (proportion \code{ERintmed}), 
+#' When \code{model = "rb", "wb", "ne", "msm" or "gformula"} with an empty \code{postc} and
+#' \code{EMint} is \code{TRUE}, \code{Rcde} (\code{cde} ratio), \code{Rpnde} (\code{pnde} ratio), 
+#' \code{Rtnde} (\code{tnde} ratio), \code{Rpnie} (\code{Rpnie} ratio), \code{Rtnie} (\code{tnie} ratio), 
+#' \code{Rte} (\code{te} ratio), \code{ERcde} (excess ratio due to \code{cde}), \code{ERintref} (excess 
+#' ratio due to \code{intref}), \code{ERintmed} (excess ratio due to \code{intmed}), \code{ERpnie} 
+#' (excess ratio due to \code{pnie}), \code{ERcde(prop)} (proportion \code{ERcde}), 
+#' \code{ERintref(prop)} (proportion \code{ERintref}), \code{ERintmed(prop)} (proportion \code{ERintmed}), 
 #' \code{ERpnie(prop)} (proportion \code{ERpnie}), \code{pm}, \code{int} and \code{pe} are estimated. 
+#' 
+#' When \code{model = "rb", "wb", "ne", "msm" or "gformula"} with an empty \code{postc} and 
+#' \code{EMint} is \code{FALSE}, \code{Rcde}, \code{Rpnde}, \code{Rtnde}, \code{Rpnie}, \code{tnie}, 
+#' \code{te} and \code{pm} are estimated.
 #' 
 #' When \code{model = "msm" or "gformula"} with a non-empty \code{postc}, \code{Rpnde}, \code{Rtnde}, 
 #' \code{Rpnie}, \code{Rtnie},  \code{ERintref}, \code{ERintmed}, \code{ERpnie}, 
@@ -333,17 +346,25 @@
 #' \dontrun{
 #' library(CMAverse)
 #' 
-#' # single-mediator case with rb
+#' # single-mediator case with rb, no exposure-mediator interaction
 #' exp1 <- cmest(data = cma2020, model = "rb", outcome = "contY", 
 #' exposure = "A", mediator = "M2", basec = c("C1", "C2"), 
-#' EMint = TRUE, mreg = list("multinomial"), yreg = "linear", 
+#' EMint = FALSE, mreg = list("multinomial"), yreg = "linear", 
 #' astar = 0, a = 1, mval = list("M2_0"), estimation = "paramfunc", 
 #' inference = "delta")
 #' summary(exp1)
 #' 
+#' # single-mediator case with rb
+#' exp2 <- cmest(data = cma2020, model = "rb", outcome = "contY", 
+#' exposure = "A", mediator = "M2", basec = c("C1", "C2"), 
+#' EMint = TRUE, mreg = list("multinomial"), yreg = "linear", 
+#' astar = 0, a = 1, mval = list("M2_0"), estimation = "paramfunc", 
+#' inference = "delta")
+#' summary(exp2)
+#' 
 #' # multiple-mediator case with rb
 #' # 10 boots are used for illustration
-#' exp2 <- cmest(data = cma2020, model = "rb", outcome = "contY", 
+#' exp3 <- cmest(data = cma2020, model = "rb", outcome = "contY", 
 #' exposure = "A", mediator = c("M1", "M2"), basec = c("C1", "C2"), 
 #' EMint = TRUE, mreg = list("logistic", "multinomial"), 
 #' yreg = "linear", astar = 0, a = 1, mval = list(0, "M2_0"), 
@@ -351,14 +372,14 @@
 #' boot.ci.type = "bca")
 #' 
 #' # multiple-mediator case with ne
-#' exp3 <- cmest(data = cma2020, model = "ne", outcome = "contY", 
+#' exp4 <- cmest(data = cma2020, model = "ne", outcome = "contY", EMint = TRUE,
 #' exposure = "A", mediator = c("M1", "M2"), basec = c("C1", "C2"), 
 #' yreg = glm(contY ~ A + M1 + M2 + A*M1 + A*M2 + C1 + C2, family = gaussian, data = cma2020), 
 #' astar = 0, a = 1, mval = list(0, "M2_0"), estimation = "imputation", 
 #' inference = "bootstrap", nboot = 10)
 #' 
 #' # case control study with msm
-#' exp4 <- cmest(data = cma2020, model = "msm", casecontrol = TRUE, 
+#' exp5 <- cmest(data = cma2020, model = "msm", casecontrol = TRUE, 
 #' yrare = TRUE, outcome = "binY", exposure = "A", 
 #' mediator = c("M1", "M2"), EMint = TRUE, basec = c("C1", "C2"), yreg = "logistic", 
 #' ereg = "logistic", mreg = list(glm(M1 ~ A, family = binomial, 
@@ -473,10 +494,10 @@ cmest <- function(data = NULL, model = "rb",
   if (length(mediator) == 0) stop("Unspecified mediator")
   out$variables$mediator <- mediator
   # EMint
-  if (is.character(yreg) && model != "iorw") {
+  if (model != "iorw") {
     if (!is.logical(EMint)) stop("EMint should be TRUE or FALSE")
     out$variables$EMint <- EMint
-  } else if (!is.null(EMint)) warning("EMint is ignored")
+  } 
   # basec
   if (!is.null(basec)) out$variables$basec <- basec
   # postc

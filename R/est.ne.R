@@ -119,7 +119,7 @@ est.ne <- function(data = NULL, indices = NULL, outReg = FALSE, full = NULL) {
     EY11 <- weighted.mean(EY11_pred, na.rm = TRUE, w = weightsEY)
   }
   rm(weightsEY, EY0m_pred, EY1m_pred, EY00_pred, EY01_pred, EY10_pred, EY11_pred)
- 
+  
   # output causal effects on the difference scale for continuous Y
   if (family_yreg$family %in% c("gaussian", "inverse.gaussian", "Gamma", "quasi")) {
     cde <- EY1m - EY0m
@@ -130,16 +130,18 @@ est.ne <- function(data = NULL, indices = NULL, outReg = FALSE, full = NULL) {
     te <- tnie + pnde
     if (full) {
       pm <- tnie / te
-      intref <- pnde - cde
-      intmed <- tnie - pnie
-      cde_prop <- cde/te
-      intref_prop <- intref/te
-      intmed_prop <- intmed/te
-      pnie_prop <- pnie/te
-      int <- (intref + intmed)/te
-      pe <- (intref + intmed + pnie)/te
-      est <- c(cde, pnde, tnde, pnie, tnie, te, intref, intmed, cde_prop, intref_prop, 
-               intmed_prop, pnie_prop, pm, int, pe)
+      if (EMint) {
+        intref <- pnde - cde
+        intmed <- tnie - pnie
+        cde_prop <- cde/te
+        intref_prop <- intref/te
+        intmed_prop <- intmed/te
+        pnie_prop <- pnie/te
+        int <- (intref + intmed)/te
+        pe <- (intref + intmed + pnie)/te
+        est <- c(cde, pnde, tnde, pnie, tnie, te, intref, intmed, cde_prop, intref_prop, 
+                 intmed_prop, pnie_prop, pm, int, pe)
+      } else est <- c(cde, pnde, tnde, pnie, tnie, te, pm)
     } else est <- c(cde, pnde, tnde, pnie, tnie, te)
   } else if (family_yreg$family %in% c("binomial", "quasibinomial", "poisson", "quasipoisson")) {
     # output causal effects on the ratio scale for non-continuous Y
@@ -151,29 +153,31 @@ est.ne <- function(data = NULL, indices = NULL, outReg = FALSE, full = NULL) {
     logRRte <- logRRtnie + logRRpnde
     if (full) {
       pm <- (exp(logRRpnde) * (exp(logRRtnie) - 1)) / (exp(logRRte) - 1)
-      ERRcde <- (EY1m-EY0m)/EY00
-      ERRintref <- exp(logRRpnde) - 1 - ERRcde
-      ERRintmed <- exp(logRRtnie) * exp(logRRpnde) - exp(logRRpnde) - exp(logRRpnie) + 1
-      ERRpnie <- exp(logRRpnie) - 1
-      ERRte <- exp(logRRte) - 1
-      ERRcde_prop <- ERRcde/ERRte
-      ERRintmed_prop <- ERRintmed/ERRte
-      ERRintref_prop <- ERRintref/ERRte
-      ERRpnie_prop <- ERRpnie/ERRte
-      int <- (ERRintref + ERRintmed)/ERRte
-      pe <- (ERRintref + ERRintmed + ERRpnie)/ERRte
-      est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte, 
-               ERRcde, ERRintref, ERRintmed, ERRpnie,
-               ERRcde_prop, ERRintref_prop, ERRintmed_prop, ERRpnie_prop,
-               pm, int, pe)
+      if (EMint) {
+        RRcde <- (EY1m-EY0m)/EY00
+        ERRintref <- exp(logRRpnde) - 1 - ERRcde
+        ERRintmed <- exp(logRRtnie) * exp(logRRpnde) - exp(logRRpnde) - exp(logRRpnie) + 1
+        ERRpnie <- exp(logRRpnie) - 1
+        ERRte <- exp(logRRte) - 1
+        ERRcde_prop <- ERRcde/ERRte
+        ERRintmed_prop <- ERRintmed/ERRte
+        ERRintref_prop <- ERRintref/ERRte
+        ERRpnie_prop <- ERRpnie/ERRte
+        int <- (ERRintref + ERRintmed)/ERRte
+        pe <- (ERRintref + ERRintmed + ERRpnie)/ERRte
+        est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte, 
+                 ERRcde, ERRintref, ERRintmed, ERRpnie,
+                 ERRcde_prop, ERRintref_prop, ERRintmed_prop, ERRpnie_prop,
+                 pm, int, pe)
+      } else est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte, pm)
     } else est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte)
   } else stop("Unsupported yreg")
   
   # progress bar
   if (!multimp) {
-  curVal <- get("counter", envir = env)
-  assign("counter", curVal + 1, envir = env)
-  setTxtProgressBar(get("progbar", envir = env), curVal + 1)
+    curVal <- get("counter", envir = env)
+    assign("counter", curVal + 1, envir = env)
+    setTxtProgressBar(get("progbar", envir = env), curVal + 1)
   }
   if (outReg) out$est <- est
   if (!outReg) out <- est

@@ -184,6 +184,7 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       te <- pnde + tnie
       if (full) {
         pm <- tnie / te
+        if (EMint) {
         intref <- pnde - cde
         intmed <- tnie - pnie
         cde_prop <- cde/te
@@ -194,6 +195,7 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
         pe <- (intref+intmed+pnie)/te
         est <- unname(c(cde, pnde, tnde, pnie, tnie, te, intref, intmed, cde_prop, intref_prop, 
                         intmed_prop, pnie_prop, pm, int, pe))
+        } else est <- unname(c(cde, pnde, tnde, pnie, tnie, te, pm))
       } else est <- unname(c(cde, pnde, tnde, pnie, tnie, te))
     } else {
       if ((is_lm_mreg[1] | (is_glm_mreg[1])) && family_mreg[[1]]$family == "gaussian") {
@@ -208,7 +210,7 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
           0.5 * variance * (sum(theta3 ^ 2 * a) - sum(theta3 ^ 2 * astar))
         logRRpnie <- theta2 * (sum(beta1 * a) - sum(beta1 * astar)) + sum(theta3  * astar) * (sum(beta1 * a) - sum(beta1 * astar))
         logRRtnie <- theta2 * (sum(beta1 * a) - sum(beta1 * astar)) + sum(theta3  * a) * (sum(beta1 * a) - sum(beta1 * astar))
-        if (full) ERRcde <- (exp(sum(theta1 * a) - sum(theta1 * astar) + sum(theta3  * a) * mstar) -
+        if (full && EMint) ERRcde <- (exp(sum(theta1 * a) - sum(theta1 * astar) + sum(theta3  * a) * mstar) -
                                exp(sum(theta3 * astar) * mstar)) * exp(theta2 * mstar - (theta2 + sum(theta3 * astar)) *
                                                                          (beta0 + sum(beta1 * astar) + covariatesTerm) -
                                                                          0.5 * (theta2 + sum(theta3 * astar)) ^ 2 * variance)
@@ -231,7 +233,7 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
                             (1 + sum(exp(theta2 + theta3 %*% a + beta0 + beta1 %*% a + covariatesTerm)))) /
                            ((1 + sum(exp(beta0 + beta1 %*% a + covariatesTerm))) *
                               (1 + sum(exp(theta2 + theta3 %*% a + beta0 + beta1 %*% astar + covariatesTerm)))))
-        if (full) ERRcde <- exp(sum(theta2*mstar)) * (exp(sum(theta1 * a) - sum(theta1 * astar) +
+        if (full && EMint) ERRcde <- exp(sum(theta2*mstar)) * (exp(sum(theta1 * a) - sum(theta1 * astar) +
                                                             ifelse(sum(mstar) == 0, 0, theta3[which(mstar == 1),] %*% a)) -
                                                         exp(ifelse(sum(mstar) == 0, 0, theta3[which(mstar == 1),] %*% astar))) *
           (1 + sum(exp(beta0 + beta1 %*% astar + covariatesTerm))) /
@@ -240,6 +242,7 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       logRRte <- logRRtnie + logRRpnde
       if (full) {
         pm <- (exp(logRRpnde) * (exp(logRRtnie) - 1)) / (exp(logRRte) - 1)
+        if (EMint) {
         ERRintref <- exp(logRRpnde) - 1 - ERRcde
         ERRintmed <- exp(logRRtnie) * exp(logRRpnde) - exp(logRRpnde) - exp(logRRpnie) + 1
         ERRpnie <- exp(logRRpnie) - 1
@@ -254,6 +257,7 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
                         ERRcde, ERRintref, ERRintmed, ERRpnie,
                         ERRcde_prop, ERRintref_prop, ERRintmed_prop, ERRpnie_prop,
                         pm, int, pe))
+        } else est <- unname(c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte, pm))
       } else est <- unname(c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte))
     }
     
@@ -435,6 +439,7 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       te <- tnie + pnde
       if (full) {
         pm <- tnie / te
+        if (EMint) {
         intref <- pnde - cde
         intmed <- tnie - pnie
         cde_prop <- cde/te
@@ -445,6 +450,7 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
         pe <- (intref + intmed + pnie)/te
         est <- c(cde, pnde, tnde, pnie, tnie, te, intref, intmed, cde_prop, intref_prop, 
                  intmed_prop, pnie_prop, pm, int, pe)
+        } else est <- c(cde, pnde, tnde, pnie, tnie, te, pm)
       } else est <- c(cde, pnde, tnde, pnie, tnie, te)
     } else {
       # output causal effects on the ratio scale for non-continuous Y
@@ -456,6 +462,7 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       logRRte <- logRRtnie + logRRpnde
       if (full) {
         pm <- (exp(logRRpnde) * (exp(logRRtnie) - 1)) / (exp(logRRte) - 1)
+        if (EMint) {
         ERRcde <- (EY1m-EY0m)/EY00
         ERRintref <- exp(logRRpnde) - 1 - ERRcde
         ERRintmed <- exp(logRRtnie) * exp(logRRpnde) - exp(logRRpnde) - exp(logRRpnie) + 1
@@ -471,6 +478,7 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
                  ERRcde, ERRintref, ERRintmed, ERRpnie,
                  ERRcde_prop, ERRintref_prop, ERRintmed_prop, ERRpnie_prop,
                  pm, int, pe)
+        } else est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte, pm)
       } else est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte)
     }
   }

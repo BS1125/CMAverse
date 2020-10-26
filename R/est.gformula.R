@@ -364,6 +364,7 @@ est.gformula <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRU
     te <- tnie + pnde
     if (full) {
       pm <- tnie / te
+      if (EMint) {
       intref <- pnde - cde
       intmed <- tnie - pnie
       cde_prop <- cde/te
@@ -374,6 +375,7 @@ est.gformula <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRU
       pe <- (intref + intmed + pnie)/te
       est <- c(cde, pnde, tnde, pnie, tnie, te, intref, intmed, 
                cde_prop, intref_prop, intmed_prop, pnie_prop, pm, int, pe)
+      } else est <- c(cde, pnde, tnde, pnie, tnie, te, pm)
     } else est <- c(cde, pnde, tnde, pnie, tnie, te)
   } else if (((is_lm_yreg | is_glm_yreg) &&
               (family_yreg$family %in% c("binomial", "quasibinomial", "multinom", "poisson", "quasipoisson", "ziplss") |
@@ -390,6 +392,7 @@ est.gformula <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRU
     logRRte <- logRRtnie + logRRpnde
     if (full) {
       pm <- (exp(logRRpnde) * (exp(logRRtnie) - 1)) / (exp(logRRte) - 1)
+      if (EMint) {
       ERRcde <- (EY1m-EY0m)/EY00
       ERRintref <- exp(logRRpnde) - 1 - ERRcde
       ERRintmed <- exp(logRRtnie) * exp(logRRpnde) - exp(logRRpnde) - exp(logRRpnie) + 1
@@ -405,6 +408,7 @@ est.gformula <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRU
                ERRcde, ERRintref, ERRintmed, ERRpnie,
                ERRcde_prop, ERRintref_prop, ERRintmed_prop, ERRpnie_prop,
                pm, int, pe)
+      } else est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte, pm)
     } else est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte)
   } 
   

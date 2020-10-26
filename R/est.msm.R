@@ -3,7 +3,7 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
   if (is.null(indices)) indices <- 1:n
   # resample data
   data <- data[indices, ]
-
+  
   # for case control study
   # method 1: weight subjects with y=1 by yprevalence/p(y=1) and weight subjects with y=0 by (1-yprevalence)/p(y=0)
   # method 2: fit yreg with all data and fit other regs on data among controls
@@ -39,7 +39,7 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       wa <- as.vector(wanom / wadenom)
       rm(a_lev, wa_data, wanom, wadenom_prob, category, wadenom)
     } else wa <- rep(1, n)
-
+    
     # calculate w_{m_p,i}=P(M_p=M_{p,i}|A=A_i,M_1=M_{1,i},...,M_{p-1}=M_{p-1,i})/
     # P(M_p=M_{p,i}|A=A_i,C=C_i,L=L_i,M_1=M_{1,i},...,M_{p-1}=M_{p-1,i})
     wmdenom <- wmnom <- matrix(nrow = n, ncol = length(mediator))
@@ -106,7 +106,7 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     # method 2 for a case control design
     # data among controls
     control_indices <- which(data[, outcome] == y_control)
-
+    
     if (length(basec) != 0) {
       # update ereg
       call_ereg$weights <- weights_ereg[indices][control_indices]
@@ -130,7 +130,7 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       wa <- as.vector(wanom / wadenom)
       rm(a_lev, wa_data, wanom, wadenom_prob, category, wadenom)
     } else wa <- rep(1, n)
-
+    
     # calculate w_{m_p,i}=P(M_p=M_{p,i}|A=A_i,M_1=M_{1,i},...,M_{p-1}=M_{p-1,i})/
     # P(M_p=M_{p,i}|A=A_i,C=C_i,L=L_i,M_1=M_{1,i},...,M_{p-1}=M_{p-1,i})
     wmdenom <- wmnom <- matrix(nrow = n, ncol = length(mediator))
@@ -185,7 +185,7 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       mreg[[p]] <- eval.parent(call_mreg[[p]])
     }
     rm(control_indices)
-
+    
   } else {
     # not a case control design
     if (length(basec) != 0) {
@@ -211,7 +211,7 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       wa <- as.vector(wanom / wadenom)
       rm(a_lev, wa_data, wanom, wadenom_prob, category, wadenom)
     } else wa <- rep(1, n)
-
+    
     # calculate w_{m_p,i}=P(M_p=M_{p,i}|A=A_i,M_1=M_{1,i},...,M_{p-1}=M_{p-1,i})/
     # P(M_p=M_{p,i}|A=A_i,C=C_i,L=L_i,M_1=M_{1,i},...,M_{p-1}=M_{p-1,i})
     wmdenom <- wmnom <- matrix(nrow = n, ncol = length(mediator))
@@ -267,7 +267,7 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       mreg[[p]] <- eval.parent(call_mreg[[p]])
     }
   }
-
+  
   # output list
   out <- list()
   if (outReg) {
@@ -277,7 +277,7 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     out$reg.output$wmnomreg <- wmnomreg
     if (length(basec) != 0) out$reg.output$ereg <- ereg
   }
-
+  
   # the index of the reference level for a categorical outcome
   if ((is_glm_yreg && (family_yreg$family %in% c("binomial", "quasibinomial", "multinom") |
                        startsWith(family_yreg$family, "Ordered Categorical"))) |
@@ -286,7 +286,7 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     yval_index <- switch((yval %in% y_lev) + 1, "1" = NULL, "2" = which(y_lev == yval))
     rm(y_lev)
   }
-
+  
   # simulate A
   if (is.factor(data[, exposure])) {
     a_sim <- factor(c(rep(a, n)), levels = a_lev)
@@ -295,7 +295,7 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     a_sim <- c(rep(a, n))
     astar_sim <- c(rep(astar, n))
   }
-
+  
   # design matrices for simulating mediator[p]
   mdesign_a <- data.frame(a_sim)
   mdesign_astar <- data.frame(astar_sim)
@@ -340,7 +340,7 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     m_astar[, p] <- mid_astar
   }
   rm(mdesign_a, mdesign_astar, type, mpred_a, mpred_astar, mid_a, mid_astar)
-
+  
   # simulate mstar for cde
   mstar_sim <- do.call(cbind, lapply(1:length(mediator), function(x)
     if (is.factor(data[, mediator[x]])) {
@@ -357,7 +357,7 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
   rm(a_sim, astar_sim, m_a, m_astar, mstar_sim)
   colnames(ydesign0m) <- colnames(ydesign1m) <- colnames(ydesign00) <- colnames(ydesign01) <-
     colnames(ydesign10) <- colnames(ydesign11) <- c(exposure, mediator)
-
+  
   # predict Y
   type <- ifelse(is_coxph_yreg, "risk", ifelse(is_multinom_yreg | is_polr_yreg, "probs", "response"))
   EY0m_pred <- as.matrix(predict(yreg, newdata =  ydesign0m, type = type))
@@ -367,11 +367,11 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
   EY10_pred <- as.matrix(predict(yreg, newdata =  ydesign10, type = type))
   EY11_pred <- as.matrix(predict(yreg, newdata =  ydesign11, type = type))
   rm(type, ydesign0m, ydesign1m, ydesign00, ydesign01, ydesign10, ydesign11)
-
+  
   # weights of yreg
   weightsEY <- as.vector(model.frame(yreg)$'(weights)')
   if (is.null(weightsEY)) weightsEY <- rep(1, n)
-
+  
   # categorical Y
   if ((is_glm_yreg && ((family_yreg$family %in% c("binomial", "quasibinomial", "multinom")) |
                        startsWith(family_yreg$family, "Ordered Categorical")))|
@@ -403,7 +403,7 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     EY11 <- weighted.mean(EY11_pred, na.rm = TRUE, w = weightsEY)
   }
   rm(weightsEY, EY0m_pred, EY1m_pred, EY00_pred, EY01_pred, EY10_pred, EY11_pred)
-
+  
   # output causal effects on the difference scale for continuous Y
   if ((is_lm_yreg | is_glm_yreg) &&
       (family_yreg$family %in% c("gaussian", "inverse.gaussian", "Gamma", "quasi"))) {
@@ -415,16 +415,18 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     te <- tnie + pnde
     if (full) {
       pm <- tnie / te
-      intref <- pnde - cde
-      intmed <- tnie - pnie
-      cde_prop <- cde/te
-      intref_prop <- intref/te
-      intmed_prop <- intmed/te
-      pnie_prop <- pnie/te
-      int <- (intref + intmed)/te
-      pe <- (intref + intmed + pnie)/te
-      est <- c(cde, pnde, tnde, pnie, tnie, te, intref, intmed, cde_prop, intref_prop, 
-               intmed_prop, pnie_prop, pm, int, pe)
+      if (EMint) {
+        intref <- pnde - cde
+        intmed <- tnie - pnie
+        cde_prop <- cde/te
+        intref_prop <- intref/te
+        intmed_prop <- intmed/te
+        pnie_prop <- pnie/te
+        int <- (intref + intmed)/te
+        pe <- (intref + intmed + pnie)/te
+        est <- c(cde, pnde, tnde, pnie, tnie, te, intref, intmed, cde_prop, intref_prop, 
+                 intmed_prop, pnie_prop, pm, int, pe)
+      } else est <- c(cde, pnde, tnde, pnie, tnie, te, pm)
     } else est <- c(cde, pnde, tnde, pnie, tnie, te)
   } else if (((is_lm_yreg | is_glm_yreg) &&
               (family_yreg$family %in% c("binomial", "quasibinomial", "multinom", "poisson", "quasipoisson", "ziplss") |
@@ -441,29 +443,31 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     logRRte <- logRRtnie + logRRpnde
     if (full) {
       pm <- (exp(logRRpnde) * (exp(logRRtnie) - 1)) / (exp(logRRte) - 1)
-      ERRcde <- (EY1m-EY0m)/EY00
-      ERRintref <- exp(logRRpnde) - 1 - ERRcde
-      ERRintmed <- exp(logRRtnie) * exp(logRRpnde) - exp(logRRpnde) - exp(logRRpnie) + 1
-      ERRpnie <- exp(logRRpnie) - 1
-      ERRte <- exp(logRRte) - 1
-      ERRcde_prop <- ERRcde/ERRte
-      ERRintmed_prop <- ERRintmed/ERRte
-      ERRintref_prop <- ERRintref/ERRte
-      ERRpnie_prop <- ERRpnie/ERRte
-      int <- (ERRintref + ERRintmed)/ERRte
-      pe <- (ERRintref + ERRintmed + ERRpnie)/ERRte
-      est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte, 
-               ERRcde, ERRintref, ERRintmed, ERRpnie,
-               ERRcde_prop, ERRintref_prop, ERRintmed_prop, ERRpnie_prop,
-               pm, int, pe)
+      if (EMint) {
+        ERRcde <- (EY1m-EY0m)/EY00
+        ERRintref <- exp(logRRpnde) - 1 - ERRcde
+        ERRintmed <- exp(logRRtnie) * exp(logRRpnde) - exp(logRRpnde) - exp(logRRpnie) + 1
+        ERRpnie <- exp(logRRpnie) - 1
+        ERRte <- exp(logRRte) - 1
+        ERRcde_prop <- ERRcde/ERRte
+        ERRintmed_prop <- ERRintmed/ERRte
+        ERRintref_prop <- ERRintref/ERRte
+        ERRpnie_prop <- ERRpnie/ERRte
+        int <- (ERRintref + ERRintmed)/ERRte
+        pe <- (ERRintref + ERRintmed + ERRpnie)/ERRte
+        est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte, 
+                 ERRcde, ERRintref, ERRintmed, ERRpnie,
+                 ERRcde_prop, ERRintref_prop, ERRintmed_prop, ERRpnie_prop,
+                 pm, int, pe)
+      } else est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte, pm)
     } else est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte)
   } else stop("Unsupported yreg")
-
+  
   # progress bar
   if (!multimp) {
-  curVal <- get("counter", envir = env)
-  assign("counter", curVal + 1, envir = env)
-  setTxtProgressBar(get("progbar", envir = env), curVal + 1)
+    curVal <- get("counter", envir = env)
+    assign("counter", curVal + 1, envir = env)
+    setTxtProgressBar(get("progbar", envir = env), curVal + 1)
   }
   if (outReg) out$est <- est
   if (!outReg) out <- est

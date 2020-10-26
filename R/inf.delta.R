@@ -155,6 +155,7 @@ inf.delta <- function(data = NULL, yreg = NULL, mreg = NULL) {
     te_formula <- paste0("(", tnie_formula, ")+(", pnde_formula, ")")
     if (full) {
       pm_formula <- paste0("(", tnie_formula, ")/(", te_formula, ")")
+      if (EMint) {
       intref_formula <- paste0("(", pnde_formula, ")-(", cde_formula, ")")
       intmed_formula <- paste0("(", tnie_formula, ")-(", pnie_formula, ")")
       cde_prop_formula <- paste0("(", cde_formula, ")/(", te_formula, ")")
@@ -171,6 +172,10 @@ inf.delta <- function(data = NULL, yreg = NULL, mreg = NULL) {
                             intmed_prop_formula = intmed_prop_formula, pnie_prop_formula = pnie_prop_formula,
                             pm_formula = pm_formula, int_formula = int_formula,
                             pe_formula = pe_formula)
+      } else delta_formula <- list(cde_formula = cde_formula, pnde_formula = pnde_formula,
+                                   tnde_formula = tnde_formula, pnie_formula = pnie_formula,
+                                   tnie_formula = tnie_formula, te_formula = te_formula,
+                                   pm_formula = pm_formula)
     } else delta_formula <- list(cde_formula = cde_formula, pnde_formula = pnde_formula,
                                  tnde_formula = tnde_formula, pnie_formula = pnie_formula,
                                  tnie_formula = tnie_formula, te_formula = te_formula)
@@ -208,7 +213,7 @@ inf.delta <- function(data = NULL, yreg = NULL, mreg = NULL) {
                                 paste(theta3, paste0("(", a, ")"), sep = "*", collapse = "+"), ")*((",
                                 paste(beta1, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
                                 paste(beta1, paste0("(", astar, ")"), sep = "*", collapse = "+"), "))")
-      if (full) cde_err_formula <- paste0("exp(((", paste(theta1, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
+      if (full && EMint) cde_err_formula <- paste0("exp(((", paste(theta1, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
                                           paste(theta1, paste0("(", astar, ")"), sep = "*", collapse = "+"), "))+(",
                                           paste(theta3, paste0("(", a, ")"), sep = "*", collapse = "+"), ")*", mstar, "-exp((",
                                           paste(theta3, paste0("(", astar, ")"), sep = "*", collapse = "+"),
@@ -281,7 +286,7 @@ inf.delta <- function(data = NULL, yreg = NULL, mreg = NULL) {
                                        ")+", beta0, "+(" , sapply(1:(mlevel - 1), FUN = function(x) paste(beta1[x, ], paste0("(", astar, ")"),
                                                                                                           sep = "*", collapse = "+")),
                                        ")+", XC, ")", collapse = "+"), ")))")
-      if (full) cde_err_formula <- paste0("(exp((", ifelse(sum(mstar) == 0, 0, theta2[which(mstar == 1)]), "))*(1+",
+      if (full && EMint) cde_err_formula <- paste0("(exp((", ifelse(sum(mstar) == 0, 0, theta2[which(mstar == 1)]), "))*(1+",
                                           paste0("exp(", beta0, "+(" , sapply(1:(mlevel - 1), FUN = function(x) paste(beta1[x, ], paste0("(", astar, ")"),
                                                                                                                       sep = "*", collapse = "+")),
                                                  ")+", XC, ")", collapse = "+"), ")*(exp((",
@@ -300,6 +305,7 @@ inf.delta <- function(data = NULL, yreg = NULL, mreg = NULL) {
     te_logrr_formula <- paste0("(", tnie_logrr_formula, ") + (", pnde_logrr_formula, ")")
     if (full) {
       pm_formula <- paste0("exp(", pnde_logrr_formula, ")*(exp(", tnie_logrr_formula, ")-1)/(exp(", te_logrr_formula, ")-1)")
+      if (EMint) {
       intref_err_formula <- paste0("exp(", pnde_logrr_formula, ")-1-(", cde_err_formula," )")
       intmed_err_formula <- paste0("exp(", tnie_logrr_formula, ")*exp(", pnde_logrr_formula, ")-exp(",
                                    pnde_logrr_formula, ")-exp(", pnie_logrr_formula, ")+1")
@@ -326,6 +332,10 @@ inf.delta <- function(data = NULL, yreg = NULL, mreg = NULL) {
                             pm_formula = pm_formula, 
                             int_formula = int_formula,
                             pe_formula = pe_formula)
+      } else delta_formula <- list(cde_logrr_formula = cde_logrr_formula, pnde_logrr_formula = pnde_logrr_formula,
+                                   tnde_logrr_formula = tnde_logrr_formula, pnie_logrr_formula = pnie_logrr_formula,
+                                   tnie_logrr_formula = tnie_logrr_formula, te_logrr_formula = te_logrr_formula,
+                                   pm_formula = pm_formula)
     } else delta_formula <- list(cde_logrr_formula = cde_logrr_formula, pnde_logrr_formula = pnde_logrr_formula,
                                  tnde_logrr_formula = tnde_logrr_formula, pnie_logrr_formula = pnie_logrr_formula,
                                  tnie_logrr_formula = tnie_logrr_formula, te_logrr_formula = te_logrr_formula)

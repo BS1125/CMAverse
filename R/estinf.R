@@ -320,9 +320,12 @@ estinf <- function() {
       # standard errors by bootstrapping
       if (inference == "bootstrap") effect.se <- sapply(1:n_effect, function(x) sd(boots$t[, x], na.rm = TRUE))
       # effect names
-      if (full) effect_name <- c("cde", "pnde", "tnde", "pnie", "tnie", "te", 
-                                 "intref", "intmed", "cde(prop)", "intref(prop)", "intmed(prop)", "pnie(prop)",
-                                 "pm", "int", "pe")
+      if (full) {
+        if (EMint) effect_name <- c("cde", "pnde", "tnde", "pnie", "tnie", "te", 
+                                    "intref", "intmed", "cde(prop)", "intref(prop)", "intmed(prop)", "pnie(prop)",
+                                    "pm", "int", "pe")
+        if (!EMint) effect_name <- c("cde", "pnde", "tnde", "pnie", "tnie", "te", "pm")
+      }
       if (!full) effect_name <- c("cde", "pnde", "tnde", "pnie", "tnie", "te")
     } else {
       # transform standard errors of effects in log scale
@@ -335,10 +338,13 @@ estinf <- function() {
       effect.ci.low[1:6] <- exp(effect.ci.low[1:6])
       effect.ci.high[1:6] <- exp(effect.ci.high[1:6])
       # effect names
-      if (full) effect_name <- c("Rcde", "Rpnde", "Rtnde", "Rpnie", "Rtnie", "Rte", 
-                                 "ERcde", "ERintref", "ERintmed", "ERpnie",
-                                 "ERcde(prop)", "ERintref(prop)", "ERintmed(prop)", "ERpnie(prop)",
-                                 "pm", "int", "pe")
+      if (full) {
+        if (EMint) effect_name <- c("Rcde", "Rpnde", "Rtnde", "Rpnie", "Rtnie", "Rte", 
+                                    "ERcde", "ERintref", "ERintmed", "ERpnie",
+                                    "ERcde(prop)", "ERintref(prop)", "ERintmed(prop)", "ERpnie(prop)",
+                                    "pm", "int", "pe")
+        if (!EMint) effect_name <- c("Rcde", "Rpnde", "Rtnde", "Rpnie", "Rtnie", "Rte", "pm")
+      }
       if (!full) effect_name <- c("Rcde", "Rpnde", "Rtnde", "Rpnie", "Rtnie", "Rte")
     }
     
@@ -409,14 +415,21 @@ estinf <- function() {
       # standard errors by bootstrapping
       effect.se <- sapply(1:n_effect, function(x) sd(boots$t[, x]))
       # effect names
-      if (length(postc) == 0 && full) effect_name <-
-          c("cde", "pnde", "tnde", "pnie", "tnie", "te", "intref", "intmed", "cde(prop)", 
-            "intref(prop)", "intmed(prop)", "pnie(prop)", "pm", "int", "pe")
-      if (length(postc) == 0 && !full) effect_name <- c("cde", "pnde", "tnde", "pnie", "tnie", "te")
-      if (length(postc) != 0 && full) effect_name <-
-          c("cde", "rpnde", "rtnde", "rpnie", "rtnie", "te", "rintref", "rintmed", "cde(prop)", 
-            "rintref(prop)", "rintmed(prop)", "rpnie(prop)", "rpm", "rint", "rpe")
-      if (length(postc) != 0 && !full) effect_name <- c("cde", "rpnde", "rtnde", "rpnie", "rtnie", "te")
+      if (length(postc) == 0) {
+        if (full) {
+          if (EMint) effect_name <-
+              c("cde", "pnde", "tnde", "pnie", "tnie", "te", "intref", "intmed", "cde(prop)", 
+                "intref(prop)", "intmed(prop)", "pnie(prop)", "pm", "int", "pe")
+          if (!EMint) effect_name <- c("cde", "pnde", "tnde", "pnie", "tnie", "te", "pm")
+        } else effect_name <- c("cde", "pnde", "tnde", "pnie", "tnie", "te")
+      } else {
+        if (full) {
+          if (EMint) effect_name <-
+              c("cde", "rpnde", "rtnde", "rpnie", "rtnie", "te", "rintref", "rintmed", "cde(prop)", 
+                "rintref(prop)", "rintmed(prop)", "rpnie(prop)", "rpm", "rint", "rpe")
+          if (!EMint) effect_name <- c("cde", "rpnde", "rtnde", "rpnie", "rtnie", "te", "pm")
+        } else effect_name <- c("cde", "rpnde", "rtnde", "rpnie", "rtnie", "te")
+      }
     } else {
       # transform standard errors of effects on the log scale
       effect.se <- sapply(1:n_effect, function(x) ifelse(x <= 6, sd(exp(boots$t[, x])), sd(boots$t[, x])))
@@ -425,14 +438,21 @@ estinf <- function() {
       effect.ci.low[1:6] <- exp(effect.ci.low[1:6])
       effect.ci.high[1:6] <- exp(effect.ci.high[1:6])
       # effect names
-      if (length(postc) == 0 && full) effect_name <-
-        c("Rcde", "Rpnde", "Rtnde", "Rpnie", "Rtnie", "Rte", "ERcde", "ERintref", "ERintmed", "ERpnie",
-          "ERcde(prop)", "ERintref(prop)", "ERintmed(prop)", "ERpnie(prop)", "pm", "int", "pe")
-      if (length(postc) == 0 && !full) effect_name <- c("Rcde", "Rpnde", "Rtnde", "Rpnie", "Rtnie", "Rte")
-      if (length(postc) != 0 && full) effect_name <-
-        c("Rcde", "rRpnde", "rRtnde", "rRpnie", "rRtnie", "Rte", "ERcde", "rERintref", "rERintmed", 
-          "rERpnie", "ERcde(prop)", "rERintref(prop)", "rERintmed(prop)", "rERpnie(prop)", "rpm", "rint", "rpe")
-      if (length(postc) != 0 && !full) effect_name <- c("Rcde", "rRpnde", "rRtnde", "rRpnie", "rRtnie", "Rte")
+      if (length(postc) == 0) {
+        if (full) {
+          if (EMint) effect_name <-
+              c("Rcde", "Rpnde", "Rtnde", "Rpnie", "Rtnie", "Rte", "ERcde", "ERintref", "ERintmed", "ERpnie",
+                "ERcde(prop)", "ERintref(prop)", "ERintmed(prop)", "ERpnie(prop)", "pm", "int", "pe")
+          if (!EMint) effect_name <- c("Rcde", "Rpnde", "Rtnde", "Rpnie", "Rtnie", "Rte", "pm")
+        } else effect_name <- c("Rcde", "Rpnde", "Rtnde", "Rpnie", "Rtnie", "Rte")
+      } else {
+        if (full) {
+          if (EMint) effect_name <-
+              c("Rcde", "rRpnde", "rRtnde", "rRpnie", "rRtnie", "Rte", "ERcde", "rERintref", "rERintmed", 
+                "rERpnie", "ERcde(prop)", "rERintref(prop)", "rERintmed(prop)", "rERpnie(prop)", "rpm", "rint", "rpe")
+          if (!EMint) effect_name <- c("Rcde", "rRpnde", "rRtnde", "rRpnie", "rRtnie", "Rte", "pm")
+        } else effect_name <- c("Rcde", "rRpnde", "rRtnde", "rRpnie", "rRtnie", "Rte")
+      }
     }
     names(effect.pe) <- names(effect.se) <- names(effect.ci.low) <- names(effect.ci.high) <-
       names(effect.pval) <- effect_name
@@ -506,9 +526,12 @@ estinf <- function() {
       # standard errors by bootstrapping
       effect.se <- sapply(1:n_effect, function(x) sd(boots$t[, x]))
       # effect names
-      if (full) effect_name <- c("cde", "pnde", "tnde", "pnie", "tnie", "te", 
-                                 "intref", "intmed", "cde(prop)", "intref(prop)", "intmed(prop)", "pnie(prop)",
-                                 "pm", "int", "pe")
+      if (full) {
+        if (EMint) effect_name <- c("cde", "pnde", "tnde", "pnie", "tnie", "te", 
+                                    "intref", "intmed", "cde(prop)", "intref(prop)", "intmed(prop)", "pnie(prop)",
+                                    "pm", "int", "pe")
+        if (!EMint) effect_name <- c("cde", "pnde", "tnde", "pnie", "tnie", "te", "pm")
+      }
       if (!full) effect_name <- c("cde", "pnde", "tnde", "pnie", "tnie", "te")
     } else {
       # transform standard errors of effects on the log scale
@@ -518,10 +541,13 @@ estinf <- function() {
       effect.ci.low[1:6] <- exp(effect.ci.low[1:6])
       effect.ci.high[1:6] <- exp(effect.ci.high[1:6])
       # effect names
-      if (full) effect_name <- c("Rcde", "Rpnde", "Rtnde", "Rpnie", "Rtnie", "Rte", 
-                                 "ERcde", "ERintref", "ERintmed", "ERpnie",
-                                 "ERcde(prop)", "ERintref(prop)", "ERintmed(prop)", "ERpnie(prop)",
-                                 "pm", "int", "pe")
+      if (full) {
+        if (EMint) effect_name <- c("Rcde", "Rpnde", "Rtnde", "Rpnie", "Rtnie", "Rte", 
+                                    "ERcde", "ERintref", "ERintmed", "ERpnie",
+                                    "ERcde(prop)", "ERintref(prop)", "ERintmed(prop)", "ERpnie(prop)",
+                                    "pm", "int", "pe")
+        if (!EMint) effect_name <- c("Rcde", "Rpnde", "Rtnde", "Rpnie", "Rtnie", "Rte", "pm")
+      }
       if (!full) effect_name <- c("Rcde", "Rpnde", "Rtnde", "Rpnie", "Rtnie", "Rte")
     }
     
@@ -695,16 +721,21 @@ estinf <- function() {
       # standard errors by bootstrapping
       effect.se <- sapply(1:n_effect, function(x) sd(boots$t[, x]))
       # effect names
-      if (length(postc) == 0 && full) effect_name <-
-          c("cde", "pnde", "tnde", "pnie", "tnie", "te", 
-            "intref", "intmed", "cde(prop)", "intref(prop)", "intmed(prop)", "pnie(prop)",
-            "pm", "int", "pe")
-      if (length(postc) == 0 && !full) effect_name <- c("cde", "pnde", "tnde", "pnie", "tnie", "te")
-      if (length(postc) != 0 && full) effect_name <-
-          c("cde", "rpnde", "rtnde", "rpnie", "rtnie", "te", 
-            "rintref", "rintmed", "cde(prop)", "rintref(prop)", "rintmed(prop)", "rpnie(prop)",
-            "rpm", "rint", "rpe")
-      if (length(postc) != 0 && !full) effect_name <- c("cde", "rpnde", "rtnde", "rpnie", "rtnie", "te")
+      if (length(postc) == 0) {
+        if (full) {
+          if (EMint) effect_name <-
+              c("cde", "pnde", "tnde", "pnie", "tnie", "te", "intref", "intmed", "cde(prop)", 
+                "intref(prop)", "intmed(prop)", "pnie(prop)", "pm", "int", "pe")
+          if (!EMint) effect_name <- c("cde", "pnde", "tnde", "pnie", "tnie", "te", "pm")
+        } else effect_name <- c("cde", "pnde", "tnde", "pnie", "tnie", "te")
+      } else {
+        if (full) {
+          if (EMint) effect_name <-
+              c("cde", "rpnde", "rtnde", "rpnie", "rtnie", "te", "rintref", "rintmed", "cde(prop)", 
+                "rintref(prop)", "rintmed(prop)", "rpnie(prop)", "rpm", "rint", "rpe")
+          if (!EMint) effect_name <- c("cde", "rpnde", "rtnde", "rpnie", "rtnie", "te", "pm")
+        } else effect_name <- c("cde", "rpnde", "rtnde", "rpnie", "rtnie", "te")
+      }
     } else {
       # transform standard errors of effects on the log scale
       effect.se <- sapply(1:n_effect, function(x) ifelse(x <= 6, sd(exp(boots$t[, x])), sd(boots$t[, x])))
@@ -713,20 +744,22 @@ estinf <- function() {
       effect.ci.low[1:6] <- exp(effect.ci.low[1:6])
       effect.ci.high[1:6] <- exp(effect.ci.high[1:6])
       # effect names
-      if (length(postc) == 0 && full) effect_name <-
-        c("Rcde", "Rpnde", "Rtnde", "Rpnie", "Rtnie", "Rte", 
-          "ERcde", "ERintref", "ERintmed", "ERpnie",
-          "ERcde(prop)", "ERintref(prop)", "ERintmed(prop)", "ERpnie(prop)",
-          "pm", "int", "pe")
-      if (length(postc) == 0 && !full) effect_name <- c("Rcde", "Rpnde", "Rtnde", "Rpnie", "Rtnie", "Rte")
-      if (length(postc) != 0 && full) effect_name <-
-        c("Rcde", "rRpnde", "rRtnde", "rRpnie", "rRtnie", "Rte", 
-          "ERcde", "rERintref", "rERintmed", "rERpnie",
-          "ERcde(prop)", "rERintref(prop)", "rERintmed(prop)", "rERpnie(prop)",
-          "rpm", "rint", "rpe")
-      if (length(postc) != 0 && !full) effect_name <- c("Rcde", "rRpnde", "rRtnde", "rRpnie", "rRtnie", "Rte")
+      if (length(postc) == 0) {
+        if (full) {
+          if (EMint) effect_name <-
+              c("Rcde", "Rpnde", "Rtnde", "Rpnie", "Rtnie", "Rte", "ERcde", "ERintref", "ERintmed", "ERpnie",
+                "ERcde(prop)", "ERintref(prop)", "ERintmed(prop)", "ERpnie(prop)", "pm", "int", "pe")
+          if (!EMint) effect_name <- c("Rcde", "Rpnde", "Rtnde", "Rpnie", "Rtnie", "Rte", "pm")
+        } else effect_name <- c("Rcde", "Rpnde", "Rtnde", "Rpnie", "Rtnie", "Rte")
+      } else {
+        if (full) {
+          if (EMint) effect_name <-
+              c("Rcde", "rRpnde", "rRtnde", "rRpnie", "rRtnie", "Rte", "ERcde", "rERintref", "rERintmed", 
+                "rERpnie", "ERcde(prop)", "rERintref(prop)", "rERintmed(prop)", "rERpnie(prop)", "rpm", "rint", "rpe")
+          if (!EMint) effect_name <- c("Rcde", "rRpnde", "rRtnde", "rRpnie", "rRtnie", "Rte", "pm")
+        } else effect_name <- c("Rcde", "rRpnde", "rRtnde", "rRpnie", "rRtnie", "Rte")
+      }
     }
-    
     names(effect.pe) <- names(effect.se) <- names(effect.ci.low) <- names(effect.ci.high) <-
       names(effect.pval) <- effect_name
     out$effect.pe <- effect.pe
@@ -794,9 +827,12 @@ estinf <- function() {
       # standard errors by bootstrapping
       effect.se <- sapply(1:n_effect, function(x) sd(boots$t[, x]))
       # effect names
-      if (full) effect_name <- c("cde", "pnde", "tnde", "pnie", "tnie", "te", 
-                                 "intref", "intmed", "cde(prop)", "intref(prop)", "intmed(prop)", "pnie(prop)",
-                                 "pm", "int", "pe")
+      if (full) {
+        if (EMint) effect_name <- c("cde", "pnde", "tnde", "pnie", "tnie", "te", 
+                                    "intref", "intmed", "cde(prop)", "intref(prop)", "intmed(prop)", "pnie(prop)",
+                                    "pm", "int", "pe")
+        if (!EMint) effect_name <- c("cde", "pnde", "tnde", "pnie", "tnie", "te", "pm")
+      }
       if (!full) effect_name <- c("cde", "pnde", "tnde", "pnie", "tnie", "te")
     } else {
       # transform standard errors of effects in log scale
@@ -806,10 +842,13 @@ estinf <- function() {
       effect.ci.low[1:6] <- exp(effect.ci.low[1:6])
       effect.ci.high[1:6] <- exp(effect.ci.high[1:6])
       # effect names
-      if (full) effect_name <- c("Rcde", "Rpnde", "Rtnde", "Rpnie", "Rtnie", "Rte", 
-                                 "ERcde", "ERintref", "ERintmed", "ERpnie",
-                                 "ERcde(prop)", "ERintref(prop)", "ERintmed(prop)", "ERpnie(prop)",
-                                 "pm", "int", "pe")
+      if (full) {
+        if (EMint) effect_name <- c("Rcde", "Rpnde", "Rtnde", "Rpnie", "Rtnie", "Rte", 
+                                    "ERcde", "ERintref", "ERintmed", "ERpnie",
+                                    "ERcde(prop)", "ERintref(prop)", "ERintmed(prop)", "ERpnie(prop)",
+                                    "pm", "int", "pe")
+        if (!EMint) effect_name <- c("Rcde", "Rpnde", "Rtnde", "Rpnie", "Rtnie", "Rte", "pm")
+      }
       if (!full) effect_name <- c("Rcde", "Rpnde", "Rtnde", "Rpnie", "Rtnie", "Rte")
     }
     

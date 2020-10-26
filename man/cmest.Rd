@@ -83,9 +83,11 @@ or \code{aft_weibull}).}
 
 \item{mediator}{a vector of variable name(s) of the mediator(s) following the temporal order.}
 
-\item{EMint}{a logical value (used when \code{yreg} is character and \code{model} is not 
-\code{iorw}). If \code{TRUE}, the outcome regression formula includes the interaction(s) 
-between the exposure and each of the mediator(s).}
+\item{EMint}{a logical value indicating the existence of exposure-mediator interaction in 
+\code{yreg} (used when \code{model} is not \code{iorw}). \code{TRUE} when there is 
+exposure-mediator interaction in \code{yreg}. If \code{TRUE} and character \code{yreg} is 
+provided, the outcome regression includes exposure-mediator interaction(s) between the exposure 
+and each of the mediator(s).}
 
 \item{basec}{a vector of variable name(s) of the exposure-outcome confounder(s), exposure-mediator 
 confounder(s) and mediator-outcome confounder(s) not affected by the exposure}
@@ -281,6 +283,9 @@ for \code{p=1,...,k}.
   }
   
 When \code{postc} is not empty, only \code{msm} and \code{gformula} can be used.
+
+When there are mediatior-mediator interactions in \code{yreg}, only \code{wb}, \code{iorw},
+\code{ne} and \code{msm} can be used.
   
 
 \strong{Estimation Methods} 
@@ -327,15 +332,19 @@ by \link[survival]{survreg}, etc.
 
 \emph{Continuous Outcome}
 
-When \code{model = "rb", "wb", "ne", "msm" or "gformula"} with an empty \code{postc}, 
-\code{cde} (controlled direct effect), \code{pnde} (pure natural direct effect), 
-\code{tnde} (total natural direct effect), \code{pnie} (pure natural indirect effect), 
-\code{tnie} (total natural indirect effect), \code{te} (total effect),  \code{intref} 
+When \code{model = "rb", "wb", "ne", "msm" or "gformula"} with an empty \code{postc} and 
+\code{EMint} is \code{TRUE}, \code{cde} (controlled direct effect), \code{pnde} (pure natural 
+direct effect), \code{tnde} (total natural direct effect), \code{pnie} (pure natural indirect 
+effect), \code{tnie} (total natural indirect effect), \code{te} (total effect),  \code{intref} 
 (reference interaction), \code{intmed} (mediated interaction), 
 \code{cde(prop)} (proportion \code{cde}), \code{intref(prop)} (proportion 
 \code{intref}), \code{intmed(prop)} (proportion \code{intmed}), \code{pnie(prop)} 
 (proportion \code{pnie}), \code{pm} (proportion mediated), \code{int} (proportion 
-attributable to interaction) and \code{pe} (proportion eliminated) are estimated. 
+attributable to interaction) and \code{pe} (proportion eliminated) are estimated.
+
+When \code{model = "rb", "wb", "ne", "msm" or "gformula"} with an empty \code{postc} and 
+\code{EMint} is \code{FALSE}, \code{cde}, \code{pnde}, \code{tnde}, \code{pnie}, \code{tnie}, 
+\code{te} and \code{pm} are estimated.
 
 When \code{postc} is not empty, \code{pnde}, \code{tnde}, \code{pnie}, \code{tnie},  
 \code{intref}, \code{intmed}, \code{intref(prop)}, \code{intmed(prop)}, \code{pnie(prop)}, 
@@ -347,14 +356,18 @@ When \code{model = "iorw"}, \code{te}, \code{pnde}, \code{tnie} and \code{pm} ar
 
 \emph{Categorical, Count or Survival Outcome}
 
-When \code{model = "rb", "wb", "ne", "msm" or "gformula"} with an empty \code{postc}, 
-\code{Rcde} (\code{cde} ratio), \code{Rpnde} (\code{pnde} ratio), \code{Rtnde} (\code{tnde} 
-ratio), \code{Rtnie} (\code{tnie} ratio), \code{Rte} (\code{te} ratio), \code{ERcde} (excess 
-ratio due to \code{cde}), \code{ERintref} (excess ratio due to \code{intref}), 
-\code{ERintmed} (excess ratio due to \code{intmed}), \code{ERpnie} (excess ratio due to 
-\code{pnie}), \code{ERcde(prop)} (proportion \code{ERcde}), \code{ERintref(prop)} (proportion 
-\code{ERintref}), \code{ERintmed(prop)} (proportion \code{ERintmed}), 
+When \code{model = "rb", "wb", "ne", "msm" or "gformula"} with an empty \code{postc} and
+\code{EMint} is \code{TRUE}, \code{Rcde} (\code{cde} ratio), \code{Rpnde} (\code{pnde} ratio), 
+\code{Rtnde} (\code{tnde} ratio), \code{Rpnie} (\code{Rpnie} ratio), \code{Rtnie} (\code{tnie} ratio), 
+\code{Rte} (\code{te} ratio), \code{ERcde} (excess ratio due to \code{cde}), \code{ERintref} (excess 
+ratio due to \code{intref}), \code{ERintmed} (excess ratio due to \code{intmed}), \code{ERpnie} 
+(excess ratio due to \code{pnie}), \code{ERcde(prop)} (proportion \code{ERcde}), 
+\code{ERintref(prop)} (proportion \code{ERintref}), \code{ERintmed(prop)} (proportion \code{ERintmed}), 
 \code{ERpnie(prop)} (proportion \code{ERpnie}), \code{pm}, \code{int} and \code{pe} are estimated. 
+
+When \code{model = "rb", "wb", "ne", "msm" or "gformula"} with an empty \code{postc} and 
+\code{EMint} is \code{FALSE}, \code{Rcde}, \code{Rpnde}, \code{Rtnde}, \code{Rpnie}, \code{tnie}, 
+\code{te} and \code{pm} are estimated.
 
 When \code{model = "msm" or "gformula"} with a non-empty \code{postc}, \code{Rpnde}, \code{Rtnde}, 
 \code{Rpnie}, \code{Rtnie},  \code{ERintref}, \code{ERintmed}, \code{ERpnie}, 

@@ -213,6 +213,8 @@ regrun <- function() {
                identical(class(yreg), c("gam", "glm", "lm")) | identical(class(yreg), "polr") |
                identical(class(yreg), "coxph") | identical(class(yreg), "survreg"))) {
     stop("Fit yreg by lm, glm, glm.nb, gam, multinom, polr, coxph, survreg")
+  } else {
+    if (model %in% c("rb", "gformula")) warning("When model is 'rb' or 'gformula', make sure there is no mediator-mediator interaction in yreg; ignore this warning if there isn't")
   }
   
   # for delta method inference, use survey regressions for yreg and mreg when weights are applied
