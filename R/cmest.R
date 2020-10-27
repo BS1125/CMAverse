@@ -202,8 +202,8 @@
 #' \code{aft_weibull}. \code{mreg} can be chosen from \code{linear}, \code{logistic} and 
 #' \code{multinomial}.
 #' 
-#' To use \code{paramfunc} with \code{yreg = "logistic"}, the outcome must be rare. To use 
-#' \code{paramfunc} with \code{yreg = "coxph"}, the outcome at the end of follow-up must be rare.
+#' To use \code{paramfunc} with \code{yreg = "logistic"} or \code{yreg = "coxph"}, the outcome must 
+#' be rare.
 #' 
 #' 
 #' \strong{Inference Methods}
@@ -574,12 +574,13 @@ cmest <- function(data = NULL, model = "rb",
 #' @describeIn cmest Print the results of \code{cmest} nicely
 #' @export
 print.cmest <- function(x, ...) {
+  cat("Causal Mediation Analysis\n\n")
   # print regression models used
   if (!x$multimp$multimp) {
     regnames <- names(x$reg.output)
     for (name in regnames) {
       if (name == "yreg") {
-        cat("# Outcome Regression:\n")
+        cat("# Outcome regression:\n")
         if (inherits(x$reg.output$yreg, "svyglm")) {
           x$reg.output$yreg$call <- update(x$reg.output$yreg,design = getCall(x$reg.output$yreg)$design,
                                            family = getCall(x$reg.output$yreg)$family, evaluate = FALSE)
@@ -595,25 +596,25 @@ print.cmest <- function(x, ...) {
         }
       }
       if (name == "yregTot") {
-        cat("# Outcome Regression for the Total Effect: \n")
+        cat("# Outcome regression for the total effect: \n")
         x$reg.output$yregTot$call <- update(x$reg.output$yregTot,data=getCall(x$reg.output$yregTot)$data,
                                             weights=getCall(x$reg.output$yregTot)$weights, evaluate = FALSE)
         print(x$reg.output$yregTot)
       }
       if (name == "yregDir") {
-        cat("# Outcome Regression for the Direct Effect: \n")
+        cat("# Outcome regression for the direct effect: \n")
         x$reg.output$yregDir$call <- update(x$reg.output$yregDir,data=getCall(x$reg.output$yregDir)$data,
                                             weights=getCall(x$reg.output$yregDir)$weights, evaluate = FALSE)
         print(x$reg.output$yregDir)
       }
       if (name == "ereg") {
-        cat("# Exposure Regression for Weighting: \n")
+        cat("# Exposure regression for weighting: \n")
         x$reg.output$ereg$call <- update(x$reg.output$ereg,data=getCall(x$reg.output$ereg)$data,
                                          weights=getCall(x$reg.output$ereg)$weights, evaluate = FALSE)
         print(x$reg.output$ereg)
       }
       if (name == "mreg") {
-        cat("# Mediator Regressions: \n")
+        cat("# Mediator regressions: \n")
         for (i in 1:length(x$reg.output$mreg)) {
           if (inherits(x$reg.output$mreg[[i]], "svyglm")) {
             x$reg.output$mreg[[i]]$call <- eval(bquote(update(x$reg.output$mreg[[.(i)]],
@@ -635,7 +636,7 @@ print.cmest <- function(x, ...) {
         }
       }
       if (name == "wmdenomreg") {
-        cat("# Mediator Regressions for Weighting (Denominator): \n")
+        cat("# Mediator regressions for weighting (denominator): \n")
         for (i in 1:length(x$reg.output$wmdenomreg)) {
           x$reg.output$wmdenomreg[[i]]$call <- eval(bquote(update(x$reg.output$wmdenomreg[[i]], 
                                                                   data=getCall(x$reg.output$wmdenomreg[[.(i)]])$data, 
@@ -646,7 +647,7 @@ print.cmest <- function(x, ...) {
         }
       }
       if (name == "wmnomreg") {
-        cat("# Mediator Regressions for Weighting (Nominator): \n")
+        cat("# Mediator regressions for weighting (nominator): \n")
         for (i in 1:length(x$reg.output$wmnomreg)) {
           x$reg.output$wmnomreg[[i]]$call <- eval(bquote(update(x$reg.output$wmnomreg[[i]], 
                                                                 data=getCall(x$reg.output$wmnomreg[[.(i)]])$data, 
@@ -657,7 +658,7 @@ print.cmest <- function(x, ...) {
         }
       }
       if (name == "postcreg") {
-        cat("# Regressions for Mediator-outcome Confounders Affected by the Exposure: \n")
+        cat("# Regressions for mediator-outcome confounders affected by the exposure: \n")
         for (i in 1:length(x$reg.output$postcreg)) {
           x$reg.output$postcreg[[i]]$call <- eval(bquote(update(x$reg.output$postcreg[[i]], 
                                                                 data=getCall(x$reg.output$postcreg[[.(i)]])$data, 
@@ -671,11 +672,11 @@ print.cmest <- function(x, ...) {
     }
   } else {
     for (m in 1:length(x$reg.output)){ 
-      cat(paste("# Regressions with Imputed Dataset", m, "\n\n"))
+      cat(paste("# Regressions with imputed dataset", m, "\n\n"))
       regnames <- names(x$reg.output[[m]])
       for (name in regnames) {
         if (name == "yreg") {
-          cat("## Outcome Regression: \n")
+          cat("## Outcome regression: \n")
           if (inherits(x$reg.output[[m]]$yreg, "svyglm")) {
             x$reg.output[[m]]$yreg$call <- eval(bquote(update(x$reg.output[[.(m)]]$yreg,design = getCall(x$reg.output[[.(m)]]$yreg)$design,
                                              family = getCall(x$reg.output[[.(m)]]$yreg)$family, evaluate = FALSE)))
@@ -693,7 +694,7 @@ print.cmest <- function(x, ...) {
           }
         }
         if (name == "yregTot") {
-          cat("## Outcome Regression for the Total Effect: \n")
+          cat("## Outcome regression for the total effect: \n")
           x$reg.output[[m]]$yregTot$call <- eval(bquote(update(x$reg.output[[.(m)]]$yregTot,
                                                                data=getCall(x$reg.output[[.(m)]]$yregTot)$data,
                                                                weights=getCall(x$reg.output[[.(m)]]$yregTot)$weights, 
@@ -701,7 +702,7 @@ print.cmest <- function(x, ...) {
           print(x$reg.output[[m]]$yregTot)
         }
         if (name == "yregDir") {
-          cat("## Outcome Regression for the Direct Effect: \n")
+          cat("## Outcome regression for the direct effect: \n")
           x$reg.output[[m]]$yregDir$call <- eval(bquote(update(x$reg.output[[.(m)]]$yregDir,
                                                                data=getCall(x$reg.output[[.(m)]]$yregDir)$data,
                                                                weights=getCall(x$reg.output[[.(m)]]$yregDir)$weights, 
@@ -709,7 +710,7 @@ print.cmest <- function(x, ...) {
           print(x$reg.output[[m]]$yregDir)
         }
         if (name == "ereg") {
-          cat("## Exposure Regression for Weighting: \n")
+          cat("## Exposure regression for weighting: \n")
           x$reg.output[[m]]$ereg$call <- eval(bquote(update(x$reg.output[[.(m)]]$ereg,
                                                             data=getCall(x$reg.output[[.(m)]]$ereg)$data,
                                                             weights=getCall(x$reg.output[[.(m)]]$ereg)$weights, 
@@ -717,7 +718,7 @@ print.cmest <- function(x, ...) {
           print(x$reg.output[[m]]$ereg)
         }
         if (name == "mreg") {
-          cat("## Mediator Regressions: \n")
+          cat("## Mediator regressions: \n")
           for (i in 1:length(x$reg.output[[m]]$mreg)) {
             if (inherits(x$reg.output[[m]]$mreg[[i]], "svyglm")) {
               x$reg.output[[m]]$mreg[[i]]$call <- eval(bquote(update(x$reg.output[[.(m)]]$mreg[[.(i)]],
@@ -740,7 +741,7 @@ print.cmest <- function(x, ...) {
         }
         if (name == "wmdenomreg") {
           if (!is.null(x$reg.output[[m]]$wmdenomreg)) {
-            cat("## Mediator Regressions for Weighting (Denominator): \n")
+            cat("## Mediator regressions for weighting (denominator): \n")
             for (i in 1:length(x$reg.output[[m]]$wmdenomreg)) {
               x$reg.output[[m]]$wmdenomreg[[i]]$call <- eval(bquote(update(x$reg.output[[.(m)]]$wmdenomreg[[i]], 
                                                                            data=getCall(x$reg.output[[.(m)]]$wmdenomreg[[.(i)]])$data, 
@@ -753,7 +754,7 @@ print.cmest <- function(x, ...) {
         }
         if (name == "wmnomreg") {
           if (!is.null(x$reg.output[[m]]$wmnomreg)) {
-            cat("## Mediator Regressions for Weighting (Nominator): \n")
+            cat("## Mediator regressions for weighting (nominator): \n")
             for (i in 1:length(x$reg.output[[m]]$wmnomreg)) {
               x$reg.output[[m]]$wmnomreg[[i]]$call <- eval(bquote(update(x$reg.output[[.(m)]]$wmnomreg[[i]], 
                                                                          data=getCall(x$reg.output[[.(m)]]$wmnomreg[[.(i)]])$data, 
@@ -766,7 +767,7 @@ print.cmest <- function(x, ...) {
         }
         if (name == "postcreg") {
           if (!is.null(x$reg.output[[m]]$postcreg)) {
-            cat("## Regressions for Mediator-outcome Confounders Affected by the Exposure: \n")
+            cat("## Regressions for mediator-outcome confounders affected by the exposure: \n")
             for (i in 1:length(x$reg.output[[m]]$postcreg)) {
               x$reg.output[[m]]$postcreg[[i]]$call <- eval(bquote(update(x$reg.output[[.(m)]]$postcreg[[i]], 
                                                                          data=getCall(x$reg.output[[.(m)]]$postcreg[[.(i)]])$data, 
@@ -782,14 +783,122 @@ print.cmest <- function(x, ...) {
     }
   }
   
+  # scale and legend
+  full <- x$methods$full
+  model <- x$methods$model
+  EMint <- x$variables$EMint
+  if (model == "iorw") {
+    if(x$multimp$multimp) yreg_mid <- x$reg.output[[1]]$yregTot
+    if(!x$multimp$multimp) yreg_mid <- x$reg.output$yregTot
+  } else {
+    if(x$multimp$multimp) yreg_mid <- x$reg.output[[1]]$yreg
+    if(!x$multimp$multimp) yreg_mid <- x$reg.output$yreg
+  }
+  if (inherits(yreg_mid, "rcreg") | inherits(yreg_mid, "simexreg")) yreg_mid <- yreg_mid$NAIVEreg
+  is_lm <- inherits(yreg_mid, "lm")
+  is_glm <- inherits(yreg_mid, "glm")
+  is_svyglm <- inherits(yreg_mid, "svyglm")
+  is_gam <- inherits(yreg_mid, "gam")
+  if (is_lm | is_glm) family_yreg <- family(yreg_mid)
+  is_multinom <- inherits(yreg_mid, "multinom")
+  is_svymultinom <- inherits(yreg_mid, "svymultinom")
+  is_polr <- inherits(yreg_mid, "polr")
+  is_survreg <- inherits(yreg_mid, "survreg")
+  is_coxph <- inherits(yreg_mid, "coxph")
+  if ((is_lm | is_glm) && (family_yreg$family %in% c("gaussian", "inverse.gaussian", "quasi", "Gamma"))) {
+    scale <- "mean difference scale"
+    if (model == "iorw") {
+      if (full) legend <- "(te: total effect; pnde: pure natural direct effect; tnie: total natural indirect effect; pm: proportion mediated)"   
+      if (!full) legend <- "(te: total effect; pnde: pure natural direct effect; tnie: total natural indirect effect)"
+    } else if (length(x$variables$postc) != 0) {
+      if (full) {
+        if (EMint) legend <- "(cde: controlled direct effect; rpnde: randomized analogue of pure natural direct effect; rtnde: randomized analogue of total natural direct effect; rpnie: randomized analogue of pure natural indirect effect; rtnie: randomized analogue of total natural indirect effect; te: total effect; rintref: randomized analogue of reference interaction; rintmed: randomized analogue of mediated interaction; cde(prop): proportion cde; rintref(prop): proportion rintref; rintmed(prop): proportion rintmed; rpnie(prop): proportion rpnie; rpm: randomized analogue of overall proportion mediated; rint: randomized analogue of overall proportion attributable to interaction; rpe: randomized analogue of overall proportion eliminated)"
+        if (!EMint) legend <- "(cde: controlled direct effect; rpnde: randomized analogue of pure natural direct effect; rtnde: randomized analogue of total natural direct effect; rpnie: randomized analogue of pure natural indirect effect; rtnie: randomized analogue of total natural indirect effect; te: total effect; rpm: randomized analogue of overall proportion mediated)"
+      } else legend <- "(cde: controlled direct effect; rpnde: randomized analogue of pure natural direct effect; rtnde: randomized analogue of total natural direct effect; rpnie: randomized analogue of pure natural indirect effect; rtnie: randomized analogue of total natural indirect effect; te: total effect)"
+    } else {
+      if (full) {
+        if (EMint) legend <- "(cde: controlled direct effect; pnde: pure natural direct effect; tnde: total natural direct effect; pnie: pure natural indirect effect; tnie: total natural indirect effect; te: total effect; intref: reference interaction; intmed: mediated interaction; cde(prop): proportion cde; intref(prop): proportion intref; intmed(prop): proportion intmed; pnie(prop): proportion pnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)"
+        if (!EMint) legend <- "(cde: controlled direct effect; pnde: pure natural direct effect; tnde: total natural direct effect; pnie: pure natural indirect effect; tnie: total natural indirect effect; te: total effect; pm: overall proportion mediated)"
+      } else legend <- "(cde: controlled direct effect; pnde: pure natural direct effect; tnde: total natural direct effect; pnie: pure natural indirect effect; tnie: total natural indirect effect; te: total effect)"
+    }
+  } else if ((is_lm | is_glm) && (family_yreg$family %in% c("poisson", "quasipoisson", "ziplss") |
+                                  startsWith(family_yreg$family, "Negative Binomial") |
+                                  startsWith(family_yreg$family, "Zero inflated Poisson"))) {
+    scale <- "rate ratio scale"
+    if (model == "iorw") {
+      if (full) legend <- "(Rte: total effect rate ratio; Rpnde: pure natural direct effect rate ratio; Rtnie: total natural indirect effect rate ratio; pm: proportion mediated)"   
+      if (!full) legend <- "(Rte: total effect rate ratio; Rpnde: pure natural direct effect rate ratio; Rtnie: total natural indirect effect rate ratio)" 
+    } else if (length(x$variables$postc) != 0) {
+      if (full) {
+        if (EMint) legend <- "(Rcde: controlled direct effect rate ratio; rRpnde: randomized analogue of pure natural direct effect rate ratio; rRtnde: randomized analogue of total natural direct effect rate ratio; rRpnie: randomized analogue of pure natural indirect effect rate ratio; rRtnie: randomized analogue of total natural indirect effect rate ratio; Rte: total effect rate ratio; ERcde: excess relative rate due to controlled direct effect; rERintref: randomized analogue of excess relative rate due to reference interaction; rERintmed: randomized analogue of excess relative rate due to mediated interaction; rERpnie: randomized analogue of excess relative rate due to pure natural indirect effect; ERcde(prop): proportion ERcde; rERintref(prop): proportion rERintref; rERintmed(prop): proportion rERintmed; rERpnie(prop): proportion rERpnie; rpm: randomized analogue of overall proportion mediated; rint: randomized analogue of overall proportion attributable to interaction; rpe: randomized analogue of overall proportion eliminated)"
+        if (!EMint) legend <- "(Rcde: controlled direct effect rate ratio; rRpnde: randomized analogue of pure natural direct effect rate ratio; rRtnde: randomized analogue of total natural direct effect rate ratio; rRpnie: randomized analogue of pure natural indirect effect rate ratio; rRtnie: randomized analogue of total natural indirect effect rate ratio; Rte: total effect rate ratio; rpm: randomized analogue of overall proportion mediated)"
+      } else legend <- "(Rcde: controlled direct effect rate ratio; rRpnde: randomized analogue of pure natural direct effect rate ratio; rRtnde: randomized analogue of total natural direct effect rate ratio; rRpnie: randomized analogue of pure natural indirect effect rate ratio; rRtnie: randomized analogue of total natural indirect effect rate ratio; Rte: total effect rate ratio)"
+    } else {
+      if (full) {
+        if (EMint) legend <- "(Rcde: controlled direct effect rate ratio; Rpnde: pure natural direct effect rate ratio; Rtnde: total natural direct effect rate ratio; Rpnie: pure natural indirect effect rate ratio; Rtnie: total natural indirect effect rate ratio; Rte: total effect rate ratio; ERcde: excess relative rate due to controlled direct effect; ERintref: excess relative rate due to reference interaction; ERintmed: excess relative rate due to mediated interaction; ERpnie: excess relative rate due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)"
+        if (!EMint) legend <- "(Rcde: controlled direct effect rate ratio; Rpnde: pure natural direct effect rate ratio; Rtnde: total natural direct effect rate ratio; Rpnie: pure natural indirect effect rate ratio; Rtnie: total natural indirect effect rate ratio; Rte: total effect rate ratio; pm: overall proportion mediated)"
+      } else legend <- "(Rcde: controlled direct effect rate ratio; Rpnde: pure natural direct effect rate ratio; Rtnde: total natural direct effect rate ratio; Rpnie: pure natural indirect effect rate ratio; Rtnie: total natural indirect effect rate ratio; Rte: total effect rate ratio)"
+    }
+  } else if (((is_lm | is_glm) && (family_yreg$family %in% c("binomial", "quasibinomial", "multinom") |
+                                   startsWith(family_yreg$family, "Ordered Categorical"))) |
+             is_multinom | is_polr) {
+    scale <- "risk ratio scale"
+    if (model == "iorw") {
+      if (full) legend <- "(Rte: total effect risk ratio; Rpnde: pure natural direct effect risk ratio; Rtnie: total natural indirect effect risk ratio; pm: proportion mediated)"   
+      if (!full) legend <- "(Rte: total effect risk ratio; Rpnde: pure natural direct effect risk ratio; Rtnie: total natural indirect effect risk ratio)" 
+    } else if (length(x$variables$postc) != 0) {
+      if (full) {
+        if (EMint) legend <- "(Rcde: controlled direct effect risk ratio; rRpnde: randomized analogue of pure natural direct effect risk ratio; rRtnde: randomized analogue of total natural direct effect risk ratio; rRpnie: randomized analogue of pure natural indirect effect risk ratio; rRtnie: randomized analogue of total natural indirect effect risk ratio; Rte: total effect risk ratio; ERcde: excess relative risk due to controlled direct effect; rERintref: randomized analogue of excess relative risk due to reference interaction; rERintmed: randomized analogue of excess relative risk due to mediated interaction; rERpnie: randomized analogue of excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; rERintref(prop): proportion rERintref; rERintmed(prop): proportion rERintmed; rERpnie(prop): proportion rERpnie; rpm: randomized analogue of overall proportion mediated; rint: randomized analogue of overall proportion attributable to interaction; rpe: randomized analogue of overall proportion eliminated)"
+        if (!EMint) legend <- "(Rcde: controlled direct effect risk ratio; rRpnde: randomized analogue of pure natural direct effect risk ratio; rRtnde: randomized analogue of total natural direct effect risk ratio; rRpnie: randomized analogue of pure natural indirect effect risk ratio; rRtnie: randomized analogue of total natural indirect effect risk ratio; Rte: total effect risk ratio; rpm: randomized analogue of overall proportion mediated)"
+      } else legend <- "(Rcde: controlled direct effect risk ratio; rRpnde: randomized analogue of pure natural direct effect risk ratio; rRtnde: randomized analogue of total natural direct effect risk ratio; rRpnie: randomized analogue of pure natural indirect effect risk ratio; rRtnie: randomized analogue of total natural indirect effect risk ratio; Rte: total effect risk ratio)"
+    } else {
+      if (full) {
+        if (EMint) legend <- "(Rcde: controlled direct effect risk ratio; Rpnde: pure natural direct effect risk ratio; Rtnde: total natural direct effect risk ratio; Rpnie: pure natural indirect effect risk ratio; Rtnie: total natural indirect effect risk ratio; Rte: total effect risk ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)"
+        if (!EMint) legend <- "(Rcde: controlled direct effect risk ratio; Rpnde: pure natural direct effect risk ratio; Rtnde: total natural direct effect risk ratio; Rpnie: pure natural indirect effect risk ratio; Rtnie: total natural indirect effect risk ratio; Rte: total effect risk ratio; pm: overall proportion mediated)"
+      } else legend <- "(Rcde: controlled direct effect risk ratio; Rpnde: pure natural direct effect risk ratio; Rtnde: total natural direct effect risk ratio; Rpnie: pure natural indirect effect risk ratio; Rtnie: total natural indirect effect risk ratio; Rte: total effect risk ratio)"
+    }
+  } else if (is_coxph) {
+    scale <- "hazard ratio scale"
+    if (model == "iorw") {
+      if (full) legend <- "(Rte: total effect hazard ratio; Rpnde: pure natural direct effect hazard ratio; Rtnie: total natural indirect effect hazard ratio; pm: proportion mediated)"   
+      if (!full) legend <- "(Rte: total effect hazard ratio; Rpnde: pure natural direct effect hazard ratio; Rtnie: total natural indirect effect hazard ratio)" 
+    }  else if (length(x$variables$postc) != 0) {
+      if (full) {
+        if (EMint) legend <- "(Rcde: controlled direct effect hazard ratio; rRpnde: randomized analogue of pure natural direct effect hazard ratio; rRtnde: randomized analogue of total natural direct effect hazard ratio; rRpnie: randomized analogue of pure natural indirect effect hazard ratio; rRtnie: randomized analogue of total natural indirect effect hazard ratio; Rte: total effect hazard ratio; ERcde: excess relative hazard due to controlled direct effect; rERintref: randomized analogue of excess relative hazard due to reference interaction; rERintmed: randomized analogue of excess relative hazard due to mediated interaction; rERpnie: randomized analogue of excess relative hazard due to pure natural indirect effect; ERcde(prop): proportion ERcde; rERintref(prop): proportion rERintref; rERintmed(prop): proportion rERintmed; rERpnie(prop): proportion rERpnie; rpm: randomized analogue of overall proportion mediated; rint: randomized analogue of overall proportion attributable to interaction; rpe: randomized analogue of overall proportion eliminated)"
+        if (!EMint) legend <- "(Rcde: controlled direct effect hazard ratio; rRpnde: randomized analogue of pure natural direct effect hazard ratio; rRtnde: randomized analogue of total natural direct effect hazard ratio; rRpnie: randomized analogue of pure natural indirect effect hazard ratio; rRtnie: randomized analogue of total natural indirect effect hazard ratio; Rte: total effect hazard ratio; rpm: randomized analogue of overall proportion mediated)"
+      } else legend <- "(Rcde: controlled direct effect hazard ratio; rRpnde: randomized analogue of pure natural direct effect hazard ratio; rRtnde: randomized analogue of total natural direct effect hazard ratio; rRpnie: randomized analogue of pure natural indirect effect hazard ratio; rRtnie: randomized analogue of total natural indirect effect hazard ratio; Rte: total effect hazard ratio)"
+    } else {
+      if (full) {
+        if (EMint) legend <- "(Rcde: controlled direct effect hazard ratio; Rpnde: pure natural direct effect hazard ratio; Rtnde: total natural direct effect hazard ratio; Rpnie: pure natural indirect effect hazard ratio; Rtnie: total natural indirect effect hazard ratio; Rte: total effect hazard ratio; ERcde: excess relative hazard due to controlled direct effect; ERintref: excess relative hazard due to reference interaction; ERintmed: excess relative hazard due to mediated interaction; ERpnie: excess relative hazard due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)"
+        if (!EMint) legend <- "(Rcde: controlled direct effect hazard ratio; Rpnde: pure natural direct effect hazard ratio; Rtnde: total natural direct effect hazard ratio; Rpnie: pure natural indirect effect hazard ratio; Rtnie: total natural indirect effect hazard ratio; Rte: total effect hazard ratio; pm: overall proportion mediated)"
+      } else legend <- "(Rcde: controlled direct effect hazard ratio; Rpnde: pure natural direct effect hazard ratio; Rtnde: total natural direct effect hazard ratio; Rpnie: pure natural indirect effect hazard ratio; Rtnie: total natural indirect effect hazard ratio; Rte: total effect hazard ratio)"
+    }
+  } else if (is_survreg) {
+    scale <- "mean survival scale"
+    if (model == "iorw") {
+      if (full) legend <- "(Rte: total effect mean survival ratio; Rpnde: pure natural direct effect mean survival ratio; Rtnie: total natural indirect effect mean survival ratio; pm: proportion mediated)"   
+      if (!full) legend <- "(Rte: total effect mean survival ratio; Rpnde: pure natural direct effect mean survival ratio; Rtnie: total natural indirect effect mean survival ratio)" 
+    } else if (length(x$variables$postc) != 0) {
+      if (full) {
+        if (EMint) legend <- "(Rcde: controlled direct effect mean survival ratio; rRpnde: randomized analogue of pure natural direct effect mean survival ratio; rRtnde: randomized analogue of total natural direct effect mean survival ratio; rRpnie: randomized analogue of pure natural indirect effect mean survival ratio; rRtnie: randomized analogue of total natural indirect effect mean survival ratio; Rte: total effect mean survival ratio; ERcde: excess mean survival ratio due to controlled direct effect; rERintref: randomized analogue of excess mean survival ratio due to reference interaction; rERintmed: randomized analogue of excess mean survival ratio due to mediated interaction; rERpnie: randomized analogue of excess mean survival ratio due to pure natural indirect effect; ERcde(prop): proportion ERcde; rERintref(prop): proportion rERintref; rERintmed(prop): proportion rERintmed; rERpnie(prop): proportion rERpnie; rpm: randomized analogue of overall proportion mediated; rint: randomized analogue of overall proportion attributable to interaction; rpe: randomized analogue of overall proportion eliminated)"
+        if (!EMint) legend <- "(Rcde: controlled direct effect mean survival ratio; rRpnde: randomized analogue of pure natural direct effect mean survival ratio; rRtnde: randomized analogue of total natural direct effect mean survival ratio; rRpnie: randomized analogue of pure natural indirect effect mean survival ratio; rRtnie: randomized analogue of total natural indirect effect mean survival ratio; Rte: total effect mean survival ratio; rpm: randomized analogue of overall proportion mediated)"
+      } else legend <- "(Rcde: controlled direct effect mean survival ratio; rRpnde: randomized analogue of pure natural direct effect mean survival ratio; rRtnde: randomized analogue of total natural direct effect mean survival ratio; rRpnie: randomized analogue of pure natural indirect effect mean survival ratio; rRtnie: randomized analogue of total natural indirect effect mean survival ratio; Rte: total effect mean survival ratio)"
+    } else {
+      if (full) {
+        if (EMint) legend <- "(Rcde: controlled direct effect mean survival ratio; Rpnde: pure natural direct effect mean survival ratio; Rtnde: total natural direct effect mean survival ratio; Rpnie: pure natural indirect effect mean survival ratio; Rtnie: total natural indirect effect mean survival ratio; Rte: total effect mean survival ratio; ERcde: excess mean survival ratio due to controlled direct effect; ERintref: excess mean survival ratio due to reference interaction; ERintmed: excess mean survival ratio due to mediated interaction; ERpnie: excess mean survival ratio due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)"
+        if (!EMint) legend <- "(Rcde: controlled direct effect mean survival ratio; Rpnde: pure natural direct effect mean survival ratio; Rtnde: total natural direct effect mean survival ratio; Rpnie: pure natural indirect effect mean survival ratio; Rtnie: total natural indirect effect mean survival ratio; Rte: total effect mean survival ratio; pm: overall proportion mediated)"
+      } else legend <- "(Rcde: controlled direct effect mean survival ratio; Rpnde: pure natural direct effect mean survival ratio; Rtnde: total natural direct effect mean survival ratio; Rpnie: pure natural indirect effect mean survival ratio; Rtnie: total natural indirect effect mean survival ratio; Rte: total effect mean survival ratio)"
+    }
+  }
+  
   # print causal mediation analysis results
-  if (x$methods$model == "rb") model_str <- "Regression-based Approach"
-  if (x$methods$model == "wb") model_str <- "Weighting-based Approach"
-  if (x$methods$model == "ne") model_str <- "Natural Effect Model"
-  if (x$methods$model == "iorw") model_str <- "Inverse Odds Ratio Weighting Approach"
-  if (x$methods$model == "msm") model_str <- "Marginal Structural Model"
-  if (x$methods$model == "gformula") model_str <- "G-formula Approach"
-  if (x$multimp$multimp) model_str <- paste(model_str, "with Multiple Imputation")
+  if (x$methods$model == "rb") model_str <- "regression-based approach"
+  if (x$methods$model == "wb") model_str <- "weighting-based approach"
+  if (x$methods$model == "ne") model_str <- "natural effect model"
+  if (x$methods$model == "iorw") model_str <- "inverse odds ratio weighting approach"
+  if (x$methods$model == "msm") model_str <- "marginal structural model"
+  if (x$methods$model == "gformula") model_str <- "g-formula approach"
+  if (x$multimp$multimp) model_str <- paste(model_str, "with multiple imputation")
   if (x$methods$estimation == "paramfunc") est_str <- "Closed-form parameter function estimation"
   if (x$methods$estimation == "imputation") est_str <- "Direct counterfactual imputation estimation"
   if (x$methods$inference == "delta") inf_str <- "delta method standard errors, confidence intervals and p-values"
@@ -797,15 +906,16 @@ print.cmest <- function(x, ...) {
     if (x$methods$boot.ci.type == "per") inf_str <- "bootstrap standard errors, percentile confidence intervals and p-values"
     if (x$methods$boot.ci.type == "bca") inf_str <- "bootstrap standard errors, bias-corrected and accelerated confidence intervals and p-values"
   }
-  if (x$methods$model != "ne" && (x$methods$casecontrol)) cat("Causal Mediation Analysis for a Case Control Study via the ")
-  if (!(x$methods$model != "ne" && (x$methods$casecontrol))) cat("Causal Mediation Analysis via the ")
+  if (x$methods$casecontrol) cat(paste("# Effect decomposition on the", scale, "for a Case Control Study via the "))
+  if (!(x$methods$casecontrol)) cat(paste("# Effect decomposition on the", scale, "via the "))
   cat(model_str)
   cat("\n \n")
   cat(est_str)
   cat(paste(" with \n", inf_str, "\n \n"))
   print(x$effect.pe)
   cat("\n")
-  cat("Relevant parameter values: \n")
+  cat(legend)
+  cat("\n\nRelevant variable values: \n")
   print(x$ref)
 }
 
@@ -1096,7 +1206,7 @@ print.summary.cmest <- function(x, digits = 4, ...) {
   cat(paste(" with \n", inf_str, "\n \n"))
   printCoefmat(x$summarydf, digits = digits, has.Pvalue = TRUE)
   cat("\n")
-  cat("Relevant parameter values: \n")
+  cat("Relevant variable values: \n")
   print(x$ref)
 }
 
