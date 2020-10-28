@@ -17,6 +17,7 @@
 \usage{
 simexreg(
   reg = NULL,
+  formula = NULL,
   data = NULL,
   weights = NULL,
   MEvariable = NULL,
@@ -52,6 +53,8 @@ simexreg(
 \arguments{
 \item{reg}{naive regression object. See \code{Details}.}
 
+\item{formula}{regression formula}
+
 \item{data}{new dataset for \code{reg}}
 
 \item{weights}{new weights for \code{reg}}
@@ -78,17 +81,14 @@ coefficients through Jackknife. Default is \code{FALSE}.}
 
 \item{x}{an object of class \code{simexreg}}
 
-\item{formula}{an object of class \code{simexreg}}
-
 \item{digits}{minimal number of significant digits. See \link{print.default}.}
 
 \item{evaluate}{a logical value. If \code{TRUE}, the updated call is evaluated. Default
 is \code{TRUE}.}
 }
 \value{
-If \code{MEvariable} is not in the regression formula of \code{reg}, \code{reg} is 
-returned. If \code{MEvariable} is in the regression formula of \code{yeg}, an object of 
-class \code{simexreg} is returned:
+If \code{MEvariable} is not in the regression formula, \code{reg} is returned. If 
+\code{MEvariable} is in the regression formula, an object of class \code{simexreg} is returned:
 \item{call}{the function call,}
 \item{NAIVEreg}{the naive regression object,}
 \item{ME}{a list of \code{MEvariable}, \code{MEvartype}, \code{MEerror}, \code{variance},
@@ -153,8 +153,8 @@ data <- data.frame(x1 = x1, x2_true = x2_true, x2_error = x2_error,
                    x3 = x3, y = y)
 reg_naive <- lm(y ~ x1 + x2_error + x3, data = data)
 reg_true <- lm(y ~ x1 + x2_true + x3, data = data)
-reg_simex <- simexreg(reg = reg_naive, data = data, MEvariable = "x2_error", 
-MEvartype = "con", MEerror = 0.5, variance = TRUE)
+reg_simex <- simexreg(reg = reg_naive, formula = y ~ x1 + x2_error + x3, data = data, 
+MEvariable = "x2_error", MEvartype = "con", MEerror = 0.5, variance = TRUE)
 coef(reg_simex)
 vcov(reg_simex)
 sigma(reg_simex)
@@ -186,8 +186,8 @@ data <- data.frame(x1 = x1, x2_true = x2_true, x2_error = x2_error,
                    x3 = x3, y = y)
 reg_naive <- glm(y ~ x1 + x2_error + x3, data = data, family = binomial("logit"))
 reg_true <- glm(y ~ x1 + x2_true + x3, data = data, family = binomial("logit"))
-reg_simex <- simexreg(reg = reg_naive, data = data, MEvariable = "x2_error",
-                      MEerror = MEerror, variance = TRUE, MEvartype = "cat")
+reg_simex <- simexreg(reg = reg_naive, formula = y ~ x1 + x2_error + x3, data = data, 
+MEvariable = "x2_error", MEerror = MEerror, variance = TRUE, MEvartype = "cat")
 }
                   
 }

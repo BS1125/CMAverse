@@ -17,6 +17,7 @@
 \usage{
 rcreg(
   reg = NULL,
+  formula = NULL,
   data = NULL,
   weights = NULL,
   MEvariable = NULL,
@@ -50,6 +51,8 @@ rcreg(
 \arguments{
 \item{reg}{naive regression object. See \code{Details}.}
 
+\item{formula}{regression formula}
+
 \item{data}{new dataset for \code{reg}}
 
 \item{weights}{new weights for \code{reg}}
@@ -70,17 +73,15 @@ is \code{400}.}
 
 \item{x}{an object of class \code{rcreg}}
 
-\item{formula}{an object of class \code{rcreg}}
-
 \item{digits}{minimal number of significant digits. See \link{print.default}.}
 
 \item{evaluate}{a logical value. If \code{TRUE}, the updated call is evaluated. Default
 is \code{TRUE}.}
 }
 \value{
-If \code{MEvariable} is not in the regression formula of \code{reg}, \code{reg} is 
-returned. If \code{MEvariable} is a continuous independent variable in the regression formula of 
-\code{yeg}, an object of class \code{rcreg} is returned:
+If \code{MEvariable} is not in the regression formula, \code{reg} is returned. If 
+\code{MEvariable} is a continuous independent variable in the regression formula, an 
+object of class \code{rcreg} is returned:
 \item{call}{the function call,}
 \item{NAIVEreg}{the naive regression object,}
 \item{ME}{a list of \code{MEvariable}, \code{MEerror}, \code{variance} and \code{nboot},}
@@ -144,8 +145,8 @@ data <- data.frame(x1 = x1, x2_true = x2_true, x2_error = x2_error,
                    x3 = x3, y = y)
 reg_naive <- lm(y ~ x1 + x2_error + x3, data = data)
 reg_true <- lm(y ~ x1 + x2_true + x3, data = data)
-reg_rc <- rcreg(reg = reg_naive, data = data, MEvariable = "x2_error",
-               MEerror = 0.5, variance = TRUE, nboot = 2)
+reg_rc <- rcreg(reg = reg_naive, formula = y ~ x1 + x2_error + x3,
+ data = data, MEvariable = "x2_error", MEerror = 0.5, variance = TRUE, nboot = 2)
 coef(reg_rc)
 vcov(reg_rc)
 sigma(reg_rc)
@@ -170,8 +171,8 @@ data <- data.frame(x1 = x1, x2_true = x2_true, x2_error = x2_error,
                    x3 = x3, y = y)
 reg_naive <- glm(y ~ x1 + x2_error + x3, data = data, family = binomial("logit"))
 reg_true <- glm(y ~ x1 + x2_true + x3, data = data, family = binomial("logit"))
-reg_rc <- rcreg(reg = reg_naive, data = data, MEvariable = "x2_error",
-                MEerror = 0.5, variance = TRUE, nboot = 2)
+reg_rc <- rcreg(reg = reg_naive, formula = y ~ x1 + x2_error + x3, data = data, 
+MEvariable = "x2_error", MEerror = 0.5, variance = TRUE, nboot = 2)
 
 # multinom
 n <- 1000
@@ -190,8 +191,8 @@ data <- data.frame(x1 = x1, x2_true = x2_true, x2_error = x2_error,
                    x3 = x3, y = y)
 reg_naive <- nnet::multinom(factor(y) ~ x1 + x2_error + x3, data = data)
 reg_true <- nnet::multinom(factor(y) ~ x1 + x2_true + x3, data = data)
-reg_rc <- rcreg(reg = reg_naive, data = data, MEvariable = "x2_error",
-                MEerror = 0.5, variance = TRUE, nboot = 2)
+reg_rc <- rcreg(reg = reg_naive, formula = factor(y) ~ x1 + x2_error + x3, 
+data = data, MEvariable = "x2_error", MEerror = 0.5, variance = TRUE, nboot = 2)
 }                
 
 }

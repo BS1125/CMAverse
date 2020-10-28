@@ -264,12 +264,14 @@ cmsens <- function(object = NULL, sens = "uc", MEmethod = "simex",
           if (!is.null(regs_mid[[r]])) {
             if (inherits(regs_mid[[r]], "list")) {
               regs_mid[[r]] <- lapply(1:length(regs_mid[[r]]), function(x)
-                eval(bquote(rcreg(reg = .(regs_mid[[r]][[x]]), data = .(data), 
+                eval(bquote(rcreg(reg = .(regs_mid[[r]][[x]]), formula = .(formula(regs_mid[[r]][[x]])),
+                                  data = .(data), 
                                   weights = .(model.frame(regs_mid[[r]][[x]])$'(weights)'),
                                   MEvariable = .(MEvariable), MEerror = .(MEerror[[i]]), 
                                   variance = .(variance), nboot = .(nboot.rc)))))
             } else {
-              regs_mid[[r]] <- eval(bquote(rcreg(reg = .(regs_mid[[r]]), data = .(data),
+              regs_mid[[r]] <- eval(bquote(rcreg(reg = .(regs_mid[[r]]), 
+                                                 formula = .(formula(regs_mid[[r]])), data = .(data),
                                                  weights = .(model.frame(regs_mid[[r]])$'(weights)'),
                                                  MEvariable = .(MEvariable), MEerror = .(MEerror[[i]]), 
                                                  variance = .(variance), nboot = .(nboot.rc))))
@@ -281,12 +283,14 @@ cmsens <- function(object = NULL, sens = "uc", MEmethod = "simex",
           if (!is.null(regs_mid[[r]])) {
             if (inherits(regs_mid[[r]], "list")) {
               regs_mid[[r]] <- lapply(1:length(regs_mid[[r]]), function(x)
-                eval(bquote(simexreg(reg = .(regs_mid[[r]][[x]]), data = .(data), 
+                eval(bquote(simexreg(reg = .(regs_mid[[r]][[x]]), 
+                                     formula = .(formula(regs_mid[[r]][[x]])), data = .(data), 
                                      weights = .(model.frame(regs_mid[[r]][[x]])$'(weights)'),
                                      MEvariable = .(MEvariable), MEvartype = .(MEvartype), 
                                      MEerror = .(MEerror[[i]]), variance = .(variance), 
                                      lambda = .(lambda), B = .(B)))))
-            } else regs_mid[[r]] <- eval(bquote(simexreg(reg = .(regs_mid[[r]]), data = .(data), 
+            } else regs_mid[[r]] <- eval(bquote(simexreg(reg = .(regs_mid[[r]]), 
+                                                         formula = .(formula(regs_mid[[r]])), data = .(data), 
                                                          weights = .(model.frame(regs_mid[[r]])$'(weights)'),
                                                          MEvariable = .(MEvariable), MEvartype = .(MEvartype), 
                                                          MEerror = .(MEerror[[i]]), variance = .(variance), 
@@ -339,10 +343,10 @@ print.cmsens.me <- function(x, ...) {
   cat(x$ME$MEvariable)
   cat("\nType of the variable measured with error: ")
   cat(x$ME$MEvartype)
-  cat("\n")
+  cat("\n\n")
   
   for (i in 1:length(x$sens)) {
-    cat(paste0("\n# Measurement error ", i, ": \n"))
+    cat(paste0("# Measurement error ", i, ": \n"))
     if (x$ME$MEvartype == "continuous") print(x$ME$MEerror[i])
     if (x$ME$MEvartype == "categorical") print(x$ME$MEerror[[i]])
     cat(paste0("\n## Error-corrected regressions for measurement error ", i, ": \n\n"))
@@ -689,11 +693,123 @@ print.cmsens.me <- function(x, ...) {
       }
     }
     
+    # scale and legend
+    full <- x$naive$methods$full
+    model <- x$naive$methods$model
+    EMint <- x$naive$variables$EMint
+    if (model == "iorw") {
+      if (x$naive$multimp$multimp) yreg_mid <- x$sens[[1]]$reg.output[[1]]$yregTot
+      if (!x$naive$multimp$multimp) yreg_mid <- x$sens[[1]]$reg.output$yregTot
+    } else {
+      if (x$naive$multimp$multimp) yreg_mid <- x$sens[[1]]$reg.output[[1]]$yreg
+      if (!x$naive$multimp$multimp) yreg_mid <- x$sens[[1]]$reg.output$yreg
+    }
+    if (inherits(yreg_mid, "rcreg") | inherits(yreg_mid, "simexreg")) yreg_mid <- yreg_mid$NAIVEreg
+    is_lm <- inherits(yreg_mid, "lm")
+    is_glm <- inherits(yreg_mid, "glm")
+    is_svyglm <- inherits(yreg_mid, "svyglm")
+    is_gam <- inherits(yreg_mid, "gam")
+    if (is_lm | is_glm) family_yreg <- family(yreg_mid)
+    is_multinom <- inherits(yreg_mid, "multinom")
+    is_svymultinom <- inherits(yreg_mid, "svymultinom")
+    is_polr <- inherits(yreg_mid, "polr")
+    is_survreg <- inherits(yreg_mid, "survreg")
+    is_coxph <- inherits(yreg_mid, "coxph")
+    if ((is_lm | is_glm) && (family_yreg$family %in% c("gaussian", "inverse.gaussian", "quasi", "Gamma"))) {
+      scale <- "mean difference scale"
+      if (model == "iorw") {
+        if (full) legend <- "(te: total effect; pnde: pure natural direct effect; tnie: total natural indirect effect; pm: proportion mediated)"   
+        if (!full) legend <- "(te: total effect; pnde: pure natural direct effect; tnie: total natural indirect effect)"
+      } else if (length(x$naive$variables$postc) != 0) {
+        if (full) {
+          if (EMint) legend <- "(cde: controlled direct effect; rpnde: randomized analogue of pure natural direct effect; rtnde: randomized analogue of total natural direct effect; rpnie: randomized analogue of pure natural indirect effect; rtnie: randomized analogue of total natural indirect effect; te: total effect; rintref: randomized analogue of reference interaction; rintmed: randomized analogue of mediated interaction; cde(prop): proportion cde; rintref(prop): proportion rintref; rintmed(prop): proportion rintmed; rpnie(prop): proportion rpnie; rpm: randomized analogue of overall proportion mediated; rint: randomized analogue of overall proportion attributable to interaction; rpe: randomized analogue of overall proportion eliminated)"
+          if (!EMint) legend <- "(cde: controlled direct effect; rpnde: randomized analogue of pure natural direct effect; rtnde: randomized analogue of total natural direct effect; rpnie: randomized analogue of pure natural indirect effect; rtnie: randomized analogue of total natural indirect effect; te: total effect; rpm: randomized analogue of overall proportion mediated)"
+        } else legend <- "(cde: controlled direct effect; rpnde: randomized analogue of pure natural direct effect; rtnde: randomized analogue of total natural direct effect; rpnie: randomized analogue of pure natural indirect effect; rtnie: randomized analogue of total natural indirect effect; te: total effect)"
+      } else {
+        if (full) {
+          if (EMint) legend <- "(cde: controlled direct effect; pnde: pure natural direct effect; tnde: total natural direct effect; pnie: pure natural indirect effect; tnie: total natural indirect effect; te: total effect; intref: reference interaction; intmed: mediated interaction; cde(prop): proportion cde; intref(prop): proportion intref; intmed(prop): proportion intmed; pnie(prop): proportion pnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)"
+          if (!EMint) legend <- "(cde: controlled direct effect; pnde: pure natural direct effect; tnde: total natural direct effect; pnie: pure natural indirect effect; tnie: total natural indirect effect; te: total effect; pm: overall proportion mediated)"
+        } else legend <- "(cde: controlled direct effect; pnde: pure natural direct effect; tnde: total natural direct effect; pnie: pure natural indirect effect; tnie: total natural indirect effect; te: total effect)"
+      }
+    } else if ((is_lm | is_glm) && (family_yreg$family %in% c("poisson", "quasipoisson", "ziplss") |
+                                    startsWith(family_yreg$family, "Negative Binomial") |
+                                    startsWith(family_yreg$family, "Zero inflated Poisson"))) {
+      scale <- "rate ratio scale"
+      if (model == "iorw") {
+        if (full) legend <- "(Rte: total effect rate ratio; Rpnde: pure natural direct effect rate ratio; Rtnie: total natural indirect effect rate ratio; pm: proportion mediated)"   
+        if (!full) legend <- "(Rte: total effect rate ratio; Rpnde: pure natural direct effect rate ratio; Rtnie: total natural indirect effect rate ratio)" 
+      } else if (length(x$naive$variables$postc) != 0) {
+        if (full) {
+          if (EMint) legend <- "(Rcde: controlled direct effect rate ratio; rRpnde: randomized analogue of pure natural direct effect rate ratio; rRtnde: randomized analogue of total natural direct effect rate ratio; rRpnie: randomized analogue of pure natural indirect effect rate ratio; rRtnie: randomized analogue of total natural indirect effect rate ratio; Rte: total effect rate ratio; ERcde: excess relative rate due to controlled direct effect; rERintref: randomized analogue of excess relative rate due to reference interaction; rERintmed: randomized analogue of excess relative rate due to mediated interaction; rERpnie: randomized analogue of excess relative rate due to pure natural indirect effect; ERcde(prop): proportion ERcde; rERintref(prop): proportion rERintref; rERintmed(prop): proportion rERintmed; rERpnie(prop): proportion rERpnie; rpm: randomized analogue of overall proportion mediated; rint: randomized analogue of overall proportion attributable to interaction; rpe: randomized analogue of overall proportion eliminated)"
+          if (!EMint) legend <- "(Rcde: controlled direct effect rate ratio; rRpnde: randomized analogue of pure natural direct effect rate ratio; rRtnde: randomized analogue of total natural direct effect rate ratio; rRpnie: randomized analogue of pure natural indirect effect rate ratio; rRtnie: randomized analogue of total natural indirect effect rate ratio; Rte: total effect rate ratio; rpm: randomized analogue of overall proportion mediated)"
+        } else legend <- "(Rcde: controlled direct effect rate ratio; rRpnde: randomized analogue of pure natural direct effect rate ratio; rRtnde: randomized analogue of total natural direct effect rate ratio; rRpnie: randomized analogue of pure natural indirect effect rate ratio; rRtnie: randomized analogue of total natural indirect effect rate ratio; Rte: total effect rate ratio)"
+      } else {
+        if (full) {
+          if (EMint) legend <- "(Rcde: controlled direct effect rate ratio; Rpnde: pure natural direct effect rate ratio; Rtnde: total natural direct effect rate ratio; Rpnie: pure natural indirect effect rate ratio; Rtnie: total natural indirect effect rate ratio; Rte: total effect rate ratio; ERcde: excess relative rate due to controlled direct effect; ERintref: excess relative rate due to reference interaction; ERintmed: excess relative rate due to mediated interaction; ERpnie: excess relative rate due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)"
+          if (!EMint) legend <- "(Rcde: controlled direct effect rate ratio; Rpnde: pure natural direct effect rate ratio; Rtnde: total natural direct effect rate ratio; Rpnie: pure natural indirect effect rate ratio; Rtnie: total natural indirect effect rate ratio; Rte: total effect rate ratio; pm: overall proportion mediated)"
+        } else legend <- "(Rcde: controlled direct effect rate ratio; Rpnde: pure natural direct effect rate ratio; Rtnde: total natural direct effect rate ratio; Rpnie: pure natural indirect effect rate ratio; Rtnie: total natural indirect effect rate ratio; Rte: total effect rate ratio)"
+      }
+    } else if (((is_lm | is_glm) && (family_yreg$family %in% c("binomial", "quasibinomial", "multinom") |
+                                     startsWith(family_yreg$family, "Ordered Categorical"))) |
+               is_multinom | is_polr) {
+      scale <- "risk ratio scale"
+      if (model == "iorw") {
+        if (full) legend <- "(Rte: total effect risk ratio; Rpnde: pure natural direct effect risk ratio; Rtnie: total natural indirect effect risk ratio; pm: proportion mediated)"   
+        if (!full) legend <- "(Rte: total effect risk ratio; Rpnde: pure natural direct effect risk ratio; Rtnie: total natural indirect effect risk ratio)" 
+      } else if (length(x$naive$variables$postc) != 0) {
+        if (full) {
+          if (EMint) legend <- "(Rcde: controlled direct effect risk ratio; rRpnde: randomized analogue of pure natural direct effect risk ratio; rRtnde: randomized analogue of total natural direct effect risk ratio; rRpnie: randomized analogue of pure natural indirect effect risk ratio; rRtnie: randomized analogue of total natural indirect effect risk ratio; Rte: total effect risk ratio; ERcde: excess relative risk due to controlled direct effect; rERintref: randomized analogue of excess relative risk due to reference interaction; rERintmed: randomized analogue of excess relative risk due to mediated interaction; rERpnie: randomized analogue of excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; rERintref(prop): proportion rERintref; rERintmed(prop): proportion rERintmed; rERpnie(prop): proportion rERpnie; rpm: randomized analogue of overall proportion mediated; rint: randomized analogue of overall proportion attributable to interaction; rpe: randomized analogue of overall proportion eliminated)"
+          if (!EMint) legend <- "(Rcde: controlled direct effect risk ratio; rRpnde: randomized analogue of pure natural direct effect risk ratio; rRtnde: randomized analogue of total natural direct effect risk ratio; rRpnie: randomized analogue of pure natural indirect effect risk ratio; rRtnie: randomized analogue of total natural indirect effect risk ratio; Rte: total effect risk ratio; rpm: randomized analogue of overall proportion mediated)"
+        } else legend <- "(Rcde: controlled direct effect risk ratio; rRpnde: randomized analogue of pure natural direct effect risk ratio; rRtnde: randomized analogue of total natural direct effect risk ratio; rRpnie: randomized analogue of pure natural indirect effect risk ratio; rRtnie: randomized analogue of total natural indirect effect risk ratio; Rte: total effect risk ratio)"
+      } else {
+        if (full) {
+          if (EMint) legend <- "(Rcde: controlled direct effect risk ratio; Rpnde: pure natural direct effect risk ratio; Rtnde: total natural direct effect risk ratio; Rpnie: pure natural indirect effect risk ratio; Rtnie: total natural indirect effect risk ratio; Rte: total effect risk ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)"
+          if (!EMint) legend <- "(Rcde: controlled direct effect risk ratio; Rpnde: pure natural direct effect risk ratio; Rtnde: total natural direct effect risk ratio; Rpnie: pure natural indirect effect risk ratio; Rtnie: total natural indirect effect risk ratio; Rte: total effect risk ratio; pm: overall proportion mediated)"
+        } else legend <- "(Rcde: controlled direct effect risk ratio; Rpnde: pure natural direct effect risk ratio; Rtnde: total natural direct effect risk ratio; Rpnie: pure natural indirect effect risk ratio; Rtnie: total natural indirect effect risk ratio; Rte: total effect risk ratio)"
+      }
+    } else if (is_coxph) {
+      scale <- "hazard ratio scale"
+      if (model == "iorw") {
+        if (full) legend <- "(Rte: total effect hazard ratio; Rpnde: pure natural direct effect hazard ratio; Rtnie: total natural indirect effect hazard ratio; pm: proportion mediated)"   
+        if (!full) legend <- "(Rte: total effect hazard ratio; Rpnde: pure natural direct effect hazard ratio; Rtnie: total natural indirect effect hazard ratio)" 
+      }  else if (length(x$naive$variables$postc) != 0) {
+        if (full) {
+          if (EMint) legend <- "(Rcde: controlled direct effect hazard ratio; rRpnde: randomized analogue of pure natural direct effect hazard ratio; rRtnde: randomized analogue of total natural direct effect hazard ratio; rRpnie: randomized analogue of pure natural indirect effect hazard ratio; rRtnie: randomized analogue of total natural indirect effect hazard ratio; Rte: total effect hazard ratio; ERcde: excess relative hazard due to controlled direct effect; rERintref: randomized analogue of excess relative hazard due to reference interaction; rERintmed: randomized analogue of excess relative hazard due to mediated interaction; rERpnie: randomized analogue of excess relative hazard due to pure natural indirect effect; ERcde(prop): proportion ERcde; rERintref(prop): proportion rERintref; rERintmed(prop): proportion rERintmed; rERpnie(prop): proportion rERpnie; rpm: randomized analogue of overall proportion mediated; rint: randomized analogue of overall proportion attributable to interaction; rpe: randomized analogue of overall proportion eliminated)"
+          if (!EMint) legend <- "(Rcde: controlled direct effect hazard ratio; rRpnde: randomized analogue of pure natural direct effect hazard ratio; rRtnde: randomized analogue of total natural direct effect hazard ratio; rRpnie: randomized analogue of pure natural indirect effect hazard ratio; rRtnie: randomized analogue of total natural indirect effect hazard ratio; Rte: total effect hazard ratio; rpm: randomized analogue of overall proportion mediated)"
+        } else legend <- "(Rcde: controlled direct effect hazard ratio; rRpnde: randomized analogue of pure natural direct effect hazard ratio; rRtnde: randomized analogue of total natural direct effect hazard ratio; rRpnie: randomized analogue of pure natural indirect effect hazard ratio; rRtnie: randomized analogue of total natural indirect effect hazard ratio; Rte: total effect hazard ratio)"
+      } else {
+        if (full) {
+          if (EMint) legend <- "(Rcde: controlled direct effect hazard ratio; Rpnde: pure natural direct effect hazard ratio; Rtnde: total natural direct effect hazard ratio; Rpnie: pure natural indirect effect hazard ratio; Rtnie: total natural indirect effect hazard ratio; Rte: total effect hazard ratio; ERcde: excess relative hazard due to controlled direct effect; ERintref: excess relative hazard due to reference interaction; ERintmed: excess relative hazard due to mediated interaction; ERpnie: excess relative hazard due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)"
+          if (!EMint) legend <- "(Rcde: controlled direct effect hazard ratio; Rpnde: pure natural direct effect hazard ratio; Rtnde: total natural direct effect hazard ratio; Rpnie: pure natural indirect effect hazard ratio; Rtnie: total natural indirect effect hazard ratio; Rte: total effect hazard ratio; pm: overall proportion mediated)"
+        } else legend <- "(Rcde: controlled direct effect hazard ratio; Rpnde: pure natural direct effect hazard ratio; Rtnde: total natural direct effect hazard ratio; Rpnie: pure natural indirect effect hazard ratio; Rtnie: total natural indirect effect hazard ratio; Rte: total effect hazard ratio)"
+      }
+    } else if (is_survreg) {
+      scale <- "mean survival scale"
+      if (model == "iorw") {
+        if (full) legend <- "(Rte: total effect mean survival ratio; Rpnde: pure natural direct effect mean survival ratio; Rtnie: total natural indirect effect mean survival ratio; pm: proportion mediated)"   
+        if (!full) legend <- "(Rte: total effect mean survival ratio; Rpnde: pure natural direct effect mean survival ratio; Rtnie: total natural indirect effect mean survival ratio)" 
+      } else if (length(x$naive$variables$postc) != 0) {
+        if (full) {
+          if (EMint) legend <- "(Rcde: controlled direct effect mean survival ratio; rRpnde: randomized analogue of pure natural direct effect mean survival ratio; rRtnde: randomized analogue of total natural direct effect mean survival ratio; rRpnie: randomized analogue of pure natural indirect effect mean survival ratio; rRtnie: randomized analogue of total natural indirect effect mean survival ratio; Rte: total effect mean survival ratio; ERcde: excess mean survival ratio due to controlled direct effect; rERintref: randomized analogue of excess mean survival ratio due to reference interaction; rERintmed: randomized analogue of excess mean survival ratio due to mediated interaction; rERpnie: randomized analogue of excess mean survival ratio due to pure natural indirect effect; ERcde(prop): proportion ERcde; rERintref(prop): proportion rERintref; rERintmed(prop): proportion rERintmed; rERpnie(prop): proportion rERpnie; rpm: randomized analogue of overall proportion mediated; rint: randomized analogue of overall proportion attributable to interaction; rpe: randomized analogue of overall proportion eliminated)"
+          if (!EMint) legend <- "(Rcde: controlled direct effect mean survival ratio; rRpnde: randomized analogue of pure natural direct effect mean survival ratio; rRtnde: randomized analogue of total natural direct effect mean survival ratio; rRpnie: randomized analogue of pure natural indirect effect mean survival ratio; rRtnie: randomized analogue of total natural indirect effect mean survival ratio; Rte: total effect mean survival ratio; rpm: randomized analogue of overall proportion mediated)"
+        } else legend <- "(Rcde: controlled direct effect mean survival ratio; rRpnde: randomized analogue of pure natural direct effect mean survival ratio; rRtnde: randomized analogue of total natural direct effect mean survival ratio; rRpnie: randomized analogue of pure natural indirect effect mean survival ratio; rRtnie: randomized analogue of total natural indirect effect mean survival ratio; Rte: total effect mean survival ratio)"
+      } else {
+        if (full) {
+          if (EMint) legend <- "(Rcde: controlled direct effect mean survival ratio; Rpnde: pure natural direct effect mean survival ratio; Rtnde: total natural direct effect mean survival ratio; Rpnie: pure natural indirect effect mean survival ratio; Rtnie: total natural indirect effect mean survival ratio; Rte: total effect mean survival ratio; ERcde: excess mean survival ratio due to controlled direct effect; ERintref: excess mean survival ratio due to reference interaction; ERintmed: excess mean survival ratio due to mediated interaction; ERpnie: excess mean survival ratio due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)"
+          if (!EMint) legend <- "(Rcde: controlled direct effect mean survival ratio; Rpnde: pure natural direct effect mean survival ratio; Rtnde: total natural direct effect mean survival ratio; Rpnie: pure natural indirect effect mean survival ratio; Rtnie: total natural indirect effect mean survival ratio; Rte: total effect mean survival ratio; pm: overall proportion mediated)"
+        } else legend <- "(Rcde: controlled direct effect mean survival ratio; Rpnde: pure natural direct effect mean survival ratio; Rtnde: total natural direct effect mean survival ratio; Rpnie: pure natural indirect effect mean survival ratio; Rtnie: total natural indirect effect mean survival ratio; Rte: total effect mean survival ratio)"
+      }
+    }
+    
     # print error-corrected results
-    cat(paste0("\n## Error-corrected causal effects for measurement error ", i, ": \n"))
+    cat(paste0(paste("\n## Error-corrected causal effects on the", scale, "for measurement error "), i, ": \n"))
     print(x$sens[[i]]$effect.pe)
     cat("----------------------------------------------------------------\n")
   }
+  cat("\n")
+  cat(legend)
+  cat("\n\nRelevant variable values: \n")
+  print(x$naive$ref)
 }
 
 
@@ -775,22 +891,22 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
           cat("### Outcome regression:\n")
           if (inherits(x$sens[[i]]$reg.output$yreg, "svyglm")) {
             x$sens[[i]]$reg.output.summary$yreg$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output$yreg,design = getCall(x$sens[[.(i)]]$reg.output$yreg)$design,
-                                                                   family = getCall(x$sens[[.(i)]]$reg.output$yreg)$family, evaluate = FALSE)))
+                                                                           family = getCall(x$sens[[.(i)]]$reg.output$yreg)$family, evaluate = FALSE)))
             x$sens[[i]]$reg.output.summary$yreg$survey.design$call <- eval(bquote(as.call(update(x$sens[[.(i)]]$reg.output.summary$yreg$survey.design,
-                                                                                         data = getCall(x$sens[[.(i)]]$reg.output.summary$yreg$survey.design)$data,
-                                                                                         weights = getCall(x$sens[[.(i)]]$reg.output.summary$yreg$survey.design)$weights, 
-                                                                                         evaluate = FALSE))))
+                                                                                                 data = getCall(x$sens[[.(i)]]$reg.output.summary$yreg$survey.design)$data,
+                                                                                                 weights = getCall(x$sens[[.(i)]]$reg.output.summary$yreg$survey.design)$weights, 
+                                                                                                 evaluate = FALSE))))
             print(x$sens[[i]]$reg.output.summary$yreg)
           } else if (inherits(x$sens[[i]]$reg.output$yreg, "rcreg")|inherits(x$sens[[i]]$reg.output$yreg, "simexreg")) {
             x$sens[[i]]$reg.output.summary$yreg$call <- eval(bquote(update(x$sens[[i]]$reg.output$yreg, 
-                                                                   reg = getCall(x$sens[[.(i)]]$reg.output$yreg)$reg,
-                                                                   data=getCall(x$sens[[.(i)]]$reg.output$yreg)$data,
-                                                                   weights=getCall(x$sens[[.(i)]]$reg.output$yreg)$weights, evaluate = FALSE)))
+                                                                           reg = getCall(x$sens[[.(i)]]$reg.output$yreg)$reg,
+                                                                           data=getCall(x$sens[[.(i)]]$reg.output$yreg)$data,
+                                                                           weights=getCall(x$sens[[.(i)]]$reg.output$yreg)$weights, evaluate = FALSE)))
             print(x$sens[[i]]$reg.output.summary$yreg)
           } else {
             x$sens[[i]]$reg.output.summary$yreg$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output$yreg,
-                                                                   data=getCall(x$sens[[.(i)]]$reg.output$yreg)$data,
-                                                                   weights=getCall(x$sens[[.(i)]]$reg.output$yreg)$weights, evaluate = FALSE)))
+                                                                           data=getCall(x$sens[[.(i)]]$reg.output$yreg)$data,
+                                                                           weights=getCall(x$sens[[.(i)]]$reg.output$yreg)$weights, evaluate = FALSE)))
             print(x$sens[[i]]$reg.output.summary$yreg)
           }
         }
@@ -798,12 +914,12 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
           cat("### Outcome regression for the total effect: \n")
           if (inherits(x$sens[[i]]$reg.output$yregTot, "rcreg")|inherits(x$sens[[i]]$reg.output$yregTot, "simexreg")) {
             x$sens[[i]]$reg.output.summary$yregTot$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output$yregTot, reg = getCall(x$sens[[.(i)]]$reg.output$yregTot)$reg,
-                                                                      data=getCall(x$sens[[.(i)]]$reg.output$yregTot)$data,
-                                                                      weights=getCall(x$sens[[.(i)]]$reg.output$yregTot)$weights, evaluate = FALSE)))
+                                                                              data=getCall(x$sens[[.(i)]]$reg.output$yregTot)$data,
+                                                                              weights=getCall(x$sens[[.(i)]]$reg.output$yregTot)$weights, evaluate = FALSE)))
             print(x$sens[[i]]$reg.output.summary$yregTot)
           } else {
             x$sens[[i]]$reg.output.summary$yregTot$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output$yregTot,data=getCall(x$sens[[.(i)]]$reg.output$yregTot)$data,
-                                                                      weights=getCall(x$sens[[.(i)]]$reg.output$yregTot)$weights, evaluate = FALSE)))
+                                                                              weights=getCall(x$sens[[.(i)]]$reg.output$yregTot)$weights, evaluate = FALSE)))
             print(x$sens[[i]]$reg.output.summary$yregTot)
           }
         }
@@ -811,12 +927,12 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
           cat("### Outcome regression for the direct effect: \n")
           if (inherits(x$sens[[i]]$reg.output$yregDir, "rcreg")|inherits(x$sens[[i]]$reg.output$yregDir, "simexreg")) {
             x$sens[[i]]$reg.output.summary$yregDir$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output$yregDir, reg = getCall(x$sens[[.(i)]]$reg.output$yregDir)$reg,
-                                                                      data=getCall(x$sens[[.(i)]]$reg.output$yregDir)$data,
-                                                                      weights=getCall(x$sens[[.(i)]]$reg.output$yregDir)$weights, evaluate = FALSE)))
+                                                                              data=getCall(x$sens[[.(i)]]$reg.output$yregDir)$data,
+                                                                              weights=getCall(x$sens[[.(i)]]$reg.output$yregDir)$weights, evaluate = FALSE)))
             print(x$sens[[i]]$reg.output.summary$yregDir)
           } else {
             x$sens[[i]]$reg.output.summary$yregDir$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output$yregDir,data=getCall(x$sens[[.(i)]]$reg.output$yregDir)$data,
-                                                                      weights=getCall(x$sens[[.(i)]]$reg.output$yregDir)$weights, evaluate = FALSE)))
+                                                                              weights=getCall(x$sens[[.(i)]]$reg.output$yregDir)$weights, evaluate = FALSE)))
             print(x$sens[[i]]$reg.output.summary$yregDir)
           }
         }
@@ -824,12 +940,12 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
           cat("### Exposure regression for weighting: \n")
           if (inherits(x$sens[[i]]$reg.output$ereg, "rcreg")|inherits(x$sens[[i]]$reg.output$ereg, "simexreg")) {
             x$sens[[i]]$reg.output.summary$ereg$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output$ereg, reg = getCall(x$sens[[.(i)]]$reg.output$ereg)$reg,
-                                                                   data=getCall(x$sens[[.(i)]]$reg.output$ereg)$data,
-                                                                   weights=getCall(x$sens[[.(i)]]$reg.output$ereg)$weights, evaluate = FALSE)))
+                                                                           data=getCall(x$sens[[.(i)]]$reg.output$ereg)$data,
+                                                                           weights=getCall(x$sens[[.(i)]]$reg.output$ereg)$weights, evaluate = FALSE)))
             print(x$sens[[i]]$reg.output.summary$ereg)
           } else {
             x$sens[[i]]$reg.output.summary$ereg$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output$ereg,data=getCall(x$sens[[.(i)]]$reg.output$ereg)$data,
-                                                                   weights=getCall(x$sens[[.(i)]]$reg.output$ereg)$weights, evaluate = FALSE)))
+                                                                           weights=getCall(x$sens[[.(i)]]$reg.output$ereg)$weights, evaluate = FALSE)))
             print(x$sens[[i]]$reg.output.summary$ereg)
           }
         }
@@ -838,26 +954,26 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
           for (j in 1:length(x$sens[[i]]$reg.output.summary$mreg)) {
             if (inherits(x$sens[[i]]$reg.output$mreg[[j]], "svyglm")) {
               x$sens[[i]]$reg.output.summary$mreg[[j]]$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output$mreg[[.(j)]],
-                                                                          design = getCall(x$sens[[.(i)]]$reg.output$mreg[[.(j)]])$design,
-                                                                          family = getCall(x$sens[[.(i)]]$reg.output$mreg[[.(j)]])$family, evaluate = FALSE)))
+                                                                                  design = getCall(x$sens[[.(i)]]$reg.output$mreg[[.(j)]])$design,
+                                                                                  family = getCall(x$sens[[.(i)]]$reg.output$mreg[[.(j)]])$family, evaluate = FALSE)))
               x$sens[[i]]$reg.output.summary$mreg[[j]]$survey.design$call <- eval(bquote(as.call(update(x$sens[[.(i)]]$reg.output.summary$mreg[[.(j)]]$survey.design,
-                                                                                                data = getCall(x$sens[[.(i)]]$reg.output.summary$mreg[[.(j)]]$survey.design)$data,
-                                                                                                weights = getCall(x$sens[[.(i)]]$reg.output.summary$mreg[[.(j)]]$survey.design)$weights, 
-                                                                                                evaluate = FALSE))))
+                                                                                                        data = getCall(x$sens[[.(i)]]$reg.output.summary$mreg[[.(j)]]$survey.design)$data,
+                                                                                                        weights = getCall(x$sens[[.(i)]]$reg.output.summary$mreg[[.(j)]]$survey.design)$weights, 
+                                                                                                        evaluate = FALSE))))
               print(x$sens[[i]]$reg.output.summary$mreg[[j]])
             } else if (inherits(x$sens[[i]]$reg.output$mreg[[j]], "rcreg") |
                        inherits(x$sens[[i]]$reg.output$mreg[[j]], "simexreg")){
               x$sens[[i]]$reg.output.summary$mreg[[j]]$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output$mreg[[.(j)]], 
-                                                                          reg=getCall(x$sens[[.(i)]]$reg.output$mreg[[.(j)]])$reg,
-                                                                          data=getCall(x$sens[[.(i)]]$reg.output$mreg[[.(j)]])$data, 
-                                                                          weights=getCall(x$sens[[.(i)]]$reg.output$mreg[[.(j)]])$weights,
-                                                                          evaluate = FALSE)))
+                                                                                  reg=getCall(x$sens[[.(i)]]$reg.output$mreg[[.(j)]])$reg,
+                                                                                  data=getCall(x$sens[[.(i)]]$reg.output$mreg[[.(j)]])$data, 
+                                                                                  weights=getCall(x$sens[[.(i)]]$reg.output$mreg[[.(j)]])$weights,
+                                                                                  evaluate = FALSE)))
               print(x$sens[[i]]$reg.output.summary$mreg[[j]])
             } else {
               x$sens[[i]]$reg.output.summary$mreg[[j]]$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output$mreg[[.(j)]], 
-                                                                          data=getCall(x$sens[[.(i)]]$reg.output$mreg[[.(j)]])$data, 
-                                                                          weights=getCall(x$sens[[.(i)]]$reg.output$mreg[[.(j)]])$weights,
-                                                                          evaluate = FALSE)))
+                                                                                  data=getCall(x$sens[[.(i)]]$reg.output$mreg[[.(j)]])$data, 
+                                                                                  weights=getCall(x$sens[[.(i)]]$reg.output$mreg[[.(j)]])$weights,
+                                                                                  evaluate = FALSE)))
               print(x$sens[[i]]$reg.output.summary$mreg[[j]])
             }
             if (j < length(x$sens[[i]]$reg.output.summary$mreg)) cat("\n")
@@ -869,16 +985,16 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
             if (inherits(x$sens[[i]]$reg.output$wmdenomreg[[j]], "rcreg") |
                 inherits(x$sens[[i]]$reg.output$wmdenomreg[[j]], "simexreg")) {
               x$sens[[i]]$reg.output.summary$wmdenomreg[[j]]$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output$wmdenomreg[[.(j)]], 
-                                                                                reg=getCall(x$sens[[.(i)]]$reg.output$wmdenomreg[[.(j)]])$reg,
-                                                                                data=getCall(x$sens[[.(i)]]$reg.output$wmdenomreg[[.(j)]])$data, 
-                                                                                weights=getCall(x$sens[[.(i)]]$reg.output$wmdenomreg[[.(j)]])$weights,
-                                                                                evaluate = FALSE)))
+                                                                                        reg=getCall(x$sens[[.(i)]]$reg.output$wmdenomreg[[.(j)]])$reg,
+                                                                                        data=getCall(x$sens[[.(i)]]$reg.output$wmdenomreg[[.(j)]])$data, 
+                                                                                        weights=getCall(x$sens[[.(i)]]$reg.output$wmdenomreg[[.(j)]])$weights,
+                                                                                        evaluate = FALSE)))
               print(x$sens[[i]]$reg.output.summary$wmdenomreg[[j]])
             } else {
               x$sens[[i]]$reg.output.summary$wmdenomreg[[j]]$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output$wmdenomreg[[.(j)]], 
-                                                                                data=getCall(x$sens[[.(i)]]$reg.output$wmdenomreg[[.(j)]])$data, 
-                                                                                weights=getCall(x$sens[[.(i)]]$reg.output$wmdenomreg[[.(j)]])$weights,
-                                                                                evaluate = FALSE)))
+                                                                                        data=getCall(x$sens[[.(i)]]$reg.output$wmdenomreg[[.(j)]])$data, 
+                                                                                        weights=getCall(x$sens[[.(i)]]$reg.output$wmdenomreg[[.(j)]])$weights,
+                                                                                        evaluate = FALSE)))
               print(x$sens[[i]]$reg.output.summary$wmdenomreg[[j]])
             }
             if (j < length(x$sens[[i]]$reg.output.summary$wmdenomreg)) cat("\n")
@@ -890,16 +1006,16 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
             if (inherits(x$sens[[i]]$reg.output$wmnomreg[[j]], "rcreg") |
                 inherits(x$sens[[i]]$reg.output$wmnomreg[[j]], "simexreg")) {
               x$sens[[i]]$reg.output.summary$wmnomreg[[j]]$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output$wmnomreg[[.(j)]], 
-                                                                              reg=getCall(x$sens[[.(i)]]$reg.output$wmnomreg[[.(j)]])$reg,
-                                                                              data=getCall(x$sens[[.(i)]]$reg.output$wmnomreg[[.(j)]])$data, 
-                                                                              weights=getCall(x$sens[[.(i)]]$reg.output$wmnomreg[[.(j)]])$weights,
-                                                                              evaluate = FALSE)))
+                                                                                      reg=getCall(x$sens[[.(i)]]$reg.output$wmnomreg[[.(j)]])$reg,
+                                                                                      data=getCall(x$sens[[.(i)]]$reg.output$wmnomreg[[.(j)]])$data, 
+                                                                                      weights=getCall(x$sens[[.(i)]]$reg.output$wmnomreg[[.(j)]])$weights,
+                                                                                      evaluate = FALSE)))
               print(x$sens[[i]]$reg.output.summary$wmnomreg[[j]])
             } else {
               x$sens[[i]]$reg.output.summary$wmnomreg[[j]]$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output$wmnomreg[[.(j)]], 
-                                                                              data=getCall(x$sens[[.(i)]]$reg.output$wmnomreg[[.(j)]])$data, 
-                                                                              weights=getCall(x$sens[[.(i)]]$reg.output$wmnomreg[[.(j)]])$weights,
-                                                                              evaluate = FALSE)))
+                                                                                      data=getCall(x$sens[[.(i)]]$reg.output$wmnomreg[[.(j)]])$data, 
+                                                                                      weights=getCall(x$sens[[.(i)]]$reg.output$wmnomreg[[.(j)]])$weights,
+                                                                                      evaluate = FALSE)))
               print(x$sens[[i]]$reg.output.summary$wmnomreg[[j]])
             }
             if (j < length(x$sens[[i]]$reg.output.summary$wmnomreg)) cat("\n")
@@ -911,16 +1027,16 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
             if (inherits(x$sens[[i]]$reg.output$postcreg[[j]], "rcreg") |
                 inherits(x$sens[[i]]$reg.output$postcreg[[j]], "simexreg")) {
               x$sens[[i]]$reg.output.summary$postcreg[[j]]$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output$postcreg[[.(j)]], 
-                                                                              reg=getCall(x$sens[[.(i)]]$reg.output$postcreg[[.(j)]])$reg,
-                                                                              data=getCall(x$sens[[.(i)]]$reg.output$postcreg[[.(j)]])$data, 
-                                                                              weights=getCall(x$sens[[.(i)]]$reg.output$postcreg[[.(j)]])$weights,
-                                                                              evaluate = FALSE)))
+                                                                                      reg=getCall(x$sens[[.(i)]]$reg.output$postcreg[[.(j)]])$reg,
+                                                                                      data=getCall(x$sens[[.(i)]]$reg.output$postcreg[[.(j)]])$data, 
+                                                                                      weights=getCall(x$sens[[.(i)]]$reg.output$postcreg[[.(j)]])$weights,
+                                                                                      evaluate = FALSE)))
               print(x$sens[[i]]$reg.output.summary$postcreg[[j]])
             } else {
               x$sens[[i]]$reg.output.summary$postcreg[[j]]$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output$postcreg[[.(j)]], 
-                                                                              data=getCall(x$sens[[.(i)]]$reg.output$postcreg[[.(j)]])$data, 
-                                                                              weights=getCall(x$sens[[.(i)]]$reg.output$postcreg[[.(j)]])$weights,
-                                                                              evaluate = FALSE)))
+                                                                                      data=getCall(x$sens[[.(i)]]$reg.output$postcreg[[.(j)]])$data, 
+                                                                                      weights=getCall(x$sens[[.(i)]]$reg.output$postcreg[[.(j)]])$weights,
+                                                                                      evaluate = FALSE)))
               print(x$sens[[i]]$reg.output.summary$postcreg[[j]])
             }
             if (j < length(x$sens[[i]]$reg.output.summary$postcreg)) cat("\n")
@@ -937,25 +1053,25 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
             cat("#### Outcome regression: \n")
             if (inherits(x$sens[[i]]$reg.output[[m]]$yreg, "svyglm")) {
               x$sens[[i]]$reg.output.summary[[m]]$yreg$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output[[.(m)]]$yreg,
-                                                                          design = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yreg)$design,
-                                                                          family = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yreg)$family, evaluate = FALSE)))
+                                                                                  design = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yreg)$design,
+                                                                                  family = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yreg)$family, evaluate = FALSE)))
               x$sens[[i]]$reg.output.summary[[m]]$yreg$survey.design$call <- eval(bquote(as.call(update(x$sens[[.(i)]]$reg.output.summary[[.(m)]]$yreg$survey.design,
-                                                                                                data = getCall(x$sens[[.(i)]]$reg.output.summary[[.(m)]]$yreg$survey.design)$data,
-                                                                                                weights = getCall(x$sens[[.(i)]]$reg.output.summary[[.(m)]]$yreg$survey.design)$weights, 
-                                                                                                evaluate = FALSE))))
+                                                                                                        data = getCall(x$sens[[.(i)]]$reg.output.summary[[.(m)]]$yreg$survey.design)$data,
+                                                                                                        weights = getCall(x$sens[[.(i)]]$reg.output.summary[[.(m)]]$yreg$survey.design)$weights, 
+                                                                                                        evaluate = FALSE))))
               print(x$sens[[i]]$reg.output.summary[[m]]$yreg)
             } else if (inherits(x$sens[[i]]$reg.output[[m]]$yreg, "rcreg")|inherits(x$sens[[i]]$reg.output[[m]]$yreg, "simexreg")){
               x$sens[[i]]$reg.output.summary[[m]]$yreg$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output[[.(m)]]$yreg,
-                                                                          reg = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yreg)$reg,
-                                                                          data = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yreg)$data,
-                                                                          weights = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yreg)$weights, 
-                                                                          evaluate = FALSE)))
+                                                                                  reg = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yreg)$reg,
+                                                                                  data = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yreg)$data,
+                                                                                  weights = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yreg)$weights, 
+                                                                                  evaluate = FALSE)))
               print(x$sens[[i]]$reg.output.summary[[m]]$yreg)
             } else {
               x$sens[[i]]$reg.output.summary[[m]]$yreg$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output[[.(m)]]$yreg,
-                                                                          data = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yreg)$data,
-                                                                          weights = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yreg)$weights, 
-                                                                          evaluate = FALSE)))
+                                                                                  data = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yreg)$data,
+                                                                                  weights = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yreg)$weights, 
+                                                                                  evaluate = FALSE)))
               print(x$sens[[i]]$reg.output.summary[[m]]$yreg)
             }
           }
@@ -963,16 +1079,16 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
             cat("#### Outcome regression for the total effect: \n")
             if (inherits(x$sens[[i]]$reg.output[[m]]$yregTot, "rcreg")|inherits(x$sens[[i]]$reg.output[[m]]$yregTot, "simexreg")){
               x$sens[[i]]$reg.output.summary[[m]]$yregTot$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output[[.(m)]]$yregTot,
-                                                                             reg = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yregTot)$reg,
-                                                                             data = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yregTot)$data,
-                                                                             weights = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yregTot)$weights, 
-                                                                             evaluate = FALSE)))
+                                                                                     reg = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yregTot)$reg,
+                                                                                     data = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yregTot)$data,
+                                                                                     weights = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yregTot)$weights, 
+                                                                                     evaluate = FALSE)))
               print(x$sens[[i]]$reg.output.summary[[m]]$yregTot)
             } else {
               x$sens[[i]]$reg.output.summary[[m]]$yregTot$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output[[.(m)]]$yregTot,
-                                                                             data = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yregTot)$data,
-                                                                             weights = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yregTot)$weights, 
-                                                                             evaluate = FALSE)))
+                                                                                     data = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yregTot)$data,
+                                                                                     weights = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yregTot)$weights, 
+                                                                                     evaluate = FALSE)))
               print(x$sens[[i]]$reg.output.summary[[m]]$yregTot)
             }
           }
@@ -980,16 +1096,16 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
             cat("#### Outcome regression for the direct effect: \n")
             if (inherits(x$sens[[i]]$reg.output[[m]]$yregDir, "rcreg")|inherits(x$sens[[i]]$reg.output[[m]]$yregDir, "simexreg")){
               x$sens[[i]]$reg.output.summary[[m]]$yregDir$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output[[.(m)]]$yregDir,
-                                                                             reg = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yregDir)$reg,
-                                                                             data = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yregDir)$data,
-                                                                             weights = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yregDir)$weights, 
-                                                                             evaluate = FALSE)))
+                                                                                     reg = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yregDir)$reg,
+                                                                                     data = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yregDir)$data,
+                                                                                     weights = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yregDir)$weights, 
+                                                                                     evaluate = FALSE)))
               print(x$sens[[i]]$reg.output.summary[[m]]$yregDir)
             } else {
               x$sens[[i]]$reg.output.summary[[m]]$yregDir$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output[[.(m)]]$yregDir,
-                                                                             data = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yregDir)$data,
-                                                                             weights = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yregDir)$weights, 
-                                                                             evaluate = FALSE)))
+                                                                                     data = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yregDir)$data,
+                                                                                     weights = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yregDir)$weights, 
+                                                                                     evaluate = FALSE)))
               print(x$sens[[i]]$reg.output.summary[[m]]$yregDir)
             }
           }
@@ -997,16 +1113,16 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
             cat("#### Exposure regression for weighting: \n")
             if (inherits(x$sens[[i]]$reg.output[[m]]$ereg, "rcreg")|inherits(x$sens[[i]]$reg.output[[m]]$ereg, "simexreg")){
               x$sens[[i]]$reg.output.summary[[m]]$ereg$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output[[.(m)]]$ereg,
-                                                                          reg = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$ereg)$reg,
-                                                                          data = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$ereg)$data,
-                                                                          weights = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$ereg)$weights, 
-                                                                          evaluate = FALSE)))
+                                                                                  reg = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$ereg)$reg,
+                                                                                  data = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$ereg)$data,
+                                                                                  weights = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$ereg)$weights, 
+                                                                                  evaluate = FALSE)))
               print(x$sens[[i]]$reg.output.summary[[m]]$ereg)
             } else {
               x$sens[[i]]$reg.output.summary[[m]]$ereg$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output[[.(m)]]$ereg,
-                                                                          data = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$ereg)$data,
-                                                                          weights = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$ereg)$weights, 
-                                                                          evaluate = FALSE)))
+                                                                                  data = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$ereg)$data,
+                                                                                  weights = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$ereg)$weights, 
+                                                                                  evaluate = FALSE)))
               print(x$sens[[i]]$reg.output.summary[[m]]$ereg)
             }
           }
@@ -1015,25 +1131,25 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
             for (j in 1:length(x$sens[[i]]$reg.output.summary[[m]]$mreg)) {
               if (inherits(x$sens[[i]]$reg.output[[m]]$mreg[[j]], "svyglm")) {
                 x$sens[[i]]$reg.output.summary[[m]]$mreg[[j]]$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output[[.(m)]]$mreg[[.(j)]],
-                                                                                 design = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$mreg[[.(j)]])$design,
-                                                                                 family = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$mreg[[.(j)]])$family, evaluate = FALSE)))
+                                                                                         design = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$mreg[[.(j)]])$design,
+                                                                                         family = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$mreg[[.(j)]])$family, evaluate = FALSE)))
                 x$sens[[i]]$reg.output.summary[[m]]$mreg[[j]]$survey.design$call <- eval(bquote(as.call(update(x$sens[[.(i)]]$reg.output.summary[[.(m)]]$mreg[[.(j)]]$survey.design,
-                                                                                                       data = getCall(x$sens[[.(i)]]$reg.output.summary[[.(m)]]$mreg[[.(j)]]$survey.design)$data,
-                                                                                                       weights = getCall(x$sens[[.(i)]]$reg.output.summary[[.(m)]]$mreg[[.(j)]]$survey.design)$weights, 
-                                                                                                       evaluate = FALSE))))
+                                                                                                               data = getCall(x$sens[[.(i)]]$reg.output.summary[[.(m)]]$mreg[[.(j)]]$survey.design)$data,
+                                                                                                               weights = getCall(x$sens[[.(i)]]$reg.output.summary[[.(m)]]$mreg[[.(j)]]$survey.design)$weights, 
+                                                                                                               evaluate = FALSE))))
                 print(x$sens[[i]]$reg.output.summary[[m]]$mreg[[j]])
               } else if (inherits(x$sens[[i]]$reg.output[[m]]$mreg[[j]], "rcreg")|inherits(x$sens[[i]]$reg.output[[m]]$mreg[[j]], "simexreg")){
                 x$sens[[i]]$reg.output.summary[[m]]$mreg[[j]]$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output[[.(m)]]$mreg[[.(j)]], 
-                                                                                 reg=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$mreg[[.(j)]])$reg,
-                                                                                 data=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$mreg[[.(j)]])$data, 
-                                                                                 weights=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$mreg[[.(j)]])$weights, 
-                                                                                 evaluate = FALSE)))
+                                                                                         reg=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$mreg[[.(j)]])$reg,
+                                                                                         data=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$mreg[[.(j)]])$data, 
+                                                                                         weights=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$mreg[[.(j)]])$weights, 
+                                                                                         evaluate = FALSE)))
                 print(x$sens[[i]]$reg.output.summary[[m]]$mreg[[j]])
               } else {
                 x$sens[[i]]$reg.output.summary[[m]]$mreg[[j]]$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output[[.(m)]]$mreg[[.(j)]], 
-                                                                                 data=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$mreg[[.(j)]])$data, 
-                                                                                 weights=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$mreg[[.(j)]])$weights, 
-                                                                                 evaluate = FALSE)))
+                                                                                         data=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$mreg[[.(j)]])$data, 
+                                                                                         weights=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$mreg[[.(j)]])$weights, 
+                                                                                         evaluate = FALSE)))
                 print(x$sens[[i]]$reg.output.summary[[m]]$mreg[[j]])
               }
               if (j < length(x$sens[[i]]$reg.output.summary[[m]]$mreg)) cat("\n")
@@ -1045,16 +1161,16 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
               for (j in 1:length(x$sens[[i]]$reg.output.summary[[m]]$wmdenomreg)) {
                 if (inherits(x$sens[[i]]$reg.output[[m]]$wmdenomreg[[j]], "rcreg")|inherits(x$sens[[i]]$reg.output[[m]]$wmdenomreg[[j]], "simexreg")){
                   x$sens[[i]]$reg.output.summary[[m]]$wmdenomreg[[j]]$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output[[.(m)]]$wmdenomreg[[.(j)]], 
-                                                                                         reg=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$wmdenomreg[[.(j)]])$reg,
-                                                                                         data=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$wmdenomreg[[.(j)]])$data, 
-                                                                                         weights=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$wmdenomreg[[.(j)]])$weights, 
-                                                                                         evaluate = FALSE)))
+                                                                                                 reg=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$wmdenomreg[[.(j)]])$reg,
+                                                                                                 data=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$wmdenomreg[[.(j)]])$data, 
+                                                                                                 weights=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$wmdenomreg[[.(j)]])$weights, 
+                                                                                                 evaluate = FALSE)))
                   print(x$sens[[i]]$reg.output.summary[[m]]$wmdenomreg[[j]])
                 } else {
                   x$sens[[i]]$reg.output.summary[[m]]$wmdenomreg[[j]]$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output[[.(m)]]$wmdenomreg[[.(j)]], 
-                                                                                         data=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$wmdenomreg[[.(j)]])$data, 
-                                                                                         weights=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$wmdenomreg[[.(j)]])$weights, 
-                                                                                         evaluate = FALSE)))
+                                                                                                 data=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$wmdenomreg[[.(j)]])$data, 
+                                                                                                 weights=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$wmdenomreg[[.(j)]])$weights, 
+                                                                                                 evaluate = FALSE)))
                   print(x$sens[[i]]$reg.output.summary[[m]]$wmdenomreg[[j]])
                 }
                 if (j < length(x$sens[[i]]$reg.output.summary[[m]]$wmdenomreg)) cat("\n")
@@ -1067,16 +1183,16 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
               for (j in 1:length(x$sens[[i]]$reg.output.summary[[m]]$wmnomreg)) {
                 if (inherits(x$sens[[i]]$reg.output[[m]]$wmnomreg[[j]], "rcreg")|inherits(x$sens[[i]]$reg.output[[m]]$wmnomreg[[j]], "simexreg")){
                   x$sens[[i]]$reg.output.summary[[m]]$wmnomreg[[j]]$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output[[.(m)]]$wmnomreg[[.(j)]], 
-                                                                                       reg=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$wmnomreg[[.(j)]])$reg,
-                                                                                       data=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$wmnomreg[[.(j)]])$data, 
-                                                                                       weights=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$wmnomreg[[.(j)]])$weights, 
-                                                                                       evaluate = FALSE)))
+                                                                                               reg=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$wmnomreg[[.(j)]])$reg,
+                                                                                               data=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$wmnomreg[[.(j)]])$data, 
+                                                                                               weights=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$wmnomreg[[.(j)]])$weights, 
+                                                                                               evaluate = FALSE)))
                   print(x$sens[[i]]$reg.output.summary[[m]]$wmnomreg[[j]])
                 } else {
                   x$sens[[i]]$reg.output.summary[[m]]$wmnomreg[[j]]$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output[[.(m)]]$wmnomreg[[.(j)]], 
-                                                                                       data=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$wmnomreg[[.(j)]])$data, 
-                                                                                       weights=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$wmnomreg[[.(j)]])$weights, 
-                                                                                       evaluate = FALSE)))
+                                                                                               data=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$wmnomreg[[.(j)]])$data, 
+                                                                                               weights=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$wmnomreg[[.(j)]])$weights, 
+                                                                                               evaluate = FALSE)))
                   print(x$sens[[i]]$reg.output.summary[[m]]$wmnomreg[[j]])
                 }
                 if (j < length(x$sens[[i]]$reg.output.summary[[m]]$wmnomreg)) cat("\n")
@@ -1089,16 +1205,16 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
               for (j in 1:length(x$sens[[i]]$reg.output.summary[[m]]$postcreg)) {
                 if (inherits(x$sens[[i]]$reg.output[[m]]$postcreg[[j]], "rcreg")|inherits(x$sens[[i]]$reg.output[[m]]$postcreg[[j]], "simexreg")){
                   x$sens[[i]]$reg.output.summary[[m]]$postcreg[[j]]$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output[[.(m)]]$postcreg[[.(j)]], 
-                                                                                       reg=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$postcreg[[.(j)]])$reg,
-                                                                                       data=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$postcreg[[.(j)]])$data, 
-                                                                                       weights=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$postcreg[[.(j)]])$weights, 
-                                                                                       evaluate = FALSE)))
+                                                                                               reg=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$postcreg[[.(j)]])$reg,
+                                                                                               data=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$postcreg[[.(j)]])$data, 
+                                                                                               weights=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$postcreg[[.(j)]])$weights, 
+                                                                                               evaluate = FALSE)))
                   print(x$sens[[i]]$reg.output.summary[[m]]$postcreg[[j]])
                 } else {
                   x$sens[[i]]$reg.output.summary[[m]]$postcreg[[j]]$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output[[.(m)]]$postcreg[[.(j)]], 
-                                                                                       data=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$postcreg[[.(j)]])$data, 
-                                                                                       weights=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$postcreg[[.(j)]])$weights, 
-                                                                                       evaluate = FALSE)))
+                                                                                               data=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$postcreg[[.(j)]])$data, 
+                                                                                               weights=getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$postcreg[[.(j)]])$weights, 
+                                                                                               evaluate = FALSE)))
                   print(x$sens[[i]]$reg.output.summary[[m]]$postcreg[[j]])
                 }
                 if (j < length(x$sens[[i]]$reg.output.summary[[m]]$postcreg)) cat("\n")
@@ -1109,10 +1225,124 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
         }
       }
     }
-    cat(paste0("\n## Error-corrected causal effects for measurement error ", i, ": \n"))
+    
+    # scale and legend
+    full <- x$naive$methods$full
+    model <- x$naive$methods$model
+    EMint <- x$naive$variables$EMint
+    if (model == "iorw") {
+      if (x$naive$multimp$multimp) yreg_mid <- x$sens[[1]]$reg.output[[1]]$yregTot
+      if (!x$naive$multimp$multimp) yreg_mid <- x$sens[[1]]$reg.output$yregTot
+    } else {
+      if (x$naive$multimp$multimp) yreg_mid <- x$sens[[1]]$reg.output[[1]]$yreg
+      if (!x$naive$multimp$multimp) yreg_mid <- x$sens[[1]]$reg.output$yreg
+    }
+    if (inherits(yreg_mid, "rcreg") | inherits(yreg_mid, "simexreg")) yreg_mid <- yreg_mid$NAIVEreg
+    is_lm <- inherits(yreg_mid, "lm")
+    is_glm <- inherits(yreg_mid, "glm")
+    is_svyglm <- inherits(yreg_mid, "svyglm")
+    is_gam <- inherits(yreg_mid, "gam")
+    if (is_lm | is_glm) family_yreg <- family(yreg_mid)
+    is_multinom <- inherits(yreg_mid, "multinom")
+    is_svymultinom <- inherits(yreg_mid, "svymultinom")
+    is_polr <- inherits(yreg_mid, "polr")
+    is_survreg <- inherits(yreg_mid, "survreg")
+    is_coxph <- inherits(yreg_mid, "coxph")
+    if ((is_lm | is_glm) && (family_yreg$family %in% c("gaussian", "inverse.gaussian", "quasi", "Gamma"))) {
+      scale <- "mean difference scale"
+      if (model == "iorw") {
+        if (full) legend <- "(te: total effect; pnde: pure natural direct effect; tnie: total natural indirect effect; pm: proportion mediated)"   
+        if (!full) legend <- "(te: total effect; pnde: pure natural direct effect; tnie: total natural indirect effect)"
+      } else if (length(x$naive$variables$postc) != 0) {
+        if (full) {
+          if (EMint) legend <- "(cde: controlled direct effect; rpnde: randomized analogue of pure natural direct effect; rtnde: randomized analogue of total natural direct effect; rpnie: randomized analogue of pure natural indirect effect; rtnie: randomized analogue of total natural indirect effect; te: total effect; rintref: randomized analogue of reference interaction; rintmed: randomized analogue of mediated interaction; cde(prop): proportion cde; rintref(prop): proportion rintref; rintmed(prop): proportion rintmed; rpnie(prop): proportion rpnie; rpm: randomized analogue of overall proportion mediated; rint: randomized analogue of overall proportion attributable to interaction; rpe: randomized analogue of overall proportion eliminated)"
+          if (!EMint) legend <- "(cde: controlled direct effect; rpnde: randomized analogue of pure natural direct effect; rtnde: randomized analogue of total natural direct effect; rpnie: randomized analogue of pure natural indirect effect; rtnie: randomized analogue of total natural indirect effect; te: total effect; rpm: randomized analogue of overall proportion mediated)"
+        } else legend <- "(cde: controlled direct effect; rpnde: randomized analogue of pure natural direct effect; rtnde: randomized analogue of total natural direct effect; rpnie: randomized analogue of pure natural indirect effect; rtnie: randomized analogue of total natural indirect effect; te: total effect)"
+      } else {
+        if (full) {
+          if (EMint) legend <- "(cde: controlled direct effect; pnde: pure natural direct effect; tnde: total natural direct effect; pnie: pure natural indirect effect; tnie: total natural indirect effect; te: total effect; intref: reference interaction; intmed: mediated interaction; cde(prop): proportion cde; intref(prop): proportion intref; intmed(prop): proportion intmed; pnie(prop): proportion pnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)"
+          if (!EMint) legend <- "(cde: controlled direct effect; pnde: pure natural direct effect; tnde: total natural direct effect; pnie: pure natural indirect effect; tnie: total natural indirect effect; te: total effect; pm: overall proportion mediated)"
+        } else legend <- "(cde: controlled direct effect; pnde: pure natural direct effect; tnde: total natural direct effect; pnie: pure natural indirect effect; tnie: total natural indirect effect; te: total effect)"
+      }
+    } else if ((is_lm | is_glm) && (family_yreg$family %in% c("poisson", "quasipoisson", "ziplss") |
+                                    startsWith(family_yreg$family, "Negative Binomial") |
+                                    startsWith(family_yreg$family, "Zero inflated Poisson"))) {
+      scale <- "rate ratio scale"
+      if (model == "iorw") {
+        if (full) legend <- "(Rte: total effect rate ratio; Rpnde: pure natural direct effect rate ratio; Rtnie: total natural indirect effect rate ratio; pm: proportion mediated)"   
+        if (!full) legend <- "(Rte: total effect rate ratio; Rpnde: pure natural direct effect rate ratio; Rtnie: total natural indirect effect rate ratio)" 
+      } else if (length(x$naive$variables$postc) != 0) {
+        if (full) {
+          if (EMint) legend <- "(Rcde: controlled direct effect rate ratio; rRpnde: randomized analogue of pure natural direct effect rate ratio; rRtnde: randomized analogue of total natural direct effect rate ratio; rRpnie: randomized analogue of pure natural indirect effect rate ratio; rRtnie: randomized analogue of total natural indirect effect rate ratio; Rte: total effect rate ratio; ERcde: excess relative rate due to controlled direct effect; rERintref: randomized analogue of excess relative rate due to reference interaction; rERintmed: randomized analogue of excess relative rate due to mediated interaction; rERpnie: randomized analogue of excess relative rate due to pure natural indirect effect; ERcde(prop): proportion ERcde; rERintref(prop): proportion rERintref; rERintmed(prop): proportion rERintmed; rERpnie(prop): proportion rERpnie; rpm: randomized analogue of overall proportion mediated; rint: randomized analogue of overall proportion attributable to interaction; rpe: randomized analogue of overall proportion eliminated)"
+          if (!EMint) legend <- "(Rcde: controlled direct effect rate ratio; rRpnde: randomized analogue of pure natural direct effect rate ratio; rRtnde: randomized analogue of total natural direct effect rate ratio; rRpnie: randomized analogue of pure natural indirect effect rate ratio; rRtnie: randomized analogue of total natural indirect effect rate ratio; Rte: total effect rate ratio; rpm: randomized analogue of overall proportion mediated)"
+        } else legend <- "(Rcde: controlled direct effect rate ratio; rRpnde: randomized analogue of pure natural direct effect rate ratio; rRtnde: randomized analogue of total natural direct effect rate ratio; rRpnie: randomized analogue of pure natural indirect effect rate ratio; rRtnie: randomized analogue of total natural indirect effect rate ratio; Rte: total effect rate ratio)"
+      } else {
+        if (full) {
+          if (EMint) legend <- "(Rcde: controlled direct effect rate ratio; Rpnde: pure natural direct effect rate ratio; Rtnde: total natural direct effect rate ratio; Rpnie: pure natural indirect effect rate ratio; Rtnie: total natural indirect effect rate ratio; Rte: total effect rate ratio; ERcde: excess relative rate due to controlled direct effect; ERintref: excess relative rate due to reference interaction; ERintmed: excess relative rate due to mediated interaction; ERpnie: excess relative rate due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)"
+          if (!EMint) legend <- "(Rcde: controlled direct effect rate ratio; Rpnde: pure natural direct effect rate ratio; Rtnde: total natural direct effect rate ratio; Rpnie: pure natural indirect effect rate ratio; Rtnie: total natural indirect effect rate ratio; Rte: total effect rate ratio; pm: overall proportion mediated)"
+        } else legend <- "(Rcde: controlled direct effect rate ratio; Rpnde: pure natural direct effect rate ratio; Rtnde: total natural direct effect rate ratio; Rpnie: pure natural indirect effect rate ratio; Rtnie: total natural indirect effect rate ratio; Rte: total effect rate ratio)"
+      }
+    } else if (((is_lm | is_glm) && (family_yreg$family %in% c("binomial", "quasibinomial", "multinom") |
+                                     startsWith(family_yreg$family, "Ordered Categorical"))) |
+               is_multinom | is_polr) {
+      scale <- "risk ratio scale"
+      if (model == "iorw") {
+        if (full) legend <- "(Rte: total effect risk ratio; Rpnde: pure natural direct effect risk ratio; Rtnie: total natural indirect effect risk ratio; pm: proportion mediated)"   
+        if (!full) legend <- "(Rte: total effect risk ratio; Rpnde: pure natural direct effect risk ratio; Rtnie: total natural indirect effect risk ratio)" 
+      } else if (length(x$naive$variables$postc) != 0) {
+        if (full) {
+          if (EMint) legend <- "(Rcde: controlled direct effect risk ratio; rRpnde: randomized analogue of pure natural direct effect risk ratio; rRtnde: randomized analogue of total natural direct effect risk ratio; rRpnie: randomized analogue of pure natural indirect effect risk ratio; rRtnie: randomized analogue of total natural indirect effect risk ratio; Rte: total effect risk ratio; ERcde: excess relative risk due to controlled direct effect; rERintref: randomized analogue of excess relative risk due to reference interaction; rERintmed: randomized analogue of excess relative risk due to mediated interaction; rERpnie: randomized analogue of excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; rERintref(prop): proportion rERintref; rERintmed(prop): proportion rERintmed; rERpnie(prop): proportion rERpnie; rpm: randomized analogue of overall proportion mediated; rint: randomized analogue of overall proportion attributable to interaction; rpe: randomized analogue of overall proportion eliminated)"
+          if (!EMint) legend <- "(Rcde: controlled direct effect risk ratio; rRpnde: randomized analogue of pure natural direct effect risk ratio; rRtnde: randomized analogue of total natural direct effect risk ratio; rRpnie: randomized analogue of pure natural indirect effect risk ratio; rRtnie: randomized analogue of total natural indirect effect risk ratio; Rte: total effect risk ratio; rpm: randomized analogue of overall proportion mediated)"
+        } else legend <- "(Rcde: controlled direct effect risk ratio; rRpnde: randomized analogue of pure natural direct effect risk ratio; rRtnde: randomized analogue of total natural direct effect risk ratio; rRpnie: randomized analogue of pure natural indirect effect risk ratio; rRtnie: randomized analogue of total natural indirect effect risk ratio; Rte: total effect risk ratio)"
+      } else {
+        if (full) {
+          if (EMint) legend <- "(Rcde: controlled direct effect risk ratio; Rpnde: pure natural direct effect risk ratio; Rtnde: total natural direct effect risk ratio; Rpnie: pure natural indirect effect risk ratio; Rtnie: total natural indirect effect risk ratio; Rte: total effect risk ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)"
+          if (!EMint) legend <- "(Rcde: controlled direct effect risk ratio; Rpnde: pure natural direct effect risk ratio; Rtnde: total natural direct effect risk ratio; Rpnie: pure natural indirect effect risk ratio; Rtnie: total natural indirect effect risk ratio; Rte: total effect risk ratio; pm: overall proportion mediated)"
+        } else legend <- "(Rcde: controlled direct effect risk ratio; Rpnde: pure natural direct effect risk ratio; Rtnde: total natural direct effect risk ratio; Rpnie: pure natural indirect effect risk ratio; Rtnie: total natural indirect effect risk ratio; Rte: total effect risk ratio)"
+      }
+    } else if (is_coxph) {
+      scale <- "hazard ratio scale"
+      if (model == "iorw") {
+        if (full) legend <- "(Rte: total effect hazard ratio; Rpnde: pure natural direct effect hazard ratio; Rtnie: total natural indirect effect hazard ratio; pm: proportion mediated)"   
+        if (!full) legend <- "(Rte: total effect hazard ratio; Rpnde: pure natural direct effect hazard ratio; Rtnie: total natural indirect effect hazard ratio)" 
+      }  else if (length(x$naive$variables$postc) != 0) {
+        if (full) {
+          if (EMint) legend <- "(Rcde: controlled direct effect hazard ratio; rRpnde: randomized analogue of pure natural direct effect hazard ratio; rRtnde: randomized analogue of total natural direct effect hazard ratio; rRpnie: randomized analogue of pure natural indirect effect hazard ratio; rRtnie: randomized analogue of total natural indirect effect hazard ratio; Rte: total effect hazard ratio; ERcde: excess relative hazard due to controlled direct effect; rERintref: randomized analogue of excess relative hazard due to reference interaction; rERintmed: randomized analogue of excess relative hazard due to mediated interaction; rERpnie: randomized analogue of excess relative hazard due to pure natural indirect effect; ERcde(prop): proportion ERcde; rERintref(prop): proportion rERintref; rERintmed(prop): proportion rERintmed; rERpnie(prop): proportion rERpnie; rpm: randomized analogue of overall proportion mediated; rint: randomized analogue of overall proportion attributable to interaction; rpe: randomized analogue of overall proportion eliminated)"
+          if (!EMint) legend <- "(Rcde: controlled direct effect hazard ratio; rRpnde: randomized analogue of pure natural direct effect hazard ratio; rRtnde: randomized analogue of total natural direct effect hazard ratio; rRpnie: randomized analogue of pure natural indirect effect hazard ratio; rRtnie: randomized analogue of total natural indirect effect hazard ratio; Rte: total effect hazard ratio; rpm: randomized analogue of overall proportion mediated)"
+        } else legend <- "(Rcde: controlled direct effect hazard ratio; rRpnde: randomized analogue of pure natural direct effect hazard ratio; rRtnde: randomized analogue of total natural direct effect hazard ratio; rRpnie: randomized analogue of pure natural indirect effect hazard ratio; rRtnie: randomized analogue of total natural indirect effect hazard ratio; Rte: total effect hazard ratio)"
+      } else {
+        if (full) {
+          if (EMint) legend <- "(Rcde: controlled direct effect hazard ratio; Rpnde: pure natural direct effect hazard ratio; Rtnde: total natural direct effect hazard ratio; Rpnie: pure natural indirect effect hazard ratio; Rtnie: total natural indirect effect hazard ratio; Rte: total effect hazard ratio; ERcde: excess relative hazard due to controlled direct effect; ERintref: excess relative hazard due to reference interaction; ERintmed: excess relative hazard due to mediated interaction; ERpnie: excess relative hazard due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)"
+          if (!EMint) legend <- "(Rcde: controlled direct effect hazard ratio; Rpnde: pure natural direct effect hazard ratio; Rtnde: total natural direct effect hazard ratio; Rpnie: pure natural indirect effect hazard ratio; Rtnie: total natural indirect effect hazard ratio; Rte: total effect hazard ratio; pm: overall proportion mediated)"
+        } else legend <- "(Rcde: controlled direct effect hazard ratio; Rpnde: pure natural direct effect hazard ratio; Rtnde: total natural direct effect hazard ratio; Rpnie: pure natural indirect effect hazard ratio; Rtnie: total natural indirect effect hazard ratio; Rte: total effect hazard ratio)"
+      }
+    } else if (is_survreg) {
+      scale <- "mean survival scale"
+      if (model == "iorw") {
+        if (full) legend <- "(Rte: total effect mean survival ratio; Rpnde: pure natural direct effect mean survival ratio; Rtnie: total natural indirect effect mean survival ratio; pm: proportion mediated)"   
+        if (!full) legend <- "(Rte: total effect mean survival ratio; Rpnde: pure natural direct effect mean survival ratio; Rtnie: total natural indirect effect mean survival ratio)" 
+      } else if (length(x$naive$variables$postc) != 0) {
+        if (full) {
+          if (EMint) legend <- "(Rcde: controlled direct effect mean survival ratio; rRpnde: randomized analogue of pure natural direct effect mean survival ratio; rRtnde: randomized analogue of total natural direct effect mean survival ratio; rRpnie: randomized analogue of pure natural indirect effect mean survival ratio; rRtnie: randomized analogue of total natural indirect effect mean survival ratio; Rte: total effect mean survival ratio; ERcde: excess mean survival ratio due to controlled direct effect; rERintref: randomized analogue of excess mean survival ratio due to reference interaction; rERintmed: randomized analogue of excess mean survival ratio due to mediated interaction; rERpnie: randomized analogue of excess mean survival ratio due to pure natural indirect effect; ERcde(prop): proportion ERcde; rERintref(prop): proportion rERintref; rERintmed(prop): proportion rERintmed; rERpnie(prop): proportion rERpnie; rpm: randomized analogue of overall proportion mediated; rint: randomized analogue of overall proportion attributable to interaction; rpe: randomized analogue of overall proportion eliminated)"
+          if (!EMint) legend <- "(Rcde: controlled direct effect mean survival ratio; rRpnde: randomized analogue of pure natural direct effect mean survival ratio; rRtnde: randomized analogue of total natural direct effect mean survival ratio; rRpnie: randomized analogue of pure natural indirect effect mean survival ratio; rRtnie: randomized analogue of total natural indirect effect mean survival ratio; Rte: total effect mean survival ratio; rpm: randomized analogue of overall proportion mediated)"
+        } else legend <- "(Rcde: controlled direct effect mean survival ratio; rRpnde: randomized analogue of pure natural direct effect mean survival ratio; rRtnde: randomized analogue of total natural direct effect mean survival ratio; rRpnie: randomized analogue of pure natural indirect effect mean survival ratio; rRtnie: randomized analogue of total natural indirect effect mean survival ratio; Rte: total effect mean survival ratio)"
+      } else {
+        if (full) {
+          if (EMint) legend <- "(Rcde: controlled direct effect mean survival ratio; Rpnde: pure natural direct effect mean survival ratio; Rtnde: total natural direct effect mean survival ratio; Rpnie: pure natural indirect effect mean survival ratio; Rtnie: total natural indirect effect mean survival ratio; Rte: total effect mean survival ratio; ERcde: excess mean survival ratio due to controlled direct effect; ERintref: excess mean survival ratio due to reference interaction; ERintmed: excess mean survival ratio due to mediated interaction; ERpnie: excess mean survival ratio due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)"
+          if (!EMint) legend <- "(Rcde: controlled direct effect mean survival ratio; Rpnde: pure natural direct effect mean survival ratio; Rtnde: total natural direct effect mean survival ratio; Rpnie: pure natural indirect effect mean survival ratio; Rtnie: total natural indirect effect mean survival ratio; Rte: total effect mean survival ratio; pm: overall proportion mediated)"
+        } else legend <- "(Rcde: controlled direct effect mean survival ratio; Rpnde: pure natural direct effect mean survival ratio; Rtnde: total natural direct effect mean survival ratio; Rpnie: pure natural indirect effect mean survival ratio; Rtnie: total natural indirect effect mean survival ratio; Rte: total effect mean survival ratio)"
+      }
+    }
+    
+    # print error-corrected results
+    cat(paste0(paste("\n## Error-corrected causal effects on the", scale, "for measurement error "), i, ": \n"))
     printCoefmat(x$summarydf[[i]], digits = digits, has.Pvalue = TRUE)
     cat("----------------------------------------------------------------\n")
   }
+  cat("\n")
+  cat(legend)
+  cat("\n\nRelevant variable values: \n")
+  print(x$naive$ref)
 }
 
 

@@ -788,11 +788,11 @@ print.cmest <- function(x, ...) {
   model <- x$methods$model
   EMint <- x$variables$EMint
   if (model == "iorw") {
-    if(x$multimp$multimp) yreg_mid <- x$reg.output[[1]]$yregTot
-    if(!x$multimp$multimp) yreg_mid <- x$reg.output$yregTot
+    if (x$multimp$multimp) yreg_mid <- x$reg.output[[1]]$yregTot
+    if (!x$multimp$multimp) yreg_mid <- x$reg.output$yregTot
   } else {
-    if(x$multimp$multimp) yreg_mid <- x$reg.output[[1]]$yreg
-    if(!x$multimp$multimp) yreg_mid <- x$reg.output$yreg
+    if (x$multimp$multimp) yreg_mid <- x$reg.output[[1]]$yreg
+    if (!x$multimp$multimp) yreg_mid <- x$reg.output$yreg
   }
   if (inherits(yreg_mid, "rcreg") | inherits(yreg_mid, "simexreg")) yreg_mid <- yreg_mid$NAIVEreg
   is_lm <- inherits(yreg_mid, "lm")

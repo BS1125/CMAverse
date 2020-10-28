@@ -4,6 +4,7 @@
 #' error via \emph{SIMEX} by Cook et al. (1994) and Küchenhoff et al. (2006).
 #'
 #' @param reg naive regression object. See \code{Details}.
+#' @param formula regression formula
 #' @param data new dataset for \code{reg}
 #' @param weights new weights for \code{reg}
 #' @param MEvariable variable measured with error
@@ -18,7 +19,6 @@
 #' @param B number of simulations for \emph{SIMEX}. Default is \code{200}.
 #' @param x an object of class \code{simexreg}
 #' @param object an object of class \code{simexreg}
-#' @param formula an object of class \code{simexreg}
 #' @param digits minimal number of significant digits. See \link{print.default}.
 #' @param evaluate a logical value. If \code{TRUE}, the updated call is evaluated. Default
 #' is \code{TRUE}.
@@ -31,9 +31,8 @@
 #' \link[survival]{survreg} is supported.
 #'  
 #' @return
-#' If \code{MEvariable} is not in the regression formula of \code{reg}, \code{reg} is 
-#' returned. If \code{MEvariable} is in the regression formula of \code{yeg}, an object of 
-#' class \code{simexreg} is returned:
+#' If \code{MEvariable} is not in the regression formula, \code{reg} is returned. If 
+#' \code{MEvariable} is in the regression formula, an object of class \code{simexreg} is returned:
 #' \item{call}{the function call,}
 #' \item{NAIVEreg}{the naive regression object,}
 #' \item{ME}{a list of \code{MEvariable}, \code{MEvartype}, \code{MEerror}, \code{variance},
@@ -78,8 +77,8 @@
 #'                    x3 = x3, y = y)
 #' reg_naive <- lm(y ~ x1 + x2_error + x3, data = data)
 #' reg_true <- lm(y ~ x1 + x2_true + x3, data = data)
-#' reg_simex <- simexreg(reg = reg_naive, data = data, MEvariable = "x2_error", 
-#' MEvartype = "con", MEerror = 0.5, variance = TRUE)
+#' reg_simex <- simexreg(reg = reg_naive, formula = y ~ x1 + x2_error + x3, data = data, 
+#' MEvariable = "x2_error", MEvartype = "con", MEerror = 0.5, variance = TRUE)
 #' coef(reg_simex)
 #' vcov(reg_simex)
 #' sigma(reg_simex)
@@ -111,8 +110,8 @@
 #'                    x3 = x3, y = y)
 #' reg_naive <- glm(y ~ x1 + x2_error + x3, data = data, family = binomial("logit"))
 #' reg_true <- glm(y ~ x1 + x2_true + x3, data = data, family = binomial("logit"))
-#' reg_simex <- simexreg(reg = reg_naive, data = data, MEvariable = "x2_error",
-#'                       MEerror = MEerror, variance = TRUE, MEvartype = "cat")
+#' reg_simex <- simexreg(reg = reg_naive, formula = y ~ x1 + x2_error + x3, data = data, 
+#' MEvariable = "x2_error", MEerror = MEerror, variance = TRUE, MEvartype = "cat")
 #' }
 #'                   
 #' @importFrom stats as.formula model.frame family coef predict model.matrix getCall cov 
@@ -121,7 +120,7 @@
 #' 
 #' @export
 #' 
-simexreg <- function (reg = NULL, data = NULL, weights = NULL, 
+simexreg <- function (reg = NULL, formula = NULL, data = NULL, weights = NULL, 
                       MEvariable = NULL, MEvartype = NULL, MEerror = NULL,
                       variance = FALSE, lambda = c(0.5, 1, 1.5, 2), B = 200) {
   
@@ -132,8 +131,8 @@ simexreg <- function (reg = NULL, data = NULL, weights = NULL,
   assign2glob("svyglm", survey::svyglm, 1L)
   
   # the vector of variable names in the regression formula
-  reg_formula <- formula(reg)
-  var_vec <- unique(all.vars(reg_formula))
+  formula <- as.formula(formula)
+  var_vec <- unique(all.vars(formula))
   
   if (length(MEvariable) == 0 | !MEvariable %in% var_vec) {
     out <- reg
@@ -172,7 +171,9 @@ simexreg <- function (reg = NULL, data = NULL, weights = NULL,
       designCall$data <- data
       designCall$weights <- weights
       regCall$design <- eval.parent(designCall)
+      regCall$formula <- formula
     } else {
+      regCall$formula <- formula
       regCall$data <- data
       regCall$weights <- weights
       if (inherits(reg, "multinom")) regCall$trace <- FALSE

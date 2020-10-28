@@ -4,6 +4,7 @@
 #' measured with error via \emph{regression calibration} by Carroll et al. (1995).
 #'
 #' @param reg naive regression object. See \code{Details}.
+#' @param formula regression formula
 #' @param data new dataset for \code{reg}
 #' @param weights new weights for \code{reg}
 #' @param MEvariable variable measured with error
@@ -14,7 +15,6 @@
 #' is \code{400}.
 #' @param x an object of class \code{rcreg}
 #' @param object an object of class \code{rcreg}
-#' @param formula an object of class \code{rcreg}
 #' @param digits minimal number of significant digits. See \link{print.default}.
 #' @param evaluate a logical value. If \code{TRUE}, the updated call is evaluated. Default
 #' is \code{TRUE}.
@@ -27,9 +27,9 @@
 #' \link[survival]{survreg} is supported.
 #'  
 #' @return
-#' If \code{MEvariable} is not in the regression formula of \code{reg}, \code{reg} is 
-#' returned. If \code{MEvariable} is a continuous independent variable in the regression formula of 
-#' \code{yeg}, an object of class \code{rcreg} is returned:
+#' If \code{MEvariable} is not in the regression formula, \code{reg} is returned. If 
+#' \code{MEvariable} is a continuous independent variable in the regression formula, an 
+#' object of class \code{rcreg} is returned:
 #' \item{call}{the function call,}
 #' \item{NAIVEreg}{the naive regression object,}
 #' \item{ME}{a list of \code{MEvariable}, \code{MEerror}, \code{variance} and \code{nboot},}
@@ -65,8 +65,8 @@
 #'                    x3 = x3, y = y)
 #' reg_naive <- lm(y ~ x1 + x2_error + x3, data = data)
 #' reg_true <- lm(y ~ x1 + x2_true + x3, data = data)
-#' reg_rc <- rcreg(reg = reg_naive, data = data, MEvariable = "x2_error",
-#'                MEerror = 0.5, variance = TRUE, nboot = 2)
+#' reg_rc <- rcreg(reg = reg_naive, formula = y ~ x1 + x2_error + x3,
+#'  data = data, MEvariable = "x2_error", MEerror = 0.5, variance = TRUE, nboot = 2)
 #' coef(reg_rc)
 #' vcov(reg_rc)
 #' sigma(reg_rc)
@@ -91,8 +91,8 @@
 #'                    x3 = x3, y = y)
 #' reg_naive <- glm(y ~ x1 + x2_error + x3, data = data, family = binomial("logit"))
 #' reg_true <- glm(y ~ x1 + x2_true + x3, data = data, family = binomial("logit"))
-#' reg_rc <- rcreg(reg = reg_naive, data = data, MEvariable = "x2_error",
-#'                 MEerror = 0.5, variance = TRUE, nboot = 2)
+#' reg_rc <- rcreg(reg = reg_naive, formula = y ~ x1 + x2_error + x3, data = data, 
+#' MEvariable = "x2_error", MEerror = 0.5, variance = TRUE, nboot = 2)
 #' 
 #' # multinom
 #' n <- 1000
@@ -111,8 +111,8 @@
 #'                    x3 = x3, y = y)
 #' reg_naive <- nnet::multinom(factor(y) ~ x1 + x2_error + x3, data = data)
 #' reg_true <- nnet::multinom(factor(y) ~ x1 + x2_true + x3, data = data)
-#' reg_rc <- rcreg(reg = reg_naive, data = data, MEvariable = "x2_error",
-#'                 MEerror = 0.5, variance = TRUE, nboot = 2)
+#' reg_rc <- rcreg(reg = reg_naive, formula = factor(y) ~ x1 + x2_error + x3, 
+#' data = data, MEvariable = "x2_error", MEerror = 0.5, variance = TRUE, nboot = 2)
 #' }                
 #'
 #' @importFrom stats as.formula model.frame family coef predict model.matrix getCall cov 
@@ -121,21 +121,21 @@
 #' 
 #' @export
 #' 
-rcreg <- function(reg = NULL, data = NULL, weights = NULL,
+rcreg <- function(reg = NULL, formula = NULL, data = NULL, weights = NULL,
                   MEvariable = NULL, MEerror = NULL, variance = FALSE, nboot = 400) {
-
+  
   cl <- match.call()
   
   # assign svyglm the global environment
   assign2glob <- function(key, val, pos) assign(key, val, envir = as.environment(pos))
   assign2glob("svyglm", survey::svyglm, 1L)
   
-  reg_formula <- formula(reg)
+  formula <- as.formula(formula)
   # the vector of names of all variables in the regression formula 
-  var_vec <- unique(all.vars(reg_formula))
+  var_vec <- unique(all.vars(formula))
   # the vector of names of all independent variables in the regression formula
-  ind_var <- unique(all.vars(reg_formula[[3]]))
-
+  ind_var <- unique(all.vars(formula[[3]]))
+  
   if (length(MEvariable) == 0 | !MEvariable %in% var_vec) {
     out <- reg
   } else if (!MEvariable %in% ind_var) {
@@ -156,28 +156,30 @@ rcreg <- function(reg = NULL, data = NULL, weights = NULL,
           identical(regClass, c("multinom", "nnet")) | identical(regClass, "polr") | 
           identical(regClass, "coxph") | identical(regClass, "survreg"))) stop(
             "Regression calibration applied to unsupported regression object")
-
+    
     # update reg with data and weights
     if (identical(regClass, c("svyglm", "glm", "lm"))) {
       designCall <- getCall(reg$survey.design)
       designCall$data <- data
       designCall$weights <- weights
       regCall$design <- eval.parent(designCall)
+      regCall$formula <- formula
     } else {
-    regCall$data <- data
-    regCall$weights <- weights
-    if (inherits(reg, "multinom")) regCall$trace <- FALSE
-    if (inherits(reg, "polr")) regCall$Hess <- TRUE
+      regCall$formula <- formula
+      regCall$data <- data
+      regCall$weights <- weights
+      if (inherits(reg, "multinom")) regCall$trace <- FALSE
+      if (inherits(reg, "polr")) regCall$Hess <- TRUE
     }
     reg <- eval.parent(regCall)
     out <- list(call = cl, NAIVEreg = reg,
                 ME = list(MEvariable = MEvariable, MEerror = MEerror, variance = variance))
-
+    
     MEvar_index <- which(ind_var %in% MEvariable)
     # code categorical variables into dummy variables
     ind_data <- model.matrix(as.formula(paste0("~", paste(c(MEvariable, ind_var[-MEvar_index]), collapse = "+"))),
                              model.frame(~., data = data[, ind_var], na.action = na.pass))[, -1]
-
+    
     rc_step <- function(data = NULL, ind_data = NULL, indices = NULL, outreg = FALSE) {
       data <- data[indices, ]
       ind_data <- ind_data[indices, ]
@@ -230,7 +232,7 @@ rcreg <- function(reg = NULL, data = NULL, weights = NULL,
       if (outreg) out <- list(RCreg = RCreg, RCcoef = RCcoef)
       return(out)
     }
-
+    
     n <- nrow(data)
     RC <- rc_step(data = data, ind_data = ind_data, indices = 1:n, outreg = TRUE)
     RCcoef <- RC$RCcoef
@@ -243,7 +245,7 @@ rcreg <- function(reg = NULL, data = NULL, weights = NULL,
                         (n-n_coef) - (RCcoef[MEvariable]* MEerror) ^ 2 )
       out$RCsigma <- unname(RCsigma)
     }
-
+    
     if (variance) {
       boots <- boot(data = data, ind_data = ind_data, statistic = rc_step, R = nboot)
       mean_boots <- apply(boots$t, 2, function(x) mean(x, na.rm = TRUE))
