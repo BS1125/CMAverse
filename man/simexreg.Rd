@@ -153,7 +153,7 @@ data <- data.frame(x1 = x1, x2_true = x2_true, x2_error = x2_error,
                    x3 = x3, y = y)
 reg_naive <- lm(y ~ x1 + x2_error + x3, data = data)
 reg_true <- lm(y ~ x1 + x2_true + x3, data = data)
-reg_simex <- simexreg(reg = reg_naive, formula = y ~ x1 + x2_error + x3, data = data, 
+reg_simex <- simexreg(reg = reg_naive, data = data, 
 MEvariable = "x2_error", MEvartype = "con", MEerror = 0.5, variance = TRUE)
 coef(reg_simex)
 vcov(reg_simex)
@@ -186,7 +186,7 @@ data <- data.frame(x1 = x1, x2_true = x2_true, x2_error = x2_error,
                    x3 = x3, y = y)
 reg_naive <- glm(y ~ x1 + x2_error + x3, data = data, family = binomial("logit"))
 reg_true <- glm(y ~ x1 + x2_true + x3, data = data, family = binomial("logit"))
-reg_simex <- simexreg(reg = reg_naive, formula = y ~ x1 + x2_error + x3, data = data, 
+reg_simex <- simexreg(reg = reg_naive, data = data, 
 MEvariable = "x2_error", MEerror = MEerror, variance = TRUE, MEvartype = "cat")
 }
                   

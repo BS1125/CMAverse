@@ -145,8 +145,8 @@ data <- data.frame(x1 = x1, x2_true = x2_true, x2_error = x2_error,
                    x3 = x3, y = y)
 reg_naive <- lm(y ~ x1 + x2_error + x3, data = data)
 reg_true <- lm(y ~ x1 + x2_true + x3, data = data)
-reg_rc <- rcreg(reg = reg_naive, formula = y ~ x1 + x2_error + x3,
- data = data, MEvariable = "x2_error", MEerror = 0.5, variance = TRUE, nboot = 2)
+reg_rc <- rcreg(reg = reg_naive, data = data, MEvariable = "x2_error", MEerror = 0.5, 
+variance = TRUE, nboot = 2)
 coef(reg_rc)
 vcov(reg_rc)
 sigma(reg_rc)
@@ -171,7 +171,7 @@ data <- data.frame(x1 = x1, x2_true = x2_true, x2_error = x2_error,
                    x3 = x3, y = y)
 reg_naive <- glm(y ~ x1 + x2_error + x3, data = data, family = binomial("logit"))
 reg_true <- glm(y ~ x1 + x2_true + x3, data = data, family = binomial("logit"))
-reg_rc <- rcreg(reg = reg_naive, formula = y ~ x1 + x2_error + x3, data = data, 
+reg_rc <- rcreg(reg = reg_naive, data = data, 
 MEvariable = "x2_error", MEerror = 0.5, variance = TRUE, nboot = 2)
 
 # multinom
@@ -191,8 +191,8 @@ data <- data.frame(x1 = x1, x2_true = x2_true, x2_error = x2_error,
                    x3 = x3, y = y)
 reg_naive <- nnet::multinom(factor(y) ~ x1 + x2_error + x3, data = data)
 reg_true <- nnet::multinom(factor(y) ~ x1 + x2_true + x3, data = data)
-reg_rc <- rcreg(reg = reg_naive, formula = factor(y) ~ x1 + x2_error + x3, 
-data = data, MEvariable = "x2_error", MEerror = 0.5, variance = TRUE, nboot = 2)
+reg_rc <- rcreg(reg = reg_naive, data = data, MEvariable = "x2_error", MEerror = 0.5, 
+variance = TRUE, nboot = 2)
 }                
 
 }

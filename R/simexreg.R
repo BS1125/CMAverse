@@ -77,7 +77,7 @@
 #'                    x3 = x3, y = y)
 #' reg_naive <- lm(y ~ x1 + x2_error + x3, data = data)
 #' reg_true <- lm(y ~ x1 + x2_true + x3, data = data)
-#' reg_simex <- simexreg(reg = reg_naive, formula = y ~ x1 + x2_error + x3, data = data, 
+#' reg_simex <- simexreg(reg = reg_naive, data = data, 
 #' MEvariable = "x2_error", MEvartype = "con", MEerror = 0.5, variance = TRUE)
 #' coef(reg_simex)
 #' vcov(reg_simex)
@@ -110,7 +110,7 @@
 #'                    x3 = x3, y = y)
 #' reg_naive <- glm(y ~ x1 + x2_error + x3, data = data, family = binomial("logit"))
 #' reg_true <- glm(y ~ x1 + x2_true + x3, data = data, family = binomial("logit"))
-#' reg_simex <- simexreg(reg = reg_naive, formula = y ~ x1 + x2_error + x3, data = data, 
+#' reg_simex <- simexreg(reg = reg_naive, data = data, 
 #' MEvariable = "x2_error", MEerror = MEerror, variance = TRUE, MEvartype = "cat")
 #' }
 #'                   
@@ -131,7 +131,8 @@ simexreg <- function (reg = NULL, formula = NULL, data = NULL, weights = NULL,
   assign2glob("svyglm", survey::svyglm, 1L)
   
   # the vector of variable names in the regression formula
-  formula <- as.formula(formula)
+  if (is.null(formula)) formula <- as.formula(formula)
+  if (!is.null(formula)) formula <- formula(reg)
   var_vec <- unique(all.vars(formula))
   
   if (length(MEvariable) == 0 | !MEvariable %in% var_vec) {

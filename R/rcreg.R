@@ -65,8 +65,8 @@
 #'                    x3 = x3, y = y)
 #' reg_naive <- lm(y ~ x1 + x2_error + x3, data = data)
 #' reg_true <- lm(y ~ x1 + x2_true + x3, data = data)
-#' reg_rc <- rcreg(reg = reg_naive, formula = y ~ x1 + x2_error + x3,
-#'  data = data, MEvariable = "x2_error", MEerror = 0.5, variance = TRUE, nboot = 2)
+#' reg_rc <- rcreg(reg = reg_naive, data = data, MEvariable = "x2_error", MEerror = 0.5, 
+#' variance = TRUE, nboot = 2)
 #' coef(reg_rc)
 #' vcov(reg_rc)
 #' sigma(reg_rc)
@@ -91,7 +91,7 @@
 #'                    x3 = x3, y = y)
 #' reg_naive <- glm(y ~ x1 + x2_error + x3, data = data, family = binomial("logit"))
 #' reg_true <- glm(y ~ x1 + x2_true + x3, data = data, family = binomial("logit"))
-#' reg_rc <- rcreg(reg = reg_naive, formula = y ~ x1 + x2_error + x3, data = data, 
+#' reg_rc <- rcreg(reg = reg_naive, data = data, 
 #' MEvariable = "x2_error", MEerror = 0.5, variance = TRUE, nboot = 2)
 #' 
 #' # multinom
@@ -111,8 +111,8 @@
 #'                    x3 = x3, y = y)
 #' reg_naive <- nnet::multinom(factor(y) ~ x1 + x2_error + x3, data = data)
 #' reg_true <- nnet::multinom(factor(y) ~ x1 + x2_true + x3, data = data)
-#' reg_rc <- rcreg(reg = reg_naive, formula = factor(y) ~ x1 + x2_error + x3, 
-#' data = data, MEvariable = "x2_error", MEerror = 0.5, variance = TRUE, nboot = 2)
+#' reg_rc <- rcreg(reg = reg_naive, data = data, MEvariable = "x2_error", MEerror = 0.5, 
+#' variance = TRUE, nboot = 2)
 #' }                
 #'
 #' @importFrom stats as.formula model.frame family coef predict model.matrix getCall cov 
@@ -130,7 +130,8 @@ rcreg <- function(reg = NULL, formula = NULL, data = NULL, weights = NULL,
   assign2glob <- function(key, val, pos) assign(key, val, envir = as.environment(pos))
   assign2glob("svyglm", survey::svyglm, 1L)
   
-  formula <- as.formula(formula)
+  if (is.null(formula)) formula <- as.formula(formula)
+  if (!is.null(formula)) formula <- formula(reg)
   # the vector of names of all variables in the regression formula 
   var_vec <- unique(all.vars(formula))
   # the vector of names of all independent variables in the regression formula
