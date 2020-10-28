@@ -305,8 +305,8 @@ of the regression. \code{yreg} can be chosen from \code{linear}, \code{logistic}
 \code{aft_weibull}. \code{mreg} can be chosen from \code{linear}, \code{logistic} and 
 \code{multinomial}.
 
-To use \code{paramfunc} with \code{yreg = "logistic"}, the outcome must be rare. To use 
-\code{paramfunc} with \code{yreg = "coxph"}, the outcome at the end of follow-up must be rare.
+To use \code{paramfunc} with \code{yreg = "logistic"} or \code{yreg = "coxph"}, the outcome must 
+be rare.
 
 
 \strong{Inference Methods}
@@ -392,17 +392,25 @@ When \code{model = "iorw"}, \code{Rte}, \code{Rpnde}, \code{Rtnie} and \code{pm}
 \dontrun{
 library(CMAverse)
 
-# single-mediator case with rb
+# single-mediator case with rb, no exposure-mediator interaction
 exp1 <- cmest(data = cma2020, model = "rb", outcome = "contY", 
 exposure = "A", mediator = "M2", basec = c("C1", "C2"), 
-EMint = TRUE, mreg = list("multinomial"), yreg = "linear", 
+EMint = FALSE, mreg = list("multinomial"), yreg = "linear", 
 astar = 0, a = 1, mval = list("M2_0"), estimation = "paramfunc", 
 inference = "delta")
 summary(exp1)
 
+# single-mediator case with rb
+exp2 <- cmest(data = cma2020, model = "rb", outcome = "contY", 
+exposure = "A", mediator = "M2", basec = c("C1", "C2"), 
+EMint = TRUE, mreg = list("multinomial"), yreg = "linear", 
+astar = 0, a = 1, mval = list("M2_0"), estimation = "paramfunc", 
+inference = "delta")
+summary(exp2)
+
 # multiple-mediator case with rb
 # 10 boots are used for illustration
-exp2 <- cmest(data = cma2020, model = "rb", outcome = "contY", 
+exp3 <- cmest(data = cma2020, model = "rb", outcome = "contY", 
 exposure = "A", mediator = c("M1", "M2"), basec = c("C1", "C2"), 
 EMint = TRUE, mreg = list("logistic", "multinomial"), 
 yreg = "linear", astar = 0, a = 1, mval = list(0, "M2_0"), 
@@ -410,14 +418,14 @@ estimation = "imputation", inference = "bootstrap", nboot = 10,
 boot.ci.type = "bca")
 
 # multiple-mediator case with ne
-exp3 <- cmest(data = cma2020, model = "ne", outcome = "contY", 
+exp4 <- cmest(data = cma2020, model = "ne", outcome = "contY", EMint = TRUE,
 exposure = "A", mediator = c("M1", "M2"), basec = c("C1", "C2"), 
 yreg = glm(contY ~ A + M1 + M2 + A*M1 + A*M2 + C1 + C2, family = gaussian, data = cma2020), 
 astar = 0, a = 1, mval = list(0, "M2_0"), estimation = "imputation", 
 inference = "bootstrap", nboot = 10)
 
 # case control study with msm
-exp4 <- cmest(data = cma2020, model = "msm", casecontrol = TRUE, 
+exp5 <- cmest(data = cma2020, model = "msm", casecontrol = TRUE, 
 yrare = TRUE, outcome = "binY", exposure = "A", 
 mediator = c("M1", "M2"), EMint = TRUE, basec = c("C1", "C2"), yreg = "logistic", 
 ereg = "logistic", mreg = list(glm(M1 ~ A, family = binomial, 

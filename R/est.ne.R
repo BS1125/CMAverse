@@ -154,7 +154,7 @@ est.ne <- function(data = NULL, indices = NULL, outReg = FALSE, full = NULL) {
     if (full) {
       pm <- (exp(logRRpnde) * (exp(logRRtnie) - 1)) / (exp(logRRte) - 1)
       if (EMint) {
-        RRcde <- (EY1m-EY0m)/EY00
+        ERRcde <- (EY1m-EY0m)/EY00
         ERRintref <- exp(logRRpnde) - 1 - ERRcde
         ERRintmed <- exp(logRRtnie) * exp(logRRpnde) - exp(logRRpnde) - exp(logRRpnie) + 1
         ERRpnie <- exp(logRRpnie) - 1

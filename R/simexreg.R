@@ -445,8 +445,10 @@ summary.simexreg <- function(object, ...) {
 print.summary.simexreg <- function(x, digits = 4, ...) {
   cat("Call:\n")
   print(x$call)
-  cat(paste("\nNaive regression object: \n"))
-  print(x$NAIVEreg)
+  cat("\nNaive coefficient estimates: \n")
+  print(coef(x$NAIVEreg))
+  cat("\nNaive var-cov estimates: \n")
+  print(vcov(x$NAIVEreg))
   cat("\nVariable measured with error:\n")
   cat(x$ME$MEvariable)
   cat("\nMeasurement error:\n")

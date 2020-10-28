@@ -342,16 +342,16 @@ print.cmsens.me <- function(x, ...) {
   cat("\n")
   
   for (i in 1:length(x$sens)) {
-    cat(paste0("\nMeasurement error ", i, ": \n"))
+    cat(paste0("\n# Measurement error ", i, ": \n"))
     if (x$ME$MEvartype == "continuous") print(x$ME$MEerror[i])
     if (x$ME$MEvartype == "categorical") print(x$ME$MEerror[[i]])
-    cat(paste0("\nError-corrected regressions for measurement error ", i, ": \n\n"))
+    cat(paste0("\n## Error-corrected regressions for measurement error ", i, ": \n\n"))
     # print error corrected regression models
     if (!x$naive$multimp$multimp) {
       regnames <- names(x$sens[[i]]$reg.output)
       for (name in regnames) {
         if (name == "yreg") {
-          cat("# Outcome Regression:\n")
+          cat("### Outcome regression:\n")
           if (inherits(x$sens[[i]]$reg.output$yreg, "svyglm")) {
             x$sens[[i]]$reg.output$yreg$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output$yreg,design = getCall(x$sens[[.(i)]]$reg.output$yreg)$design,
                                                                    family = getCall(x$sens[[.(i)]]$reg.output$yreg)$family, evaluate = FALSE)))
@@ -374,7 +374,7 @@ print.cmsens.me <- function(x, ...) {
           }
         }
         if (name == "yregTot") {
-          cat("# Outcome Regression for the Total Effect: \n")
+          cat("### Outcome regression for the total effect: \n")
           if (inherits(x$sens[[i]]$reg.output$yregTot, "rcreg")|inherits(x$sens[[i]]$reg.output$yregTot, "simexreg")) {
             x$sens[[i]]$reg.output$yregTot$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output$yregTot, reg = getCall(x$sens[[.(i)]]$reg.output$yregTot)$reg,
                                                                       data=getCall(x$sens[[.(i)]]$reg.output$yregTot)$data,
@@ -387,7 +387,7 @@ print.cmsens.me <- function(x, ...) {
           }
         }
         if (name == "yregDir") {
-          cat("# Outcome Regression for the Direct Effect: \n")
+          cat("### Outcome regression for the direct effect: \n")
           if (inherits(x$sens[[i]]$reg.output$yregDir, "rcreg")|inherits(x$sens[[i]]$reg.output$yregDir, "simexreg")) {
             x$sens[[i]]$reg.output$yregDir$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output$yregDir, reg = getCall(x$sens[[.(i)]]$reg.output$yregDir)$reg,
                                                                       data=getCall(x$sens[[.(i)]]$reg.output$yregDir)$data,
@@ -400,7 +400,7 @@ print.cmsens.me <- function(x, ...) {
           }
         }
         if (name == "ereg") {
-          cat("# Exposure Regression for Weighting: \n")
+          cat("### Exposure regression for weighting: \n")
           if (inherits(x$sens[[i]]$reg.output$ereg, "rcreg")|inherits(x$sens[[i]]$reg.output$ereg, "simexreg")) {
             x$sens[[i]]$reg.output$ereg$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output$ereg, reg = getCall(x$sens[[.(i)]]$reg.output$ereg)$reg,
                                                                    data=getCall(x$sens[[.(i)]]$reg.output$ereg)$data,
@@ -413,7 +413,7 @@ print.cmsens.me <- function(x, ...) {
           }
         }
         if (name == "mreg") {
-          cat("# Mediator Regressions: \n")
+          cat("### Mediator regressions: \n")
           for (j in 1:length(x$sens[[i]]$reg.output$mreg)) {
             if (inherits(x$sens[[i]]$reg.output$mreg[[j]], "svyglm")) {
               x$sens[[i]]$reg.output$mreg[[j]]$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output$mreg[[.(j)]],
@@ -443,7 +443,7 @@ print.cmsens.me <- function(x, ...) {
           }
         }
         if (name == "wmdenomreg") {
-          cat("# Mediator Regressions for Weighting (Denominator): \n")
+          cat("### Mediator regressions for weighting (denominator): \n")
           for (j in 1:length(x$sens[[i]]$reg.output$wmdenomreg)) {
             if (inherits(x$sens[[i]]$reg.output$wmdenomreg[[j]], "rcreg") |
                 inherits(x$sens[[i]]$reg.output$wmdenomreg[[j]], "simexreg")) {
@@ -464,7 +464,7 @@ print.cmsens.me <- function(x, ...) {
           }
         }
         if (name == "wmnomreg") {
-          cat("# Mediator Regressions for Weighting (Nominator): \n")
+          cat("### Mediator regressions for weighting (nominator): \n")
           for (j in 1:length(x$sens[[i]]$reg.output$wmnomreg)) {
             if (inherits(x$sens[[i]]$reg.output$wmnomreg[[j]], "rcreg") |
                 inherits(x$sens[[i]]$reg.output$wmnomreg[[j]], "simexreg")) {
@@ -485,7 +485,7 @@ print.cmsens.me <- function(x, ...) {
           }
         }
         if (name == "postcreg") {
-          cat("# Regressions for Mediator-outcome Confounders Affected by the Exposure: \n")
+          cat("### Regressions for mediator-outcome confounders affected by the exposure: \n")
           for (j in 1:length(x$sens[[i]]$reg.output$postcreg)) {
             if (inherits(x$sens[[i]]$reg.output$postcreg[[j]], "rcreg") |
                 inherits(x$sens[[i]]$reg.output$postcreg[[j]], "simexreg")) {
@@ -509,11 +509,11 @@ print.cmsens.me <- function(x, ...) {
       }
     } else {
       for (m in 1:length(x$sens[[i]]$reg.output)) { 
-        cat(paste("# Regressions with Imputed Dataset", m, "\n\n"))
+        cat(paste("### Regressions with imputed dataset", m, "\n\n"))
         regnames <- names(x$sens[[i]]$reg.output[[m]])
         for (name in regnames) {
           if (name == "yreg") {
-            cat("## Outcome Regression: \n")
+            cat("#### Outcome regression: \n")
             if (inherits(x$sens[[i]]$reg.output[[m]]$yreg, "svyglm")) {
               x$sens[[i]]$reg.output[[m]]$yreg$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output[[.(m)]]$yreg,
                                                                           design = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yreg)$design,
@@ -539,7 +539,7 @@ print.cmsens.me <- function(x, ...) {
             }
           }
           if (name == "yregTot") {
-            cat("## Outcome Regression for the Total Effect: \n")
+            cat("#### Outcome regression for the total effect: \n")
             if (inherits(x$sens[[i]]$reg.output[[m]]$yregTot, "rcreg")|inherits(x$sens[[i]]$reg.output[[m]]$yregTot, "simexreg")){
               x$sens[[i]]$reg.output[[m]]$yregTot$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output[[.(m)]]$yregTot,
                                                                              reg = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yregTot)$reg,
@@ -556,7 +556,7 @@ print.cmsens.me <- function(x, ...) {
             }
           }
           if (name == "yregDir") {
-            cat("## Outcome Regression for the Direct Effect: \n")
+            cat("#### Outcome regression for the direct effect: \n")
             if (inherits(x$sens[[i]]$reg.output[[m]]$yregDir, "rcreg")|inherits(x$sens[[i]]$reg.output[[m]]$yregDir, "simexreg")){
               x$sens[[i]]$reg.output[[m]]$yregDir$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output[[.(m)]]$yregDir,
                                                                              reg = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yregDir)$reg,
@@ -573,7 +573,7 @@ print.cmsens.me <- function(x, ...) {
             }
           }
           if (name == "ereg") {
-            cat("## Exposure Regression for Weighting: \n")
+            cat("#### Exposure regression for weighting: \n")
             if (inherits(x$sens[[i]]$reg.output[[m]]$ereg, "rcreg")|inherits(x$sens[[i]]$reg.output[[m]]$ereg, "simexreg")){
               x$sens[[i]]$reg.output[[m]]$ereg$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output[[.(m)]]$ereg,
                                                                           reg = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$ereg)$reg,
@@ -590,7 +590,7 @@ print.cmsens.me <- function(x, ...) {
             }
           }
           if (name == "mreg") {
-            cat("## Mediator Regressions: \n")
+            cat("#### Mediator regressions: \n")
             for (j in 1:length(x$sens[[i]]$reg.output[[m]]$mreg)) {
               if (inherits(x$sens[[i]]$reg.output[[m]]$mreg[[j]], "svyglm")) {
                 x$sens[[i]]$reg.output[[m]]$mreg[[j]]$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output[[.(m)]]$mreg[[.(j)]],
@@ -620,7 +620,7 @@ print.cmsens.me <- function(x, ...) {
           }
           if (name == "wmdenomreg") {
             if (!is.null(x$sens[[i]]$reg.output[[m]]$wmdenomreg)) {
-              cat("## Mediator Regressions for Weighting (Denominator): \n")
+              cat("#### Mediator regressions for weighting (denominator): \n")
               for (j in 1:length(x$sens[[i]]$reg.output[[m]]$wmdenomreg)) {
                 if (inherits(x$sens[[i]]$reg.output[[m]]$wmdenomreg[[j]], "rcreg")|inherits(x$sens[[i]]$reg.output[[m]]$wmdenomreg[[j]], "simexreg")){
                   x$sens[[i]]$reg.output[[m]]$wmdenomreg[[j]]$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output[[.(m)]]$wmdenomreg[[.(j)]], 
@@ -642,7 +642,7 @@ print.cmsens.me <- function(x, ...) {
           }
           if (name == "wmnomreg") {
             if (!is.null(x$sens[[i]]$reg.output[[m]]$wmnomreg)) {
-              cat("## Mediator Regressions for Weighting (Nominator): \n")
+              cat("#### Mediator regressions for weighting (nominator): \n")
               for (j in 1:length(x$sens[[i]]$reg.output[[m]]$wmnomreg)) {
                 if (inherits(x$sens[[i]]$reg.output[[m]]$wmnomreg[[j]], "rcreg")|inherits(x$sens[[i]]$reg.output[[m]]$wmnomreg[[j]], "simexreg")){
                   x$sens[[i]]$reg.output[[m]]$wmnomreg[[j]]$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output[[.(m)]]$wmnomreg[[.(j)]], 
@@ -664,7 +664,7 @@ print.cmsens.me <- function(x, ...) {
           }
           if (name == "postcreg") {
             if (!is.null(x$sens[[i]]$reg.output[[m]]$postcreg)) {
-              cat("## Regressions for Mediator-outcome Confounders Affected by the Exposure: \n")
+              cat("#### Regressions for mediator-outcome confounders affected by the exposure: \n")
               for (j in 1:length(x$sens[[i]]$reg.output[[m]]$postcreg)) {
                 if (inherits(x$sens[[i]]$reg.output[[m]]$postcreg[[j]], "rcreg")|inherits(x$sens[[i]]$reg.output[[m]]$postcreg[[j]], "simexreg")){
                   x$sens[[i]]$reg.output[[m]]$postcreg[[j]]$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output[[.(m)]]$postcreg[[.(j)]], 
@@ -690,7 +690,7 @@ print.cmsens.me <- function(x, ...) {
     }
     
     # print error-corrected results
-    cat(paste0("\nError-corrected causal effects for measurement error ", i, ": \n"))
+    cat(paste0("\n## Error-corrected causal effects for measurement error ", i, ": \n"))
     print(x$sens[[i]]$effect.pe)
     cat("----------------------------------------------------------------\n")
   }
@@ -763,16 +763,16 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
   cat(x$ME$MEvartype)
   cat("\n")
   for (i in 1:length(x$sens)) {
-    cat(paste0("\nMeasurement error ", i, ": \n"))
+    cat(paste0("\n# Measurement error ", i, ": \n"))
     if (x$ME$MEvartype == "continuous") print(x$ME$MEerror[i])
     if (x$ME$MEvartype == "categorical") print(x$ME$MEerror[[i]])
-    cat(paste0("\nError-corrected regressions for measurement error ", i, ": \n\n"))
+    cat(paste0("\n## Error-corrected regressions for measurement error ", i, ": \n\n"))
     # print error corrected regression models
     if (!x$naive$multimp$multimp) {
       regnames <- names(x$sens[[i]]$reg.output)
       for (name in regnames) {
         if (name == "yreg") {
-          cat("# Outcome Regression:\n")
+          cat("### Outcome regression:\n")
           if (inherits(x$sens[[i]]$reg.output$yreg, "svyglm")) {
             x$sens[[i]]$reg.output.summary$yreg$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output$yreg,design = getCall(x$sens[[.(i)]]$reg.output$yreg)$design,
                                                                    family = getCall(x$sens[[.(i)]]$reg.output$yreg)$family, evaluate = FALSE)))
@@ -795,7 +795,7 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
           }
         }
         if (name == "yregTot") {
-          cat("# Outcome Regression for the Total Effect: \n")
+          cat("### Outcome regression for the total effect: \n")
           if (inherits(x$sens[[i]]$reg.output$yregTot, "rcreg")|inherits(x$sens[[i]]$reg.output$yregTot, "simexreg")) {
             x$sens[[i]]$reg.output.summary$yregTot$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output$yregTot, reg = getCall(x$sens[[.(i)]]$reg.output$yregTot)$reg,
                                                                       data=getCall(x$sens[[.(i)]]$reg.output$yregTot)$data,
@@ -808,7 +808,7 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
           }
         }
         if (name == "yregDir") {
-          cat("# Outcome Regression for the Direct Effect: \n")
+          cat("### Outcome regression for the direct effect: \n")
           if (inherits(x$sens[[i]]$reg.output$yregDir, "rcreg")|inherits(x$sens[[i]]$reg.output$yregDir, "simexreg")) {
             x$sens[[i]]$reg.output.summary$yregDir$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output$yregDir, reg = getCall(x$sens[[.(i)]]$reg.output$yregDir)$reg,
                                                                       data=getCall(x$sens[[.(i)]]$reg.output$yregDir)$data,
@@ -821,7 +821,7 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
           }
         }
         if (name == "ereg") {
-          cat("# Exposure Regression for Weighting: \n")
+          cat("### Exposure regression for weighting: \n")
           if (inherits(x$sens[[i]]$reg.output$ereg, "rcreg")|inherits(x$sens[[i]]$reg.output$ereg, "simexreg")) {
             x$sens[[i]]$reg.output.summary$ereg$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output$ereg, reg = getCall(x$sens[[.(i)]]$reg.output$ereg)$reg,
                                                                    data=getCall(x$sens[[.(i)]]$reg.output$ereg)$data,
@@ -834,7 +834,7 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
           }
         }
         if (name == "mreg") {
-          cat("# Mediator Regressions: \n")
+          cat("### Mediator regressions: \n")
           for (j in 1:length(x$sens[[i]]$reg.output.summary$mreg)) {
             if (inherits(x$sens[[i]]$reg.output$mreg[[j]], "svyglm")) {
               x$sens[[i]]$reg.output.summary$mreg[[j]]$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output$mreg[[.(j)]],
@@ -864,7 +864,7 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
           }
         }
         if (name == "wmdenomreg") {
-          cat("# Mediator Regressions for Weighting (Denominator): \n")
+          cat("### Mediator regressions for weighting (denominator): \n")
           for (j in 1:length(x$sens[[i]]$reg.output.summary$wmdenomreg)) {
             if (inherits(x$sens[[i]]$reg.output$wmdenomreg[[j]], "rcreg") |
                 inherits(x$sens[[i]]$reg.output$wmdenomreg[[j]], "simexreg")) {
@@ -885,7 +885,7 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
           }
         }
         if (name == "wmnomreg") {
-          cat("# Mediator Regressions for Weighting (Nominator): \n")
+          cat("### Mediator regressions for weighting (nominator): \n")
           for (j in 1:length(x$sens[[i]]$reg.output.summary$wmnomreg)) {
             if (inherits(x$sens[[i]]$reg.output$wmnomreg[[j]], "rcreg") |
                 inherits(x$sens[[i]]$reg.output$wmnomreg[[j]], "simexreg")) {
@@ -906,7 +906,7 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
           }
         }
         if (name == "postcreg") {
-          cat("# Regressions for Mediator-outcome Confounders Affected by the Exposure: \n")
+          cat("### Regressions for mediator-outcome confounders affected by the exposure: \n")
           for (j in 1:length(x$sens[[i]]$reg.output.summary$postcreg)) {
             if (inherits(x$sens[[i]]$reg.output$postcreg[[j]], "rcreg") |
                 inherits(x$sens[[i]]$reg.output$postcreg[[j]], "simexreg")) {
@@ -930,11 +930,11 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
       }
     } else {
       for (m in 1:length(x$sens[[i]]$reg.output)) { 
-        cat(paste("# Regressions with Imputed Dataset", m, "\n\n"))
+        cat(paste("### Regressions with imputed dataset", m, "\n\n"))
         regnames <- names(x$sens[[i]]$reg.output[[m]])
         for (name in regnames) {
           if (name == "yreg") {
-            cat("## Outcome Regression: \n")
+            cat("#### Outcome regression: \n")
             if (inherits(x$sens[[i]]$reg.output[[m]]$yreg, "svyglm")) {
               x$sens[[i]]$reg.output.summary[[m]]$yreg$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output[[.(m)]]$yreg,
                                                                           design = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yreg)$design,
@@ -960,7 +960,7 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
             }
           }
           if (name == "yregTot") {
-            cat("## Outcome Regression for the Total Effect: \n")
+            cat("#### Outcome regression for the total effect: \n")
             if (inherits(x$sens[[i]]$reg.output[[m]]$yregTot, "rcreg")|inherits(x$sens[[i]]$reg.output[[m]]$yregTot, "simexreg")){
               x$sens[[i]]$reg.output.summary[[m]]$yregTot$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output[[.(m)]]$yregTot,
                                                                              reg = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yregTot)$reg,
@@ -977,7 +977,7 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
             }
           }
           if (name == "yregDir") {
-            cat("## Outcome Regression for the Direct Effect: \n")
+            cat("#### Outcome regression for the direct effect: \n")
             if (inherits(x$sens[[i]]$reg.output[[m]]$yregDir, "rcreg")|inherits(x$sens[[i]]$reg.output[[m]]$yregDir, "simexreg")){
               x$sens[[i]]$reg.output.summary[[m]]$yregDir$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output[[.(m)]]$yregDir,
                                                                              reg = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$yregDir)$reg,
@@ -994,7 +994,7 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
             }
           }
           if (name == "ereg") {
-            cat("## Exposure Regression for Weighting: \n")
+            cat("#### Exposure regression for weighting: \n")
             if (inherits(x$sens[[i]]$reg.output[[m]]$ereg, "rcreg")|inherits(x$sens[[i]]$reg.output[[m]]$ereg, "simexreg")){
               x$sens[[i]]$reg.output.summary[[m]]$ereg$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output[[.(m)]]$ereg,
                                                                           reg = getCall(x$sens[[.(i)]]$reg.output[[.(m)]]$ereg)$reg,
@@ -1011,7 +1011,7 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
             }
           }
           if (name == "mreg") {
-            cat("## Mediator Regressions: \n")
+            cat("#### Mediator regressions: \n")
             for (j in 1:length(x$sens[[i]]$reg.output.summary[[m]]$mreg)) {
               if (inherits(x$sens[[i]]$reg.output[[m]]$mreg[[j]], "svyglm")) {
                 x$sens[[i]]$reg.output.summary[[m]]$mreg[[j]]$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output[[.(m)]]$mreg[[.(j)]],
@@ -1041,7 +1041,7 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
           }
           if (name == "wmdenomreg") {
             if (!is.null(x$sens[[i]]$reg.output[[m]]$wmdenomreg)) {
-              cat("## Mediator Regressions for Weighting (Denominator): \n")
+              cat("#### Mediator regressions for weighting (denominator): \n")
               for (j in 1:length(x$sens[[i]]$reg.output.summary[[m]]$wmdenomreg)) {
                 if (inherits(x$sens[[i]]$reg.output[[m]]$wmdenomreg[[j]], "rcreg")|inherits(x$sens[[i]]$reg.output[[m]]$wmdenomreg[[j]], "simexreg")){
                   x$sens[[i]]$reg.output.summary[[m]]$wmdenomreg[[j]]$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output[[.(m)]]$wmdenomreg[[.(j)]], 
@@ -1063,7 +1063,7 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
           }
           if (name == "wmnomreg") {
             if (!is.null(x$sens[[i]]$reg.output[[m]]$wmnomreg)) {
-              cat("## Mediator Regressions for Weighting (Nominator): \n")
+              cat("#### Mediator regressions for weighting (nominator): \n")
               for (j in 1:length(x$sens[[i]]$reg.output.summary[[m]]$wmnomreg)) {
                 if (inherits(x$sens[[i]]$reg.output[[m]]$wmnomreg[[j]], "rcreg")|inherits(x$sens[[i]]$reg.output[[m]]$wmnomreg[[j]], "simexreg")){
                   x$sens[[i]]$reg.output.summary[[m]]$wmnomreg[[j]]$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output[[.(m)]]$wmnomreg[[.(j)]], 
@@ -1085,7 +1085,7 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
           }
           if (name == "postcreg") {
             if (!is.null(x$sens[[i]]$reg.output[[m]]$postcreg)) {
-              cat("## Regressions for Mediator-outcome Confounders Affected by the Exposure: \n")
+              cat("#### Regressions for mediator-outcome confounders affected by the exposure: \n")
               for (j in 1:length(x$sens[[i]]$reg.output.summary[[m]]$postcreg)) {
                 if (inherits(x$sens[[i]]$reg.output[[m]]$postcreg[[j]], "rcreg")|inherits(x$sens[[i]]$reg.output[[m]]$postcreg[[j]], "simexreg")){
                   x$sens[[i]]$reg.output.summary[[m]]$postcreg[[j]]$call <- eval(bquote(update(x$sens[[.(i)]]$reg.output[[.(m)]]$postcreg[[.(j)]], 
@@ -1109,7 +1109,7 @@ print.summary.cmsens.me <- function(x, digits = 4, ...) {
         }
       }
     }
-    cat(paste0("\nError-corrected causal effects for measurement error ", i, ": \n"))
+    cat(paste0("\n## Error-corrected causal effects for measurement error ", i, ": \n"))
     printCoefmat(x$summarydf[[i]], digits = digits, has.Pvalue = TRUE)
     cat("----------------------------------------------------------------\n")
   }
