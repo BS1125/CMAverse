@@ -12,7 +12,7 @@ test_that("cmest works correctly for binary Y and binary M", {
   A <- rbinom(n, 1, pa)
   pm <- expit(1 + 2*A + 1.5*C1 + 0.8*C2)
   M <- rbinom(n, 1, pm)
-  py <- expit(-3 + 0.8*A - 1.8*M - 0.5*A*M + 0.3*C1 - 0.6*C2)
+  py <- expit(-5 + 0.8*A - 0.6*M - 0.5*A*M + 0.3*C1 - 0.6*C2)
   Y <- rbinom(n, 1, py)
   data <- data.frame(A, M, Y, C1, C2)
   yreg <- glm(Y ~ A*M + C1 + C2, family = binomial(), data = data)
