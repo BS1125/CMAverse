@@ -5,7 +5,7 @@ test_that("cmest works correctly for binary Y and binary M", {
   set.seed(1)
   # data simulation
   expit <- function(x) exp(x)/(1+exp(x))
-  n <- 10000
+  n <- 100000
   C1 <- rnorm(n, mean = 1, sd = 0.1)
   C2 <- rbinom(n, 1, 0.6)
   pa <- expit(0.2 + 0.5*C1 + 0.1*C2)
