@@ -906,7 +906,7 @@ print.cmest <- function(x, ...) {
     if (x$methods$boot.ci.type == "per") inf_str <- "bootstrap standard errors, percentile confidence intervals and p-values"
     if (x$methods$boot.ci.type == "bca") inf_str <- "bootstrap standard errors, bias-corrected and accelerated confidence intervals and p-values"
   }
-  if (x$methods$casecontrol) cat(paste("# Effect decomposition on the", scale, "for a Case Control Study via the "))
+  if (x$methods$casecontrol) cat(paste("# Effect decomposition on the", scale, "for a case control study via the "))
   if (!(x$methods$casecontrol)) cat(paste("# Effect decomposition on the", scale, "via the "))
   cat(model_str)
   cat("\n \n")
@@ -1307,7 +1307,7 @@ print.summary.cmest <- function(x, digits = 4, ...) {
     if (x$methods$boot.ci.type == "per") inf_str <- "bootstrap standard errors, percentile confidence intervals and p-values"
     if (x$methods$boot.ci.type == "bca") inf_str <- "bootstrap standard errors, bias-corrected and accelerated confidence intervals and p-values"
   }
-  if (x$methods$casecontrol) cat(paste("# Effect decomposition on the", scale, "for a Case Control Study via the "))
+  if (x$methods$casecontrol) cat(paste("# Effect decomposition on the", scale, "for a case control study via the "))
   if (!(x$methods$casecontrol)) cat(paste("# Effect decomposition on the", scale, "via the "))
   cat(model_str)
   cat("\n \n")

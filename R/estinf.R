@@ -58,13 +58,13 @@ estinf <- function() {
   yreg_formula <- formula(yreg)
   d_var <- unique(all.vars(yreg_formula[[2]]))
   ind_var <- unique(all.vars(yreg_formula[[3]]))
-  if (model %in% c("rb", "wb", "ne") && ((outcome != d_var) | !all(ind_var %in% c(exposure, mediator, basec)))) stop(
+  if (model %in% c("rb", "wb", "ne") && (!(outcome %in% d_var) | !all(ind_var %in% c(exposure, mediator, basec)))) stop(
     "For yreg, please regress outcome on variables in c(exposure, mediator, basec) when model is rb or wb or ne")
-  if (model == "iorw" && ((outcome != d_var) | !all(ind_var %in% c(exposure, basec)))) stop(
+  if (model == "iorw" && (!(outcome %in% d_var) | !all(ind_var %in% c(exposure, basec)))) stop(
     "For yreg, please regress outcome on variables in c(exposure, basec) when model is iorw")
-  if (model == "msm" && ((outcome != d_var) | !all(ind_var %in% c(exposure, mediator)))) stop(
+  if (model == "msm" && (!(outcome %in% d_var) | !all(ind_var %in% c(exposure, mediator)))) stop(
     "For yreg, please regress outcome on variables in c(exposure, mediator) when model is msm")
-  if (model == "gformula" && ((outcome != d_var) | !all(ind_var %in% c(exposure, mediator, basec, postc)))) stop(
+  if (model == "gformula" && (!(outcome %in% d_var) | !all(ind_var %in% c(exposure, mediator, basec, postc)))) stop(
     "For yreg, please regress outcome on variables in c(exposure, mediator, basec, postc) when model is gformula")
   rm(yreg_formula, d_var, ind_var)
   if (!is.null(ereg)) {
