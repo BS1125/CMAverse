@@ -243,3 +243,333 @@ test_that("cmest works correctly for continuous Y and binary M", {
   expect_equal(unname(res_contbin_gformula$effect.pe), ref, tolerance = 0.1)
   
 })
+
+test_that("cmest works correctly for survival Y and count M", {
+  
+  set.seed(1)
+  # data simulation
+  expit <- function(x) exp(x)/(1+exp(x))
+  n <- 10000
+  C1 <- rnorm(n, mean = 1, sd = 1)
+  C2 <- rbinom(n, 1, 0.6)
+  pa <- expit(0.2 + 0.5*C1 - 0.3*C2)
+  A <- rbinom(n, 1, pa)
+  M <- rpois(n, exp(1 + 0.2*A + 0.2*C1 + 0.1*C2))
+  Y <- rexp(n,exp(-1 - 0.3*A - 0.1*M - 0.1*A*M + 0.3*C1 - 0.6*C2))
+  cen <- quantile(Y, probs = 0.01)
+  delta <- as.numeric(Y > cen)
+  data <- data.frame(A, M, Y, C1, C2, delta)
+  ereg <- glm(A ~ C1 + C2, family = binomial(), data = data)
+  yreg <- survival::survreg(survival::Surv(Y, delta) ~ A*M + C1 + C2, data = data, dist = "weibull")
+  mreg <- glm(M ~ A + C1 + C2, family = poisson(), data = data)
+  
+  # results of cmest
+  res_survcount_rb <- cmest(data = data, model = "rb", outcome = "Y", event = "delta",
+                            exposure = "A", mediator = "M", basec = c("C1", "C2"), 
+                            EMint = TRUE,
+                            mreg = list("poisson"), yreg = "aft_weibull",
+                            astar = 0, a = 1, mval = list(1),
+                            estimation = "imputation", inference = "bootstrap")
+  res_survcount_iorw <- cmest(data = data, model = "iorw", outcome = "Y", exposure = "A",
+                              mediator = "M", basec = c("C1", "C2"), EMint = TRUE, event = "delta",
+                              ereg = "logistic", yreg = "aft_weibull",
+                              astar = 0, a = 1, 
+                              estimation = "imputation", inference = "bootstrap")
+  res_survcount_gformula <- cmest(data = data, model = "gformula", outcome = "Y", exposure = "A",
+                                  mediator = "M", basec = c("C1", "C2"), EMint = TRUE, event = "delta",
+                                  mreg = list("poisson"), yreg = "aft_weibull",
+                                  astar = 0, a = 1, mval = list(1),
+                                  estimation = "imputation", inference = "bootstrap")
+  
+  # test
+  expect_equal(unname(res_survcount_rb$effect.pe)[c(6,2,5,15)], 
+               unname(res_survcount_iorw$effect.pe), tolerance = 0.1)
+  expect_equal(unname(res_survcount_rb$effect.pe), 
+               unname(res_survcount_gformula$effect.pe), tolerance = 0.1)
+  
+  # results of cmest
+  res_survcount_rb <- cmest(data = data, model = "rb", outcome = "Y", event = "delta",
+                            exposure = "A", mediator = "M", basec = c("C1", "C2"), 
+                            EMint = TRUE,
+                            mreg = list("negbin"), yreg = "coxph",
+                            astar = 0, a = 1, mval = list(1),
+                            estimation = "imputation", inference = "bootstrap")
+  res_survcount_iorw <- cmest(data = data, model = "iorw", outcome = "Y", exposure = "A",
+                              mediator = "M", basec = c("C1", "C2"), EMint = TRUE, event = "delta",
+                              ereg = "logistic", yreg = "coxph",
+                              astar = 0, a = 1, 
+                              estimation = "imputation", inference = "bootstrap")
+  res_survcount_gformula <- cmest(data = data, model = "gformula", outcome = "Y", exposure = "A",
+                                  mediator = "M", basec = c("C1", "C2"), EMint = TRUE, event = "delta",
+                                  mreg = list("negbin"), yreg = "coxph",
+                                  astar = 0, a = 1, mval = list(1),
+                                  estimation = "imputation", inference = "bootstrap")
+  
+  # test
+  expect_equal(unname(res_survcount_rb$effect.pe)[c(6,2,5,15)], 
+               unname(res_survcount_iorw$effect.pe), tolerance = 0.1)
+  expect_equal(unname(res_survcount_rb$effect.pe), 
+               unname(res_survcount_gformula$effect.pe), tolerance = 0.1)
+  
+})
+
+
+test_that("cmest works correctly for count Y and count M", {
+  
+  set.seed(1)
+  # data simulation
+  expit <- function(x) exp(x)/(1+exp(x))
+  n <- 10000
+  C1 <- rnorm(n, mean = 1, sd = 1)
+  C2 <- rbinom(n, 1, 0.6)
+  pa <- expit(0.2 + 0.5*C1 - 0.3*C2)
+  A <- rbinom(n, 1, pa)
+  M <- rpois(n, exp(1 + 0.2*A + 0.2*C1 + 0.1*C2))
+  Y <- rpois(n,exp(-1 - 0.3*A - 0.1*M - 0.1*A*M + 0.3*C1 - 0.6*C2))
+  data <- data.frame(A, M, Y, C1, C2)
+  ereg <- glm(A ~ C1 + C2, family = binomial(), data = data)
+  yreg <- glm(Y ~ A*M + C1 + C2, family = quasipoisson(), data = data)
+  mreg <- glm(M ~ A + C1 + C2, family = quasipoisson(), data = data)
+  
+  # results of cmest
+  res_countcount_rb <- cmest(data = data, model = "rb", outcome = "Y", event = "delta",
+                             exposure = "A", mediator = "M", basec = c("C1", "C2"), 
+                             EMint = TRUE,
+                             mreg = list("quasipoisson"), yreg = "quasipoisson",
+                             astar = 0, a = 1, mval = list(1),
+                             estimation = "imputation", inference = "bootstrap")
+  res_countcount_wb <- cmest(data = data, model = "wb", outcome = "Y", event = "delta", exposure = "A",
+                             mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
+                             ereg = "logistic", yreg = "quasipoisson",
+                             astar = 0, a = 1, mval = list(1),
+                             estimation = "imputation", inference = "bootstrap")
+  res_countcount_iorw <- cmest(data = data, model = "iorw", outcome = "Y", exposure = "A",
+                               mediator = "M", basec = c("C1", "C2"), EMint = TRUE, event = "delta",
+                               ereg = "logistic", yreg = "quasipoisson",
+                               astar = 0, a = 1, 
+                               estimation = "imputation", inference = "bootstrap")
+  res_countcount_gformula <- cmest(data = data, model = "gformula", outcome = "Y", exposure = "A",
+                                   mediator = "M", basec = c("C1", "C2"), EMint = TRUE, event = "delta",
+                                   mreg = list("quasipoisson"), yreg = "quasipoisson",
+                                   astar = 0, a = 1, mval = list(1),
+                                   estimation = "imputation", inference = "bootstrap")
+  
+  # test
+  expect_equal(unname(res_countcount_rb$effect.pe), 
+               unname(res_countcount_wb$effect.pe), tolerance = 0.1)
+  expect_equal(unname(res_countcount_rb$effect.pe)[c(6,2,5,15)], 
+               unname(res_countcount_iorw$effect.pe), tolerance = 0.1)
+  expect_equal(unname(res_countcount_rb$effect.pe), 
+               unname(res_countcount_gformula$effect.pe), tolerance = 0.1)
+  
+})
+
+
+test_that("cmest works correctly for survival Y and ordinal M", {
+  
+  set.seed(1)
+  # data simulation
+  expit <- function(x) exp(x)/(1+exp(x))
+  n <- 10000
+  C1 <- rnorm(n, mean = 1, sd = 1)
+  C2 <- rbinom(n, 1, 0.6)
+  proba1to2 <- expit(0.4 + 0.5*C1 - 0.3*C2)
+  proba2 <- expit(-0.8 + 0.5*C1 - 0.3*C2)
+  proba0 <- 1 - proba1to2
+  proba1 <- proba1to2 - proba2
+  A <- sapply(1:n, FUN = function(x) sample(c(0,1,2),size=1,replace=TRUE,
+                                            prob=c(proba0[x],
+                                                   proba1[x],
+                                                   proba2[x])))
+  A <- as.factor(A)
+  probm1to2 <- expit(0.5 + 0.2*(A == 1) + 0.1*(A == 2) + 0.2*C1 + 0.1*C2)
+  probm2 <- expit(-1 + 0.2*(A == 1) + 0.1*(A == 2) + 0.2*C1 + 0.1*C2)
+  probm0 <- 1 - probm1to2
+  probm1 <- probm1to2 - probm2
+  M <- sapply(1:n, FUN = function(x) sample(c(0,1,2),size=1,replace=TRUE,
+                                            prob=c(probm0[x],
+                                                   probm1[x],
+                                                   probm2[x])))
+  M <- as.factor(M)
+  Y <- rexp(n,exp(-1 - 0.3*(A == 1) - 0.1*(A == 2) - 0.1*(M == 1) - 0.3*(M == 2) -
+                    0.1*(A == 1)*(M == 1) - 0.3*(A == 1)*(M == 2) -
+                    0.2*(A == 2)*(M == 1) - 0.1*(A == 2)*(M == 2) +
+                    0.3*C1 - 0.6*C2))
+  cen <- quantile(Y, probs = 0.01)
+  delta <- as.numeric(Y > cen)
+  data <- data.frame(A, M, Y, C1, C2, delta)
+  ereg <- MASS::polr(A ~ C1 + C2, data = data)
+  yreg <- survival::survreg(survival::Surv(Y, delta) ~ A*M + C1 + C2, data = data, dist = "exponential")
+  mreg <- MASS::polr(M ~ A + C1 + C2, data = data)
+  
+  # results of cmest
+  res_survordinal_rb <- cmest(data = data, model = "rb", outcome = "Y", event = "delta",
+                              exposure = "A", mediator = "M", basec = c("C1", "C2"),
+                              EMint = TRUE,
+                              mreg = list("ordinal"), yreg = "aft_exp",
+                              astar = 0, a = 1, mval = list(1),
+                              estimation = "imputation", inference = "bootstrap")
+  res_survordinal_iorw <- cmest(data = data, model = "iorw", outcome = "Y", exposure = "A",
+                                mediator = "M", basec = c("C1", "C2"), EMint = TRUE, event = "delta",
+                                ereg = "ordinal", yreg = "aft_exp",
+                                astar = 0, a = 1,
+                                estimation = "imputation", inference = "bootstrap")
+  res_survordinal_msm <- cmest(data = data, model = "msm",
+                               outcome = "Y", exposure = "A",
+                               mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
+                               ereg = "ordinal", yreg = "aft_exp", mreg = list("ordinal"),
+                               wmnomreg = list("ordinal"), wmdenomreg = list("ordinal"),
+                               astar = 0, a = 1, mval = list(1),
+                               estimation = "imputation", inference = "bootstrap")
+  res_survordinal_gformula <- cmest(data = data, model = "gformula", outcome = "Y", exposure = "A",
+                                    mediator = "M", basec = c("C1", "C2"), EMint = TRUE, event = "delta",
+                                    mreg = list("ordinal"), yreg = "aft_exp",
+                                    astar = 0, a = 1, mval = list(1),
+                                    estimation = "imputation", inference = "bootstrap")
+  
+  # test
+  expect_equal(unname(res_survordinal_rb$effect.pe)[c(6,2,5,15)],
+               unname(res_survordinal_iorw$effect.pe), tolerance = 0.1)
+  expect_equal(unname(res_survordinal_rb$effect.pe),
+               unname(res_survordinal_msm$effect.pe), tolerance = 0.1)
+  expect_equal(unname(res_survordinal_rb$effect.pe),
+               unname(res_survordinal_gformula$effect.pe), tolerance = 0.1)
+  
+})
+
+
+test_that("cmest works correctly for ordinal Y and ordinal M", {
+  
+  set.seed(1)
+  # data simulation
+  expit <- function(x) exp(x)/(1+exp(x))
+  n <- 10000
+  C1 <- rnorm(n, mean = 1, sd = 1)
+  C2 <- rbinom(n, 1, 0.6)
+  proba1to2 <- expit(0.4 + 0.5*C1 - 0.3*C2)
+  proba2 <- expit(-0.8 + 0.5*C1 - 0.3*C2)
+  proba0 <- 1 - proba1to2
+  proba1 <- proba1to2 - proba2
+  A <- sapply(1:n, FUN = function(x) sample(c(0,1,2),size=1,replace=TRUE,
+                                            prob=c(proba0[x],
+                                                   proba1[x],
+                                                   proba2[x])))
+  A <- as.factor(A)
+  probm1to2 <- expit(0.5 + 0.2*(A == 1) + 0.1*(A == 2) + 0.2*C1 + 0.1*C2)
+  probm2 <- expit(-1 + 0.2*(A == 1) + 0.1*(A == 2) + 0.2*C1 + 0.1*C2)
+  probm0 <- 1 - probm1to2
+  probm1 <- probm1to2 - probm2
+  M <- sapply(1:n, FUN = function(x) sample(c(0,1,2),size=1,replace=TRUE,
+                                            prob=c(probm0[x],
+                                                   probm1[x],
+                                                   probm2[x])))
+  M <- as.factor(M)
+  proby1to2 <- expit(1 - 0.3*(A == 1) - 0.1*(A == 2) - 0.1*(M == 1) - 0.3*(M == 2) -
+                       0.1*(A == 1)*(M == 1) - 0.3*(A == 1)*(M == 2) -
+                       0.2*(A == 2)*(M == 1) - 0.1*(A == 2)*(M == 2) +
+                       0.3*C1 - 0.6*C2)
+  proby2 <- expit(-0.5 - 0.3*(A == 1) - 0.1*(A == 2) - 0.1*(M == 1) - 0.3*(M == 2) -
+                    0.1*(A == 1)*(M == 1) - 0.3*(A == 1)*(M == 2) -
+                    0.2*(A == 2)*(M == 1) - 0.1*(A == 2)*(M == 2) +
+                    0.3*C1 - 0.6*C2)
+  proby0 <- 1 - proby1to2
+  proby1 <- proby1to2 - proby2
+  Y <- sapply(1:n, FUN = function(x) sample(c(0,1,2), size = 1, replace = TRUE,
+                                            prob=c(proby0[x],
+                                                   proby1[x],
+                                                   proby2[x])))
+  Y <- as.factor(Y)
+  data <- data.frame(A, M, Y, C1, C2)
+  ereg <- MASS::polr(A ~ C1 + C2, data = data)
+  yreg <- MASS::polr(Y ~ A*M + C1 + C2, data = data)
+  mreg <- MASS::polr(M ~ A + C1 + C2, data = data)
+  
+  # results of cmest
+  res_ordinalordinal_rb <- cmest(data = data, model = "rb", outcome = "Y", event = "delta",
+                                 exposure = "A", mediator = "M", basec = c("C1", "C2"),
+                                 EMint = TRUE,
+                                 mreg = list("ordinal"), yreg = "ordinal", yref = "1",
+                                 astar = 0, a = 1, mval = list(1),
+                                 estimation = "imputation", inference = "bootstrap")
+  res_ordinalordinal_iorw <- cmest(data = data, model = "iorw", outcome = "Y", exposure = "A",
+                                   mediator = "M", basec = c("C1", "C2"), EMint = TRUE, event = "delta",
+                                   ereg = "ordinal", yreg = "ordinal", yref = "1",
+                                   astar = 0, a = 1,
+                                   estimation = "imputation", inference = "bootstrap")
+  res_ordinalordinal_msm <- cmest(data = data, model = "msm",
+                                  outcome = "Y", exposure = "A",
+                                  mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
+                                  ereg = "ordinal", yreg = "ordinal", mreg = list("ordinal"),
+                                  wmnomreg = list("ordinal"), wmdenomreg = list("ordinal"),
+                                  astar = 0, a = 1, mval = list(1), yref = "1",
+                                  estimation = "imputation", inference = "bootstrap")
+  res_ordinalordinal_gformula <- cmest(data = data, model = "gformula", outcome = "Y", exposure = "A",
+                                       mediator = "M", basec = c("C1", "C2"), EMint = TRUE, event = "delta",
+                                       mreg = list("ordinal"), yreg = "ordinal",
+                                       astar = 0, a = 1, mval = list(1), yref = "1",
+                                       estimation = "imputation", inference = "bootstrap")
+  
+  # test
+  expect_equal(unname(res_ordinalordinal_rb$effect.pe)[c(6,2,5)],
+               unname(res_ordinalordinal_iorw$effect.pe)[1:3], tolerance = 0.1)
+  expect_equal(unname(res_ordinalordinal_rb$effect.pe),
+               unname(res_ordinalordinal_msm$effect.pe), tolerance = 0.1)
+  expect_equal(unname(res_ordinalordinal_rb$effect.pe),
+               unname(res_ordinalordinal_gformula$effect.pe), tolerance = 0.1)
+  
+})
+
+
+test_that("cmest works correctly for continuous Y and gamma M", {
+  
+  set.seed(1)
+  # data simulation
+  expit <- function(x) exp(x)/(1+exp(x))
+  n <- 10000
+  C1 <- rnorm(n, mean = 1, sd = 0.1)
+  C2 <- rbinom(n, 1, 0.6)
+  pa <- expit(0.2 + 0.5*C1 + 0.1*C2)
+  A <- rbinom(n, 1, pa)
+  M <- rgamma(n, shape = 2, scale = exp(-3 + 2*A + 1.5*C1 + 0.8*C2)/2)
+  Y <- rnorm(n, -3 + 0.8*A - 1.8*M + 0.5*A*M + 0.3*C1 - 0.6*C2, 0.5)
+  data <- data.frame(A, M, Y, C1, C2)
+  mreg <- glm(M ~ A + C1 + C2, data = data, family = Gamma("log"))
+  # results of cmest
+  res_gammalinear_rb <- cmest(data = data, model = "rb", outcome = "Y", 
+                              exposure = "A", mediator = "M", basec = c("C1", "C2"), 
+                              EMint = TRUE,
+                              mreg = list(mreg), yreg = "linear",
+                              astar = 0, a = 1, mval = list(1),
+                              estimation = "imputation", inference = "bootstrap")
+  res_gammalinear_wb <- cmest(data = data, model = "wb", outcome = "Y", 
+                              exposure = "A", mediator = "M", basec = c("C1", "C2"), 
+                              EMint = TRUE,
+                              ereg = "logistic", yreg = "linear",
+                              astar = 0, a = 1, mval = list(1),
+                              estimation = "imputation", inference = "bootstrap")
+  res_gammalinear_iorw <- cmest(data = data, model = "iorw", outcome = "Y", exposure = "A",
+                                mediator = "M", basec = c("C1", "C2"), EMint = TRUE, 
+                                ereg = "logistic", yreg = "linear",
+                                astar = 0, a = 1, 
+                                estimation = "imputation", inference = "bootstrap")
+  res_gammalinear_ne <- cmest(data = data, model = "ne", outcome = "Y", exposure = "A",
+                              mediator = "M", basec = c("C1", "C2"), EMint = TRUE, 
+                              yreg = "linear",
+                              astar = 0, a = 1, mval = list(1),
+                              estimation = "imputation", inference = "bootstrap")
+  res_gammalinear_gformula <- cmest(data = data, model = "gformula", outcome = "Y", exposure = "A",
+                                    mediator = "M", basec = c("C1", "C2"), EMint = TRUE, 
+                                    mreg = list(mreg), yreg = "linear",
+                                    astar = 0, a = 1, mval = list(1),
+                                    estimation = "imputation", inference = "bootstrap")
+  # test
+  expect_equal(unname(res_gammalinear_rb$effect.pe), 
+               unname(res_gammalinear_wb$effect.pe), tolerance = 0.1)
+  expect_equal(unname(res_gammalinear_rb$effect.pe)[c(6,2,5,15)], 
+               unname(res_gammalinear_iorw$effect.pe), tolerance = 0.1)
+  expect_equal(unname(res_gammalinear_rb$effect.pe), 
+               unname(res_gammalinear_ne$effect.pe), tolerance = 0.1)
+  expect_equal(unname(res_gammalinear_rb$effect.pe), 
+               unname(res_gammalinear_gformula$effect.pe), tolerance = 0.1)
+  
+})
