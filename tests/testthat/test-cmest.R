@@ -21,23 +21,13 @@ test_that("multiple imputation works correctly for binary Y and binary M ", {
                          ereg = "logistic", yreg = "logistic",
                          astar = 0, a = 1, mval = list(1),
                          estimation = "imputation", inference = "bootstrap", multimp = TRUE)
-  res_binbin_iorw <- cmest(data = data, model = "iorw", outcome = "Y", exposure = "A",
-                           mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
-                           ereg = "logistic", yreg = "logistic",
-                           astar = 0, a = 1, mval = list(1),
-                           estimation = "imputation", inference = "bootstrap", multimp = TRUE)
   res_binbin_msm <- cmest(data = data, model = "msm", outcome = "Y", exposure = "A",
                           mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                           ereg = "logistic", yreg = "logistic", mreg = list("logistic"),
                           wmnomreg = list("logistic"), wmdenomreg = list("logistic"),
                           astar = 0, a = 1, mval = list(1),
                           estimation = "imputation", inference = "bootstrap", multimp = TRUE)
-  res_binbin_ne <- cmest(data = data, model = "ne", outcome = "Y", exposure = "A",
-                         mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
-                         yreg = "logistic",
-                         astar = 0, a = 1, mval = list(1),
-                         estimation = "imputation", inference = "bootstrap", multimp = TRUE)
-  res_binbin_gformula <- cmest(data = data, model = "gformula", outcome = "Y", exposure = "A",
+   res_binbin_gformula <- cmest(data = data, model = "gformula", outcome = "Y", exposure = "A",
                                mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                                mreg = list("logistic"), yreg = "logistic",
                                astar = 0, a = 1, mval = list(1),
@@ -93,8 +83,6 @@ test_that("multiple imputation works correctly for binary Y and binary M ", {
   # test
   expect_equal(summary(res_binbin_wb)$summarydf$Estimate, ref, tolerance = 0.1)
   expect_equal(summary(res_binbin_msm)$summarydf$Estimate, ref, tolerance = 0.1)
-  expect_equal(summary(res_binbin_ne)$summarydf$Estimate, ref, tolerance = 0.1)
-  expect_equal(summary(res_binbin_iorw)$summarydf$Estimate, ref[c(6,2,5,15)], tolerance = 0.1)
   expect_equal(summary(res_binbin_gformula)$summarydf$Estimate, ref, tolerance = 0.1)
   
 })
