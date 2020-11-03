@@ -16,18 +16,12 @@ test_that("multiple imputation works correctly for binary Y and binary M ", {
   yreg <- glm(Y ~ A*M + C1 + C2, family = binomial(), data = data)
   mreg <- glm(M ~ A + C1 + C2, family = binomial(), data = data)
   
-  # results of cmest
-  res_binbin_rb_param_delta <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
-                                     mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
-                                     mreg = list("logistic"), yreg = "logistic",
-                                     astar = 0, a = 1, mval = list(1),
-                                     estimation = "paramfunc", inference = "delta", multimp = TRUE)
-  res_binbin_rb_param_bootstrap <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
-                                         mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
-                                         mreg = list("logistic"), yreg = "logistic",
-                                         astar = 0, a = 1, mval = list(1),
-                                         estimation = "paramfunc", inference = "bootstrap", multimp = TRUE)
-
+  res_binbin_rb_impu_bootstrap <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
+                                        mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
+                                        mreg = list("logistic"), yreg = "logistic",
+                                        astar = 0, a = 1, mval = list(1),
+                                        estimation = "imputation", inference = "bootstrap", multimp = TRUE)
+  
   # reference results
   thetas <- unname(coef(yreg))
   betas <- unname(coef(mreg))
@@ -76,8 +70,7 @@ test_that("multiple imputation works correctly for binary Y and binary M ", {
            intref_err_prop_binbin, intmed_err_prop_binbin, pnie_err_prop_binbin,
            pm_binbin, int_binbin, pe_binbin)
   # test
-  expect_equal(summary(res_binbin_rb_param_delta)$summarydf$Estimate, ref)
-  expect_equal(summary(res_binbin_rb_param_bootstrap)$summarydf$Estimate, ref)
+  expect_equal(summary(res_binbin_rb_impu_bootstrap)$summarydf$Estimate, ref)
 
 })
 
