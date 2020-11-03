@@ -70,7 +70,7 @@ test_that("multiple imputation works correctly for binary Y and binary M ", {
            intref_err_prop_binbin, intmed_err_prop_binbin, pnie_err_prop_binbin,
            pm_binbin, int_binbin, pe_binbin)
   # test
-  expect_equal(summary(res_binbin_rb_impu_bootstrap)$summarydf$Estimate, ref)
+  expect_equal(summary(res_binbin_rb_impu_bootstrap)$summarydf$Estimate, ref, tolerance = 0.1)
 
 })
 
