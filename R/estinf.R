@@ -872,9 +872,10 @@ boot.ci <- function(boots) {
     out <- cbind(effect.ci.low, effect.ci.high)
   } else if (boot.ci.type == "bca") {
     boot.ci.bca <- function(x) {
-      z0 <- qnorm(length(which(x < mean(x)))/nboot)
-      U <- x - mean(x)
-      a <- sum(U^3)/(6*(sum(U^2))^(3/2))
+      xbar <- mean(x, na.rm = TRUE)
+      z0 <- qnorm(length(which(x < xbar))/nboot)
+      U <- x - xbar
+      a <- sum(U^3, na.rm = TRUE)/(6*(sum(U^2, na.rm = TRUE))^(3/2))
       alpha1 <- pnorm(z0 + (z0 + qnorm(0.025))/(1 - a*(z0 + qnorm(0.025))))
       alpha2 <- pnorm(z0 + (z0 + qnorm(0.975))/(1 - a*(z0 + qnorm(0.975))))
       quantile(x, c(alpha1, alpha2)) 

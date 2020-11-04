@@ -2,7 +2,7 @@ est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
   if (is.null(indices)) indices <- 1:n
   # resample data
   data <- data[indices, ]
-
+  
   # for case control study
   # method 1: weight subjects with y=1 by yprevalence/p(y=1) and weight subjects with y=0 by (1-yprevalence)/p(y=0)
   # method 2: fit yreg with all data and fit other regs on data from controls
@@ -38,7 +38,7 @@ est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     }
     wa <- as.vector(wanom / wadenom)
     rm(weights_ereg, wadenom_prob, a_lev, wa_data, category, wanom, wadenom)
-
+    
     # weights for yreg
     if (!is.null(weights_yreg)) weights_yreg <- weights_yreg[indices] * w4casecon
     if (is.null(weights_yreg)) weights_yreg <- w4casecon
@@ -54,7 +54,7 @@ est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     if (outReg && (inherits(yreg, "rcreg") | inherits(yreg, "simexreg"))) call_yreg_dir$variance <- TRUE
     yreg_dir <- eval.parent(call_yreg_dir)
     rm(prob1, w4casecon, weights_ereg, weights_yreg)
-
+    
   } else if (casecontrol && yrare) {
     # method 2 for a case control design
     # data from controls
@@ -81,7 +81,7 @@ est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     }
     wa <- as.vector(wanom / wadenom)
     rm(wadenom_prob, a_lev, wa_data, category, wanom, wadenom)
-
+    
     # update yreg
     call_yreg_tot <- call_yreg
     call_yreg_tot$weights <- weights_yreg[indices]
@@ -95,7 +95,7 @@ est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     if (outReg && (inherits(yreg, "rcreg") | inherits(yreg, "simexreg"))) call_yreg_dir$variance <- TRUE
     yreg_dir <- eval.parent(call_yreg_dir)
     rm(control_indices)
-
+    
   } else {
     # not a case control design
     # update ereg
@@ -120,7 +120,7 @@ est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     }
     wa <- as.vector(wanom / wadenom)
     rm(wadenom_prob, a_lev, wa_data, category, wanom, wadenom)
-
+    
     # update yreg
     call_yreg_tot <- call_yreg
     call_yreg_tot$weights <- weights_yreg[indices]
@@ -134,7 +134,7 @@ est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     if (outReg && (inherits(yreg, "rcreg") | inherits(yreg, "simexreg"))) call_yreg_dir$variance <- TRUE
     yreg_dir <- eval.parent(call_yreg_dir)
   }
-
+  
   # output list
   out <- list()
   if (outReg) {
@@ -142,7 +142,7 @@ est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     out$reg.output$yregDir <- yreg_dir
     out$reg.output$ereg <- ereg
   }
-
+  
   # the index of the reference level for a categorical outcome
   if ((is_glm_yreg && (family_yreg$family %in% c("binomial", "quasibinomial", "multinom") |
                        startsWith(family_yreg$family, "Ordered Categorical"))) |
@@ -151,7 +151,7 @@ est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     yval_index <- switch((yval %in% y_lev) + 1, "1" = NULL, "2" = which(y_lev == yval))
     rm(y_lev)
   }
-
+  
   a_lev <- levels(droplevels(as.factor(data[, exposure])))
   # simulate A
   if (is.factor(data[, exposure])) {
@@ -161,17 +161,17 @@ est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     a_sim <- c(rep(a, n))
     astar_sim <- c(rep(astar, n))
   }
-
+  
   # simulate C
   basec_sim <- data[, basec]
-
+  
   # design matrices for outcome simulation
   totdesign0 <- dirdesign0 <- data.frame(astar_sim, basec_sim)
   totdesign1 <- dirdesign1 <- data.frame(a_sim, basec_sim)
   rm(a_sim, astar_sim, basec_sim)
   colnames(totdesign0) <- colnames(totdesign1) <-
     colnames(dirdesign0) <- colnames(dirdesign1) <- c(exposure, basec)
-
+  
   # predict Y
   type <- ifelse(is_coxph_yreg, "risk", ifelse(is_multinom_yreg | is_polr_yreg, "probs", "response"))
   tot0_pred <- as.matrix(predict(yreg_tot, newdata = totdesign0, type = type))
@@ -179,13 +179,13 @@ est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
   dir0_pred <- as.matrix(predict(yreg_dir, newdata = dirdesign0, type = type))
   dir1_pred <- as.matrix(predict(yreg_dir, newdata = dirdesign1, type = type))
   rm(type, totdesign0, totdesign1, dirdesign0, dirdesign1)
-
+  
   # weights for calculating counterfactuals
   weightsEY_tot <- as.vector(model.frame(yreg_tot)$'(weights)')
   if (is.null(weightsEY_tot)) weightsEY_tot <- rep(1, n)
   weightsEY_dir <- as.vector(model.frame(yreg_dir)$'(weights)')
   if (is.null(weightsEY_dir)) weightsEY_dir <- rep(1, n)
-
+  
   # categorical Y
   if ((is_glm_yreg && ((family_yreg$family %in% c("binomial", "quasibinomial", "multinom")) |
                        startsWith(family_yreg$family, "Ordered Categorical")))|
@@ -211,7 +211,7 @@ est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     EYdir1 <- weighted.mean(dir1_pred, na.rm = TRUE, w = weightsEY_dir)
   }
   rm(weightsEY_tot, weightsEY_dir, tot0_pred, tot1_pred, dir0_pred, dir1_pred)
-
+  
   # output causal effects on the difference scale for continuous Y
   if ((is_lm_yreg | is_glm_yreg) &&
       (family_yreg$family %in% c("gaussian", "inverse.gaussian", "Gamma", "quasi"))) {
@@ -219,8 +219,8 @@ est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     dir <- EYdir1 - EYdir0
     ind <- tot - dir
     if (full) {
-    pm <- ind / tot
-    est <- c(tot, dir, ind, pm)
+      pm <- ind / tot
+      est <- c(tot, dir, ind, pm)
     } else est <- c(tot, dir, ind)
   } else if (((is_lm_yreg | is_glm_yreg) &&
               (family_yreg$family %in% c("binomial", "quasibinomial", "multinom", "poisson", "quasipoisson", "ziplss") |
@@ -233,16 +233,16 @@ est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     logRRdir <- log(EYdir1) - log(EYdir0)
     logRRind <- logRRtot - logRRdir
     if (full) {
-    pm <- (exp(logRRdir) * (exp(logRRind) - 1)) / (exp(logRRtot) - 1)
-    est <- c(logRRtot, logRRdir, logRRind, pm)
-} else est <- c(logRRtot, logRRdir, logRRind)
+      pm <- (exp(logRRdir) * (exp(logRRind) - 1)) / (exp(logRRtot) - 1)
+      est <- c(logRRtot, logRRdir, logRRind, pm)
+    } else est <- c(logRRtot, logRRdir, logRRind)
   } else stop("Unsupported yreg")
-
+  
   # progress bar
   if (!multimp) {
-  curVal <- get("counter", envir = env)
-  assign("counter", curVal + 1, envir = env)
-  setTxtProgressBar(get("progbar", envir = env), curVal + 1)
+    curVal <- get("counter", envir = env)
+    assign("counter", curVal + 1, envir = env)
+    setTxtProgressBar(get("progbar", envir = env), curVal + 1)
   }
   if (outReg) out$est <- est
   if (!outReg) out <- est
