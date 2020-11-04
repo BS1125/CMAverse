@@ -21,6 +21,11 @@ test_that("multiple imputation works correctly for binary Y and binary M ", {
                            ereg = "logistic", yreg = "logistic",
                            astar = 0, a = 1, mval = list(1),
                            estimation = "imputation", inference = "bootstrap", multimp = TRUE)
+  res_binbin_ne <- cmest(data = data, model = "ne", outcome = "Y", exposure = "A",
+                         mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
+                         yreg = "logistic",
+                         astar = 0, a = 1, mval = list(1),
+                         estimation = "imputation", inference = "bootstrap", multimp = TRUE)
   
   # reference results
   thetas <- unname(coef(yreg))
@@ -71,6 +76,6 @@ test_that("multiple imputation works correctly for binary Y and binary M ", {
            pm_binbin, int_binbin, pe_binbin)
   # test
   expect_equal(summary(res_binbin_iorw)$summarydf$Estimate, ref[c(6,2,5,15)], tolerance = 0.1)
-  
+  expect_equal(summary(res_binbin_ne)$summarydf$Estimate, ref, tolerance = 0.1)
 })
 
