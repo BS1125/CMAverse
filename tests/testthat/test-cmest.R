@@ -1112,43 +1112,51 @@ test_that("multiple imputation works correctly for binary Y and binary M ", {
                                      mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                                      mreg = list("logistic"), yreg = "logistic",
                                      astar = 0, a = 1, mval = list(1),
-                                     estimation = "paramfunc", inference = "delta", multimp = TRUE)
+                                     estimation = "paramfunc", inference = "delta", 
+                                     multimp = TRUE, m = 1)
   res_binbin_rb_param_bootstrap <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
                                          mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                                          mreg = list("logistic"), yreg = "logistic",
                                          astar = 0, a = 1, mval = list(1),
-                                         estimation = "paramfunc", inference = "bootstrap", multimp = TRUE)
+                                         estimation = "paramfunc", inference = "bootstrap", 
+                                         multimp = TRUE, m = 1)
   res_binbin_rb_impu_bootstrap <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
                                         mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                                         mreg = list("logistic"), yreg = "logistic",
                                         astar = 0, a = 1, mval = list(1),
-                                        estimation = "imputation", inference = "bootstrap", multimp = TRUE)
+                                        estimation = "imputation", inference = "bootstrap", 
+                                        multimp = TRUE, m = 1)
   res_binbin_wb <- cmest(data = data, model = "wb", outcome = "Y", exposure = "A",
                          mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                          ereg = "logistic", yreg = "logistic",
                          astar = 0, a = 1, mval = list(1),
-                         estimation = "imputation", inference = "bootstrap", multimp = TRUE)
+                         estimation = "imputation", inference = "bootstrap", 
+                         multimp = TRUE, m = 1)
   res_binbin_iorw <- cmest(data = data, model = "iorw", outcome = "Y", exposure = "A",
                            mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                            ereg = "logistic", yreg = "logistic",
                            astar = 0, a = 1, mval = list(1),
-                           estimation = "imputation", inference = "bootstrap", multimp = TRUE)
+                           estimation = "imputation", inference = "bootstrap", 
+                           multimp = TRUE, m = 1)
   res_binbin_msm <- cmest(data = data, model = "msm", outcome = "Y", exposure = "A",
                           mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                           ereg = "logistic", yreg = "logistic", mreg = list("logistic"),
                           wmnomreg = list("logistic"), wmdenomreg = list("logistic"),
                           astar = 0, a = 1, mval = list(1),
-                          estimation = "imputation", inference = "bootstrap", multimp = TRUE)
+                          estimation = "imputation", inference = "bootstrap", 
+                          multimp = TRUE, m = 1)
   res_binbin_ne <- cmest(data = data, model = "ne", outcome = "Y", exposure = "A",
                          mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                          yreg = "logistic",
                          astar = 0, a = 1, mval = list(1),
-                         estimation = "imputation", inference = "bootstrap", multimp = TRUE)
+                         estimation = "imputation", inference = "bootstrap", 
+                         multimp = TRUE, m = 1)
   res_binbin_gformula <- cmest(data = data, model = "gformula", outcome = "Y", exposure = "A",
                                mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                                mreg = list("logistic"), yreg = "logistic",
                                astar = 0, a = 1, mval = list(1),
-                               estimation = "imputation", inference = "bootstrap", multimp = TRUE)
+                               estimation = "imputation", inference = "bootstrap", 
+                               multimp = TRUE, m = 1)
   
   # reference results
   thetas <- unname(coef(yreg))
@@ -1230,44 +1238,44 @@ test_that("multiple imputation works correctly for binary Y and binary M ", {
                                          mreg = list("logistic"), yreg = "logistic",
                                          astar = 0, a = 1, mval = list(1),
                                          estimation = "paramfunc", inference = "bootstrap", 
-                                         boot.ci.type = "bca", multimp = TRUE)
+                                         boot.ci.type = "bca", multimp = TRUE, m = 1)
   res_binbin_rb_impu_bootstrap <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
                                         mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                                         mreg = list("logistic"), yreg = "logistic",
                                         astar = 0, a = 1, mval = list(1),
                                         estimation = "imputation", inference = "bootstrap", 
-                                        boot.ci.type = "bca", multimp = TRUE)
+                                        boot.ci.type = "bca", multimp = TRUE, m = 1)
   res_binbin_wb <- cmest(data = data, model = "wb", outcome = "Y", exposure = "A",
                          mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                          ereg = "logistic", yreg = "logistic",
                          astar = 0, a = 1, mval = list(1),
                          estimation = "imputation", inference = "bootstrap", 
-                         boot.ci.type = "bca", multimp = TRUE)
+                         boot.ci.type = "bca", multimp = TRUE, m = 1)
   res_binbin_iorw <- cmest(data = data, model = "iorw", outcome = "Y", exposure = "A",
                            mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                            ereg = "logistic", yreg = "logistic",
                            astar = 0, a = 1, mval = list(1),
                            estimation = "imputation", inference = "bootstrap", 
-                           boot.ci.type = "bca", multimp = TRUE)
+                           boot.ci.type = "bca", multimp = TRUE, m = 1)
   res_binbin_msm <- cmest(data = data, model = "msm", outcome = "Y", exposure = "A",
                           mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                           ereg = "logistic", yreg = "logistic", mreg = list("logistic"),
                           wmnomreg = list("logistic"), wmdenomreg = list("logistic"),
                           astar = 0, a = 1, mval = list(1),
                           estimation = "imputation", inference = "bootstrap", 
-                          boot.ci.type = "bca", multimp = TRUE)
+                          boot.ci.type = "bca", multimp = TRUE, m = 1)
   res_binbin_ne <- cmest(data = data, model = "ne", outcome = "Y", exposure = "A",
                          mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                          yreg = "logistic",
                          astar = 0, a = 1, mval = list(1),
                          estimation = "imputation", inference = "bootstrap", 
-                         boot.ci.type = "bca", multimp = TRUE)
+                         boot.ci.type = "bca", multimp = TRUE, m = 1)
   res_binbin_gformula <- cmest(data = data, model = "gformula", outcome = "Y", exposure = "A",
                                mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                                mreg = list("logistic"), yreg = "logistic",
                                astar = 0, a = 1, mval = list(1),
                                estimation = "imputation", inference = "bootstrap", 
-                               boot.ci.type = "bca", multimp = TRUE)
+                               boot.ci.type = "bca", multimp = TRUE, m = 1)
   
   expect_equal(summary(res_binbin_rb_param_bootstrap)$summarydf$Estimate, ref)
   expect_equal(summary(res_binbin_rb_impu_bootstrap)$summarydf$Estimate, ref, tolerance = 0.1)
