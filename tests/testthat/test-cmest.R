@@ -1145,12 +1145,12 @@ test_that("multiple imputation works correctly for binary Y and binary M ", {
                           astar = 0, a = 1, mval = list(1),
                           estimation = "imputation", inference = "bootstrap", 
                           multimp = TRUE, m = 1)
-  res_binbin_ne <- cmest(data = data, model = "ne", outcome = "Y", exposure = "A",
-                         mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
-                         yreg = "logistic",
-                         astar = 0, a = 1, mval = list(1),
-                         estimation = "imputation", inference = "bootstrap", 
-                         multimp = TRUE, m = 1)
+  # res_binbin_ne <- cmest(data = data, model = "ne", outcome = "Y", exposure = "A",
+  #                        mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
+  #                        yreg = "logistic",
+  #                        astar = 0, a = 1, mval = list(1),
+  #                        estimation = "imputation", inference = "bootstrap", 
+  #                        multimp = TRUE, m = 1)
   res_binbin_gformula <- cmest(data = data, model = "gformula", outcome = "Y", exposure = "A",
                                mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                                mreg = list("logistic"), yreg = "logistic",
@@ -1212,7 +1212,7 @@ test_that("multiple imputation works correctly for binary Y and binary M ", {
   expect_equal(summary(res_binbin_rb_impu_bootstrap)$summarydf$Estimate, ref, tolerance = 0.1)
   expect_equal(summary(res_binbin_wb)$summarydf$Estimate, ref, tolerance = 0.1)
   expect_equal(summary(res_binbin_msm)$summarydf$Estimate, ref, tolerance = 0.1)
-  expect_equal(summary(res_binbin_ne)$summarydf$Estimate, ref, tolerance = 0.1)
+  #expect_equal(summary(res_binbin_ne)$summarydf$Estimate, ref, tolerance = 0.1)
   expect_equal(summary(res_binbin_iorw)$summarydf$Estimate, ref[c(6,2,5,15)], tolerance = 0.1)
   expect_equal(summary(res_binbin_gformula)$summarydf$Estimate, ref, tolerance = 0.1)
   expect_equal(class(print(res_binbin_rb_param_delta)), "list")
@@ -1220,7 +1220,7 @@ test_that("multiple imputation works correctly for binary Y and binary M ", {
   expect_equal(class(print(res_binbin_rb_impu_bootstrap)), "list")
   expect_equal(class(print(res_binbin_wb)), "list")
   expect_equal(class(print(res_binbin_msm)), "list")
-  expect_equal(class(print(res_binbin_ne)), "list")
+  #expect_equal(class(print(res_binbin_ne)), "list")
   expect_equal(class(print(res_binbin_iorw)), "list")
   expect_equal(class(print(res_binbin_gformula)), "list")
   expect_equal(class(print(summary(res_binbin_rb_param_delta))), "list")
@@ -1228,7 +1228,7 @@ test_that("multiple imputation works correctly for binary Y and binary M ", {
   expect_equal(class(print(summary(res_binbin_rb_impu_bootstrap))), "list")
   expect_equal(class(print(summary(res_binbin_wb))), "list")
   expect_equal(class(print(summary(res_binbin_msm))), "list")
-  expect_equal(class(print(summary(res_binbin_ne))), "list")
+  #expect_equal(class(print(summary(res_binbin_ne))), "list")
   expect_equal(class(print(summary(res_binbin_iorw))), "list")
   expect_equal(class(print(summary(res_binbin_gformula))), "list")
   
