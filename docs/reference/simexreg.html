@@ -167,6 +167,7 @@ error via <em>SIMEX</em> by Cook et al. (1994) and Küchenhoff et al. (2006).</p
 
     <pre class="usage"><span class='fu'>simexreg</span><span class='op'>(</span>
   reg <span class='op'>=</span> <span class='cn'>NULL</span>,
+  formula <span class='op'>=</span> <span class='cn'>NULL</span>,
   data <span class='op'>=</span> <span class='cn'>NULL</span>,
   weights <span class='op'>=</span> <span class='cn'>NULL</span>,
   MEvariable <span class='op'>=</span> <span class='cn'>NULL</span>,
@@ -218,6 +219,10 @@ error via <em>SIMEX</em> by Cook et al. (1994) and Küchenhoff et al. (2006).</p
       <td><p>naive regression object. See <code>Details</code>.</p></td>
     </tr>
     <tr>
+      <th>formula</th>
+      <td><p>regression formula</p></td>
+    </tr>
+    <tr>
       <th>data</th>
       <td><p>new dataset for <code>reg</code></p></td>
     </tr>
@@ -266,10 +271,6 @@ coefficients through Jackknife. Default is <code>FALSE</code>.</p></td>
       <td><p>an object of class <code>simexreg</code></p></td>
     </tr>
     <tr>
-      <th>formula</th>
-      <td><p>an object of class <code>simexreg</code></p></td>
-    </tr>
-    <tr>
       <th>digits</th>
       <td><p>minimal number of significant digits. See <a href='https://rdrr.io/r/base/print.default.html'>print.default</a>.</p></td>
     </tr>
@@ -282,9 +283,8 @@ is <code>TRUE</code>.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>If <code>MEvariable</code> is not in the regression formula of <code>reg</code>, <code>reg</code> is 
-returned. If <code>MEvariable</code> is in the regression formula of <code>yeg</code>, an object of 
-class <code>simexreg</code> is returned:</p>
+    <p>If <code>MEvariable</code> is not in the regression formula, <code>reg</code> is returned. If 
+<code>MEvariable</code> is in the regression formula, an object of class <code>simexreg</code> is returned:</p>
 <dt>call</dt><dd><p>the function call,</p></dd>
 <dt>NAIVEreg</dt><dd><p>the naive regression object,</p></dd>
 <dt>ME</dt><dd><p>a list of <code>MEvariable</code>, <code>MEvartype</code>, <code>MEerror</code>, <code>variance</code>,
@@ -320,13 +320,13 @@ corrected by <code>simexreg</code></p></li>
 </ul>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-    <p>Carrol RJ, Ruppert D, Stefanski LA, Crainiceanu C. Measurement Error in Nonlinear Models: 
-A Modern Perspective, Second Edition (2006). London: Chapman &amp; Hall.</p>
-<p>Cook JR, Stefanski LA. Simulation-extrapolation estimation in parametric measurement error 
-models (1994). Journal of the American Statistical Association, 89(428): 1314 - 1328.</p>
-<p>Küchenhoff H, Mwalili SM, Lesaffre E. A general method for dealing with misclassification 
-in regression: the misclassification SIMEX (2006). Biometrics. 62(1): 85 - 96.</p>
-<p>Stefanski LA, Cook JR. Simulation-extrapolation: the measurement error jackknife (1995). 
+    <p>Carrol RJ, Ruppert D, Stefanski LA, Crainiceanu C (2006). Measurement Error in Nonlinear Models: 
+A Modern Perspective, Second Edition. London: Chapman &amp; Hall.</p>
+<p>Cook JR, Stefanski LA (1994). Simulation-extrapolation estimation in parametric measurement error 
+models. Journal of the American Statistical Association, 89(428): 1314 - 1328.</p>
+<p>Küchenhoff H, Mwalili SM, Lesaffre E (2006). A general method for dealing with misclassification 
+in regression: the misclassification SIMEX. Biometrics. 62(1): 85 - 96.</p>
+<p>Stefanski LA, Cook JR (1995). Simulation-extrapolation: the measurement error jackknife. 
 Journal of the American Statistical Association. 90(432): 1247 - 56.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
@@ -350,8 +350,8 @@ Journal of the American Statistical Association. 90(432): 1247 - 56.</p>
                    x3 <span class='op'>=</span> <span class='va'>x3</span>, y <span class='op'>=</span> <span class='va'>y</span><span class='op'>)</span>
 <span class='va'>reg_naive</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='va'>x1</span> <span class='op'>+</span> <span class='va'>x2_error</span> <span class='op'>+</span> <span class='va'>x3</span>, data <span class='op'>=</span> <span class='va'>data</span><span class='op'>)</span>
 <span class='va'>reg_true</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='va'>x1</span> <span class='op'>+</span> <span class='va'>x2_true</span> <span class='op'>+</span> <span class='va'>x3</span>, data <span class='op'>=</span> <span class='va'>data</span><span class='op'>)</span>
-<span class='va'>reg_simex</span> <span class='op'>&lt;-</span> <span class='fu'>simexreg</span><span class='op'>(</span>reg <span class='op'>=</span> <span class='va'>reg_naive</span>, data <span class='op'>=</span> <span class='va'>data</span>, MEvariable <span class='op'>=</span> <span class='st'>"x2_error"</span>, 
-MEvartype <span class='op'>=</span> <span class='st'>"con"</span>, MEerror <span class='op'>=</span> <span class='fl'>0.5</span>, variance <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+<span class='va'>reg_simex</span> <span class='op'>&lt;-</span> <span class='fu'>simexreg</span><span class='op'>(</span>reg <span class='op'>=</span> <span class='va'>reg_naive</span>, data <span class='op'>=</span> <span class='va'>data</span>, 
+MEvariable <span class='op'>=</span> <span class='st'>"x2_error"</span>, MEvartype <span class='op'>=</span> <span class='st'>"con"</span>, MEerror <span class='op'>=</span> <span class='fl'>0.5</span>, variance <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/stats/coef.html'>coef</a></span><span class='op'>(</span><span class='va'>reg_simex</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/stats/vcov.html'>vcov</a></span><span class='op'>(</span><span class='va'>reg_simex</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/stats/sigma.html'>sigma</a></span><span class='op'>(</span><span class='va'>reg_simex</span><span class='op'>)</span>
@@ -383,8 +383,8 @@ MEvartype <span class='op'>=</span> <span class='st'>"con"</span>, MEerror <span
                    x3 <span class='op'>=</span> <span class='va'>x3</span>, y <span class='op'>=</span> <span class='va'>y</span><span class='op'>)</span>
 <span class='va'>reg_naive</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/glm.html'>glm</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='va'>x1</span> <span class='op'>+</span> <span class='va'>x2_error</span> <span class='op'>+</span> <span class='va'>x3</span>, data <span class='op'>=</span> <span class='va'>data</span>, family <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/family.html'>binomial</a></span><span class='op'>(</span><span class='st'>"logit"</span><span class='op'>)</span><span class='op'>)</span>
 <span class='va'>reg_true</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/glm.html'>glm</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='va'>x1</span> <span class='op'>+</span> <span class='va'>x2_true</span> <span class='op'>+</span> <span class='va'>x3</span>, data <span class='op'>=</span> <span class='va'>data</span>, family <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/family.html'>binomial</a></span><span class='op'>(</span><span class='st'>"logit"</span><span class='op'>)</span><span class='op'>)</span>
-<span class='va'>reg_simex</span> <span class='op'>&lt;-</span> <span class='fu'>simexreg</span><span class='op'>(</span>reg <span class='op'>=</span> <span class='va'>reg_naive</span>, data <span class='op'>=</span> <span class='va'>data</span>, MEvariable <span class='op'>=</span> <span class='st'>"x2_error"</span>,
-                      MEerror <span class='op'>=</span> <span class='va'>MEerror</span>, variance <span class='op'>=</span> <span class='cn'>TRUE</span>, MEvartype <span class='op'>=</span> <span class='st'>"cat"</span><span class='op'>)</span>
+<span class='va'>reg_simex</span> <span class='op'>&lt;-</span> <span class='fu'>simexreg</span><span class='op'>(</span>reg <span class='op'>=</span> <span class='va'>reg_naive</span>, data <span class='op'>=</span> <span class='va'>data</span>, 
+MEvariable <span class='op'>=</span> <span class='st'>"x2_error"</span>, MEerror <span class='op'>=</span> <span class='va'>MEerror</span>, variance <span class='op'>=</span> <span class='cn'>TRUE</span>, MEvartype <span class='op'>=</span> <span class='st'>"cat"</span><span class='op'>)</span>
 <span class='op'>}</span>
                   
 </div></pre>

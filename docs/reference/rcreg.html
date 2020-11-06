@@ -167,6 +167,7 @@ measured with error via <em>regression calibration</em> by Carroll et al. (1995)
 
     <pre class="usage"><span class='fu'>rcreg</span><span class='op'>(</span>
   reg <span class='op'>=</span> <span class='cn'>NULL</span>,
+  formula <span class='op'>=</span> <span class='cn'>NULL</span>,
   data <span class='op'>=</span> <span class='cn'>NULL</span>,
   weights <span class='op'>=</span> <span class='cn'>NULL</span>,
   MEvariable <span class='op'>=</span> <span class='cn'>NULL</span>,
@@ -216,6 +217,10 @@ measured with error via <em>regression calibration</em> by Carroll et al. (1995)
       <td><p>naive regression object. See <code>Details</code>.</p></td>
     </tr>
     <tr>
+      <th>formula</th>
+      <td><p>regression formula</p></td>
+    </tr>
+    <tr>
       <th>data</th>
       <td><p>new dataset for <code>reg</code></p></td>
     </tr>
@@ -254,10 +259,6 @@ is <code>400</code>.</p></td>
       <td><p>an object of class <code>rcreg</code></p></td>
     </tr>
     <tr>
-      <th>formula</th>
-      <td><p>an object of class <code>rcreg</code></p></td>
-    </tr>
-    <tr>
       <th>digits</th>
       <td><p>minimal number of significant digits. See <a href='https://rdrr.io/r/base/print.default.html'>print.default</a>.</p></td>
     </tr>
@@ -270,9 +271,9 @@ is <code>TRUE</code>.</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>If <code>MEvariable</code> is not in the regression formula of <code>reg</code>, <code>reg</code> is 
-returned. If <code>MEvariable</code> is a continuous independent variable in the regression formula of 
-<code>yeg</code>, an object of class <code>rcreg</code> is returned:</p>
+    <p>If <code>MEvariable</code> is not in the regression formula, <code>reg</code> is returned. If 
+<code>MEvariable</code> is a continuous independent variable in the regression formula, an 
+object of class <code>rcreg</code> is returned:</p>
 <dt>call</dt><dd><p>the function call,</p></dd>
 <dt>NAIVEreg</dt><dd><p>the naive regression object,</p></dd>
 <dt>ME</dt><dd><p>a list of <code>MEvariable</code>, <code>MEerror</code>, <code>variance</code> and <code>nboot</code>,</p></dd>
@@ -306,8 +307,8 @@ corrected by <code>rcreg</code></p></li>
 </ul>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-    <p>Carrol RJ, Ruppert D, Stefanski LA, Crainiceanu C. Measurement Error in Nonlinear Models: 
-A Modern Perspective, Second Edition (2006). London: Chapman &amp; Hall.</p>
+    <p>Carrol RJ, Ruppert D, Stefanski LA, Crainiceanu C (2006). Measurement Error in Nonlinear Models: 
+A Modern Perspective, Second Edition. London: Chapman &amp; Hall.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><code><a href='simexreg.html'>simexreg</a></code>, <code>cmsens</code>, <code><a href='cmest.html'>cmest</a></code></p></div>
@@ -331,8 +332,8 @@ A Modern Perspective, Second Edition (2006). London: Chapman &amp; Hall.</p>
                    x3 <span class='op'>=</span> <span class='va'>x3</span>, y <span class='op'>=</span> <span class='va'>y</span><span class='op'>)</span>
 <span class='va'>reg_naive</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='va'>x1</span> <span class='op'>+</span> <span class='va'>x2_error</span> <span class='op'>+</span> <span class='va'>x3</span>, data <span class='op'>=</span> <span class='va'>data</span><span class='op'>)</span>
 <span class='va'>reg_true</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='va'>x1</span> <span class='op'>+</span> <span class='va'>x2_true</span> <span class='op'>+</span> <span class='va'>x3</span>, data <span class='op'>=</span> <span class='va'>data</span><span class='op'>)</span>
-<span class='va'>reg_rc</span> <span class='op'>&lt;-</span> <span class='fu'>rcreg</span><span class='op'>(</span>reg <span class='op'>=</span> <span class='va'>reg_naive</span>, data <span class='op'>=</span> <span class='va'>data</span>, MEvariable <span class='op'>=</span> <span class='st'>"x2_error"</span>,
-               MEerror <span class='op'>=</span> <span class='fl'>0.5</span>, variance <span class='op'>=</span> <span class='cn'>TRUE</span>, nboot <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
+<span class='va'>reg_rc</span> <span class='op'>&lt;-</span> <span class='fu'>rcreg</span><span class='op'>(</span>reg <span class='op'>=</span> <span class='va'>reg_naive</span>, data <span class='op'>=</span> <span class='va'>data</span>, MEvariable <span class='op'>=</span> <span class='st'>"x2_error"</span>, MEerror <span class='op'>=</span> <span class='fl'>0.5</span>, 
+variance <span class='op'>=</span> <span class='cn'>TRUE</span>, nboot <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/stats/coef.html'>coef</a></span><span class='op'>(</span><span class='va'>reg_rc</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/stats/vcov.html'>vcov</a></span><span class='op'>(</span><span class='va'>reg_rc</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/stats/sigma.html'>sigma</a></span><span class='op'>(</span><span class='va'>reg_rc</span><span class='op'>)</span>
@@ -357,8 +358,8 @@ A Modern Perspective, Second Edition (2006). London: Chapman &amp; Hall.</p>
                    x3 <span class='op'>=</span> <span class='va'>x3</span>, y <span class='op'>=</span> <span class='va'>y</span><span class='op'>)</span>
 <span class='va'>reg_naive</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/glm.html'>glm</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='va'>x1</span> <span class='op'>+</span> <span class='va'>x2_error</span> <span class='op'>+</span> <span class='va'>x3</span>, data <span class='op'>=</span> <span class='va'>data</span>, family <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/family.html'>binomial</a></span><span class='op'>(</span><span class='st'>"logit"</span><span class='op'>)</span><span class='op'>)</span>
 <span class='va'>reg_true</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/glm.html'>glm</a></span><span class='op'>(</span><span class='va'>y</span> <span class='op'>~</span> <span class='va'>x1</span> <span class='op'>+</span> <span class='va'>x2_true</span> <span class='op'>+</span> <span class='va'>x3</span>, data <span class='op'>=</span> <span class='va'>data</span>, family <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/family.html'>binomial</a></span><span class='op'>(</span><span class='st'>"logit"</span><span class='op'>)</span><span class='op'>)</span>
-<span class='va'>reg_rc</span> <span class='op'>&lt;-</span> <span class='fu'>rcreg</span><span class='op'>(</span>reg <span class='op'>=</span> <span class='va'>reg_naive</span>, data <span class='op'>=</span> <span class='va'>data</span>, MEvariable <span class='op'>=</span> <span class='st'>"x2_error"</span>,
-                MEerror <span class='op'>=</span> <span class='fl'>0.5</span>, variance <span class='op'>=</span> <span class='cn'>TRUE</span>, nboot <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
+<span class='va'>reg_rc</span> <span class='op'>&lt;-</span> <span class='fu'>rcreg</span><span class='op'>(</span>reg <span class='op'>=</span> <span class='va'>reg_naive</span>, data <span class='op'>=</span> <span class='va'>data</span>, 
+MEvariable <span class='op'>=</span> <span class='st'>"x2_error"</span>, MEerror <span class='op'>=</span> <span class='fl'>0.5</span>, variance <span class='op'>=</span> <span class='cn'>TRUE</span>, nboot <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
 
 <span class='co'># multinom</span>
 <span class='va'>n</span> <span class='op'>&lt;-</span> <span class='fl'>1000</span>
@@ -377,8 +378,8 @@ A Modern Perspective, Second Edition (2006). London: Chapman &amp; Hall.</p>
                    x3 <span class='op'>=</span> <span class='va'>x3</span>, y <span class='op'>=</span> <span class='va'>y</span><span class='op'>)</span>
 <span class='va'>reg_naive</span> <span class='op'>&lt;-</span> <span class='fu'>nnet</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/nnet/man/multinom.html'>multinom</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/factor.html'>factor</a></span><span class='op'>(</span><span class='va'>y</span><span class='op'>)</span> <span class='op'>~</span> <span class='va'>x1</span> <span class='op'>+</span> <span class='va'>x2_error</span> <span class='op'>+</span> <span class='va'>x3</span>, data <span class='op'>=</span> <span class='va'>data</span><span class='op'>)</span>
 <span class='va'>reg_true</span> <span class='op'>&lt;-</span> <span class='fu'>nnet</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/nnet/man/multinom.html'>multinom</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/factor.html'>factor</a></span><span class='op'>(</span><span class='va'>y</span><span class='op'>)</span> <span class='op'>~</span> <span class='va'>x1</span> <span class='op'>+</span> <span class='va'>x2_true</span> <span class='op'>+</span> <span class='va'>x3</span>, data <span class='op'>=</span> <span class='va'>data</span><span class='op'>)</span>
-<span class='va'>reg_rc</span> <span class='op'>&lt;-</span> <span class='fu'>rcreg</span><span class='op'>(</span>reg <span class='op'>=</span> <span class='va'>reg_naive</span>, data <span class='op'>=</span> <span class='va'>data</span>, MEvariable <span class='op'>=</span> <span class='st'>"x2_error"</span>,
-                MEerror <span class='op'>=</span> <span class='fl'>0.5</span>, variance <span class='op'>=</span> <span class='cn'>TRUE</span>, nboot <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
+<span class='va'>reg_rc</span> <span class='op'>&lt;-</span> <span class='fu'>rcreg</span><span class='op'>(</span>reg <span class='op'>=</span> <span class='va'>reg_naive</span>, data <span class='op'>=</span> <span class='va'>data</span>, MEvariable <span class='op'>=</span> <span class='st'>"x2_error"</span>, MEerror <span class='op'>=</span> <span class='fl'>0.5</span>, 
+variance <span class='op'>=</span> <span class='cn'>TRUE</span>, nboot <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
 <span class='op'>}</span>                
 
 </div></pre>

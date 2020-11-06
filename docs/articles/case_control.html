@@ -109,12 +109,13 @@
 
       
 
-      </header><script src="case_control_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><script src="case_control_files/accessible-code-block-0.0.1/empty-anchor.js"></script><link href="case_control_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
+<script src="case_control_files/anchor-sections-1.0/anchor-sections.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Statistical Modeling for a Case Control Study</h1>
             
-            <h4 class="date">2020-10-16</h4>
+            <h4 class="date">2020-11-06</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BS1125/CMAverse/blob/master/vignettes/case_control.Rmd"><code>vignettes/case_control.Rmd</code></a></small>
       <div class="hidden name"><code>case_control.Rmd</code></div>
@@ -124,8 +125,8 @@
     
     
 <p>This example demonstrates how to use <code>cmest</code> for a case control study. For this purpose, we simulate some data containing a continuous baseline confounder <span class="math inline">\(C_1\)</span>, a binary baseline confounder <span class="math inline">\(C_2\)</span>, a binary exposure <span class="math inline">\(A\)</span>, a binary mediator <span class="math inline">\(M\)</span> and a binary outcome <span class="math inline">\(Y\)</span>. We sample 2000 cases out of all cases and sample 2000 controls out of all controls. The true regression models for <span class="math inline">\(A\)</span>, <span class="math inline">\(M\)</span> and <span class="math inline">\(Y\)</span> are: <span class="math display">\[logit(E(A|C_1,C_2))=0.2+0.5C_1+0.1C_2\]</span> <span class="math display">\[logit(E(M|A,C_1,C_2))=1+2A+1.5C_1+0.8C_2\]</span> <span class="math display">\[logit(E(Y|A,M,C_1,C_2)))=-5+0.8A-1.8M+0.5AM+0.3C_1-0.6C_2\]</span></p>
-<div class="sourceCode" id="cb1"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
 <span class="co"># data simulation</span>
 <span class="va">expit</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span><span class="op">+</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span>
 <span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">1000000</span>
@@ -138,25 +139,77 @@
 <span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span><span class="va">A</span>, <span class="va">M</span>, <span class="va">Y</span>, <span class="va">C1</span>, <span class="va">C2</span><span class="op">)</span>
 <span class="va">case_indice</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">Y</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span>, <span class="fl">2000</span>, replace <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
 <span class="va">control_indice</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/which.html">which</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">Y</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span>, <span class="fl">2000</span>, replace <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>
-<span class="va">data</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">case_indice</span>, <span class="va">control_indice</span><span class="op">)</span>, <span class="op">]</span></pre></div>
+<span class="va">data</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">case_indice</span>, <span class="va">control_indice</span><span class="op">)</span>, <span class="op">]</span></code></pre></div>
 <p>The DAG for this scientific setting is:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit">
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://bs1125.github.io/CMAverse/">CMAverse</a></span><span class="op">)</span>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://bs1125.github.io/CMAverse/">CMAverse</a></span><span class="op">)</span>
 <span class="fu"><a href="../reference/cmdag.html">cmdag</a></span><span class="op">(</span>outcome <span class="op">=</span> <span class="st">"Y"</span>, exposure <span class="op">=</span> <span class="st">"A"</span>, mediator <span class="op">=</span> <span class="st">"M"</span>,
-      basec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C1"</span>, <span class="st">"C2"</span><span class="op">)</span>, postc <span class="op">=</span> <span class="cn">NULL</span>, node <span class="op">=</span> <span class="cn">TRUE</span>, text_col <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span></pre></div>
+      basec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C1"</span>, <span class="st">"C2"</span><span class="op">)</span>, postc <span class="op">=</span> <span class="cn">NULL</span>, node <span class="op">=</span> <span class="cn">TRUE</span>, text_col <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span></code></pre></div>
 <p><img src="case_control_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
 <p>For a case control study, we set the <code>casecontrol</code> argument to be <code>TRUE</code>. It requires that either the prevalence of the case be known or the case be rare. We use the regression-based approach for illustration.</p>
 <p>If the prevalence of the case is known, we specify it by the <code>yprevalence</code> argument. The results are:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit">
-<span class="va">res_yprevelence</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data</span>, model <span class="op">=</span> <span class="st">"rb"</span>, casecontrol <span class="op">=</span> <span class="cn">TRUE</span>, yprevalence <span class="op">=</span> <span class="va">yprevalence</span>,
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">res_yprevelence</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data</span>, model <span class="op">=</span> <span class="st">"rb"</span>, casecontrol <span class="op">=</span> <span class="cn">TRUE</span>, yprevalence <span class="op">=</span> <span class="va">yprevalence</span>,
                          outcome <span class="op">=</span> <span class="st">"Y"</span>, exposure <span class="op">=</span> <span class="st">"A"</span>,
                          mediator <span class="op">=</span> <span class="st">"M"</span>, basec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C1"</span>, <span class="st">"C2"</span><span class="op">)</span>, EMint <span class="op">=</span> <span class="cn">TRUE</span>,
                          mreg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">"logistic"</span><span class="op">)</span>, yreg <span class="op">=</span> <span class="st">"logistic"</span>,
                          astar <span class="op">=</span> <span class="fl">0</span>, a <span class="op">=</span> <span class="fl">1</span>, mval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>, 
-                         estimation <span class="op">=</span> <span class="st">"paramfunc"</span>, inference <span class="op">=</span> <span class="st">"delta"</span><span class="op">)</span></pre></div>
-<div class="sourceCode" id="cb4"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">res_yprevelence</span><span class="op">)</span></pre></div>
-<pre><code>## Causal Mediation Analysis for a Case Control Study via the Regression-based Approach
+                         estimation <span class="op">=</span> <span class="st">"paramfunc"</span>, inference <span class="op">=</span> <span class="st">"delta"</span><span class="op">)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">res_yprevelence</span><span class="op">)</span></code></pre></div>
+<pre><code>## Causal Mediation Analysis
+## 
+## # Outcome regression:
+## 
+## Call:
+## svyglm(formula = Y ~ A + M + A * M + C1 + C2, design = getCall(x$reg.output$yreg)$design, 
+##     family = getCall(x$reg.output$yreg)$family)
+## 
+## Survey design:
+## survey::svydesign(~1, data = getCall(x$reg.output.summary$yreg$survey.design)$data, 
+##     weights = getCall(x$reg.output.summary$yreg$survey.design)$weights)
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -4.97446    0.39866 -12.478  &lt; 2e-16 ***
+## A            1.08507    0.39955   2.716  0.00664 ** 
+## M           -1.66061    0.22032  -7.537  5.9e-14 ***
+## C1           0.14732    0.34430   0.428  0.66875    
+## C2          -0.61153    0.06887  -8.879  &lt; 2e-16 ***
+## A:M          0.19323    0.40922   0.472  0.63682    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 0.9919739)
+## 
+## Number of Fisher Scoring iterations: 9
+## 
+## 
+## # Mediator regressions: 
+## 
+## Call:
+## svyglm(formula = M ~ A + C1 + C2, design = getCall(x$reg.output$mreg[[1L]])$design, 
+##     family = getCall(x$reg.output$mreg[[1L]])$family)
+## 
+## Survey design:
+## survey::svydesign(~1, data = getCall(x$reg.output.summary$mreg[[1L]]$survey.design)$data, 
+##     weights = getCall(x$reg.output.summary$mreg[[1L]]$survey.design)$weights)
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   0.7836     1.5384   0.509   0.6105    
+## A             1.9558     0.3439   5.687 1.38e-08 ***
+## C1            1.6832     1.5600   1.079   0.2807    
+## C2            0.7054     0.2965   2.379   0.0174 *  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1.045659)
+## 
+## Number of Fisher Scoring iterations: 7
+## 
+## 
+## # Effect decomposition on the risk ratio scale for a case control study via the regression-based approach
 ##  
 ## Closed-form parameter function estimation with 
 ##  delta method standard errors, confidence intervals and p-values 
@@ -168,21 +221,23 @@
 ## Rpnie           0.83794   0.04473  0.75471   0.930 0.000925 ***
 ## Rtnie           0.86763   0.05490  0.76644   0.982 0.024823 *  
 ## Rte             2.98666   0.27610  2.49171   3.580  &lt; 2e-16 ***
-## ERcde           2.09752   0.11082  1.88031   2.315  &lt; 2e-16 ***
-## ERintref        0.34479   0.25249 -0.15008   0.840 0.172079    
-## ERintmed       -0.29359   0.25148 -0.78647   0.199 0.243020    
-## ERpnie         -0.16206   0.21623 -0.58586   0.262 0.453579    
-## ERcde(prop)     1.05580   0.04473  0.96814   1.143  &lt; 2e-16 ***
-## ERintref(prop)  0.17355   0.03792  0.09923   0.248 4.73e-06 ***
-## ERintmed(prop) -0.14778   0.12318 -0.38921   0.094 0.230251    
-## ERpnie(prop)   -0.08157   0.10636 -0.29003   0.127 0.443095    
-## pm             -0.22935   0.02901 -0.28621  -0.173 2.66e-15 ***
+## ERcde           2.09752   0.25249  1.60265   2.592  &lt; 2e-16 ***
+## ERintref        0.34479   0.25148 -0.14810   0.838 0.170361    
+## ERintmed       -0.29359   0.21623 -0.71740   0.130 0.174540    
+## ERpnie         -0.16206   0.04473 -0.24972  -0.074 0.000291 ***
+## ERcde(prop)     1.05580   0.03792  0.98148   1.130  &lt; 2e-16 ***
+## ERintref(prop)  0.17355   0.12318 -0.06788   0.415 0.158862    
+## ERintmed(prop) -0.14778   0.10636 -0.35624   0.061 0.164683    
+## ERpnie(prop)   -0.08157   0.02901 -0.13843  -0.025 0.004921 ** 
+## pm             -0.22935   0.11082 -0.44656  -0.012 0.038494 *  
 ## int             0.02577   0.01922 -0.01190   0.063 0.179931    
 ## pe             -0.05580   0.03792 -0.13013   0.019 0.141133    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Reference values: 
+## (Rcde: controlled direct effect risk ratio; Rpnde: pure natural direct effect risk ratio; Rtnde: total natural direct effect risk ratio; Rpnie: pure natural indirect effect risk ratio; Rtnie: total natural indirect effect risk ratio; Rte: total effect risk ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
+## 
+## Relevant variable values: 
 ## $a
 ## [1] 1
 ## 
@@ -204,16 +259,76 @@
 ## $basecval[[2]]
 ## [1] 0.5255</code></pre>
 <p>If the prevalence of the case is unknown but we know the case is rare, we set the <code>yrare</code> argument to be <code>TRUE</code>. The results are:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit">
-<span class="va">res_yrare</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data</span>, model <span class="op">=</span> <span class="st">"rb"</span>, casecontrol <span class="op">=</span> <span class="cn">TRUE</span>, yrare <span class="op">=</span> <span class="cn">TRUE</span>,
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">res_yrare</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data</span>, model <span class="op">=</span> <span class="st">"rb"</span>, casecontrol <span class="op">=</span> <span class="cn">TRUE</span>, yrare <span class="op">=</span> <span class="cn">TRUE</span>,
                    outcome <span class="op">=</span> <span class="st">"Y"</span>, exposure <span class="op">=</span> <span class="st">"A"</span>,
                    mediator <span class="op">=</span> <span class="st">"M"</span>, basec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C1"</span>, <span class="st">"C2"</span><span class="op">)</span>, EMint <span class="op">=</span> <span class="cn">TRUE</span>,
                    mreg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">"logistic"</span><span class="op">)</span>, yreg <span class="op">=</span> <span class="st">"logistic"</span>,
                    astar <span class="op">=</span> <span class="fl">0</span>, a <span class="op">=</span> <span class="fl">1</span>, mval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>,
-                   estimation <span class="op">=</span> <span class="st">"paramfunc"</span>, inference <span class="op">=</span> <span class="st">"delta"</span><span class="op">)</span></pre></div>
-<div class="sourceCode" id="cb7"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">res_yrare</span><span class="op">)</span></pre></div>
-<pre><code>## Causal Mediation Analysis for a Case Control Study via the Regression-based Approach
+                   estimation <span class="op">=</span> <span class="st">"paramfunc"</span>, inference <span class="op">=</span> <span class="st">"delta"</span><span class="op">)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">res_yrare</span><span class="op">)</span></code></pre></div>
+<pre><code>## Causal Mediation Analysis
+## 
+## # Outcome regression:
+## 
+## Call:
+## glm(formula = Y ~ A + M + A * M + C1 + C2, family = binomial(), 
+##     data = getCall(x$reg.output$yreg)$data, weights = getCall(x$reg.output$yreg)$weights)
+## 
+## Deviance Residuals: 
+##      Min        1Q    Median        3Q       Max  
+## -2.02664  -1.14853  -0.07283   1.04234   1.79068  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  0.87856    0.38849   2.261   0.0237 *  
+## A            0.96088    0.38782   2.478   0.0132 *  
+## M           -1.69239    0.21731  -7.788 6.82e-15 ***
+## C1           0.07022    0.33423   0.210   0.8336    
+## C2          -0.62047    0.06664  -9.310  &lt; 2e-16 ***
+## A:M          0.33475    0.39764   0.842   0.3999    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 5545.2  on 3999  degrees of freedom
+## Residual deviance: 5163.4  on 3994  degrees of freedom
+## AIC: 5175.4
+## 
+## Number of Fisher Scoring iterations: 4
+## 
+## 
+## # Mediator regressions: 
+## 
+## Call:
+## glm(formula = M ~ A + C1 + C2, family = binomial(), data = getCall(x$reg.output$mreg[[1L]])$data, 
+##     weights = getCall(x$reg.output$mreg[[1L]])$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -3.2695   0.1089   0.1460   0.2770   0.5010  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)   0.7862     1.4552   0.540   0.5890    
+## A             1.9627     0.3474   5.650  1.6e-08 ***
+## C1            1.6876     1.4587   1.157   0.2473    
+## C2            0.7016     0.2982   2.353   0.0186 *  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 452.89  on 1999  degrees of freedom
+## Residual deviance: 406.21  on 1996  degrees of freedom
+## AIC: 414.21
+## 
+## Number of Fisher Scoring iterations: 7
+## 
+## 
+## # Effect decomposition on the risk ratio scale for a case control study via the regression-based approach
 ##  
 ## Closed-form parameter function estimation with 
 ##  delta method standard errors, confidence intervals and p-values 
@@ -225,21 +340,23 @@
 ## Rpnie           0.83319   0.04532  0.74893   0.927 0.000794 ***
 ## Rtnie           0.88340   0.04962  0.79131   0.986 0.027294 *  
 ## Rte             3.00715   0.27763  2.50939   3.604  &lt; 2e-16 ***
-## ERcde           2.13416   0.09648  1.94506   2.323  &lt; 2e-16 ***
-## ERintref        0.26991   0.25499 -0.22987   0.770 0.289829    
-## ERintmed       -0.23012   0.21978 -0.66088   0.201 0.295084    
-## ERpnie         -0.16681   0.18887 -0.53699   0.203 0.377131    
-## ERcde(prop)     1.06328   0.04532  0.97445   1.152  &lt; 2e-16 ***
-## ERintref(prop)  0.13447   0.03649  0.06295   0.206 0.000229 ***
-## ERintmed(prop) -0.11465   0.10691 -0.32419   0.095 0.283547    
-## ERpnie(prop)   -0.08311   0.09217 -0.26376   0.098 0.367237    
-## pm             -0.19776   0.02927 -0.25512  -0.140 1.41e-11 ***
+## ERcde           2.13416   0.25499  1.63438   2.634  &lt; 2e-16 ***
+## ERintref        0.26991   0.21978 -0.16085   0.701 0.219412    
+## ERintmed       -0.23012   0.18887 -0.60029   0.140 0.223076    
+## ERpnie         -0.16681   0.04532 -0.25564  -0.078 0.000233 ***
+## ERcde(prop)     1.06328   0.03649  0.99175   1.135  &lt; 2e-16 ***
+## ERintref(prop)  0.13447   0.10691 -0.07507   0.344 0.208453    
+## ERintmed(prop) -0.11465   0.09217 -0.29530   0.066 0.213549    
+## ERpnie(prop)   -0.08311   0.02927 -0.14047  -0.026 0.004517 ** 
+## pm             -0.19776   0.09648 -0.38686  -0.009 0.040401 *  
 ## int             0.01983   0.01642 -0.01235   0.052 0.227195    
 ## pe             -0.06328   0.03649 -0.13481   0.008 0.082916 .  
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## Reference values: 
+## (Rcde: controlled direct effect risk ratio; Rpnde: pure natural direct effect risk ratio; Rtnde: total natural direct effect risk ratio; Rpnie: pure natural indirect effect risk ratio; Rtnie: total natural indirect effect risk ratio; Rte: total effect risk ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
+## 
+## Relevant variable values: 
 ## $a
 ## [1] 1
 ## 
