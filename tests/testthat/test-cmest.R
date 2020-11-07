@@ -244,6 +244,115 @@ test_that("cmest works correctly for continuous Y and binary M", {
   
 })
 
+test_that("cmest works correctly for multiple imputations", {
+  
+  set.seed(1)
+  # data simulation
+  expit <- function(x) exp(x)/(1+exp(x))
+  n <- 10000
+  C1 <- rnorm(n, mean = 1, sd = 1)
+  C2 <- rbinom(n, 1, 0.6)
+  pa <- expit(0.2 + 0.5*C1 + 0.1*C2)
+  A <- rbinom(n, 1, pa)
+  pm <- expit(1 + 2*A + 1.5*C1 + 0.8*C2)
+  M <- rbinom(n, 1, pm)
+  Y <- rnorm(n, -1 + 0.8*A + 0.5*M + 0.5*A*M + 0.3*C1 - 0.6*C2, 1)
+  data <- data.frame(A, M, Y, C1, C2)
+  yreg <- lm(Y ~ A*M + C1 + C2, data = data)
+  mreg <- glm(M ~ A + C1 + C2, family = binomial, data = data)
+  
+  # results of cmest
+  res_contbin_rb_param_delta <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
+                                      mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
+                                      mreg = list("logistic"), yreg = "linear",
+                                      astar = 0, a = 1, mval = list(1),
+                                      estimation = "paramfunc", inference = "delta", multimp = TRUE)
+  res_contbin_rb_param_bootstrap <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
+                                          mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
+                                          mreg = list("logistic"), yreg = "linear",
+                                          astar = 0, a = 1, mval = list(1),
+                                          estimation = "paramfunc", inference = "bootstrap", multimp = TRUE)
+  res_contbin_rb_impu_bootstrap <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
+                                         mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
+                                         mreg = list("logistic"), yreg = "linear",
+                                         astar = 0, a = 1, mval = list(1),
+                                         estimation = "imputation", inference = "bootstrap", multimp = TRUE)
+  res_contbin_wb <- cmest(data = data, model = "wb", outcome = "Y", exposure = "A",
+                          mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
+                          ereg = "logistic", yreg = "linear",
+                          astar = 0, a = 1, mval = list(1),
+                          estimation = "imputation", inference = "bootstrap", multimp = TRUE)
+  res_contbin_iorw <- cmest(data = data, model = "iorw", outcome = "Y", exposure = "A",
+                            mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
+                            ereg = "logistic", yreg = "linear",
+                            astar = 0, a = 1, mval = list(1),
+                            estimation = "imputation", inference = "bootstrap", multimp = TRUE)
+  res_contbin_msm <- cmest(data = data, model = "msm", outcome = "Y", exposure = "A",
+                           mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
+                           ereg = "logistic", yreg = "linear", mreg = list("logistic"),
+                           wmnomreg = list("logistic"), wmdenomreg = list("logistic"),
+                           astar = 0, a = 1, mval = list(1),
+                           estimation = "imputation", inference = "bootstrap", multimp = TRUE)
+  res_contbin_ne <- cmest(data = data, model = "ne", outcome = "Y", exposure = "A",
+                          mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
+                          yreg = "linear",
+                          astar = 0, a = 1, mval = list(1),
+                          estimation = "imputation", inference = "bootstrap", multimp = TRUE)
+  res_contbin_gformula <- cmest(data = data, model = "gformula", outcome = "Y", exposure = "A",
+                                mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
+                                mreg = list("logistic"), yreg = "linear",
+                                astar = 0, a = 1, mval = list(1),
+                                estimation = "imputation", inference = "bootstrap", multimp = TRUE)
+  
+  # reference results
+  thetas <- unname(coef(yreg))
+  betas <- unname(coef(mreg))
+  beta0 <- betas[1]
+  beta1 <- betas[2]
+  beta2 <- betas[3]
+  beta3 <- betas[4]
+  theta0 <- thetas[1]
+  theta1 <- thetas[2]
+  theta2 <- thetas[3]
+  theta3 <- thetas[6]
+  theta4 <- thetas[4]
+  theta5 <- thetas[5]
+  m <- 1
+  a <- 1
+  astar <- 0
+  meanc1 <- mean(C1)
+  meanc2 <- mean(C2)
+  cde_contbin <- (theta1+theta3*m)*(a-astar)
+  pnde_contbin <- theta1*(a-astar) + theta3*(a-astar)*expit(beta0+beta1*astar+beta2*meanc1+beta3*meanc2)
+  tnde_contbin <- theta1*(a-astar) + theta3*(a-astar)*expit(beta0+beta1*a+beta2*meanc1+beta3*meanc2)
+  pnie_contbin <- (theta2+theta3*astar)*(expit(beta0+beta1*a+beta2*meanc1+beta3*meanc2)-expit(beta0+beta1*astar+beta2*meanc1+beta3*meanc2))
+  tnie_contbin <- (theta2+theta3*a)*(expit(beta0+beta1*a+beta2*meanc1+beta3*meanc2)-expit(beta0+beta1*astar+beta2*meanc1+beta3*meanc2))
+  te_contbin <- pnde_contbin+tnie_contbin
+  intref_contbin <- pnde_contbin-cde_contbin
+  intmed_contbin <- tnie_contbin-pnie_contbin
+  cde_prop_contbin <- cde_contbin/te_contbin
+  intref_prop_contbin <- intref_contbin/te_contbin
+  intmed_prop_contbin <- intmed_contbin/te_contbin
+  pnie_prop_contbin <- pnie_contbin/te_contbin
+  pm_contbin<- (pnie_contbin+intmed_contbin)/te_contbin
+  int_contbin <- (intref_contbin+intmed_contbin)/te_contbin
+  pe_contbin <- (intref_contbin+intmed_contbin+pnie_contbin)/te_contbin
+  ref <- c(cde_contbin, pnde_contbin, tnde_contbin, pnie_contbin, tnie_contbin, te_contbin,
+           intref_contbin, intmed_contbin, cde_prop_contbin, intref_prop_contbin, intmed_prop_contbin,
+           pnie_prop_contbin, pm_contbin, int_contbin, pe_contbin)
+  
+  # test
+  expect_equal(unname(res_contbin_rb_param_delta$effect.pe), ref)
+  expect_equal(unname(res_contbin_rb_param_bootstrap$effect.pe), ref)
+  expect_equal(unname(res_contbin_rb_impu_bootstrap$effect.pe), ref, tolerance = 0.1)
+  expect_equal(unname(res_contbin_wb$effect.pe), ref, tolerance = 0.1)
+  expect_equal(unname(res_contbin_msm$effect.pe), ref, tolerance = 0.1)
+  expect_equal(unname(res_contbin_ne$effect.pe), ref, tolerance = 0.1)
+  expect_equal(unname(res_contbin_iorw$effect.pe), ref[c(6,2,5,15)], tolerance = 0.1)
+  expect_equal(unname(res_contbin_gformula$effect.pe), ref, tolerance = 0.1)
+  
+})
+
 
 test_that("cmest works correctly for bca", {
   
@@ -326,6 +435,7 @@ test_that("cmest works correctly for bca", {
   expect_equal(class(print(summary(res_contbin_ne))), "list")
   expect_equal(class(print(summary(res_contbin_iorw))), "list")
   expect_equal(class(print(summary(res_contbin_gformula))), "list")
+  
 })
 
 
