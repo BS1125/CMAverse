@@ -151,8 +151,9 @@ cmsens <- function(object = NULL, sens = "uc", MEmethod = "simex",
   ############################Sensitivity Analysis for Unmeasured Confounding#######################
   #################################################################################################
   if (sens == "uc") {
-    if (reg.input$yreg %in% c("coxph", "aft_exp", "aft_weibull") | inherits(reg.input$yreg, "coxph") | 
-        inherits(reg.input$yreg, "survreg")) stop("sensitivity analysis for unmeasured confounding currently doesn't support survival outcomes")
+    if (inherits(reg.input$yreg, "coxph") | inherits(reg.input$yreg, "survreg") | 
+        (is.character(reg.input$yreg) && reg.input$yreg %in% c("coxph", "aft_exp", "aft_weibull"))
+        ) stop("sensitivity analysis for unmeasured confounding currently doesn't support survival outcomes")
     # report evalues for cde, pnde, tnde, pnie, tnie, te when model is not iorw
     if (model %in% c("rb", "wb", "msm", "g-formula", "ne")) out.index <- 1:6
     # report evalues for te, pnde, tnie when model is iorw

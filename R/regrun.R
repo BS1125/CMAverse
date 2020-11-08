@@ -163,6 +163,7 @@ regrun <- function() {
                        paste0("Select character yreg from 'linear', 'logistic',
                               'loglinear', 'poisson', 'quasipoisson', 'negbin', 'multinomial', 'ordinal',
                               'coxph', 'aft_exp', 'aft_weibull'"))
+    if (estimation == "paramfunc" && yreg %in% c("logistic", "coxph")) warning("When estimation is 'paramfunc' and yreg is 'logistic' or 'coxph', the outcome must be rare; ignore this warning if the outcome is rare")
     if (model != "iorw") {
       out$variables$EMint <- EMint
       int.terms <- switch(EMint + 1, "1" = NULL, "2" = paste(exposure, mediator, sep = "*"))
