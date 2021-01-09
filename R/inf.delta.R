@@ -43,8 +43,11 @@ inf.delta <- function(data = NULL, yreg = NULL, mreg = NULL) {
   beta0 <- paste0("x", length(thetas) + 1 + (0:(mlevel - 2))*length(betas)/(mlevel - 1))
   beta1 <- t(matrix(paste0("x", length(thetas) + rowSums(expand.grid(2:elevel,(0:(mlevel-2))*length(betas)/(mlevel-1)))),
                     ncol = mlevel - 1))
-  XC <- sapply(0:(mlevel-2), function(x) paste0("x", length(thetas) + elevel + x*length(betas)/(mlevel-1) +
+  if (length(basec) > 0) {
+    XC <- sapply(0:(mlevel-2), function(x) paste0("x", length(thetas) + elevel + x*length(betas)/(mlevel-1) +
                                                   1:length(vecc), "*", paste0("(", vecc, ")"), collapse = "+"))
+  } else XC <- 0
+  
   if ((is_lm_yreg | is_glm_yreg ) && family_yreg$family == "gaussian") {
     if ((is_lm_mreg | is_glm_mreg) && family_mreg[[1]]$family == "gaussian") {
       # linear Y with linear M
