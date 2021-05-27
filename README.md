@@ -23,6 +23,8 @@ See the package [website](https://bs1125.github.io/CMAverse/) for a
 quickstart guide, an overview of statistical modeling approaches and
 examples.
 
+Cite the paper: [website](https://journals.lww.com/epidem/citation/9000/cmaverse__a_suite_of_functions_for_reproducible.98264.aspx)
+
 ### DAG Visualization
 
 `cmdag` visualizes causal relationships via a directed acyclic graph
