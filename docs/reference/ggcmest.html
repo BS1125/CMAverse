@@ -229,8 +229,8 @@ plotting functions in the ggplot2 package.</p>
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
 <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://bs1125.github.io/CMAverse/'>CMAverse</a></span><span class='op'>)</span>
-<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='http://ggplot2.tidyverse.org'>ggplot2</a></span><span class='op'>)</span>
-
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://ggplot2.tidyverse.org'>ggplot2</a></span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='warning'>Warning: package 'ggplot2' was built under R version 4.0.4</span></div><div class='input'>
 <span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='cmest.html'>cmest</a></span><span class='op'>(</span>data <span class='op'>=</span> <span class='va'>cma2020</span>, model <span class='op'>=</span> <span class='st'>"rb"</span>, outcome <span class='op'>=</span> <span class='st'>"contY"</span>, 
 exposure <span class='op'>=</span> <span class='st'>"A"</span>, mediator <span class='op'>=</span> <span class='st'>"M2"</span>, basec <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"C1"</span>, <span class='st'>"C2"</span><span class='op'>)</span>, 
 EMint <span class='op'>=</span> <span class='cn'>TRUE</span>, mreg <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span><span class='op'>(</span><span class='st'>"multinomial"</span><span class='op'>)</span>, yreg <span class='op'>=</span> <span class='st'>"linear"</span>, 
