@@ -26,6 +26,7 @@ inf.delta <- function(data = NULL, yreg = NULL, mreg = NULL) {
 
   # coefficients for yreg
   thetas <- coef(yreg)
+  if (is_coxph_yreg) thetas <- c(0, thetas)
   # coefficients for mreg
   betas  <- as.vector(t(coef(mreg)))
   # variance-covariance matrix of thetas
@@ -34,6 +35,7 @@ inf.delta <- function(data = NULL, yreg = NULL, mreg = NULL) {
   vcov_betas <- vcov(mreg)
   # stack the two diagonally
   vcov_block <- bdiag(vcov_thetas, vcov_betas)
+  if (is_coxph_yreg) vcov_block <- bdiag(0, vcov_block)
   theta0 <- "x1"
   theta1 <- paste0("x", 2:elevel)
   theta2 <- paste0("x", (elevel + 1):(elevel + mlevel - 1))
