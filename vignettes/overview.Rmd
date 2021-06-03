@@ -572,7 +572,7 @@ With the marginal structural model, `CMAverse` estimates causal effects through 
 9. Calculate causal effects with formulas in table 3 or table 4.
 
 
-## The G-formula Approach
+## The g-formula Approach
 
 With the $g$-formula approach, `CMAverse` estimates causal effects through direct counterfactual imputation estimation by the following steps:
 

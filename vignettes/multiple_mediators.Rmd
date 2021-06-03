@@ -61,7 +61,7 @@ res_rb <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
 summary(res_rb)
 ```
 
-## The Weighting-base Approach
+## The Weighting-based Approach
 
 ```{r message=F,warning=F,results='hide'}
 res_wb <- cmest(data = data, model = "wb", outcome = "Y", exposure = "A",
@@ -103,7 +103,7 @@ res_ne <- cmest(data = data, model = "ne", outcome = "Y", exposure = "A",
 summary(res_ne)
 ```
 
-## The $G$-formula Approach
+## The g-formula Approach
 
 ```{r message=F,warning=F,results='hide'}
 res_gformula <- cmest(data = data, model = "gformula", outcome = "Y", exposure = "A",

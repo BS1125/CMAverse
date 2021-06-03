@@ -79,7 +79,7 @@ res_rb_impu_bootstrap <- cmest(data = data, model = "rb", outcome = "Y", exposur
 summary(res_rb_impu_bootstrap)
 ```
 
-## The Weighting-base Approach
+## The Weighting-based Approach
 
 ```{r message=F,warning=F,results='hide'}
 res_wb <- cmest(data = data, model = "wb", outcome = "Y", exposure = "A",
@@ -136,7 +136,7 @@ res_msm <- cmest(data = data, model = "msm", outcome = "Y", exposure = "A",
 summary(res_msm)
 ```
 
-## The $G$-formula Approach
+## The g-formula Approach
 
 ```{r message=F,warning=F,results='hide'}
 res_gformula <- cmest(data = data, model = "gformula", outcome = "Y", exposure = "A",
