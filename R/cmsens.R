@@ -155,7 +155,7 @@ cmsens <- function(object = NULL, sens = "uc", MEmethod = "simex",
         (is.character(reg.input$yreg) && reg.input$yreg %in% c("coxph", "aft_exp", "aft_weibull"))
         ) stop("sensitivity analysis for unmeasured confounding currently doesn't support survival outcomes")
     # report evalues for cde, pnde, tnde, pnie, tnie, te when model is not iorw
-    if (model %in% c("rb", "wb", "msm", "g-formula", "ne")) out.index <- 1:6
+    if (model %in% c("rb", "wb", "msm", "gformula", "ne")) out.index <- 1:6
     # report evalues for te, pnde, tnie when model is iorw
     if (model == "iorw") out.index <- 1:3
     
