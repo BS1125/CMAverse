@@ -222,21 +222,32 @@ est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       pm <- ind / tot
       est <- c(tot, dir, ind, pm)
     } else est <- c(tot, dir, ind)
-  } else if (((is_lm_yreg | is_glm_yreg) &&
-              (family_yreg$family %in% c("binomial", "quasibinomial", "multinom", "poisson", "quasipoisson", "ziplss") |
-               startsWith(family_yreg$family, "Negative Binomial") |
-               startsWith(family_yreg$family, "Zero inflated Poisson") |
-               startsWith(family_yreg$family, "Ordered Categorical"))) |
-             is_multinom_yreg | is_polr_yreg | is_survreg_yreg | is_coxph_yreg){
+  } else {
     # output causal effects in ratio scale for non-continuous Y
-    logRRtot <- log(EYtot1) - log(EYtot0)
-    logRRdir <- log(EYdir1) - log(EYdir0)
+    
+    ## output effects on the odds ratio scale for logistic regressions
+    if (is_glm_yreg && family_yreg$family %in% c("binomial", "quasibinomial") &&
+        yreg_tot$family$link == "logit") {
+    logRRtot <- log(EYtot1/(1-EYtot1)) - log(EYtot0/(1-EYtot0))
+    logRRdir <- log(EYdir1/(1-EYdir1)) - log(EYdir0/(1-EYdir0))
     logRRind <- logRRtot - logRRdir
     if (full) {
       pm <- (exp(logRRdir) * (exp(logRRind) - 1)) / (exp(logRRtot) - 1)
       est <- c(logRRtot, logRRdir, logRRind, pm)
     } else est <- c(logRRtot, logRRdir, logRRind)
-  } else stop("Unsupported yreg")
+    
+    ## otherwise on the risk ratio scale
+    } else {
+      logRRtot <- log(EYtot1) - log(EYtot0)
+      logRRdir <- log(EYdir1) - log(EYdir0)
+      logRRind <- logRRtot - logRRdir
+      if (full) {
+        pm <- (exp(logRRdir) * (exp(logRRind) - 1)) / (exp(logRRtot) - 1)
+        est <- c(logRRtot, logRRdir, logRRind, pm)
+      } else est <- c(logRRtot, logRRdir, logRRind)
+    }
+    
+  }
   
   # progress bar
   if (!multimp) {

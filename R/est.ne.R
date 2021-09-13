@@ -145,32 +145,67 @@ est.ne <- function(data = NULL, indices = NULL, outReg = FALSE, full = NULL) {
     } else est <- c(cde, pnde, tnde, pnie, tnie, te)
   } else if (family_yreg$family %in% c("binomial", "quasibinomial", "poisson", "quasipoisson")) {
     # output causal effects on the ratio scale for non-continuous Y
-    logRRcde <- log(EY1m) - log(EY0m)
-    logRRpnde <- log(EY10) - log(EY00)
-    logRRtnde <- log(EY11) - log(EY01)
-    logRRpnie <- log(EY01) - log(EY00)
-    logRRtnie <- log(EY11) - log(EY10)
-    logRRte <- logRRtnie + logRRpnde
-    if (full) {
-      pm <- (exp(logRRpnde) * (exp(logRRtnie) - 1)) / (exp(logRRte) - 1)
-      if (EMint) {
-        ERRcde <- (EY1m-EY0m)/EY00
-        ERRintref <- exp(logRRpnde) - 1 - ERRcde
-        ERRintmed <- exp(logRRtnie) * exp(logRRpnde) - exp(logRRpnde) - exp(logRRpnie) + 1
-        ERRpnie <- exp(logRRpnie) - 1
-        ERRte <- exp(logRRte) - 1
-        ERRcde_prop <- ERRcde/ERRte
-        ERRintmed_prop <- ERRintmed/ERRte
-        ERRintref_prop <- ERRintref/ERRte
-        ERRpnie_prop <- ERRpnie/ERRte
-        int <- (ERRintref + ERRintmed)/ERRte
-        pe <- (ERRintref + ERRintmed + ERRpnie)/ERRte
-        est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte, 
-                 ERRcde, ERRintref, ERRintmed, ERRpnie,
-                 ERRcde_prop, ERRintref_prop, ERRintmed_prop, ERRpnie_prop,
-                 pm, int, pe)
-      } else est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte, pm)
-    } else est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte)
+    
+    ## output effects on the odds ratio scale for logistic regressions
+    if (is_glm_yreg && family_yreg$family %in% c("binomial", "quasibinomial") &&
+        yreg$family$link == "logit") {
+      logRRcde <- log(EY1m/(1-EY1m)) - log(EY0m/(1-EY0m))
+      logRRpnde <- log(EY10/(1-EY10)) - log(EY00/(1-EY00))
+      logRRtnde <- log(EY11/(1-EY11)) - log(EY01/(1-EY01))
+      logRRpnie <- log(EY01/(1-EY01)) - log(EY00/(1-EY00))
+      logRRtnie <- log(EY11/(1-EY11)) - log(EY10/(1-EY10))
+      logRRte <- logRRtnie + logRRpnde
+      if (full) {
+        pm <- (exp(logRRpnde) * (exp(logRRtnie) - 1)) / (exp(logRRte) - 1)
+        if (EMint) {
+          ERRcde <- (EY1m-EY0m)/EY00
+          ERRintref <- exp(logRRpnde) - 1 - ERRcde
+          ERRintmed <- exp(logRRtnie) * exp(logRRpnde) - exp(logRRpnde) - exp(logRRpnie) + 1
+          ERRpnie <- exp(logRRpnie) - 1
+          ERRte <- exp(logRRte) - 1
+          ERRcde_prop <- ERRcde/ERRte
+          ERRintmed_prop <- ERRintmed/ERRte
+          ERRintref_prop <- ERRintref/ERRte
+          ERRpnie_prop <- ERRpnie/ERRte
+          int <- (ERRintref + ERRintmed)/ERRte
+          pe <- (ERRintref + ERRintmed + ERRpnie)/ERRte
+          est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte, 
+                   ERRcde, ERRintref, ERRintmed, ERRpnie,
+                   ERRcde_prop, ERRintref_prop, ERRintmed_prop, ERRpnie_prop,
+                   pm, int, pe)
+        } else est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte, pm)
+      } else est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte)
+      
+      ## otherwise on the risk ratio scale
+    } else {
+      logRRcde <- log(EY1m) - log(EY0m)
+      logRRpnde <- log(EY10) - log(EY00)
+      logRRtnde <- log(EY11) - log(EY01)
+      logRRpnie <- log(EY01) - log(EY00)
+      logRRtnie <- log(EY11) - log(EY10)
+      logRRte <- logRRtnie + logRRpnde
+      if (full) {
+        pm <- (exp(logRRpnde) * (exp(logRRtnie) - 1)) / (exp(logRRte) - 1)
+        if (EMint) {
+          ERRcde <- (EY1m-EY0m)/EY00
+          ERRintref <- exp(logRRpnde) - 1 - ERRcde
+          ERRintmed <- exp(logRRtnie) * exp(logRRpnde) - exp(logRRpnde) - exp(logRRpnie) + 1
+          ERRpnie <- exp(logRRpnie) - 1
+          ERRte <- exp(logRRte) - 1
+          ERRcde_prop <- ERRcde/ERRte
+          ERRintmed_prop <- ERRintmed/ERRte
+          ERRintref_prop <- ERRintref/ERRte
+          ERRpnie_prop <- ERRpnie/ERRte
+          int <- (ERRintref + ERRintmed)/ERRte
+          pe <- (ERRintref + ERRintmed + ERRpnie)/ERRte
+          est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte, 
+                   ERRcde, ERRintref, ERRintmed, ERRpnie,
+                   ERRcde_prop, ERRintref_prop, ERRintmed_prop, ERRpnie_prop,
+                   pm, int, pe)
+        } else est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte, pm)
+      } else est <- c(logRRcde, logRRpnde, logRRtnde, logRRpnie, logRRtnie, logRRte)
+    }
+    
   } else stop("Unsupported yreg")
   
   # progress bar
