@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 This document describes how the six causal mediation analysis approaches including *the regression-based approach* by [Valeri et al. (2013)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3659198/) and [VanderWeele et al. (2014)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/), 
 *the weighting-based approach* by [VanderWeele et al. (2014)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/), *the inverse odd-ratio weighting approach* by [Tchetgen Tchetgen (2013)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3954805/), *the natural effect model* by
 [Vansteelandt et al. (2012)](https://www.degruyter.com/view/journals/em/1/1/article-p131.xml?language=en), *the marginal structural model* by [VanderWeele 
-et al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5560424/), and *the $g$-formula approach* by [Robins (1986)](https://www.sciencedirect.com/science/article/pii/0270025586900886) are implemented by the `CMAverse` package. See publications of these approaches for methodological details .
+et al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5560424/), and *the $g$-formula approach* by [Robins (1986)](https://www.sciencedirect.com/science/article/pii/0270025586900886) are implemented by the `CMAverse` package. See publications of these approaches for methodological details.
 
 `CMAverse` currently supports a single exposure, multiple sequential mediators and a single outcome.  When multiple mediators are of interest, `CMAverse` estimates the joint mediated effect through the set of mediators. `CMAverse` also supports time varying confounders preceding the mediators. 
 
@@ -122,7 +122,7 @@ With the regression-based approach, all causal effects are estimated through eit
 
 ### Closed-form Parameter Function Estimation
 
-Closed-form parameter function estimation is available when there is only a single mediator, i.e., $M=M_1$. Also, `yreg` must be chosen from `linear`, `logistic`, `loglinear`, `poisson`, `quasipoisson`, `negbin`, `coxph`, `aft_exp` and `aft_weibull`. `mreg` must be chosen from `linear`, `logistic` and `multinomial`. To use `yreg = "logistic"` and `yreg = "coxph"` in closed-form parameter function estimation, the outcome must be rare. Additionally, the causal effects estimated through closed-form parameter function estimation are conditional on the value of $C$ specified by the `precval` argument. Closed-form parameter functions are summarized below.
+Closed-form parameter function estimation is available when there is only a single mediator, i.e., $M=M_1$. Also, `yreg` must be chosen from `linear`, `logistic`, `loglinear`, `poisson`, `quasipoisson`, `negbin`, `coxph`, `aft_exp` and `aft_weibull`. `mreg` must be chosen from `linear`, `logistic` and `multinomial`. To use `yreg = "logistic"` and `yreg = "coxph"` in closed-form parameter function estimation, the outcome must be rare. Additionally, the causal effects estimated through closed-form parameter function estimation are conditional on the value of $C$ specified by the `basecval` argument. Closed-form parameter functions are summarized below.
 
 #### Linear `yreg`, Linear `mreg` and Noncategorical Exposure
 
