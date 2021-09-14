@@ -228,24 +228,19 @@ est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     ## output effects on the odds ratio scale for logistic regressions
     if (is_glm_yreg && family_yreg$family %in% c("binomial", "quasibinomial") &&
         yreg_tot$family$link == "logit") {
-    logRRtot <- log(EYtot1/(1-EYtot1)) - log(EYtot0/(1-EYtot0))
-    logRRdir <- log(EYdir1/(1-EYdir1)) - log(EYdir0/(1-EYdir0))
+      logRRtot <- log(EYtot1/(1-EYtot1)) - log(EYtot0/(1-EYtot0))
+      logRRdir <- log(EYdir1/(1-EYdir1)) - log(EYdir0/(1-EYdir0))
+      ## otherwise on the risk ratio scale
+    } else {
+      logRRtot <- log(EYtot1) - log(EYtot0)
+      logRRdir <- log(EYdir1) - log(EYdir0)
+    }
+    
     logRRind <- logRRtot - logRRdir
     if (full) {
       pm <- (exp(logRRdir) * (exp(logRRind) - 1)) / (exp(logRRtot) - 1)
       est <- c(logRRtot, logRRdir, logRRind, pm)
     } else est <- c(logRRtot, logRRdir, logRRind)
-    
-    ## otherwise on the risk ratio scale
-    } else {
-      logRRtot <- log(EYtot1) - log(EYtot0)
-      logRRdir <- log(EYdir1) - log(EYdir0)
-      logRRind <- logRRtot - logRRdir
-      if (full) {
-        pm <- (exp(logRRdir) * (exp(logRRind) - 1)) / (exp(logRRtot) - 1)
-        est <- c(logRRtot, logRRdir, logRRind, pm)
-      } else est <- c(logRRtot, logRRdir, logRRind)
-    }
     
   }
   
