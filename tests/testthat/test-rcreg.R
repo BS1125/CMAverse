@@ -1,7 +1,7 @@
 context("rcreg works correctly")
 
 test_that("rcreg works correctly for lm", {
-  
+
   set.seed(1)
   n <- 10000
   x1 <- rnorm(n, mean = 0, sd = 1)
@@ -16,13 +16,13 @@ test_that("rcreg works correctly for lm", {
   reg_true <- lm(y ~ x1 + x2_true + x3, data = data)
   reg_rc <- rcreg(reg = reg_naive, data = data, MEvariable = "x2_error",
                   MEerror = 0.5, variance = TRUE, nboot = 2)
-  
+
   # test
   expect_equal(unname(coef(reg_rc)), unname(coef(reg_true)), tolerance = 0.1)
   expect_equal(formula(reg_rc), as.formula(y ~ x1 + x2_error + x3))
   expect_equal(sigma(reg_rc), 2, tolerance = 0.1)
   expect_equal(family(reg_rc), family(reg_true))
-  expect_equal(as.numeric(predict(reg_rc, newdata = data[1, ], type = "response")), 
+  expect_equal(as.numeric(predict(reg_rc, newdata = data[1, ], type = "response")),
                as.numeric(unname(coef(reg_rc)) %*% c(1, as.numeric(data[1, c(1, 3, 4)]))))
   expect_equal(model.frame(reg_rc), model.frame(reg_naive))
   expect_equal(update(reg_rc, data = data)$RCcoef, coef(reg_rc))
@@ -32,7 +32,7 @@ test_that("rcreg works correctly for lm", {
 })
 
 test_that("rcreg works correctly for glm", {
-  
+
   set.seed(1)
   n <- 10000
   x1 <- rnorm(n, mean = 0, sd = 1)
@@ -54,17 +54,17 @@ test_that("rcreg works correctly for glm", {
   expect_equal(unname(coef(reg_rc)), unname(coef(reg_true)), tolerance = 0.1)
   expect_equal(formula(reg_rc), as.formula(y ~ x1 + x2_error + x3))
   expect_equal(family(reg_rc), family(reg_true))
-  expect_equal(as.numeric(predict(reg_rc, newdata = data[1, ], type = "response")), 
+  expect_equal(as.numeric(predict(reg_rc, newdata = data[1, ], type = "response")),
                as.numeric(exp(t(unname(coef(reg_rc))) %*% c(1, as.numeric(data[1, c(1, 3, 4)])))/
-                 (1+exp(t(unname(coef(reg_rc))) %*% c(1, as.numeric(data[1, c(1, 3, 4)]))))))
+                            (1+exp(t(unname(coef(reg_rc))) %*% c(1, as.numeric(data[1, c(1, 3, 4)]))))))
   expect_equal(model.frame(reg_rc), model.frame(reg_naive))
   expect_equal(update(reg_rc, data = data)$RCcoef, coef(reg_rc))
   expect_equal(summary(reg_rc)$summarydf$Estimate, as.numeric(coef(reg_rc)))
-  
+
 })
 
 test_that("rcreg works correctly for multinom", {
-  
+
   set.seed(1)
   n <- 10000
   x1 <- rnorm(n, mean = 0, sd = 1)
@@ -84,7 +84,7 @@ test_that("rcreg works correctly for multinom", {
   reg_true <- nnet::multinom(factor(y) ~ x1 + x2_true + x3, data = data)
   reg_rc <- rcreg(reg = reg_naive, data = data, MEvariable = "x2_error",
                   MEerror = 0.5, variance = TRUE, nboot = 2)
-  
+
   # test
   expect_equal(unname(coef(reg_rc)), as.numeric(t(unname(coef(reg_true)))), tolerance = 0.1)
   expect_equal(formula(reg_rc), as.formula(factor(y) ~ x1 + x2_error + x3))
@@ -93,11 +93,11 @@ test_that("rcreg works correctly for multinom", {
   expect_equal(model.frame(reg_rc), model.frame(reg_naive))
   expect_equal(update(reg_rc, data = data)$RCcoef, coef(reg_rc))
   expect_equal(summary(reg_rc)$summarydf$Estimate, as.numeric(coef(reg_rc)))
-  
+
 })
 
 test_that("rcreg works correctly for polr", {
-  
+
   set.seed(1)
   n <- 10000
   x1 <- rnorm(n, mean = 0, sd = 1)
@@ -117,7 +117,7 @@ test_that("rcreg works correctly for polr", {
   reg_true <- MASS::polr(factor(y) ~ x1 + x2_true + x3, data = data)
   reg_rc <- rcreg(reg = reg_naive, data = data, MEvariable = "x2_error",
                   MEerror = 0.5, variance = TRUE, nboot = 2)
-  
+
   # test
   expect_equal(unname(coef(reg_rc))[1:3], as.numeric(t(unname(coef(reg_true)))), tolerance = 0.1)
   expect_equal(formula(reg_rc), as.formula(factor(y) ~ x1 + x2_error + x3))
@@ -126,11 +126,11 @@ test_that("rcreg works correctly for polr", {
   expect_equal(model.frame(reg_rc), model.frame(reg_naive))
   expect_equal(update(reg_rc, data = data)$RCcoef, coef(reg_rc))
   expect_equal(summary(reg_rc)$summarydf$Estimate, as.numeric(coef(reg_rc)))
-  
+
 })
 
 test_that("rcreg works correctly for coxph", {
-  
+
   set.seed(1)
   n <- 10000
   x1 <- rnorm(n, mean = 0, sd = 1)
@@ -149,19 +149,19 @@ test_that("rcreg works correctly for coxph", {
   reg_true <- survival::coxph(survival::Surv(ycen, delta) ~ x1 + x2_true + x3, data = data)
   reg_rc <- rcreg(reg = reg_naive, data = data, MEvariable = "x2_error",
                   MEerror = 0.5, variance = TRUE, nboot = 2)
-  
+
   # test
   expect_equal(unname(coef(reg_rc)), as.numeric(t(unname(coef(reg_true)))), tolerance = 0.1)
   expect_equal(formula(reg_rc), as.formula(survival::Surv(ycen, delta) ~ x1 + x2_error + x3))
   expect_equal(model.frame(reg_rc), model.frame(reg_naive))
   expect_equal(update(reg_rc, data = data)$RCcoef, coef(reg_rc))
   expect_equal(summary(reg_rc)$summarydf$Estimate, as.numeric(coef(reg_rc)))
-  
+
 })
 
 
 test_that("rcreg works correctly for svyglm", {
-  
+
   set.seed(1)
   n <- 10000
   x1 <- rnorm(n, mean = 0, sd = 1)
@@ -180,23 +180,23 @@ test_that("rcreg works correctly for svyglm", {
                              design = survey::svydesign(ids = ~1, data = data, w = rep(1,n)))
   reg_rc <- rcreg(reg = reg_naive, data = data, weights = rep(1,n), MEvariable = "x2_error",
                   MEerror = 0.5, variance = TRUE, nboot = 2)
-  
+
   # test
   expect_equal(unname(coef(reg_rc)), unname(coef(reg_true)), tolerance = 0.1)
   expect_equal(formula(reg_rc), as.formula(y ~ x1 + x2_error + x3))
   expect_equal(family(reg_rc), family(reg_true))
-  expect_equal(as.numeric(predict(reg_rc, newdata = data[1, ], type = "response")), 
+  expect_equal(as.numeric(predict(reg_rc, newdata = data[1, ], type = "response")),
                as.numeric(exp(t(unname(coef(reg_rc))) %*% c(1, as.numeric(data[1, c(1, 3, 4)])))/
                             (1+exp(t(unname(coef(reg_rc))) %*% c(1, as.numeric(data[1, c(1, 3, 4)]))))))
   expect_equal(model.frame(reg_rc), model.frame(reg_naive))
   expect_equal(update(reg_rc, data = data)$RCcoef, coef(reg_rc))
   expect_equal(summary(reg_rc)$summarydf$Estimate, as.numeric(coef(reg_rc)))
-  
+
 })
 
 
 test_that("rcreg works correctly for svymultinom", {
-  
+
   set.seed(1)
   n <- 1000
   x1 <- rnorm(n, mean = 0, sd = 1)
@@ -213,7 +213,7 @@ test_that("rcreg works correctly for svymultinom", {
   reg_true <- svymultinom(y ~ x1 + x2_true + x3, data = data, weights = rep(1,n))
   reg_rc <- rcreg(reg = reg_naive, data = data, weights = rep(1,n), MEvariable = "x2_error",
                   MEerror = 0.5, variance = FALSE)
-  
+
   # test
   expect_equal(unname(coef(reg_rc)), as.numeric(t(unname(coef(reg_true)))), tolerance = 0.1)
   expect_equal(formula(reg_rc), as.formula(y ~ x1 + x2_error + x3))
@@ -221,8 +221,8 @@ test_that("rcreg works correctly for svymultinom", {
                py[1], tolerance = 0.1)
   expect_equal(model.frame(reg_rc), model.frame(reg_naive))
   expect_equal(update(reg_rc, data = data)$RCcoef, coef(reg_rc))
-  
-  
+
+
   set.seed(1)
   n <- 1000
   x1 <- rnorm(n, mean = 0, sd = 1)
@@ -242,7 +242,7 @@ test_that("rcreg works correctly for svymultinom", {
   reg_true <- svymultinom(y ~ x1 + x2_true + x3, data = data, weights = rep(1,n))
   reg_rc <- rcreg(reg = reg_naive, data = data, weights = rep(1,n), MEvariable = "x2_error",
                   MEerror = 0.2, variance = FALSE)
-  
+
   # test
   expect_equal(unname(coef(reg_rc)), as.numeric(t(unname(coef(reg_true)))), tolerance = 0.1)
   expect_equal(formula(reg_rc), as.formula(y ~ x1 + x2_error + x3))
@@ -250,5 +250,5 @@ test_that("rcreg works correctly for svymultinom", {
                c(py1[1], py2[1], py3[1]), tolerance = 0.1)
   expect_equal(model.frame(reg_rc), model.frame(reg_naive))
   expect_equal(update(reg_rc, data = data)$RCcoef, coef(reg_rc))
-  
+
 })

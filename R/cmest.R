@@ -448,6 +448,8 @@ cmest <- function(data = NULL, model = "rb",
   if (casecontrol) {
     if (length(unique(data[, outcome])) != 2) stop("When casecontrol is TRUE, the outcome must be binary")
     if (is.null(yprevalence) && yrare != TRUE) stop("When casecontrol is TRUE, specify yprevalence or set yrare to be TRUE")
+    # imputation-based estimation is biased for case-control studies without specifying yprevalence 
+    if (is.null(yprevalence) && !(estimation %in% c("para", "paramfunc"))) stop("When casecontrol is TRUE, specify yprevalence or use estimation = 'paramfunc'")
     if (!is.null(yprevalence)) {
       if (!is.numeric(yprevalence)) stop("yprevalence should be numeric")
       out$methods$yprevalence <- yprevalence

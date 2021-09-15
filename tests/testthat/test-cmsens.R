@@ -269,7 +269,7 @@ test_that("sensitivity analysis for unmeasured confounding works correctly for c
 
 
 test_that("sensitivity analysis for measurement error works correctly for binary Y and binary M with multiple imputation", {
-  
+
   # a continuous variable measured with error
   set.seed(1)
   # data simulation
@@ -294,20 +294,20 @@ test_that("sensitivity analysis for measurement error works correctly for binary
   M[missing[which((missing > 3*n)*(missing <= 4*n) == 1)] - 3*n] <- NA
   Y[missing[which((missing > 4*n)*(missing <= 5*n) == 1)] - 4*n] <- NA
   data <- data.frame(A, M, Y, C1, C1_error, C2)
-  
+
   # naive results
   res_binbin_naive <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
                             mediator = "M", basec = c("C1_error", "C2"), EMint = TRUE,
                             mreg = list("logistic"), yreg = "logistic",
                             astar = 0, a = 1, mval = list(1),
                             estimation = "paramfunc", inference = "delta", multimp = TRUE, m = 5)
-  
+
   # cmsens-corrected results
   res_binbin_cmsens_rc <- cmsens(object = res_binbin_naive, sens = "me", MEmethod = "rc",
                                  MEvariable = "C1_error", MEvartype = "con", MEerror = 0.1)
   res_binbin_cmsens_simex <- cmsens(object = res_binbin_naive, sens = "me", MEmethod = "simex",
                                     MEvariable = "C1_error", MEvartype = "con", MEerror = 0.1)
-  
+
   # reference results
   yreg <- glm(Y ~ A*M + C1 + C2, family = binomial, data = data_noNA)
   mreg <- glm(M ~ A + C1 + C2, family = binomial, data = data_noNA)
@@ -352,7 +352,7 @@ test_that("sensitivity analysis for measurement error works correctly for binary
   pm_binbin <- (pnie_err_binbin+intmed_err_binbin)/total_err_binbin
   int_binbin <- (intref_err_binbin+intmed_err_binbin)/total_err_binbin
   pe_binbin <- (intref_err_binbin+intmed_err_binbin+pnie_err_binbin)/total_err_binbin
-  
+
   ref <- c(cde_binbin, pnde_binbin, tnde_binbin, pnie_binbin, tnie_binbin, te_binbin, cde_err_binbin,
            intref_err_binbin, intmed_err_binbin, pnie_err_binbin, cde_err_prop_binbin,
            intref_err_prop_binbin, intmed_err_prop_binbin, pnie_err_prop_binbin,
@@ -366,12 +366,12 @@ test_that("sensitivity analysis for measurement error works correctly for binary
   expect_equal(class(print(res_binbin_cmsens_simex)), "list")
   expect_equal(class(print(summary(res_binbin_cmsens_rc))), "list")
   expect_equal(class(print(summary(res_binbin_cmsens_simex))), "list")
-  
+
 })
 
 
 test_that("sensitivity analysis for measurement error works correctly for case control study", {
-  
+
   set.seed(1)
   # data simulation
   expit <- function(x) exp(x)/(1+exp(x))
@@ -435,12 +435,12 @@ test_that("sensitivity analysis for measurement error works correctly for case c
   pm_binbin <- (pnie_err_binbin+intmed_err_binbin)/total_err_binbin
   int_binbin <- (intref_err_binbin+intmed_err_binbin)/total_err_binbin
   pe_binbin <- (intref_err_binbin+intmed_err_binbin+pnie_err_binbin)/total_err_binbin
-  
+
   ref <- c(cde_binbin, pnde_binbin, tnde_binbin, pnie_binbin, tnie_binbin, te_binbin, cde_err_binbin,
            intref_err_binbin, intmed_err_binbin, pnie_err_binbin, cde_err_prop_binbin,
            intref_err_prop_binbin, intmed_err_prop_binbin, pnie_err_prop_binbin,
            pm_binbin, int_binbin, pe_binbin)
-  
+
   # naive results
   res_binbin_naive <- cmest(data = data_casecon, model = "rb", casecontrol = TRUE, yprevalence = yprevalence,
                             outcome = "Y", exposure = "A",
@@ -448,13 +448,13 @@ test_that("sensitivity analysis for measurement error works correctly for case c
                             mreg = list("logistic"), yreg = "logistic",
                             astar = 0, a = 1, mval = list(1),
                             estimation = "paramfunc", inference = "delta")
-  
+
   # cmsens-corrected results
   res_binbin_cmsens_rc <- cmsens(object = res_binbin_naive, sens = "me", MEmethod = "rc",
                                  MEvariable = "C1_error", MEvartype = "con", MEerror = 0.1)
   res_binbin_cmsens_simex <- cmsens(object = res_binbin_naive, sens = "me", MEmethod = "simex",
                                     MEvariable = "C1_error", MEvartype = "con", MEerror = 0.1)
-  
+
   # test
   expect_equal(summary(res_binbin_cmsens_rc)$summarydf[[1]]$Estimate, ref, tolerance = 0.1)
   expect_equal(summary(res_binbin_cmsens_simex)$summarydf[[1]]$Estimate, ref, tolerance = 0.1)
@@ -464,7 +464,7 @@ test_that("sensitivity analysis for measurement error works correctly for case c
   expect_equal(class(print(res_binbin_cmsens_simex)), "list")
   expect_equal(class(print(summary(res_binbin_cmsens_rc))), "list")
   expect_equal(class(print(summary(res_binbin_cmsens_simex))), "list")
-  
+
   # naive results
   res_binbin_naive <- cmest(data = data_casecon, model = "rb", casecontrol = TRUE, yrare = TRUE,
                             outcome = "Y", exposure = "A",
@@ -472,13 +472,13 @@ test_that("sensitivity analysis for measurement error works correctly for case c
                             mreg = list("logistic"), yreg = "logistic",
                             astar = 0, a = 1, mval = list(1),
                             estimation = "paramfunc", inference = "delta")
-  
+
   # cmsens-corrected results
   res_binbin_cmsens_rc <- cmsens(object = res_binbin_naive, sens = "me", MEmethod = "rc",
                                  MEvariable = "C1_error", MEvartype = "con", MEerror = 0.1)
   res_binbin_cmsens_simex <- cmsens(object = res_binbin_naive, sens = "me", MEmethod = "simex",
                                     MEvariable = "C1_error", MEvartype = "con", MEerror = 0.1)
-  
+
   # test
   expect_equal(summary(res_binbin_cmsens_rc)$summarydf[[1]]$Estimate, ref, tolerance = 0.1)
   expect_equal(summary(res_binbin_cmsens_simex)$summarydf[[1]]$Estimate, ref, tolerance = 0.1)
@@ -488,5 +488,5 @@ test_that("sensitivity analysis for measurement error works correctly for case c
   expect_equal(class(print(res_binbin_cmsens_simex)), "list")
   expect_equal(class(print(summary(res_binbin_cmsens_rc))), "list")
   expect_equal(class(print(summary(res_binbin_cmsens_simex))), "list")
-  
+
 })

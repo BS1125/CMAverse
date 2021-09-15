@@ -1,7 +1,7 @@
 context("simexreg works correctly")
 
 test_that("simexreg works correctly for lm", {
-  
+
   # a continuous variable measured with error
   set.seed(1)
   n <- 10000
@@ -17,20 +17,20 @@ test_that("simexreg works correctly for lm", {
   reg_true <- lm(y ~ x1 + x2_true + x3, data = data)
   reg_simex <- simexreg(reg = reg_naive, data = data, MEvariable = "x2_error", MEvartype = "con",
                   MEerror = 0.5, variance = TRUE)
-  
+
   # test
   expect_equal(unname(coef(reg_simex)), unname(coef(reg_true)), tolerance = 0.1)
   expect_equal(formula(reg_simex), as.formula(y ~ x1 + x2_error + x3))
   expect_equal(sigma(reg_simex), 2, tolerance = 0.1)
   expect_equal(family(reg_simex), family(reg_true))
-  expect_equal(as.numeric(predict(reg_simex, newdata = data[1, ], type = "response")), 
+  expect_equal(as.numeric(predict(reg_simex, newdata = data[1, ], type = "response")),
                as.numeric(unname(coef(reg_simex)) %*% c(1, as.numeric(data[1, c(1, 3, 4)]))))
   expect_equal(model.frame(reg_simex), model.frame(reg_naive))
   expect_equal(update(reg_simex, data = data)$SIMEXcoef, coef(reg_simex), tolerance = 0.1)
   expect_equal(summary(reg_simex)$summarydf$Estimate, as.numeric(coef(reg_simex)))
   expect_equal(class(print(reg_simex)), "numeric")
   expect_equal(class(print(summary(reg_simex))), "data.frame")
-  
+
   # a continuous dependent variable measured with error
   set.seed(1)
   n <- 10000
@@ -46,11 +46,11 @@ test_that("simexreg works correctly for lm", {
   reg_true <- lm(y_true ~ x1 + x2 + x3, data = data)
   reg_simex <- simexreg(reg = reg_naive, data = data, MEvariable = "y_error", MEvartype = "con",
                         MEerror = 0.5, variance = TRUE)
-  
+
   # test
   expect_equal(unname(coef(reg_simex)), unname(coef(reg_true)), tolerance = 0.1)
   expect_equal(sigma(reg_simex), 2, tolerance = 0.1)
-  
+
   # a categorical variable measured with error
   set.seed(1)
   n <- 10000
@@ -74,23 +74,23 @@ test_that("simexreg works correctly for lm", {
   reg_true <- lm(y ~ x1 + x2_true + x3, data = data)
   reg_simex <- simexreg(reg = reg_naive, data = data, MEvariable = "x2_error", MEvartype = "cat",
                         MEerror = MEerror, variance = TRUE)
-  
+
   # test
   expect_equal(unname(coef(reg_simex)), unname(coef(reg_true)), tolerance = 0.1)
   expect_equal(formula(reg_simex), as.formula(y ~ x1 + x2_error + x3))
   expect_equal(sigma(reg_simex), 2, tolerance = 0.1)
   expect_equal(family(reg_simex), family(reg_true))
-  expect_equal(as.numeric(predict(reg_simex, newdata = data[1, ], type = "response")), 
-               as.numeric(unname(coef(reg_simex)) %*% c(1, data[1,1], as.numeric(data[1,3] == 2), 
+  expect_equal(as.numeric(predict(reg_simex, newdata = data[1, ], type = "response")),
+               as.numeric(unname(coef(reg_simex)) %*% c(1, data[1,1], as.numeric(data[1,3] == 2),
                                                         as.numeric(data[1,3] == 3), data[1,4])))
   expect_equal(model.frame(reg_simex), model.frame(reg_naive))
   expect_equal(update(reg_simex, data = data)$SIMEXcoef, coef(reg_simex), tolerance = 0.1)
   expect_equal(summary(reg_simex)$summarydf$Estimate, as.numeric(coef(reg_simex)))
-  
+
 })
 
 test_that("simexreg works correctly for glm", {
-  
+
   # a continuous variable measured with error
   set.seed(1)
   n <- 10000
@@ -113,13 +113,13 @@ test_that("simexreg works correctly for glm", {
   expect_equal(unname(coef(reg_simex)), unname(coef(reg_true)), tolerance = 0.1)
   expect_equal(formula(reg_simex), as.formula(y ~ x1 + x2_error + x3))
   expect_equal(family(reg_simex), family(reg_true))
-  expect_equal(as.numeric(predict(reg_simex, newdata = data[1, ], type = "response")), 
+  expect_equal(as.numeric(predict(reg_simex, newdata = data[1, ], type = "response")),
                as.numeric(exp(t(unname(coef(reg_simex))) %*% c(1, as.numeric(data[1, c(1, 3, 4)])))/
                  (1+exp(t(unname(coef(reg_simex))) %*% c(1, as.numeric(data[1, c(1, 3, 4)]))))))
   expect_equal(model.frame(reg_simex), model.frame(reg_naive))
   expect_equal(update(reg_simex, data = data)$SIMEXcoef, coef(reg_simex), tolerance = 0.01)
   expect_equal(summary(reg_simex)$summarydf$Estimate, as.numeric(coef(reg_simex)))
-  
+
   # a categorical variable measured with error
   set.seed(1)
   n <- 10000
@@ -144,24 +144,24 @@ test_that("simexreg works correctly for glm", {
   reg_true <- glm(y ~ x1 + x2_true + x3, data = data, family = binomial("logit"))
   reg_simex <- simexreg(reg = reg_naive, data = data, MEvariable = "x2_error",
                         MEerror = MEerror, variance = TRUE, MEvartype = "cat")
-  
+
   # test
   expect_equal(unname(coef(reg_simex)), unname(coef(reg_true)), tolerance = 0.1)
   expect_equal(formula(reg_simex), as.formula(y ~ x1 + x2_error + x3))
   expect_equal(family(reg_simex), family(reg_true))
-  expect_equal(as.numeric(predict(reg_simex, newdata = data[1, ], type = "response")), 
-               as.numeric(exp(t(unname(coef(reg_simex))) %*% c(1, data[1,1], as.numeric(data[1,3] == 2), 
+  expect_equal(as.numeric(predict(reg_simex, newdata = data[1, ], type = "response")),
+               as.numeric(exp(t(unname(coef(reg_simex))) %*% c(1, data[1,1], as.numeric(data[1,3] == 2),
                                                                as.numeric(data[1,3] == 3), data[1,4]))/
-                            (1+exp(t(unname(coef(reg_simex))) %*% c(1, data[1,1], as.numeric(data[1,3] == 2), 
+                            (1+exp(t(unname(coef(reg_simex))) %*% c(1, data[1,1], as.numeric(data[1,3] == 2),
                                                                     as.numeric(data[1,3] == 3), data[1,4])))))
   expect_equal(model.frame(reg_simex), model.frame(reg_naive))
   expect_equal(update(reg_simex, data = data)$SIMEXcoef, coef(reg_simex), tolerance = 0.01)
   expect_equal(summary(reg_simex)$summarydf$Estimate, as.numeric(coef(reg_simex)))
-  
+
 })
 
 test_that("simexreg works correctly for multinom", {
-  
+
   # a continuous variable measured with error
   set.seed(1)
   n <- 10000
@@ -182,7 +182,7 @@ test_that("simexreg works correctly for multinom", {
   reg_true <- nnet::multinom(factor(y) ~ x1 + x2_true + x3, data = data)
   reg_simex <- simexreg(reg = reg_naive, data = data, MEvariable = "x2_error", MEvartype = "con",
                   MEerror = 0.5, variance = TRUE)
-  
+
   # test
   expect_equal(unname(coef(reg_simex)), as.numeric(t(unname(coef(reg_true)))), tolerance = 0.1)
   expect_equal(formula(reg_simex), as.formula(factor(y) ~ x1 + x2_error + x3))
@@ -191,7 +191,7 @@ test_that("simexreg works correctly for multinom", {
   expect_equal(model.frame(reg_simex), model.frame(reg_naive))
   expect_equal(update(reg_simex, data = data)$SIMEXcoef, coef(reg_simex), tolerance = 0.01)
   expect_equal(summary(reg_simex)$summarydf$Estimate, as.numeric(coef(reg_simex)))
-  
+
   # a categorical variable measured with error
   set.seed(1)
   n <- 10000
@@ -219,7 +219,7 @@ test_that("simexreg works correctly for multinom", {
   reg_true <- nnet::multinom(factor(y) ~ x1 + x2_true + x3, data = data)
   reg_simex <- simexreg(reg = reg_naive, data = data, MEvariable = "x2_error",
                         MEerror = MEerror, variance = TRUE, MEvartype = "cat")
-  
+
   # test
   expect_equal(unname(coef(reg_simex)), as.numeric(t(unname(coef(reg_true)))), tolerance = 0.1)
   expect_equal(formula(reg_simex), as.formula(factor(y) ~ x1 + x2_error + x3))
@@ -228,11 +228,11 @@ test_that("simexreg works correctly for multinom", {
   expect_equal(model.frame(reg_simex), model.frame(reg_naive))
   expect_equal(update(reg_simex, data = data)$SIMEXcoef, coef(reg_simex), tolerance = 0.01)
   expect_equal(summary(reg_simex)$summarydf$Estimate, as.numeric(coef(reg_simex)))
-  
+
 })
 
 test_that("simexreg works correctly for polr", {
-  
+
   # a continuous variable measured with error
   set.seed(1)
   n <- 10000
@@ -253,7 +253,7 @@ test_that("simexreg works correctly for polr", {
   reg_true <- MASS::polr(y ~ x1 + x2_true + x3, data = data)
   reg_simex <- simexreg(reg = reg_naive, data = data, MEvariable = "x2_error", MEvartype = "con",
                   MEerror = 0.5, variance = TRUE)
-  
+
   # test
   expect_equal(unname(coef(reg_simex))[1:3], as.numeric(t(unname(coef(reg_true)))), tolerance = 0.1)
   expect_equal(formula(reg_simex), as.formula(y ~ x1 + x2_error + x3))
@@ -262,7 +262,7 @@ test_that("simexreg works correctly for polr", {
   expect_equal(model.frame(reg_simex), model.frame(reg_naive))
   expect_equal(update(reg_simex, data = data)$SIMEXcoef, coef(reg_simex), tolerance = 0.01)
   expect_equal(summary(reg_simex)$summarydf$Estimate, as.numeric(coef(reg_simex)))
-  
+
   # a categorical variable measured with error
   set.seed(1)
   n <- 10000
@@ -290,7 +290,7 @@ test_that("simexreg works correctly for polr", {
   reg_true <- MASS::polr(y ~ x1 + x2_true + x3, data = data)
   reg_simex <- simexreg(reg = reg_naive, data = data, MEvariable = "x2_error",
                         MEerror = MEerror, variance = TRUE, MEvartype = "cat")
-  
+
   # test
   expect_equal(unname(coef(reg_simex))[1:4], as.numeric(t(unname(coef(reg_true)))), tolerance = 0.1)
   expect_equal(formula(reg_simex), as.formula(y ~ x1 + x2_error + x3))
@@ -303,7 +303,7 @@ test_that("simexreg works correctly for polr", {
   })
 
 test_that("simexreg works correctly for coxph", {
-  
+
   # a continuous variable measured with error
   set.seed(1)
   n <- 10000
@@ -323,14 +323,14 @@ test_that("simexreg works correctly for coxph", {
   reg_true <- survival::coxph(survival::Surv(ycen, delta) ~ x1 + x2_true + x3, data = data)
   reg_simex <- simexreg(reg = reg_naive, data = data, MEvariable = "x2_error", MEvartype = "con",
                   MEerror = 0.5, variance = TRUE)
-  
+
   # test
   expect_equal(unname(coef(reg_simex)), as.numeric(t(unname(coef(reg_true)))), tolerance = 0.1)
   expect_equal(formula(reg_simex), as.formula(survival::Surv(ycen, delta) ~ x1 + x2_error + x3))
   expect_equal(model.frame(reg_simex), model.frame(reg_naive))
   expect_equal(update(reg_simex, data = data)$SIMEXcoef, coef(reg_simex), tolerance = 0.01)
   expect_equal(summary(reg_simex)$summarydf$Estimate, as.numeric(coef(reg_simex)))
-  
+
   # a categorical variable measured with error
   set.seed(1)
   n <- 10000
@@ -357,19 +357,19 @@ test_that("simexreg works correctly for coxph", {
   reg_true <- survival::coxph(survival::Surv(ycen, delta) ~ x1 + x2_true + x3, data = data)
   reg_simex <- simexreg(reg = reg_naive, data = data, MEvariable = "x2_error",
                         MEerror = MEerror, variance = TRUE, MEvartype = "cat")
-  
+
   # test
   expect_equal(unname(coef(reg_simex)), as.numeric(t(unname(coef(reg_true)))), tolerance = 0.1)
   expect_equal(formula(reg_simex), as.formula(survival::Surv(ycen, delta) ~ x1 + x2_error + x3))
   expect_equal(model.frame(reg_simex), model.frame(reg_naive))
   expect_equal(update(reg_simex, data = data)$SIMEXcoef, coef(reg_simex), tolerance = 0.01)
   expect_equal(summary(reg_simex)$summarydf$Estimate, as.numeric(coef(reg_simex)))
-  
+
 })
 
 
 test_that("simexreg works correctly for svyglm", {
-  
+
   set.seed(1)
   n <- 10000
   x1 <- rnorm(n, mean = 0, sd = 1)
@@ -388,14 +388,14 @@ test_that("simexreg works correctly for svyglm", {
                              design = survey::svydesign(ids = ~1, data = data, w = rep(1,n)))
   reg_simex <- simexreg(reg = reg_naive, data = data, weights = rep(1,n), MEvariable = "x2_error",
                   MEerror = 0.5, MEvartype = "con", variance = FALSE)
-  
+
   # test
   expect_equal(unname(coef(reg_simex)), unname(coef(reg_true)), tolerance = 0.1)
   expect_equal(formula(reg_simex), as.formula(y ~ x1 + x2_error + x3))
   expect_equal(family(reg_simex), family(reg_true))
-  expect_equal(as.numeric(predict(reg_simex, newdata = data[1, ], type = "response")), 
+  expect_equal(as.numeric(predict(reg_simex, newdata = data[1, ], type = "response")),
                as.numeric(exp(t(unname(coef(reg_simex))) %*% c(1, as.numeric(data[1, c(1, 3, 4)])))/
                             (1+exp(t(unname(coef(reg_simex))) %*% c(1, as.numeric(data[1, c(1, 3, 4)]))))))
   expect_equal(model.frame(reg_simex), model.frame(reg_naive))
-  
+
 })
