@@ -30,7 +30,8 @@ inf.delta <- function(data = NULL, yreg = NULL, mreg = NULL) {
   # coefficients for mreg
   betas  <- as.vector(t(coef(mreg)))
   # variance-covariance matrix of thetas
-  vcov_thetas <- vcov(yreg)
+  if (is_survreg_yreg) vcov_thetas <- vcov(yreg)[names(thetas), names(thetas)]
+  else vcov_thetas <- vcov(yreg)
   # variance-covariance matrix of betas
   vcov_betas <- vcov(mreg)
   # stack the two diagonally
