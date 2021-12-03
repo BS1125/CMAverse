@@ -182,7 +182,33 @@ estinf <- function() {
   }
   
   # reference values for the mediators
-  if (model != "iorw") out$ref$mval <- mval
+  if (model != "iorw") {
+    if (model %in% c("wb", "ne")) {
+      for (i in 1:length(mediator)) {
+        if (is.factor(data[, mediator[i]]) | is.character(data[, mediator[i]])) {
+          m_lev <- levels(droplevels(as.factor(data[, mediator[i]])))
+          if (!mval[[i]] %in% m_lev) {
+            mval[[i]] <- m_lev[length(m_lev)]
+            warning(paste0("mval[[", i, "]] is not a value of mediator[", i, "]; ", mval[[i]], " is used"))
+          }
+        }
+      }
+    } else {
+      for (i in 1:length(mediator)) {
+        if ((is_glm_mreg[i] && ((family_mreg[[i]]$family %in% c("binomial", "multinom")) |
+                                startsWith(family_mreg[[i]]$family, "Ordered Categorical")))|
+            is_multinom_mreg[i] | is_polr_mreg[i]) {
+          m_lev <- levels(droplevels(as.factor(data[, mediator[i]])))
+          if (is.numeric(data[, mediator[i]])) m_lev <- as.numeric(m_lev)
+          if (!mval[[i]] %in% m_lev) {
+            mval[[i]] <- m_lev[length(m_lev)]
+            warning(paste0("mval[[", i, "]] is not a value of mediator[", i, "]; ", mval[[i]], " is used"))
+          }
+        }
+      }
+    }
+    out$ref$mval <- mval
+  }
   
   # get the level of the case and the level of the control
   if (casecontrol) {

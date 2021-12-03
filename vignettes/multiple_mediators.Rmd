@@ -25,10 +25,10 @@ A <- rbinom(n, 1, expit(0.2 + 0.5*C1 + 0.1*C2))
 M1 <- rpois(n, exp(1 - 2*A + 0.5*C1 + 0.8*C2))
 linpred1 <- 0.1 + 0.1*A + 0.4*M1 - 0.5*C1 + 0.1*C2
 linpred2 <- 0.4 + 0.2*A - 0.1*M1 - C1 + 0.5*C2
-probm0 = 1 / (1 + exp(linpred1) + exp(linpred2))
-probm1 = exp(linpred1) / (1 + exp(linpred1) + exp(linpred2))
-probm2 = exp(linpred2) / (1 + exp(linpred1) + exp(linpred2))
-M2 = factor(sapply(1:n, FUN = function(x) sample(c(0, 1, 2), size = 1, replace = TRUE,
+probm0 <- 1 / (1 + exp(linpred1) + exp(linpred2))
+probm1 <- exp(linpred1) / (1 + exp(linpred1) + exp(linpred2))
+probm2 <- exp(linpred2) / (1 + exp(linpred1) + exp(linpred2))
+M2 <- factor(sapply(1:n, FUN = function(x) sample(c(0, 1, 2), size = 1, replace = TRUE,
                                                  prob=c(probm0[x],
                                                         probm1[x],
                                                         probm2[x]))))

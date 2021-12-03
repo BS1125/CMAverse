@@ -168,6 +168,11 @@ test_that("cmest works correctly for continuous Y and binary M", {
                                          mreg = list("logistic"), yreg = "linear",
                                          astar = 0, a = 1, mval = list(1),
                                          estimation = "imputation", inference = "bootstrap")
+  # res_contbin_rb_impu_bootstrap <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
+  #                                        mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
+  #                                        mreg = list("multinomial"), yreg = "linear",
+  #                                        astar = 0, a = 1, mval = list(1),
+  #                                        estimation = "imputation", inference = "bootstrap")
   res_contbin_wb <- cmest(data = data, model = "wb", outcome = "Y", exposure = "A",
                           mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                           ereg = "logistic", yreg = "linear",
@@ -459,6 +464,12 @@ test_that("cmest works correctly for survival Y and count M", {
   mreg <- glm(M ~ A + C1 + C2, family = poisson(), data = data)
 
   # results of cmest
+  # res_survcount_rb <- cmest(data = data, model = "rb", outcome = "Y", event = "delta",
+  #                           exposure = "A", mediator = "M", basec = c("C1", "C2"),
+  #                           EMint = TRUE,
+  #                           mreg = list("linear"), yreg = "aft_exp",
+  #                           astar = 0, a = 1, mval = list(1),
+  #                           estimation = "paramfunc", inference = "delta")
   res_survcount_rb <- cmest(data = data, model = "rb", outcome = "Y", event = "delta",
                             exposure = "A", mediator = "M", basec = c("C1", "C2"),
                             EMint = TRUE,
