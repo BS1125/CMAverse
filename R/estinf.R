@@ -25,7 +25,7 @@ estinf <- function() {
           assign(paste0("is_survreg_", reg_name), inherits(reg_mid, "survreg"))
           assign(paste0("is_coxph_", reg_name), inherits(reg_mid, "coxph"))
         }
-        assign(paste0("weights_", reg_name), model.frame(get(reg_name))$'(weights)')   
+        assign(paste0("weights_", reg_name), model.frame(get(reg_name), na.action = na.pass)$'(weights)')   
       } else {
         assign(paste0("call_", reg_name), lapply(1:length(reg), function(x) getCall(reg[[x]])))
         assign("reg_mid", lapply(1:length(reg), function(x)
@@ -39,7 +39,7 @@ estinf <- function() {
         assign(paste0("is_multinom_", reg_name), sapply(1:length(reg_mid), function(x) inherits(reg_mid[[x]], "multinom")))
         assign(paste0("is_svymultinom_", reg_name), sapply(1:length(reg_mid), function(x) inherits(reg_mid[[x]], "svymultinom")))
         assign(paste0("is_polr_", reg_name), sapply(1:length(reg_mid), function(x) inherits(reg_mid[[x]], "polr")))
-        assign(paste0("weights_", reg_name), lapply(1:length(reg), function(x) model.frame(get(reg_name)[[x]])$'(weights)'))
+        assign(paste0("weights_", reg_name), lapply(1:length(reg), function(x) model.frame(get(reg_name)[[x]], na.action = na.pass)$'(weights)'))
       }
       rm(reg_mid)
     }
