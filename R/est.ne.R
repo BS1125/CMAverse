@@ -33,7 +33,7 @@ est.ne <- function(data = NULL, indices = NULL, outReg = FALSE, full = NULL) {
   
   # natural effect model
   call_nereg <- call_yreg
-  weights_yreg_new <- as.vector(model.frame(yreg)$'(weights)')
+  weights_yreg_new <- as.vector(model.frame(yreg, na.action = na.pass)$'(weights)')
   if (!is.null(weights_yreg_new)) call_nereg$weights <- rep(weights_yreg_new, rep(nRep, length(weights_yreg_new)))
   call_nereg$formula <- as.formula(ne_formula)
   call_nereg$data <- expdata

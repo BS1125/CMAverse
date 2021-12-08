@@ -175,9 +175,9 @@ est.wb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
   rm(type, ydesign0m, ydesign1m, ydesign01, ydesign10)
   
   # weights for calculating counterfactuals
-  weightsEY_cde <- as.vector(model.frame(yreg)$'(weights)')
+  weightsEY_cde <- as.vector(model.frame(yreg, na.action = na.pass)$'(weights)')
   if (is.null(weightsEY_cde)) weightsEY_cde <- rep(1, n)
-  weightsEY <- as.vector(model.frame(yreg)$'(weights)')
+  weightsEY <- as.vector(model.frame(yreg, na.action = na.pass)$'(weights)')
   if (!is.null(weightsEY)) weightsEY <- weightsEY * wa
   if (is.null(weightsEY)) weightsEY <- wa
   
