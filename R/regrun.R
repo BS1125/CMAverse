@@ -86,7 +86,7 @@ regrun <- function() {
     for (p in 1:length(mreg)) {
       if (is.null(mreg[[p]])) stop(paste0("Unspecified mreg[[", p, "]]"))
       if (is.character(mreg[[p]])) {
-        if (mreg[[p]] == "loglinear" && length(unique(data[, mediator[p]])) != 2) stop(paste0("When mreg[[", p, "]] is 'loglinear', mediator[[", p, "]] should be binary"))
+        if (mreg[[p]] == "loglinear" && length(unique(na.omit(data[, mediator[p]]))) != 2) stop(paste0("When mreg[[", p, "]] is 'loglinear', mediator[[", p, "]] should be binary"))
         if (!mreg[[p]] %in% c("linear", "logistic", "loglinear", "poisson", "quasipoisson",
                               "negbin", "multinomial", "ordinal")) stop(
                                 paste0("Select character mreg[[", p, "]] from 'linear', 'logistic',
