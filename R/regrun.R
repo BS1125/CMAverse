@@ -9,7 +9,7 @@ regrun <- function() {
     if (is.null(ereg)) stop("ereg is required when model is 'wb' or 'msm' with length(basec) > 0 and when model is 'iorw'")
     if (is.character(ereg)) {
       # fit glm with family = poisson() rather than family = binomial("log") for "loglinear"
-      if (ereg == "loglinear" && length(unique(data[, exposure])) != 2) stop("When ereg is 'loglinear', exposure should be binary")
+      if (ereg == "loglinear" && length(unique(na.omit(data[, exposure]))) != 2) stop("When ereg is 'loglinear', exposure should be binary")
       if (!ereg %in% c("logistic", "loglinear", "multinomial", "ordinal")) stop("Select character ereg from 'logistic', 'loglinear', 'multinomial', 'ordinal'")
       exposure_formula <- switch((model == "iorw") + 1, "1" = paste0(exposure, "~", paste0(basec, collapse = "+")),
                                  "2" = paste0(exposure, "~", paste0(c(mediator, basec), collapse = "+")))
@@ -37,7 +37,7 @@ regrun <- function() {
     for (p in 1:length(wmnomreg)) {
       if (is.null(wmnomreg[[p]])) stop(paste0("Unspecified wmnomreg[[", p, "]]"))
       if (is.character(wmnomreg[[p]])) {
-        if (wmnomreg[[p]] == "loglinear" && length(unique(data[, mediator[p]])) != 2) stop(paste0("When wmnomreg[[", p, "]] is 'loglinear', mediator[[", p, "]] should be binary"))
+        if (wmnomreg[[p]] == "loglinear" && length(unique(na.omit(data[, mediator[p]]))) != 2) stop(paste0("When wmnomreg[[", p, "]] is 'loglinear', mediator[[", p, "]] should be binary"))
         if (!wmnomreg[[p]] %in% c("logistic", "loglinear", "multinomial", "ordinal")) stop(paste0("Select character wmnomreg[[", p, "]] from 'logistic', 'loglinear', 'multinomial', 'ordinal'"))
         wmnomreg_formula <- paste0(mediator[p], "~", paste(c(exposure, mediator[0:(p-1)]), collapse = "+"))
         # regression for the nominator of w_{m_p,i}
@@ -57,7 +57,7 @@ regrun <- function() {
     for (p in 1:length(wmdenomreg)) {
       if (is.null(wmdenomreg[[p]])) stop(paste0("Unspecified wmdenomreg[[", p, "]]"))
       if (is.character(wmdenomreg[[p]])) {
-        if (wmdenomreg[[p]] == "loglinear" && length(unique(data[, mediator[p]])) != 2) stop(paste0("When wmdenomreg[[", p, "]] is 'loglinear', mediator[[", p, "]] should be binary"))
+        if (wmdenomreg[[p]] == "loglinear" && length(unique(na.omit(data[, mediator[p]]))) != 2) stop(paste0("When wmdenomreg[[", p, "]] is 'loglinear', mediator[[", p, "]] should be binary"))
         if (!wmdenomreg[[p]] %in% c("logistic", "loglinear", "multinomial", "ordinal")) stop(paste0("Select character wmdenomreg[[", p, "]] from 'logistic', 'loglinear', 'multinomial', 'ordinal'"))
         wmdenomreg_formula <- paste0(mediator[p], "~", paste(c(exposure, mediator[0:(p-1)], basec, postc), collapse = "+"))
         # regression for the denominator of w_{m_p,i}
@@ -126,7 +126,7 @@ regrun <- function() {
     for (p in 1:length(postcreg)) {
       if (is.null(postcreg[[p]])) stop(paste0("Unspecified postcreg[[", p, "]]"))
       if (is.character(postcreg[[p]])) {
-        if (postcreg[[p]] == "loglinear" && length(unique(data[, postc[p]])) != 2) stop(paste0("When postcreg[[", p, "]] is 'loglinear', postc[[", p, "]] should be binary"))
+        if (postcreg[[p]] == "loglinear" && length(unique(na.omit(data[, postc[p]]))) != 2) stop(paste0("When postcreg[[", p, "]] is 'loglinear', postc[[", p, "]] should be binary"))
         if (!postcreg[[p]] %in% c("linear", "logistic", "loglinear", "poisson", "quasipoisson",
                                   "negbin", "multinomial", "ordinal"))  stop(
                                     paste0("Select character postcreg[[", p, "]] from 'linear', 'logistic',
@@ -156,7 +156,7 @@ regrun <- function() {
   # Outcome Regression
   if (is.null(yreg)) stop("yreg is required")
   if (is.character(yreg)) {
-    if (yreg == "loglinear" && length(unique(data[, outcome])) != 2) stop("When yreg is 'loglinear', outcome should be binary")
+    if (yreg == "loglinear" && length(unique(na.omit(data[, outcome]))) != 2) stop("When yreg is 'loglinear', outcome should be binary")
     if (!yreg %in% c("linear", "logistic", "loglinear", "poisson", "quasipoisson",
                      "negbin", "multinomial", "ordinal", "coxph", "aft_exp",
                      "aft_weibull")) stop(
@@ -220,15 +220,15 @@ regrun <- function() {
   
   # for delta method inference, use survey regressions for yreg and mreg when weights are applied
   if (inference == "delta" && casecontrol && !is.null(yprevalence)) {
-    yreg <- eval(bquote(survey::svyglm(formula = .(formula(yreg)), family = .(family(yreg)),
-                                       design = survey::svydesign(~ 1, data = .(data)))))
+    yreg <- suppressWarnings(eval(bquote(survey::svyglm(formula = .(formula(yreg)), family = .(family(yreg)),
+                                       design = survey::svydesign(~ 1, data = .(data))))))
   }
   if (inference == "delta" && casecontrol && !is.null(yprevalence)) {
-    if (inherits(mreg[[1]], "glm")) mreg[[1]] <- eval(bquote(survey::svyglm(formula = .(formula(mreg[[1]])), 
+    if (inherits(mreg[[1]], "glm")) mreg[[1]] <- suppressWarnings(eval(bquote(survey::svyglm(formula = .(formula(mreg[[1]])), 
                                                                             family = .(family(mreg[[1]])),
-                                                                            design = survey::svydesign(~ 1, data = .(data)))))
-    if (inherits(mreg[[1]], "multinom")) mreg[[1]] <- eval(bquote(svymultinom(formula = .(formula(mreg[[1]])), 
-                                                                              data = .(data))))
+                                                                            design = survey::svydesign(~ 1, data = .(data))))))
+    if (inherits(mreg[[1]], "multinom")) mreg[[1]] <- suppressWarnings(eval(bquote(svymultinom(formula = .(formula(mreg[[1]])), 
+                                                                              data = .(data)))))
   }
   out <- list(yreg = yreg, ereg = ereg, mreg = mreg, wmnomreg = wmnomreg, 
               wmdenomreg = wmdenomreg, postcreg = postcreg)

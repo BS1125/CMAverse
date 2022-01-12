@@ -298,74 +298,77 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       type <- ifelse(is_multinom_mreg[p] | is_polr_mreg[p], "probs", "response")
       mpred_a <- predict(mreg[[p]], newdata = mdesign_a, type = type)
       mpred_astar <- predict(mreg[[p]], newdata = mdesign_astar, type = type)
+      full_index <- which(rowSums(is.na(mdesign_a))==0)
+      n_full <- length(full_index)
       # categorical M
       if ((is_glm_mreg[p] && ((family_mreg[[p]]$family %in% c("binomial", "multinom")) |
                               startsWith(family_mreg[[p]]$family, "Ordered Categorical")))|
           is_multinom_mreg[p] | is_polr_mreg[p]) {
+        m_lev <- levels(droplevels(as.factor(data[, mediator[p]])))
         prob_a <- as.matrix(mpred_a)
         prob_astar <- as.matrix(mpred_astar)
         if (dim(prob_a)[2] == 1) {
           # simulate mediator[p] for exposure=a
-          msim_a <- rbinom(n, size = 1, prob = prob_a[, 1]) + 1
+          mid_a <- m_lev[rbinom(n_full, size = 1, prob = prob_a[full_index, 1]) + 1]
           # simulate mediator[p] for exposure=astar
-          msim_astar <- rbinom(n, size = 1, prob = prob_astar[, 1]) + 1
+          mid_astar <- m_lev[rbinom(n_full, size = 1, prob = prob_astar[full_index, 1]) + 1]
         } else {
-          msim_a <- apply(prob_a, 1, FUN = function(x) apply(t(rmultinom(1, 1, prob = x)), 1, which.max))
-          msim_astar <- apply(prob_astar, 1, FUN = function(x) apply(t(rmultinom(1, 1, prob = x)), 1, which.max))
+          mid_a <- m_lev[apply(prob_a[full_index,], 1, FUN = function(x) apply(t(rmultinom(1, 1, prob = x)), 1, which.max))]
+          mid_astar <- m_lev[apply(prob_astar[full_index,], 1, FUN = function(x) apply(t(rmultinom(1, 1, prob = x)), 1, which.max))]
         }
-        m_lev <- levels(droplevels(as.factor(data[, mediator[p]])))
-        # mid_a: simulated mediator[p] for exposure = a
-        # mid_astar: simulated mediator[p] for exposure = astar
-        if (is.factor(data[, mediator[p]])) {
-          mid_a <- factor(m_lev[msim_a], levels = m_lev)
-          mid_astar <- factor(m_lev[msim_astar], levels = m_lev)
-        } else if (is.character(data[, mediator[p]])) {
-          mid_a <- m_lev[msim_a]
-          mid_astar <- m_lev[msim_astar]
-        } else if (is.numeric(data[, mediator[p]])) {
-          mid_a <- as.numeric(m_lev[msim_a])
-          mid_astar <- as.numeric(m_lev[msim_astar])
-        } 
-        rm(prob_a, prob_astar, msim_a, msim_astar, m_lev)
+        
+        if (is.numeric(data[, mediator[p]])) {
+          mid_a <- as.numeric(mid_a)
+          mid_astar <- as.numeric(mid_astar)
+        }
+        
+        rm(prob_a, prob_astar, m_lev)
         # linear M
       } else if ((is_lm_mreg[p] | is_glm_mreg[p]) && family_mreg[[p]]$family == "gaussian") {
-        error <- rnorm(n, mean = 0, sd = sigma(mreg[[p]]))
-        mid_a <- mpred_a + error
-        mid_astar <- mpred_astar + error
+        error <- rnorm(n_full, mean = 0, sd = sigma(mreg[[p]]))
+        mid_a <- mpred_a[full_index] + error
+        mid_astar <- mpred_astar[full_index] + error
         rm(error)
         # gamma M
       } else if (is_glm_mreg[p] && family_mreg[[p]]$family == "Gamma") {
         shape_mreg <- MASS::gamma.shape(mreg[[p]])$alpha
-        mid_a <- rgamma(n, shape = shape_mreg, scale = mpred_a/shape_mreg)
-        mid_astar <- rgamma(n, shape = shape_mreg, scale = mpred_astar/shape_mreg)
+        mid_a <- rgamma(n_full, shape = shape_mreg, scale = mpred_a[full_index]/shape_mreg)
+        mid_astar <- rgamma(n_full, shape = shape_mreg, scale = mpred_astar[full_index]/shape_mreg)
         rm(shape_mreg)
         # inverse gaussian M
       } else if (is_glm_mreg[p] && family_mreg[[p]]$family == "inverse.gaussian") {
         lambda <- 1/summary(mreg[[p]])$dispersion
-        mid_a <- SuppDists::rinvGauss(n, nu = mpred_a, lambda = lambda)
-        mid_astar <- SuppDists::rinvGauss(n, nu = mpred_astar, lambda = lambda)
+        mid_a <- SuppDists::rinvGauss(n_full, nu = mpred_a[full_index], lambda = lambda)
+        mid_astar <- SuppDists::rinvGauss(n_full, nu = mpred_astar[full_index], lambda = lambda)
         rm(lambda)
         # poisson M
       } else if (is_glm_mreg[p] && family_mreg[[p]]$family == "poisson") {
-        mid_a <- rpois(n, lambda = mpred_a)
-        mid_astar <- rpois(n, lambda = mpred_astar)
+        mid_a <- rpois(n_full, lambda = mpred_a[full_index])
+        mid_astar <- rpois(n_full, lambda = mpred_astar[full_index])
         # quasipoisson M
       } else if (is_glm_mreg[p] && family_mreg[[p]]$family == "quasipoisson") {
         phi <- summary(mreg[[p]])$dispersion
-        mid_a <- rqpois(n, lambda = mpred_a, phi = phi)
-        mid_astar <- rqpois(n, lambda = mpred_astar, phi = phi)
+        mid_a <- rqpois(n_full, lambda = mpred_a[full_index], phi = phi)
+        mid_astar <- rqpois(n_full, lambda = mpred_astar[full_index], phi = phi)
         rm(phi)
         # negative binomial M
       } else if ( is_glm_mreg[p] && startsWith(family_mreg[[p]]$family, "Negative Binomial")) {
         theta <- summary(mreg[[p]])$theta
-        mid_a <- MASS::rnegbin(n, mu = mpred_a, theta = theta)
-        mid_astar <- MASS::rnegbin(n, mu = mpred_astar, theta = theta)
+        mid_a <- MASS::rnegbin(n_full, mu = mpred_a[full_index], theta = theta)
+        mid_astar <- MASS::rnegbin(n_full, mu = mpred_astar[full_index], theta = theta)
         rm(theta)
       } else stop(paste0("Unsupported mreg[[", p, "]]"))
-      m_a[, p] <- mid_a
-      m_astar[, p] <- mid_astar
+      
+      m_a[full_index, p] <- mid_a
+      m_astar[full_index, p] <- mid_astar
+      
+      if (is.factor(data[, mediator[p]])) {
+        m_lev <- levels(droplevels(as.factor(data[, mediator[p]])))
+        m_a[, p] <- factor(m_a[, p], levels = m_lev)
+        m_astar[, p] <- factor(m_astar[, p], levels = m_lev)
+      }
     }
-    rm(mdesign_a, mdesign_astar, type, mpred_a, mpred_astar, mid_a, mid_astar)
+    rm(mdesign_a, mdesign_astar, type, mpred_a, mpred_astar, mid_a, mid_astar, full_index, n_full)
     
     # simulate mstar for cde
     mstar_sim <- do.call(cbind, lapply(1:length(mediator), function(x)

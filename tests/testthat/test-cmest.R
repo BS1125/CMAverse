@@ -1253,14 +1253,6 @@ test_that("cmest works correctly for binary Y and binary M in a case control stu
                                      mreg = list("logistic"), yreg = "loglinear",
                                      astar = 0, a = 1, mval = list(1),
                                      estimation = "paramfunc", inference = "delta")
-  # res_binbin_rb_param_delta_multinom <- cmest(data = data, model = "rb",
-  #                                             casecontrol = TRUE, yprevalence = yprevalence,
-  #                                             outcome = "Y", exposure = "A",
-  #                                             mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
-  #                                             mreg = list("multinomial"), yreg = "loglinear",
-  #                                             astar = 0, a = 1, mval = list(1),
-  #                                             estimation = "paramfunc", inference = "delta",
-  #                                             multimp = TRUE, m = 1)
   res_binbin_rb_param_bootstrap <- cmest(data = data, model = "rb",
                                          casecontrol = TRUE, yprevalence = yprevalence,
                                          outcome = "Y", exposure = "A",
