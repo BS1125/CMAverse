@@ -132,7 +132,7 @@ regrun <- function() {
                                     paste0("Select character postcreg[[", p, "]] from 'linear', 'logistic',
                                            'loglinear', 'poisson', 'quasipoisson', 'negbin', 'multinomial', 'ordinal'"))
         # regress each L on A, C
-        postc_formula <- paste0(postc[p], "~", paste(c(exposure, basec, postc[0:(p-1)]), collapse = "+"))
+        postc_formula <- paste0(postc[p], "~", paste(c(exposure, basec), collapse = "+"))
         switch(postcreg[[p]],
                linear = postcreg[[p]] <- eval(bquote(glm(.(as.formula(postc_formula)), family = gaussian(), data = .(data)))),
                logistic = postcreg[[p]] <- eval(bquote(glm(.(as.formula(postc_formula)), family = binomial(), data = .(data)))),
