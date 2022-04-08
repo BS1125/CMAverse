@@ -926,7 +926,11 @@ boot.pval <- function(boots, pe){
 
 
 rqpois = function(n, lambda, phi) {
-  r = stats::rnbinom(n, mu = lambda, size = lambda/(phi-1))
+  r <- stats::rnbinom(n, mu = lambda, size = lambda/(phi-1))
   return(r)
 }
 
+weighted_mean <- function(x, w){
+  df_omit <- na.omit(data.frame(x, w))
+  return(weighted.mean(df_omit$x, df_omit$w))
+}

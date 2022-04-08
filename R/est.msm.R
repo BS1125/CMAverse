@@ -383,29 +383,29 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       is_multinom_yreg | is_polr_yreg) {
     if (!is.null(yval_index)) {
       if (dim(EY0m_pred)[2] == 1) {
-        EY0m <- weighted.mean(cbind(1 - EY0m_pred, EY0m_pred)[, yval_index], na.rm = TRUE, w = weightsEY)
-        EY1m <- weighted.mean(cbind(1 - EY1m_pred, EY1m_pred)[, yval_index], na.rm = TRUE, w = weightsEY)
-        EY00 <- weighted.mean(cbind(1 - EY00_pred, EY00_pred)[, yval_index], na.rm = TRUE, w = weightsEY)
-        EY01 <- weighted.mean(cbind(1 - EY01_pred, EY01_pred)[, yval_index], na.rm = TRUE, w = weightsEY)
-        EY10 <- weighted.mean(cbind(1 - EY10_pred, EY10_pred)[, yval_index], na.rm = TRUE, w = weightsEY)
-        EY11 <- weighted.mean(cbind(1 - EY11_pred, EY11_pred)[, yval_index], na.rm = TRUE, w = weightsEY)
+        EY0m <- weighted_mean(cbind(1 - EY0m_pred, EY0m_pred)[, yval_index], w = weightsEY)
+        EY1m <- weighted_mean(cbind(1 - EY1m_pred, EY1m_pred)[, yval_index], w = weightsEY)
+        EY00 <- weighted_mean(cbind(1 - EY00_pred, EY00_pred)[, yval_index], w = weightsEY)
+        EY01 <- weighted_mean(cbind(1 - EY01_pred, EY01_pred)[, yval_index], w = weightsEY)
+        EY10 <- weighted_mean(cbind(1 - EY10_pred, EY10_pred)[, yval_index], w = weightsEY)
+        EY11 <- weighted_mean(cbind(1 - EY11_pred, EY11_pred)[, yval_index], w = weightsEY)
       } else {
-        EY0m <- weighted.mean(EY0m_pred[, yval_index], na.rm = TRUE, w = weightsEY)
-        EY1m <- weighted.mean(EY1m_pred[, yval_index], na.rm = TRUE, w = weightsEY)
-        EY00 <- weighted.mean(EY00_pred[, yval_index], na.rm = TRUE, w = weightsEY)
-        EY01 <- weighted.mean(EY01_pred[, yval_index], na.rm = TRUE, w = weightsEY)
-        EY10 <- weighted.mean(EY10_pred[, yval_index], na.rm = TRUE, w = weightsEY)
-        EY11 <- weighted.mean(EY11_pred[, yval_index], na.rm = TRUE, w = weightsEY)
+        EY0m <- weighted_mean(EY0m_pred[, yval_index], w = weightsEY)
+        EY1m <- weighted_mean(EY1m_pred[, yval_index], w = weightsEY)
+        EY00 <- weighted_mean(EY00_pred[, yval_index], w = weightsEY)
+        EY01 <- weighted_mean(EY01_pred[, yval_index], w = weightsEY)
+        EY10 <- weighted_mean(EY10_pred[, yval_index], w = weightsEY)
+        EY11 <- weighted_mean(EY11_pred[, yval_index], w = weightsEY)
       }
     } else EY0m <- EY1m <- EY00 <- EY01 <- EY10 <- EY11 <- 0
   } else {
     # non-categorical Y
-    EY0m <- weighted.mean(EY0m_pred, na.rm = TRUE, w = weightsEY)
-    EY1m <- weighted.mean(EY1m_pred, na.rm = TRUE, w = weightsEY)
-    EY00 <- weighted.mean(EY00_pred, na.rm = TRUE, w = weightsEY)
-    EY01 <- weighted.mean(EY01_pred, na.rm = TRUE, w = weightsEY)
-    EY10 <- weighted.mean(EY10_pred, na.rm = TRUE, w = weightsEY)
-    EY11 <- weighted.mean(EY11_pred, na.rm = TRUE, w = weightsEY)
+    EY0m <- weighted_mean(EY0m_pred, w = weightsEY)
+    EY1m <- weighted_mean(EY1m_pred, w = weightsEY)
+    EY00 <- weighted_mean(EY00_pred, w = weightsEY)
+    EY01 <- weighted_mean(EY01_pred, w = weightsEY)
+    EY10 <- weighted_mean(EY10_pred, w = weightsEY)
+    EY11 <- weighted_mean(EY11_pred, w = weightsEY)
   }
   rm(weightsEY, EY0m_pred, EY1m_pred, EY00_pred, EY01_pred, EY10_pred, EY11_pred)
   
