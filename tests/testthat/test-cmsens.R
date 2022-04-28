@@ -235,7 +235,7 @@ test_that("sensitivity analysis for unmeasured confounding works correctly for c
   A <- rbinom(n, 1, pa)
   pm <- expit(1 + 2*A + 1.5*C1 + 0.8*C2)
   M <- rbinom(n, 1, pm)
-  Y <- rnorm(n, -1 + 0.8*A + 0.5*M + 0.5*A*M + 0.3*C1 - 0.6*C2, 1)
+  Y <- rnorm(n, -1 - 0.8*A + 0.5*M + 0.5*A*M + 0.3*C1 - 0.6*C2, 1)
   data <- data.frame(A, M, Y, C1, C2)
 
   # naive results
@@ -243,7 +243,7 @@ test_that("sensitivity analysis for unmeasured confounding works correctly for c
                                       mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                                       mreg = list("logistic"), yreg = "linear",
                                       astar = 0, a = 1, mval = list(1),
-                                      estimation = "paramfunc", inference = "delta")
+                                      estimation = "paramfunc", inference = "delta", multimp = T, m = 2)
 
   # cmsens results
   res_contbin_cmsens_uc <- cmsens(object = res_contbin_naive, sens = "uc")

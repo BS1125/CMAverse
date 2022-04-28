@@ -142,7 +142,6 @@ cmsens <- function(object = NULL, sens = "uc", MEmethod = "simex",
   data <- object$data
   model <- object$methods$model
   reg.input <- object$reg.input
-  reg.output <- object$reg.output
   effect.pe <- object$effect.pe
   effect.se <- object$effect.se
   outcome <- object$variables$outcome
@@ -151,6 +150,10 @@ cmsens <- function(object = NULL, sens = "uc", MEmethod = "simex",
   ############################Sensitivity Analysis for Unmeasured Confounding#######################
   #################################################################################################
   if (sens == "uc") {
+    if (object$multimp$multimp) {
+      reg.output <- object$reg.output[[1]]
+    } else reg.output <- object$reg.output
+    
     if (inherits(reg.input$yreg, "coxph") | inherits(reg.input$yreg, "survreg") | 
         (is.character(reg.input$yreg) && reg.input$yreg %in% c("coxph", "aft_exp", "aft_weibull"))
         ) stop("sensitivity analysis for unmeasured confounding currently doesn't support survival outcomes")
