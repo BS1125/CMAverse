@@ -29,7 +29,7 @@
 #' @param event variable name of the event (used when \code{yreg} is \code{coxph}, \code{aft_exp},
 #' or \code{aft_weibull}).
 #' @param exposure variable name of the exposure.
-#' @param mediator a vector of variable name(s) of the mediator(s) following the temporal order.
+#' @param mediator a vector of variable name(s) of the mediator(s).
 #' @param EMint a logical value indicating the existence of exposure-mediator interaction in 
 #' \code{yreg} (used when \code{model} is not \code{iorw}). \code{TRUE} when there is 
 #' exposure-mediator interaction in \code{yreg}. If \code{TRUE} and character \code{yreg} is 
