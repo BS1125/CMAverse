@@ -81,7 +81,7 @@ or \code{aft_weibull}).}
 
 \item{exposure}{variable name of the exposure.}
 
-\item{mediator}{a vector of variable name(s) of the mediator(s) following the temporal order.}
+\item{mediator}{a vector of variable name(s) of the mediator(s).}
 
 \item{EMint}{a logical value indicating the existence of exposure-mediator interaction in 
 \code{yreg} (used when \code{model} is not \code{iorw}). \code{TRUE} when there is 
