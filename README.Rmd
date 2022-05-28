@@ -41,7 +41,7 @@ et al. (2017)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5560424/), and *the 
 
 `cmest` currently supports a single exposure, multiple sequential mediators and a single outcome.  When multiple mediators are of interest, `cmest` estimates the joint mediated effect through the set of mediators. `cmest` also allows for time varying confounders preceding mediators. The two causal scenarios supported are:
 
-1. There are no confounders affected by the exposure:
+(1) There are no confounders affected by the exposure:
 
 ```{r echo=F,warning=F,message=F,fig.width=6,fig.height=3}
 library(dagitty)
@@ -56,7 +56,7 @@ coordinates(g1) <- list(x=c(A=0,Y=4,M=2,C=0.2),y=c(A=0,Y=0,M=-0.8,C=-1))
 plot(g1)
 ```
 
-2. There are mediator-outcome confounders affected by the exposure and these confounders precede all of the mediators:
+(2) There are mediator-outcome confounders affected by the exposure and these confounders precede all of the mediators:
 
 ```{r echo=F,warning=F,message=F,fig.width=6,fig.height=3}
 g2 <- dagitty::dagitty( "dag {
