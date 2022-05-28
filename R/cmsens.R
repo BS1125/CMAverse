@@ -138,6 +138,7 @@ cmsens <- function(object = NULL, sens = "uc", MEmethod = "simex",
   if (is.null(object)) stop("Unspecified object")
   cl <- match.call()
   out <- list(call = cl)
+  
   # extract objects from cmest object
   data <- object$data
   model <- object$methods$model

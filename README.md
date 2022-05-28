@@ -23,10 +23,13 @@ See the package [website](https://bs1125.github.io/CMAverse/) for a
 quickstart guide, an overview of statistical modeling approaches and
 examples.
 
-Cite the paper: [CMAverse
-a suite of functions for reproducible causal mediation analyses](https://journals.lww.com/epidem/citation/9000/cmaverse__a_suite_of_functions_for_reproducible.98264.aspx)
+Cite the paper: [CMAverse a suite of functions for reproducible causal
+mediation
+analyses](https://journals.lww.com/epidem/citation/9000/cmaverse__a_suite_of_functions_for_reproducible.98264.aspx)
 
-Please feel free to email bs3141@cumc.columbia.edu if you have any questions.
+Please feel free to email
+<a href="mailto:bs3141@cumc.columbia.edu" class="email">bs3141@cumc.columbia.edu</a>
+if you have any questions.
 
 ### DAG Visualization
 
@@ -317,6 +320,7 @@ mediators. The two causal scenarios supported are:
 </tbody>
 </table>
 <section class="footnotes" role="doc-endnotes">
+<hr />
 <ol>
 <li id="fn1" role="doc-endnote"><p>rb: the regression-based approach; wb: the weighting-based approach; iorw: the inverse odds ratio weighting approach; ne: the natural effect model; msm: the marginal structural model; gformula: the g-formula approach.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn2" role="doc-endnote"><p>Y denotes the outcome, A denotes the exposure, M denotes the mediator(s) and C denotes the exposure-outcome confounder(s), the exposure-mediator confounder(s) and the mediator-outcome confounder(s) not affected by the exposure.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
