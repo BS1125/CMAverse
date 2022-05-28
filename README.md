@@ -26,6 +26,8 @@ examples.
 Cite the paper: [CMAverse
 a suite of functions for reproducible causal mediation analyses](https://journals.lww.com/epidem/citation/9000/cmaverse__a_suite_of_functions_for_reproducible.98264.aspx)
 
+Please feel free to email bs3141@cumc.columbia.edu if you have questions.
+
 ### DAG Visualization
 
 `cmdag` visualizes causal relationships via a directed acyclic graph
