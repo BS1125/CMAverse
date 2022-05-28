@@ -150,13 +150,9 @@
 <a href="#statistical-modeling" class="anchor"></a>Statistical Modeling</h3>
 <p><code>cmest</code> implements six causal mediation analysis approaches including <em>the regression-based approach</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3659198/">Valeri et al. (2013)</a> and <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/">VanderWeele et al. (2014)</a>, <em>the weighting-based approach</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/">VanderWeele et al. (2014)</a>, <em>the inverse odd-ratio weighting approach</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3954805/">Tchetgen Tchetgen (2013)</a>, <em>the natural effect model</em> by <a href="https://www.degruyter.com/view/journals/em/1/1/article-p131.xml?language=en">Vansteelandt et al. (2012)</a>, <em>the marginal structural model</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5560424/">VanderWeele et al. (2017)</a>, and <em>the g-formula approach</em> by <a href="https://www.sciencedirect.com/science/article/pii/0270025586900886">Robins (1986)</a>.</p>
 <p><code>cmest</code> currently supports a single exposure, multiple sequential mediators and a single outcome. When multiple mediators are of interest, <code>cmest</code> estimates the joint mediated effect through the set of mediators. <code>cmest</code> also allows for time varying confounders preceding mediators. The two causal scenarios supported are:</p>
-<ol>
-<li>There are no confounders affected by the exposure:</li>
-</ol>
+<p>1.There are no confounders affected by the exposure:</p>
 <p><img src="reference/figures/unnamed-chunk-1-1.png"></p>
-<ol>
-<li>There are mediator-outcome confounders affected by the exposure and these confounders precede all of the mediators:</li>
-</ol>
+<p>2.There are mediator-outcome confounders affected by the exposure and these confounders precede all of the mediators:</p>
 <p><img src="reference/figures/unnamed-chunk-2-1.png"></p>
 <table class="table">
 <caption>
