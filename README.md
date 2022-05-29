@@ -27,9 +27,8 @@ Cite the paper: [CMAverse a suite of functions for reproducible causal
 mediation
 analyses](https://journals.lww.com/epidem/citation/9000/cmaverse__a_suite_of_functions_for_reproducible.98264.aspx)
 
-Please feel free to email
-<a href="mailto:bs3141@cumc.columbia.edu" class="email">bs3141@cumc.columbia.edu</a>
-if you have any questions.
+We welcome your feedback and questions (email
+<a href="mailto:bs3141@cumc.columbia.edu" class="email">bs3141@cumc.columbia.edu</a>)!
 
 ### DAG Visualization
 
