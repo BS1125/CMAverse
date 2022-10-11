@@ -24,7 +24,7 @@ res_yprevelence <- cmest(data = data, model = "rb", casecontrol = TRUE, yprevale
                          outcome = "Y", exposure = "A",
                          mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                          mreg = list("logistic"), yreg = "logistic",
-                         astar = 0, a = 1, mval = list(1), yref = 1,
+                         astar = 0, a = 1, mval = list(1), 
                          estimation = "paramfunc", inference = "delta")
 
 ## ----message=F,warning=F------------------------------------------------------
@@ -35,7 +35,7 @@ res_yrare <- cmest(data = data, model = "rb", casecontrol = TRUE, yrare = TRUE,
                    outcome = "Y", exposure = "A",
                    mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                    mreg = list("logistic"), yreg = "logistic",
-                   astar = 0, a = 1, mval = list(1), yref = 1,
+                   astar = 0, a = 1, mval = list(1),
                    estimation = "paramfunc", inference = "delta")
 
 ## ----message=F,warning=F------------------------------------------------------

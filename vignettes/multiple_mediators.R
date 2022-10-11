@@ -8,10 +8,10 @@ A <- rbinom(n, 1, expit(0.2 + 0.5*C1 + 0.1*C2))
 M1 <- rpois(n, exp(1 - 2*A + 0.5*C1 + 0.8*C2))
 linpred1 <- 0.1 + 0.1*A + 0.4*M1 - 0.5*C1 + 0.1*C2
 linpred2 <- 0.4 + 0.2*A - 0.1*M1 - C1 + 0.5*C2
-probm0 = 1 / (1 + exp(linpred1) + exp(linpred2))
-probm1 = exp(linpred1) / (1 + exp(linpred1) + exp(linpred2))
-probm2 = exp(linpred2) / (1 + exp(linpred1) + exp(linpred2))
-M2 = factor(sapply(1:n, FUN = function(x) sample(c(0, 1, 2), size = 1, replace = TRUE,
+probm0 <- 1 / (1 + exp(linpred1) + exp(linpred2))
+probm1 <- exp(linpred1) / (1 + exp(linpred1) + exp(linpred2))
+probm2 <- exp(linpred2) / (1 + exp(linpred1) + exp(linpred2))
+M2 <- factor(sapply(1:n, FUN = function(x) sample(c(0, 1, 2), size = 1, replace = TRUE,
                                                  prob=c(probm0[x],
                                                         probm1[x],
                                                         probm2[x]))))
@@ -28,7 +28,7 @@ cmdag(outcome = "Y", exposure = "A", mediator = c("M1", "M2"),
 res_rb <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
                 mediator = c("M1", "M2"), basec = c("C1", "C2"), EMint = TRUE,
                 mreg = list("poisson", "multinomial"), yreg = "logistic",
-                astar = 0, a = 1, mval = list(0, 2), yref = 1,
+                astar = 0, a = 1, mval = list(0, 2), 
                 estimation = "imputation", inference = "bootstrap", nboot = 2)
 
 ## ----message=F,warning=F------------------------------------------------------
@@ -38,7 +38,7 @@ summary(res_rb)
 res_wb <- cmest(data = data, model = "wb", outcome = "Y", exposure = "A",
                 mediator = c("M1", "M2"), basec = c("C1", "C2"), EMint = TRUE,
                 ereg = "logistic", yreg = "logistic",
-                astar = 0, a = 1, mval = list(0, 2), yref = 1,
+                astar = 0, a = 1, mval = list(0, 2), 
                 estimation = "imputation", inference = "bootstrap", nboot = 2)
 
 ## ----message=F,warning=F------------------------------------------------------
@@ -48,7 +48,7 @@ summary(res_wb)
 res_iorw <- cmest(data = data, model = "iorw", outcome = "Y", exposure = "A",
                   mediator = c("M1", "M2"), basec = c("C1", "C2"), EMint = TRUE,
                   ereg = "logistic", yreg = "logistic",
-                  astar = 0, a = 1, mval = list(0, 2), yref = 1,
+                  astar = 0, a = 1, mval = list(0, 2), 
                   estimation = "imputation", inference = "bootstrap", nboot = 2)
 
 ## ----message=F,warning=F------------------------------------------------------
@@ -58,7 +58,7 @@ summary(res_iorw)
 res_ne <- cmest(data = data, model = "ne", outcome = "Y", exposure = "A",
                 mediator = c("M1", "M2"), basec = c("C1", "C2"), EMint = TRUE,
                 yreg = "logistic",
-                astar = 0, a = 1, mval = list(0, 2), yref = 1,
+                astar = 0, a = 1, mval = list(0, 2), 
                 estimation = "imputation", inference = "bootstrap", nboot = 2)
 
 ## ----message=F,warning=F------------------------------------------------------
@@ -68,7 +68,7 @@ summary(res_ne)
 res_gformula <- cmest(data = data, model = "gformula", outcome = "Y", exposure = "A",
                       mediator = c("M1", "M2"), basec = c("C1", "C2"), EMint = TRUE,
                       mreg = list("poisson", "multinomial"), yreg = "logistic",
-                      astar = 0, a = 1, mval = list(0, 2), yref = 1,
+                      astar = 0, a = 1, mval = list(0, 2), 
                       estimation = "imputation", inference = "bootstrap", nboot = 2)
 
 ## ----message=F,warning=F------------------------------------------------------

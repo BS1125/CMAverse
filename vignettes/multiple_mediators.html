@@ -11,27 +11,57 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
 
-<meta name="date" content="2020-09-11" />
+<meta name="date" content="2022-10-10" />
 
 <title>Statistical Modeling with Multiple Mediators</title>
 
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
 
 
-<style type="text/css">code{white-space: pre;}</style>
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
 <style type="text/css" data-origin="pandoc">
-code.sourceCode > span { display: inline-block; line-height: 1.25; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-code.sourceCode > span:empty { height: 1.2em; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -51,7 +81,7 @@ pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-le
 div.sourceCode
   {   }
 @media screen {
-code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -105,6 +135,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   }
 })();
 </script>
+
 
 
 
@@ -300,80 +331,172 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<h1 class="title toc-ignore">Statistical Modeling with Multiple Mediators</h1>
-<h4 class="date">2020-09-11</h4>
+<h1 class="title toc-ignore">Statistical Modeling with Multiple
+Mediators</h1>
+<h4 class="date">2022-10-10</h4>
 
 
 
-<p>This example demonstrates how to use the <code>cmest</code> function when there are multiple mediators. For this purpose, we simulate some data containing a continuous baseline confounder <span class="math inline">\(C_1\)</span>, a binary baseline confounder <span class="math inline">\(C_2\)</span>, a binary exposure <span class="math inline">\(A\)</span>, a count mediator <span class="math inline">\(M_1\)</span>, a categorical mediator <span class="math inline">\(M_2\)</span> and a binary outcome <span class="math inline">\(Y\)</span>. The true regression models for <span class="math inline">\(A\)</span>, <span class="math inline">\(M_1\)</span>, <span class="math inline">\(M_2\)</span> and <span class="math inline">\(Y\)</span> are: <span class="math display">\[logit(E(A|C_1,C_2))=0.2+0.5C_1+0.1C_2\]</span> <span class="math display">\[log(E(M_1|A,C_1,C_2))=1-2A+0.5C_1+0.8C_2\]</span> <span class="math display">\[log\frac{E[M_2=1|A,M_1,C_1,C_2]}{E[M_2=0|A,M_1,C_1,C_2]}=0.1+0.1A+0.4M_1-0.5C_1+0.1C_2\]</span> <span class="math display">\[log\frac{E[M_2=2|A,M_1,C_1,C_2]}{E[M_2=0|A,M_1,C_1,C_2]}=0.4+0.2A-0.1M_1-C_1+0.5C_2\]</span> <span class="math display">\[logit(E(Y|A,M_1,M_2,C_1,C_2)))=-4+0.8A-1.8M_1+0.5(M_2==1)+0.8(M_2==2)+0.5AM_1-0.4A(M_2==1)-1.4A(M_2==2)+0.3*C_1-0.6C_2\]</span></p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">set.seed</span>(<span class="dv">1</span>)</span>
-<span id="cb1-2"><a href="#cb1-2"></a>expit &lt;-<span class="st"> </span><span class="cf">function</span>(x) <span class="kw">exp</span>(x)<span class="op">/</span>(<span class="dv">1</span><span class="op">+</span><span class="kw">exp</span>(x))</span>
-<span id="cb1-3"><a href="#cb1-3"></a>n &lt;-<span class="st"> </span><span class="dv">10000</span></span>
-<span id="cb1-4"><a href="#cb1-4"></a>C1 &lt;-<span class="st"> </span><span class="kw">rnorm</span>(n, <span class="dt">mean =</span> <span class="dv">1</span>, <span class="dt">sd =</span> <span class="fl">0.1</span>)</span>
-<span id="cb1-5"><a href="#cb1-5"></a>C2 &lt;-<span class="st"> </span><span class="kw">rbinom</span>(n, <span class="dv">1</span>, <span class="fl">0.6</span>)</span>
-<span id="cb1-6"><a href="#cb1-6"></a>A &lt;-<span class="st"> </span><span class="kw">rbinom</span>(n, <span class="dv">1</span>, <span class="kw">expit</span>(<span class="fl">0.2</span> <span class="op">+</span><span class="st"> </span><span class="fl">0.5</span><span class="op">*</span>C1 <span class="op">+</span><span class="st"> </span><span class="fl">0.1</span><span class="op">*</span>C2))</span>
-<span id="cb1-7"><a href="#cb1-7"></a>M1 &lt;-<span class="st"> </span><span class="kw">rpois</span>(n, <span class="kw">exp</span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>A <span class="op">+</span><span class="st"> </span><span class="fl">0.5</span><span class="op">*</span>C1 <span class="op">+</span><span class="st"> </span><span class="fl">0.8</span><span class="op">*</span>C2))</span>
-<span id="cb1-8"><a href="#cb1-8"></a>linpred1 &lt;-<span class="st"> </span><span class="fl">0.1</span> <span class="op">+</span><span class="st"> </span><span class="fl">0.1</span><span class="op">*</span>A <span class="op">+</span><span class="st"> </span><span class="fl">0.4</span><span class="op">*</span>M1 <span class="op">-</span><span class="st"> </span><span class="fl">0.5</span><span class="op">*</span>C1 <span class="op">+</span><span class="st"> </span><span class="fl">0.1</span><span class="op">*</span>C2</span>
-<span id="cb1-9"><a href="#cb1-9"></a>linpred2 &lt;-<span class="st"> </span><span class="fl">0.4</span> <span class="op">+</span><span class="st"> </span><span class="fl">0.2</span><span class="op">*</span>A <span class="op">-</span><span class="st"> </span><span class="fl">0.1</span><span class="op">*</span>M1 <span class="op">-</span><span class="st"> </span>C1 <span class="op">+</span><span class="st"> </span><span class="fl">0.5</span><span class="op">*</span>C2</span>
-<span id="cb1-10"><a href="#cb1-10"></a>probm0 =<span class="st"> </span><span class="dv">1</span> <span class="op">/</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(linpred1) <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(linpred2))</span>
-<span id="cb1-11"><a href="#cb1-11"></a>probm1 =<span class="st"> </span><span class="kw">exp</span>(linpred1) <span class="op">/</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(linpred1) <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(linpred2))</span>
-<span id="cb1-12"><a href="#cb1-12"></a>probm2 =<span class="st"> </span><span class="kw">exp</span>(linpred2) <span class="op">/</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(linpred1) <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(linpred2))</span>
-<span id="cb1-13"><a href="#cb1-13"></a>M2 =<span class="st"> </span><span class="kw">factor</span>(<span class="kw">sapply</span>(<span class="dv">1</span><span class="op">:</span>n, <span class="dt">FUN =</span> <span class="cf">function</span>(x) <span class="kw">sample</span>(<span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">size =</span> <span class="dv">1</span>, <span class="dt">replace =</span> <span class="ot">TRUE</span>,</span>
-<span id="cb1-14"><a href="#cb1-14"></a>                                                 <span class="dt">prob=</span><span class="kw">c</span>(probm0[x],</span>
-<span id="cb1-15"><a href="#cb1-15"></a>                                                        probm1[x],</span>
-<span id="cb1-16"><a href="#cb1-16"></a>                                                        probm2[x]))))</span>
-<span id="cb1-17"><a href="#cb1-17"></a>Y &lt;-<span class="st"> </span><span class="kw">rbinom</span>(n, <span class="dv">1</span>, <span class="kw">expit</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="fl">0.8</span><span class="op">*</span>A <span class="op">-</span><span class="st"> </span><span class="fl">1.8</span><span class="op">*</span>M1 <span class="op">+</span><span class="st"> </span><span class="fl">0.5</span><span class="op">*</span>(M2 <span class="op">==</span><span class="st"> </span><span class="dv">1</span>) <span class="op">+</span><span class="st"> </span><span class="fl">0.8</span><span class="op">*</span>(M2 <span class="op">==</span><span class="st"> </span><span class="dv">2</span>) <span class="op">+</span><span class="st"> </span></span>
-<span id="cb1-18"><a href="#cb1-18"></a><span class="st">                          </span><span class="fl">0.5</span><span class="op">*</span>A<span class="op">*</span>M1 <span class="op">-</span><span class="st"> </span><span class="fl">0.4</span><span class="op">*</span>A<span class="op">*</span>(M2 <span class="op">==</span><span class="st"> </span><span class="dv">1</span>) <span class="op">-</span><span class="st"> </span><span class="fl">1.4</span><span class="op">*</span>A<span class="op">*</span>(M2 <span class="op">==</span><span class="st"> </span><span class="dv">2</span>)  <span class="op">+</span><span class="st"> </span><span class="fl">0.3</span><span class="op">*</span>C1 <span class="op">-</span><span class="st"> </span><span class="fl">0.6</span><span class="op">*</span>C2))</span>
-<span id="cb1-19"><a href="#cb1-19"></a>data &lt;-<span class="st"> </span><span class="kw">data.frame</span>(A, M1, M2, Y, C1, C2)</span></code></pre></div>
+<p>This example demonstrates how to use <code>cmest</code> when there
+are multiple mediators. For this purpose, we simulate some data
+containing a continuous baseline confounder <span class="math inline">\(C_1\)</span>, a binary baseline confounder <span class="math inline">\(C_2\)</span>, a binary exposure <span class="math inline">\(A\)</span>, a count mediator <span class="math inline">\(M_1\)</span>, a categorical mediator <span class="math inline">\(M_2\)</span> and a binary outcome <span class="math inline">\(Y\)</span>. The true regression models for <span class="math inline">\(A\)</span>, <span class="math inline">\(M_1\)</span>, <span class="math inline">\(M_2\)</span> and <span class="math inline">\(Y\)</span> are: <span class="math display">\[logit(E(A|C_1,C_2))=0.2+0.5C_1+0.1C_2\]</span>
+<span class="math display">\[log(E(M_1|A,C_1,C_2))=1-2A+0.5C_1+0.8C_2\]</span>
+<span class="math display">\[log\frac{E[M_2=1|A,M_1,C_1,C_2]}{E[M_2=0|A,M_1,C_1,C_2]}=0.1+0.1A+0.4M_1-0.5C_1+0.1C_2\]</span>
+<span class="math display">\[log\frac{E[M_2=2|A,M_1,C_1,C_2]}{E[M_2=0|A,M_1,C_1,C_2]}=0.4+0.2A-0.1M_1-C_1+0.5C_2\]</span>
+<span class="math display">\[logit(E(Y|A,M_1,M_2,C_1,C_2)))=-4+0.8A-1.8M_1+0.5(M_2==1)+0.8(M_2==2)+0.5AM_1-0.4A(M_2==1)-1.4A(M_2==2)+0.3*C_1-0.6C_2\]</span></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>expit <span class="ot">&lt;-</span> <span class="cf">function</span>(x) <span class="fu">exp</span>(x)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">+</span><span class="fu">exp</span>(x))</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">10000</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>C1 <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="dv">1</span>, <span class="at">sd =</span> <span class="fl">0.1</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>C2 <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fl">0.6</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>A <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fu">expit</span>(<span class="fl">0.2</span> <span class="sc">+</span> <span class="fl">0.5</span><span class="sc">*</span>C1 <span class="sc">+</span> <span class="fl">0.1</span><span class="sc">*</span>C2))</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>M1 <span class="ot">&lt;-</span> <span class="fu">rpois</span>(n, <span class="fu">exp</span>(<span class="dv">1</span> <span class="sc">-</span> <span class="dv">2</span><span class="sc">*</span>A <span class="sc">+</span> <span class="fl">0.5</span><span class="sc">*</span>C1 <span class="sc">+</span> <span class="fl">0.8</span><span class="sc">*</span>C2))</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>linpred1 <span class="ot">&lt;-</span> <span class="fl">0.1</span> <span class="sc">+</span> <span class="fl">0.1</span><span class="sc">*</span>A <span class="sc">+</span> <span class="fl">0.4</span><span class="sc">*</span>M1 <span class="sc">-</span> <span class="fl">0.5</span><span class="sc">*</span>C1 <span class="sc">+</span> <span class="fl">0.1</span><span class="sc">*</span>C2</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>linpred2 <span class="ot">&lt;-</span> <span class="fl">0.4</span> <span class="sc">+</span> <span class="fl">0.2</span><span class="sc">*</span>A <span class="sc">-</span> <span class="fl">0.1</span><span class="sc">*</span>M1 <span class="sc">-</span> C1 <span class="sc">+</span> <span class="fl">0.5</span><span class="sc">*</span>C2</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>probm0 <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(linpred1) <span class="sc">+</span> <span class="fu">exp</span>(linpred2))</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>probm1 <span class="ot">&lt;-</span> <span class="fu">exp</span>(linpred1) <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(linpred1) <span class="sc">+</span> <span class="fu">exp</span>(linpred2))</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>probm2 <span class="ot">&lt;-</span> <span class="fu">exp</span>(linpred2) <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(linpred1) <span class="sc">+</span> <span class="fu">exp</span>(linpred2))</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>M2 <span class="ot">&lt;-</span> <span class="fu">factor</span>(<span class="fu">sapply</span>(<span class="dv">1</span><span class="sc">:</span>n, <span class="at">FUN =</span> <span class="cf">function</span>(x) <span class="fu">sample</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>), <span class="at">size =</span> <span class="dv">1</span>, <span class="at">replace =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>                                                 <span class="at">prob=</span><span class="fu">c</span>(probm0[x],</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>                                                        probm1[x],</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>                                                        probm2[x]))))</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>Y <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fu">expit</span>(<span class="dv">1</span> <span class="sc">+</span> <span class="fl">0.8</span><span class="sc">*</span>A <span class="sc">-</span> <span class="fl">1.8</span><span class="sc">*</span>M1 <span class="sc">+</span> <span class="fl">0.5</span><span class="sc">*</span>(M2 <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">+</span> <span class="fl">0.8</span><span class="sc">*</span>(M2 <span class="sc">==</span> <span class="dv">2</span>) <span class="sc">+</span> </span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>                          <span class="fl">0.5</span><span class="sc">*</span>A<span class="sc">*</span>M1 <span class="sc">-</span> <span class="fl">0.4</span><span class="sc">*</span>A<span class="sc">*</span>(M2 <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">-</span> <span class="fl">1.4</span><span class="sc">*</span>A<span class="sc">*</span>(M2 <span class="sc">==</span> <span class="dv">2</span>)  <span class="sc">+</span> <span class="fl">0.3</span><span class="sc">*</span>C1 <span class="sc">-</span> <span class="fl">0.6</span><span class="sc">*</span>C2))</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(A, M1, M2, Y, C1, C2)</span></code></pre></div>
 <p>The DAG for this scientific setting is:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">library</span>(CMAverse)</span>
-<span id="cb2-2"><a href="#cb2-2"></a><span class="kw">cmdag</span>(<span class="dt">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="dt">exposure =</span> <span class="st">&quot;A&quot;</span>, <span class="dt">mediator =</span> <span class="kw">c</span>(<span class="st">&quot;M1&quot;</span>, <span class="st">&quot;M2&quot;</span>),</span>
-<span id="cb2-3"><a href="#cb2-3"></a>      <span class="dt">basec =</span> <span class="kw">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="dt">postc =</span> <span class="ot">NULL</span>, <span class="dt">node =</span> <span class="ot">TRUE</span>, <span class="dt">text_col =</span> <span class="st">&quot;white&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(CMAverse)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cmdag</span>(<span class="at">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="at">exposure =</span> <span class="st">&quot;A&quot;</span>, <span class="at">mediator =</span> <span class="fu">c</span>(<span class="st">&quot;M1&quot;</span>, <span class="st">&quot;M2&quot;</span>),</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>      <span class="at">basec =</span> <span class="fu">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="at">postc =</span> <span class="cn">NULL</span>, <span class="at">node =</span> <span class="cn">TRUE</span>, <span class="at">text_col =</span> <span class="st">&quot;white&quot;</span>)</span></code></pre></div>
 <p><img src="data:image/png;base64,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" /><!-- --></p>
-<p>In this setting, we have a count mediator, so we can’t use the marginal structural model. We can the rest five statistical modeling approaches. The results are shown below.</p>
+<p>In this setting, we have a count mediator, so the marginal structural
+model is not available. We can use the rest five statistical modeling
+approaches. The results are shown below.</p>
 <div id="the-regression-based-approach" class="section level2">
 <h2>The Regression-based Approach</h2>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>res_rb &lt;-<span class="st"> </span><span class="kw">cmest</span>(<span class="dt">data =</span> data, <span class="dt">model =</span> <span class="st">&quot;rb&quot;</span>, <span class="dt">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="dt">exposure =</span> <span class="st">&quot;A&quot;</span>,</span>
-<span id="cb3-2"><a href="#cb3-2"></a>                <span class="dt">mediator =</span> <span class="kw">c</span>(<span class="st">&quot;M1&quot;</span>, <span class="st">&quot;M2&quot;</span>), <span class="dt">basec =</span> <span class="kw">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="dt">EMint =</span> <span class="ot">TRUE</span>,</span>
-<span id="cb3-3"><a href="#cb3-3"></a>                <span class="dt">mreg =</span> <span class="kw">list</span>(<span class="st">&quot;poisson&quot;</span>, <span class="st">&quot;multinomial&quot;</span>), <span class="dt">yreg =</span> <span class="st">&quot;logistic&quot;</span>,</span>
-<span id="cb3-4"><a href="#cb3-4"></a>                <span class="dt">astar =</span> <span class="dv">0</span>, <span class="dt">a =</span> <span class="dv">1</span>, <span class="dt">mval =</span> <span class="kw">list</span>(<span class="dv">0</span>, <span class="dv">2</span>), <span class="dt">yref =</span> <span class="dv">1</span>,</span>
-<span id="cb3-5"><a href="#cb3-5"></a>                <span class="dt">estimation =</span> <span class="st">&quot;imputation&quot;</span>, <span class="dt">inference =</span> <span class="st">&quot;bootstrap&quot;</span>, <span class="dt">nboot =</span> <span class="dv">2</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">summary</span>(res_rb)</span></code></pre></div>
-<pre><code>## # Causal Mediation Analysis via the Regression-based Approach
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>res_rb <span class="ot">&lt;-</span> <span class="fu">cmest</span>(<span class="at">data =</span> data, <span class="at">model =</span> <span class="st">&quot;rb&quot;</span>, <span class="at">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="at">exposure =</span> <span class="st">&quot;A&quot;</span>,</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">mediator =</span> <span class="fu">c</span>(<span class="st">&quot;M1&quot;</span>, <span class="st">&quot;M2&quot;</span>), <span class="at">basec =</span> <span class="fu">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="at">EMint =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">mreg =</span> <span class="fu">list</span>(<span class="st">&quot;poisson&quot;</span>, <span class="st">&quot;multinomial&quot;</span>), <span class="at">yreg =</span> <span class="st">&quot;logistic&quot;</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">astar =</span> <span class="dv">0</span>, <span class="at">a =</span> <span class="dv">1</span>, <span class="at">mval =</span> <span class="fu">list</span>(<span class="dv">0</span>, <span class="dv">2</span>), </span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">estimation =</span> <span class="st">&quot;imputation&quot;</span>, <span class="at">inference =</span> <span class="st">&quot;bootstrap&quot;</span>, <span class="at">nboot =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(res_rb)</span></code></pre></div>
+<pre><code>## Causal Mediation Analysis
+## 
+## # Outcome regression:
+## 
+## Call:
+## glm(formula = Y ~ A + M1 + M2 + A * M1 + A * M2 + C1 + C2, family = binomial(), 
+##     data = getCall(x$reg.output$yreg)$data, weights = getCall(x$reg.output$yreg)$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -2.2066  -0.5055  -0.0007   0.6383   3.3715  
+## 
+## Coefficients:
+##              Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  1.125104   0.478893   2.349 0.018804 *  
+## A            0.460265   0.400463   1.149 0.250419    
+## M1          -1.809307   0.180027 -10.050  &lt; 2e-16 ***
+## M21         -0.007101   0.364067  -0.020 0.984438    
+## M22          0.841167   0.405154   2.076 0.037879 *  
+## C1           0.504243   0.284671   1.771 0.076508 .  
+## C2          -0.643001   0.062025 -10.367  &lt; 2e-16 ***
+## A:M1         0.535812   0.183808   2.915 0.003556 ** 
+## A:M21        0.129896   0.370967   0.350 0.726222    
+## A:M22       -1.447096   0.412172  -3.511 0.000447 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 13336.6  on 9999  degrees of freedom
+## Residual deviance:  7347.9  on 9990  degrees of freedom
+## AIC: 7367.9
+## 
+## Number of Fisher Scoring iterations: 10
+## 
+## 
+## # Mediator regressions: 
+## 
+## Call:
+## glm(formula = M1 ~ A + C1 + C2, family = poisson(), data = getCall(x$reg.output$mreg[[1L]])$data, 
+##     weights = getCall(x$reg.output$mreg[[1L]])$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -3.4516  -1.0946  -0.2769   0.5079   3.4944  
+## 
+## Coefficients:
+##             Estimate Std. Error  z value Pr(&gt;|z|)    
+## (Intercept)  1.06240    0.05631   18.868  &lt; 2e-16 ***
+## A           -2.00634    0.01331 -150.709  &lt; 2e-16 ***
+## C1           0.45102    0.05496    8.206 2.29e-16 ***
+## C2           0.80084    0.01314   60.961  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for poisson family taken to be 1)
+## 
+##     Null deviance: 43205  on 9999  degrees of freedom
+## Residual deviance: 10846  on 9996  degrees of freedom
+## AIC: 33081
+## 
+## Number of Fisher Scoring iterations: 5
+## 
+## 
+## Call:
+## nnet::multinom(formula = M2 ~ A + C1 + C2, data = getCall(x$reg.output$mreg[[2]])$data, 
+##     trace = FALSE, weights = getCall(x$reg.output$mreg[[2]])$weights)
+## 
+## Coefficients:
+##   (Intercept)         A         C1        C2
+## 1    1.946698 -1.785773 -0.3220412 0.7256062
+## 2    0.654218  0.688984 -1.7259629 0.4295399
+## 
+## Std. Errors:
+##   (Intercept)          A        C1         C2
+## 1   0.2620667 0.06393051 0.2550181 0.05235024
+## 2   0.3129261 0.10149606 0.2996053 0.06106820
+## 
+## Residual Deviance: 17966.15 
+## AIC: 17982.15 
+## 
+## # Effect decomposition on the odds ratio scale via the regression-based approach
 ##  
 ## Direct counterfactual imputation estimation with 
 ##  bootstrap standard errors, percentile confidence intervals and p-values 
 ##  
 ##                 Estimate Std.error   95% CIL 95% CIU  P.val    
-## Rcde            0.840859  0.041308  0.841993   0.897 &lt;2e-16 ***
-## Rpnde           2.254816  0.151019  2.140529   2.343 &lt;2e-16 ***
-## Rtnde           1.186904  0.019581  1.227297   1.254 &lt;2e-16 ***
-## Rpnie          20.893238  2.734318 20.142532  23.816 &lt;2e-16 ***
-## Rtnie          10.997914  0.886641 11.548953  12.740 &lt;2e-16 ***
-## Rte            24.798272  3.822335 24.720873  29.855 &lt;2e-16 ***
-## ERcde          -6.228081  2.807782 -7.549890  -3.778 &lt;2e-16 ***
-## ERintref        7.482897  2.958801  4.918400   8.894 &lt;2e-16 ***
-## ERintmed        2.650217  0.936999  3.442164   4.701 &lt;2e-16 ***
-## ERpnie         19.893238  2.734318 19.150610  22.824 &lt;2e-16 ***
-## ERcde(prop)    -0.261703  0.076265 -0.261031  -0.159 &lt;2e-16 ***
-## ERintref(prop)  0.314430  0.075131  0.206644   0.308 &lt;2e-16 ***
-## ERintmed(prop)  0.111362  0.013268  0.144930   0.163 &lt;2e-16 ***
-## ERpnie(prop)    0.835911  0.012134  0.790694   0.807 &lt;2e-16 ***
-## pm              0.947273  0.001134  0.951925   0.953 &lt;2e-16 ***
-## int             0.425792  0.088399  0.351574   0.470 &lt;2e-16 ***
-## pe              1.261703  0.076265  1.158569   1.261 &lt;2e-16 ***
+## Rcde            0.377584  0.210028  0.124803   0.405 &lt;2e-16 ***
+## Rpnde           2.627117  0.263412  2.268273   2.622 &lt;2e-16 ***
+## Rtnde           1.453067  0.334983  1.054599   1.504 &lt;2e-16 ***
+## Rpnie          41.152523  8.052787 40.529554  51.346 &lt;2e-16 ***
+## Rtnie          22.761604  0.461080 23.252971  23.872 &lt;2e-16 ***
+## Rte            59.797387  5.079004 54.149180  60.972 &lt;2e-16 ***
+## ERcde          -6.683714  1.717727 -8.708034  -6.400 &lt;2e-16 ***
+## ERintref        8.310831  1.454315  8.023107   9.977 &lt;2e-16 ***
+## ERintmed       17.017747 12.868379  1.509260  18.798 &lt;2e-16 ***
+## ERpnie         40.152523  8.052787 39.562749  50.382 &lt;2e-16 ***
+## ERcde(prop)    -0.113674  0.042524 -0.164006  -0.107 &lt;2e-16 ***
+## ERintref(prop)  0.141347  0.040152  0.133921   0.188 &lt;2e-16 ***
+## ERintmed(prop)  0.289430  0.212212  0.027403   0.313 &lt;2e-16 ***
+## ERpnie(prop)    0.682896  0.214583  0.660446   0.949 &lt;2e-16 ***
+## pm              0.972327  0.002371  0.972955   0.976 &lt;2e-16 ***
+## int             0.430777  0.172059  0.215268   0.446 &lt;2e-16 ***
+## pe              1.113674  0.042524  1.106876   1.164 &lt;2e-16 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Reference values: 
+## (Rcde: controlled direct effect odds ratio; Rpnde: pure natural direct effect odds ratio; Rtnde: total natural direct effect odds ratio; Rpnie: pure natural indirect effect odds ratio; Rtnie: total natural indirect effect odds ratio; Rte: total effect odds ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
+## 
+## Relevant variable values: 
 ## $a
 ## [1] 1
 ## 
 ## $astar
 ## [1] 0
 ## 
-## $yref
-## [1] 1
+## $yval
+## [1] &quot;1&quot;
 ## 
 ## $mval
 ## $mval[[1]]
@@ -382,49 +505,114 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## $mval[[2]]
 ## [1] 2</code></pre>
 </div>
-<div id="the-weighting-base-approach" class="section level2">
-<h2>The Weighting-base Approach</h2>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>res_wb &lt;-<span class="st"> </span><span class="kw">cmest</span>(<span class="dt">data =</span> data, <span class="dt">model =</span> <span class="st">&quot;wb&quot;</span>, <span class="dt">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="dt">exposure =</span> <span class="st">&quot;A&quot;</span>,</span>
-<span id="cb6-2"><a href="#cb6-2"></a>                <span class="dt">mediator =</span> <span class="kw">c</span>(<span class="st">&quot;M1&quot;</span>, <span class="st">&quot;M2&quot;</span>), <span class="dt">basec =</span> <span class="kw">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="dt">EMint =</span> <span class="ot">TRUE</span>,</span>
-<span id="cb6-3"><a href="#cb6-3"></a>                <span class="dt">ereg =</span> <span class="st">&quot;logistic&quot;</span>, <span class="dt">yreg =</span> <span class="st">&quot;logistic&quot;</span>,</span>
-<span id="cb6-4"><a href="#cb6-4"></a>                <span class="dt">astar =</span> <span class="dv">0</span>, <span class="dt">a =</span> <span class="dv">1</span>, <span class="dt">mval =</span> <span class="kw">list</span>(<span class="dv">0</span>, <span class="dv">2</span>), <span class="dt">yref =</span> <span class="dv">1</span>,</span>
-<span id="cb6-5"><a href="#cb6-5"></a>                <span class="dt">estimation =</span> <span class="st">&quot;imputation&quot;</span>, <span class="dt">inference =</span> <span class="st">&quot;bootstrap&quot;</span>, <span class="dt">nboot =</span> <span class="dv">2</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw">summary</span>(res_wb)</span></code></pre></div>
-<pre><code>## # Causal Mediation Analysis via the Weighting-based Approach
+<div id="the-weighting-based-approach" class="section level2">
+<h2>The Weighting-based Approach</h2>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>res_wb <span class="ot">&lt;-</span> <span class="fu">cmest</span>(<span class="at">data =</span> data, <span class="at">model =</span> <span class="st">&quot;wb&quot;</span>, <span class="at">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="at">exposure =</span> <span class="st">&quot;A&quot;</span>,</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">mediator =</span> <span class="fu">c</span>(<span class="st">&quot;M1&quot;</span>, <span class="st">&quot;M2&quot;</span>), <span class="at">basec =</span> <span class="fu">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="at">EMint =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">ereg =</span> <span class="st">&quot;logistic&quot;</span>, <span class="at">yreg =</span> <span class="st">&quot;logistic&quot;</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">astar =</span> <span class="dv">0</span>, <span class="at">a =</span> <span class="dv">1</span>, <span class="at">mval =</span> <span class="fu">list</span>(<span class="dv">0</span>, <span class="dv">2</span>), </span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">estimation =</span> <span class="st">&quot;imputation&quot;</span>, <span class="at">inference =</span> <span class="st">&quot;bootstrap&quot;</span>, <span class="at">nboot =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(res_wb)</span></code></pre></div>
+<pre><code>## Causal Mediation Analysis
+## 
+## # Outcome regression:
+## 
+## Call:
+## glm(formula = Y ~ A + M1 + M2 + A * M1 + A * M2 + C1 + C2, family = binomial(), 
+##     data = getCall(x$reg.output$yreg)$data, weights = getCall(x$reg.output$yreg)$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -2.2066  -0.5055  -0.0007   0.6383   3.3715  
+## 
+## Coefficients:
+##              Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  1.125104   0.478893   2.349 0.018804 *  
+## A            0.460265   0.400463   1.149 0.250419    
+## M1          -1.809307   0.180027 -10.050  &lt; 2e-16 ***
+## M21         -0.007101   0.364067  -0.020 0.984438    
+## M22          0.841167   0.405154   2.076 0.037879 *  
+## C1           0.504243   0.284671   1.771 0.076508 .  
+## C2          -0.643001   0.062025 -10.367  &lt; 2e-16 ***
+## A:M1         0.535812   0.183808   2.915 0.003556 ** 
+## A:M21        0.129896   0.370967   0.350 0.726222    
+## A:M22       -1.447096   0.412172  -3.511 0.000447 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 13336.6  on 9999  degrees of freedom
+## Residual deviance:  7347.9  on 9990  degrees of freedom
+## AIC: 7367.9
+## 
+## Number of Fisher Scoring iterations: 10
+## 
+## 
+## # Exposure regression for weighting: 
+## 
+## Call:
+## glm(formula = A ~ C1 + C2, family = binomial(), data = getCall(x$reg.output$ereg)$data, 
+##     weights = getCall(x$reg.output$ereg)$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.6126  -1.4791   0.8573   0.8867   0.9750  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)   
+## (Intercept)  0.08342    0.21440   0.389  0.69723   
+## C1           0.60899    0.21208   2.872  0.00409 **
+## C2           0.10532    0.04375   2.407  0.01606 * 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 12534  on 9999  degrees of freedom
+## Residual deviance: 12520  on 9997  degrees of freedom
+## AIC: 12526
+## 
+## Number of Fisher Scoring iterations: 4
+## 
+## 
+## # Effect decomposition on the odds ratio scale via the weighting-based approach
 ##  
 ## Direct counterfactual imputation estimation with 
 ##  bootstrap standard errors, percentile confidence intervals and p-values 
 ##  
-##                 Estimate Std.error   95% CIL 95% CIU  P.val    
-## Rcde            0.840859  0.011571  0.815451   0.831 &lt;2e-16 ***
-## Rpnde           2.184496  0.032210  1.957900   2.001 &lt;2e-16 ***
-## Rtnde           1.197960  0.014933  1.105984   1.126 &lt;2e-16 ***
-## Rpnie          20.345349  1.304755 19.650557  21.403 &lt;2e-16 ***
-## Rtnie          11.157227  0.702143 11.100261  12.044 &lt;2e-16 ***
-## Rte            24.372911  1.762690 21.733197  24.101 &lt;2e-16 ***
-## ERcde          -6.150317  1.090806 -7.319340  -5.854 &lt;2e-16 ***
-## ERintref        7.334812  1.123016  6.811751   8.321 &lt;2e-16 ***
-## ERintmed        2.843066  0.425725  1.125984   1.698 &lt;2e-16 ***
-## ERpnie         19.345349  1.304755 18.652551  20.405 &lt;2e-16 ***
-## ERcde(prop)    -0.263139  0.025683 -0.316696  -0.282 &lt;2e-16 ***
-## ERintref(prop)  0.313817  0.023552  0.328394   0.360 &lt;2e-16 ***
-## ERintmed(prop)  0.121639  0.014288  0.054241   0.073 &lt;2e-16 ***
-## ERpnie(prop)    0.827682  0.012157  0.883223   0.900 &lt;2e-16 ***
-## pm              0.949322  0.002131  0.953797   0.957 &lt;2e-16 ***
-## int             0.435456  0.037840  0.382635   0.433 &lt;2e-16 ***
-## pe              1.263139  0.025683  1.282191   1.317 &lt;2e-16 ***
+##                  Estimate  Std.error    95% CIL 95% CIU  P.val    
+## Rcde            0.3775843  0.0227470  0.3752670   0.406 &lt;2e-16 ***
+## Rpnde           2.2468828  0.1302465  2.1177910   2.293 &lt;2e-16 ***
+## Rtnde           1.4481237  0.0423478  1.3086198   1.366 &lt;2e-16 ***
+## Rpnie          37.2271375  2.3490397 35.1601269  38.316 &lt;2e-16 ***
+## Rtnie          23.9930181  0.8142279 21.7260533  22.820 &lt;2e-16 ***
+## Rte            53.9094991  4.6968302 46.0112396  52.321 &lt;2e-16 ***
+## ERcde          -6.1503170  0.5444024 -5.7823835  -5.051 &lt;2e-16 ***
+## ERintref        7.3971997  0.6746489  6.1689534   7.075 &lt;2e-16 ***
+## ERintmed       15.4354789  2.2175440  9.7402420  12.720 &lt;2e-16 ***
+## ERpnie         36.2271375  2.3490397 34.1637376  37.320 &lt;2e-16 ***
+## ERcde(prop)    -0.1162422  0.0003405 -0.1126449  -0.112 &lt;2e-16 ***
+## ERintref(prop)  0.1398085  0.0006058  0.1370179   0.138 &lt;2e-16 ***
+## ERintmed(prop)  0.2917336  0.0234156  0.2162252   0.248 &lt;2e-16 ***
+## ERpnie(prop)    0.6847001  0.0236809  0.7271290   0.759 &lt;2e-16 ***
+## pm              0.9764337  0.0002654  0.9748130   0.975 &lt;2e-16 ***
+## int             0.4315421  0.0240214  0.3532431   0.386 &lt;2e-16 ***
+## pe              1.1162422  0.0003405  1.1121875   1.113 &lt;2e-16 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Reference values: 
+## (Rcde: controlled direct effect odds ratio; Rpnde: pure natural direct effect odds ratio; Rtnde: total natural direct effect odds ratio; Rpnie: pure natural indirect effect odds ratio; Rtnie: total natural indirect effect odds ratio; Rte: total effect odds ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
+## 
+## Relevant variable values: 
 ## $a
 ## [1] 1
 ## 
 ## $astar
 ## [1] 0
 ## 
-## $yref
-## [1] 1
+## $yval
+## [1] &quot;1&quot;
 ## 
 ## $mval
 ## $mval[[1]]
@@ -435,78 +623,207 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="the-inverse-odds-ratio-weighting-approach" class="section level2">
 <h2>The Inverse Odds-ratio Weighting Approach</h2>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>res_iorw &lt;-<span class="st"> </span><span class="kw">cmest</span>(<span class="dt">data =</span> data, <span class="dt">model =</span> <span class="st">&quot;iorw&quot;</span>, <span class="dt">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="dt">exposure =</span> <span class="st">&quot;A&quot;</span>,</span>
-<span id="cb9-2"><a href="#cb9-2"></a>                  <span class="dt">mediator =</span> <span class="kw">c</span>(<span class="st">&quot;M1&quot;</span>, <span class="st">&quot;M2&quot;</span>), <span class="dt">basec =</span> <span class="kw">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="dt">EMint =</span> <span class="ot">TRUE</span>,</span>
-<span id="cb9-3"><a href="#cb9-3"></a>                  <span class="dt">ereg =</span> <span class="st">&quot;logistic&quot;</span>, <span class="dt">yreg =</span> <span class="st">&quot;logistic&quot;</span>,</span>
-<span id="cb9-4"><a href="#cb9-4"></a>                  <span class="dt">astar =</span> <span class="dv">0</span>, <span class="dt">a =</span> <span class="dv">1</span>, <span class="dt">mval =</span> <span class="kw">list</span>(<span class="dv">0</span>, <span class="dv">2</span>), <span class="dt">yref =</span> <span class="dv">1</span>,</span>
-<span id="cb9-5"><a href="#cb9-5"></a>                  <span class="dt">estimation =</span> <span class="st">&quot;imputation&quot;</span>, <span class="dt">inference =</span> <span class="st">&quot;bootstrap&quot;</span>, <span class="dt">nboot =</span> <span class="dv">2</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="kw">summary</span>(res_iorw)</span></code></pre></div>
-<pre><code>## # Causal Mediation Analysis via the Inverse Odds Ratio Weighting Approach
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>res_iorw <span class="ot">&lt;-</span> <span class="fu">cmest</span>(<span class="at">data =</span> data, <span class="at">model =</span> <span class="st">&quot;iorw&quot;</span>, <span class="at">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="at">exposure =</span> <span class="st">&quot;A&quot;</span>,</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">mediator =</span> <span class="fu">c</span>(<span class="st">&quot;M1&quot;</span>, <span class="st">&quot;M2&quot;</span>), <span class="at">basec =</span> <span class="fu">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="at">EMint =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">ereg =</span> <span class="st">&quot;logistic&quot;</span>, <span class="at">yreg =</span> <span class="st">&quot;logistic&quot;</span>,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">astar =</span> <span class="dv">0</span>, <span class="at">a =</span> <span class="dv">1</span>, <span class="at">mval =</span> <span class="fu">list</span>(<span class="dv">0</span>, <span class="dv">2</span>), </span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">estimation =</span> <span class="st">&quot;imputation&quot;</span>, <span class="at">inference =</span> <span class="st">&quot;bootstrap&quot;</span>, <span class="at">nboot =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(res_iorw)</span></code></pre></div>
+<pre><code>## Causal Mediation Analysis
+## 
+## # Outcome regression for the total effect: 
+## 
+## Call:
+## glm(formula = Y ~ A + C1 + C2, family = binomial(), data = getCall(x$reg.output$yregTot)$data, 
+##     weights = getCall(x$reg.output$yregTot)$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.6731  -1.0673  -0.1524   0.7688   2.5278  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  -2.9946     0.2726 -10.987   &lt;2e-16 ***
+## A             4.1997     0.1205  34.855   &lt;2e-16 ***
+## C1           -0.1306     0.2473  -0.528    0.597    
+## C2           -1.3288     0.0534 -24.885   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 13336.6  on 9999  degrees of freedom
+## Residual deviance:  9397.2  on 9996  degrees of freedom
+## AIC: 9405.2
+## 
+## Number of Fisher Scoring iterations: 6
+## 
+## 
+## # Outcome regression for the direct effect: 
+## 
+## Call:
+## glm(formula = Y ~ A + C1 + C2, family = binomial(), data = getCall(x$reg.output$yregDir)$data, 
+##     weights = getCall(x$reg.output$yregDir)$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -4.7789  -0.0549  -0.0069   0.0818   8.4799  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  -1.5600     0.7405  -2.107   0.0351 *  
+## A             1.7294     0.1460  11.848   &lt;2e-16 ***
+## C1           -1.2645     0.7413  -1.706   0.0880 .  
+## C2           -3.7661     0.4333  -8.691   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 1926.6  on 9999  degrees of freedom
+## Residual deviance: 1423.0  on 9996  degrees of freedom
+## AIC: 1214.1
+## 
+## Number of Fisher Scoring iterations: 8
+## 
+## 
+## # Exposure regression for weighting: 
+## 
+## Call:
+## glm(formula = A ~ M1 + M2 + C1 + C2, family = binomial(), data = getCall(x$reg.output$ereg)$data, 
+##     weights = getCall(x$reg.output$ereg)$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -3.6520  -0.0024   0.0343   0.1447   3.1329  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  1.14163    0.58304   1.958   0.0502 .  
+## M1          -2.00321    0.05823 -34.402  &lt; 2e-16 ***
+## M21          0.08020    0.13700   0.585   0.5583    
+## M22         -0.01835    0.17781  -0.103   0.9178    
+## C1           3.43446    0.58316   5.889 3.88e-09 ***
+## C2           4.84059    0.18684  25.907  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 12534.4  on 9999  degrees of freedom
+## Residual deviance:  2139.2  on 9994  degrees of freedom
+## AIC: 2151.2
+## 
+## Number of Fisher Scoring iterations: 8
+## 
+## 
+## # Effect decomposition on the odds ratio scale via the inverse odds ratio weighting approach
 ##  
 ## Direct counterfactual imputation estimation with 
 ##  bootstrap standard errors, percentile confidence intervals and p-values 
 ##  
 ##        Estimate Std.error   95% CIL 95% CIU  P.val    
-## Rte   23.713831  6.428623 21.640929  30.273 &lt;2e-16 ***
-## Rpnde  4.483896  0.813734  4.429144   5.522 &lt;2e-16 ***
-## Rtnie  5.288667  0.443750  4.886030   5.482 &lt;2e-16 ***
-## pm     0.846618  0.008671  0.833881   0.846 &lt;2e-16 ***
+## Rte   52.434074  4.686177 54.249690  60.545 &lt;2e-16 ***
+## Rpnde  4.974916  0.521379  4.560246   5.261 &lt;2e-16 ***
+## Rtnie 10.539691  0.288168 11.509069  11.896 &lt;2e-16 ***
+## pm     0.922718  0.003494  0.928448   0.933 &lt;2e-16 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Reference values: 
+## (Rte: total effect odds ratio; Rpnde: pure natural direct effect odds ratio; Rtnie: total natural indirect effect odds ratio; pm: proportion mediated)
+## 
+## Relevant variable values: 
 ## $a
 ## [1] 1
 ## 
 ## $astar
 ## [1] 0
 ## 
-## $yref
-## [1] 1</code></pre>
+## $yval
+## [1] &quot;1&quot;</code></pre>
 </div>
 <div id="the-natural-effect-model" class="section level2">
 <h2>The Natural Effect Model</h2>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>res_ne &lt;-<span class="st"> </span><span class="kw">cmest</span>(<span class="dt">data =</span> data, <span class="dt">model =</span> <span class="st">&quot;ne&quot;</span>, <span class="dt">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="dt">exposure =</span> <span class="st">&quot;A&quot;</span>,</span>
-<span id="cb12-2"><a href="#cb12-2"></a>                <span class="dt">mediator =</span> <span class="kw">c</span>(<span class="st">&quot;M1&quot;</span>, <span class="st">&quot;M2&quot;</span>), <span class="dt">basec =</span> <span class="kw">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="dt">EMint =</span> <span class="ot">TRUE</span>,</span>
-<span id="cb12-3"><a href="#cb12-3"></a>                <span class="dt">yreg =</span> <span class="st">&quot;logistic&quot;</span>,</span>
-<span id="cb12-4"><a href="#cb12-4"></a>                <span class="dt">astar =</span> <span class="dv">0</span>, <span class="dt">a =</span> <span class="dv">1</span>, <span class="dt">mval =</span> <span class="kw">list</span>(<span class="dv">0</span>, <span class="dv">2</span>), <span class="dt">yref =</span> <span class="dv">1</span>,</span>
-<span id="cb12-5"><a href="#cb12-5"></a>                <span class="dt">estimation =</span> <span class="st">&quot;imputation&quot;</span>, <span class="dt">inference =</span> <span class="st">&quot;bootstrap&quot;</span>, <span class="dt">nboot =</span> <span class="dv">2</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="kw">summary</span>(res_ne)</span></code></pre></div>
-<pre><code>## # Causal Mediation Analysis via the Natural Effect Model
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>res_ne <span class="ot">&lt;-</span> <span class="fu">cmest</span>(<span class="at">data =</span> data, <span class="at">model =</span> <span class="st">&quot;ne&quot;</span>, <span class="at">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="at">exposure =</span> <span class="st">&quot;A&quot;</span>,</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">mediator =</span> <span class="fu">c</span>(<span class="st">&quot;M1&quot;</span>, <span class="st">&quot;M2&quot;</span>), <span class="at">basec =</span> <span class="fu">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="at">EMint =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">yreg =</span> <span class="st">&quot;logistic&quot;</span>,</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">astar =</span> <span class="dv">0</span>, <span class="at">a =</span> <span class="dv">1</span>, <span class="at">mval =</span> <span class="fu">list</span>(<span class="dv">0</span>, <span class="dv">2</span>), </span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">estimation =</span> <span class="st">&quot;imputation&quot;</span>, <span class="at">inference =</span> <span class="st">&quot;bootstrap&quot;</span>, <span class="at">nboot =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(res_ne)</span></code></pre></div>
+<pre><code>## Causal Mediation Analysis
+## 
+## # Outcome regression:
+## 
+## Call:
+## glm(formula = Y ~ A + M1 + M2 + A * M1 + A * M2 + C1 + C2, family = binomial(), 
+##     data = getCall(x$reg.output$yreg)$data, weights = getCall(x$reg.output$yreg)$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -2.2066  -0.5055  -0.0007   0.6383   3.3715  
+## 
+## Coefficients:
+##              Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  1.125104   0.478893   2.349 0.018804 *  
+## A            0.460265   0.400463   1.149 0.250419    
+## M1          -1.809307   0.180027 -10.050  &lt; 2e-16 ***
+## M21         -0.007101   0.364067  -0.020 0.984438    
+## M22          0.841167   0.405154   2.076 0.037879 *  
+## C1           0.504243   0.284671   1.771 0.076508 .  
+## C2          -0.643001   0.062025 -10.367  &lt; 2e-16 ***
+## A:M1         0.535812   0.183808   2.915 0.003556 ** 
+## A:M21        0.129896   0.370967   0.350 0.726222    
+## A:M22       -1.447096   0.412172  -3.511 0.000447 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 13336.6  on 9999  degrees of freedom
+## Residual deviance:  7347.9  on 9990  degrees of freedom
+## AIC: 7367.9
+## 
+## Number of Fisher Scoring iterations: 10
+## 
+## 
+## 
+## # Effect decomposition on the odds ratio scale via the natural effect model
 ##  
 ## Direct counterfactual imputation estimation with 
 ##  bootstrap standard errors, percentile confidence intervals and p-values 
 ##  
 ##                 Estimate Std.error   95% CIL 95% CIU  P.val    
-## Rcde            0.840859  0.067360  0.825263   0.916 &lt;2e-16 ***
-## Rpnde           2.397002  0.926317  2.554210   3.798 &lt;2e-16 ***
-## Rtnde           1.212344  0.146389  1.184207   1.381 &lt;2e-16 ***
-## Rpnie          20.806505  4.358756 22.298910  28.153 &lt;2e-16 ***
-## Rtnie          10.523413  0.075984 10.236342  10.338 &lt;2e-16 ***
-## Rte            25.224641  9.287561 26.406515  38.876 &lt;2e-16 ***
-## ERcde          -6.332043  1.992458 -7.333638  -4.657 &lt;2e-16 ***
-## ERintref        7.729045  1.066141  7.461710   8.894 &lt;2e-16 ***
-## ERintmed        3.021133  4.002488  2.590412   7.968 &lt;2e-16 ***
-## ERpnie         19.806505  4.358756 21.316628  27.173 &lt;2e-16 ***
-## ERcde(prop)    -0.261389  0.123528 -0.290157  -0.124 &lt;2e-16 ***
-## ERintref(prop)  0.319057  0.114072  0.198005   0.351 &lt;2e-16 ***
-## ERintmed(prop)  0.124713  0.080937  0.100276   0.209 &lt;2e-16 ***
-## ERpnie(prop)    0.817618  0.090393  0.717178   0.839 &lt;2e-16 ***
-## pm              0.942331  0.009456  0.926192   0.939 &lt;2e-16 ***
-## int             0.443770  0.033135  0.407019   0.452 &lt;2e-16 ***
-## pe              1.261389  0.123528  1.124197   1.290 &lt;2e-16 ***
+## Rcde            0.377584  0.325563  0.604897   1.042      1    
+## Rpnde           2.475695  0.111129  2.506520   2.656 &lt;2e-16 ***
+## Rtnde           1.483891  0.235651  1.739914   2.056 &lt;2e-16 ***
+## Rpnie          37.875648  4.546785 28.714089  34.822 &lt;2e-16 ***
+## Rtnie          22.702047  0.554985 22.812824  23.558 &lt;2e-16 ***
+## Rte            56.203351  1.144052 59.049703  60.587 &lt;2e-16 ***
+## ERcde          -6.332043  3.477253 -4.288821   0.383      1    
+## ERintref        7.807738  3.588382  1.123756   5.945 &lt;2e-16 ***
+## ERintmed       16.852008  3.513862 24.093229  28.814 &lt;2e-16 ***
+## ERpnie         36.875648  4.546785 27.729486  33.838 &lt;2e-16 ***
+## ERcde(prop)    -0.114704  0.058483 -0.071921   0.007      1    
+## ERintref(prop)  0.141436  0.059850  0.019301   0.100 &lt;2e-16 ***
+## ERintmed(prop)  0.305271  0.068501  0.404399   0.496 &lt;2e-16 ***
+## ERpnie(prop)    0.667997  0.067135  0.477616   0.568 &lt;2e-16 ***
+## pm              0.973268  0.001367  0.972211   0.974 &lt;2e-16 ***
+## int             0.446707  0.008651  0.504109   0.516 &lt;2e-16 ***
+## pe              1.114704  0.058483  0.993348   1.072 &lt;2e-16 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Reference values: 
+## (Rcde: controlled direct effect odds ratio; Rpnde: pure natural direct effect odds ratio; Rtnde: total natural direct effect odds ratio; Rpnie: pure natural indirect effect odds ratio; Rtnie: total natural indirect effect odds ratio; Rte: total effect odds ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
+## 
+## Relevant variable values: 
 ## $a
 ## [1] 1
 ## 
 ## $astar
 ## [1] 0
 ## 
-## $yref
-## [1] 1
+## $yval
+## [1] &quot;1&quot;
 ## 
 ## $mval
 ## $mval[[1]]
@@ -516,48 +833,131 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## [1] 2</code></pre>
 </div>
 <div id="the-g-formula-approach" class="section level2">
-<h2>The <span class="math inline">\(G\)</span>-formula Approach</h2>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>res_gformula &lt;-<span class="st"> </span><span class="kw">cmest</span>(<span class="dt">data =</span> data, <span class="dt">model =</span> <span class="st">&quot;gformula&quot;</span>, <span class="dt">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="dt">exposure =</span> <span class="st">&quot;A&quot;</span>,</span>
-<span id="cb15-2"><a href="#cb15-2"></a>                      <span class="dt">mediator =</span> <span class="kw">c</span>(<span class="st">&quot;M1&quot;</span>, <span class="st">&quot;M2&quot;</span>), <span class="dt">basec =</span> <span class="kw">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="dt">EMint =</span> <span class="ot">TRUE</span>,</span>
-<span id="cb15-3"><a href="#cb15-3"></a>                      <span class="dt">mreg =</span> <span class="kw">list</span>(<span class="st">&quot;poisson&quot;</span>, <span class="st">&quot;multinomial&quot;</span>), <span class="dt">yreg =</span> <span class="st">&quot;logistic&quot;</span>,</span>
-<span id="cb15-4"><a href="#cb15-4"></a>                      <span class="dt">astar =</span> <span class="dv">0</span>, <span class="dt">a =</span> <span class="dv">1</span>, <span class="dt">mval =</span> <span class="kw">list</span>(<span class="dv">0</span>, <span class="dv">2</span>), <span class="dt">yref =</span> <span class="dv">1</span>,</span>
-<span id="cb15-5"><a href="#cb15-5"></a>                      <span class="dt">estimation =</span> <span class="st">&quot;imputation&quot;</span>, <span class="dt">inference =</span> <span class="st">&quot;bootstrap&quot;</span>, <span class="dt">nboot =</span> <span class="dv">2</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="kw">summary</span>(res_gformula)</span></code></pre></div>
-<pre><code>## # Causal Mediation Analysis via the G-formula Approach
+<h2>The g-formula Approach</h2>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>res_gformula <span class="ot">&lt;-</span> <span class="fu">cmest</span>(<span class="at">data =</span> data, <span class="at">model =</span> <span class="st">&quot;gformula&quot;</span>, <span class="at">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="at">exposure =</span> <span class="st">&quot;A&quot;</span>,</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">mediator =</span> <span class="fu">c</span>(<span class="st">&quot;M1&quot;</span>, <span class="st">&quot;M2&quot;</span>), <span class="at">basec =</span> <span class="fu">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="at">EMint =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>                      <span class="at">mreg =</span> <span class="fu">list</span>(<span class="st">&quot;poisson&quot;</span>, <span class="st">&quot;multinomial&quot;</span>), <span class="at">yreg =</span> <span class="st">&quot;logistic&quot;</span>,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>                      <span class="at">astar =</span> <span class="dv">0</span>, <span class="at">a =</span> <span class="dv">1</span>, <span class="at">mval =</span> <span class="fu">list</span>(<span class="dv">0</span>, <span class="dv">2</span>), </span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>                      <span class="at">estimation =</span> <span class="st">&quot;imputation&quot;</span>, <span class="at">inference =</span> <span class="st">&quot;bootstrap&quot;</span>, <span class="at">nboot =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(res_gformula)</span></code></pre></div>
+<pre><code>## Causal Mediation Analysis
+## 
+## # Outcome regression:
+## 
+## Call:
+## glm(formula = Y ~ A + M1 + M2 + A * M1 + A * M2 + C1 + C2, family = binomial(), 
+##     data = getCall(x$reg.output$yreg)$data, weights = getCall(x$reg.output$yreg)$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -2.2066  -0.5055  -0.0007   0.6383   3.3715  
+## 
+## Coefficients:
+##              Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  1.125104   0.478893   2.349 0.018804 *  
+## A            0.460265   0.400463   1.149 0.250419    
+## M1          -1.809307   0.180027 -10.050  &lt; 2e-16 ***
+## M21         -0.007101   0.364067  -0.020 0.984438    
+## M22          0.841167   0.405154   2.076 0.037879 *  
+## C1           0.504243   0.284671   1.771 0.076508 .  
+## C2          -0.643001   0.062025 -10.367  &lt; 2e-16 ***
+## A:M1         0.535812   0.183808   2.915 0.003556 ** 
+## A:M21        0.129896   0.370967   0.350 0.726222    
+## A:M22       -1.447096   0.412172  -3.511 0.000447 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 13336.6  on 9999  degrees of freedom
+## Residual deviance:  7347.9  on 9990  degrees of freedom
+## AIC: 7367.9
+## 
+## Number of Fisher Scoring iterations: 10
+## 
+## 
+## # Mediator regressions: 
+## 
+## Call:
+## glm(formula = M1 ~ A + C1 + C2, family = poisson(), data = getCall(x$reg.output$mreg[[1L]])$data, 
+##     weights = getCall(x$reg.output$mreg[[1L]])$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -3.4516  -1.0946  -0.2769   0.5079   3.4944  
+## 
+## Coefficients:
+##             Estimate Std. Error  z value Pr(&gt;|z|)    
+## (Intercept)  1.06240    0.05631   18.868  &lt; 2e-16 ***
+## A           -2.00634    0.01331 -150.709  &lt; 2e-16 ***
+## C1           0.45102    0.05496    8.206 2.29e-16 ***
+## C2           0.80084    0.01314   60.961  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for poisson family taken to be 1)
+## 
+##     Null deviance: 43205  on 9999  degrees of freedom
+## Residual deviance: 10846  on 9996  degrees of freedom
+## AIC: 33081
+## 
+## Number of Fisher Scoring iterations: 5
+## 
+## 
+## Call:
+## nnet::multinom(formula = M2 ~ A + C1 + C2, data = getCall(x$reg.output$mreg[[2]])$data, 
+##     trace = FALSE, weights = getCall(x$reg.output$mreg[[2]])$weights)
+## 
+## Coefficients:
+##   (Intercept)         A         C1        C2
+## 1    1.946698 -1.785773 -0.3220412 0.7256062
+## 2    0.654218  0.688984 -1.7259629 0.4295399
+## 
+## Std. Errors:
+##   (Intercept)          A        C1         C2
+## 1   0.2620667 0.06393051 0.2550181 0.05235024
+## 2   0.3129261 0.10149606 0.2996053 0.06106820
+## 
+## Residual Deviance: 17966.15 
+## AIC: 17982.15 
+## 
+## # Effect decomposition on the odds ratio scale via the g-formula approach
 ##  
 ## Direct counterfactual imputation estimation with 
 ##  bootstrap standard errors, percentile confidence intervals and p-values 
 ##  
 ##                 Estimate Std.error   95% CIL 95% CIU  P.val    
-## Rcde            0.840859  0.082142  0.827210   0.938 &lt;2e-16 ***
-## Rpnde           2.372106  0.265099  1.894106   2.250 &lt;2e-16 ***
-## Rtnde           1.199679  0.179804  1.032759   1.274 &lt;2e-16 ***
-## Rpnie          24.178349  1.052793 20.198212  21.613 &lt;2e-16 ***
-## Rtnie          12.228066  0.257677 11.438064  11.784 &lt;2e-16 ***
-## Rte            29.006268  2.543978 22.320627  25.738 &lt;2e-16 ***
-## ERcde          -7.316142  2.980550 -6.230392  -2.226 &lt;2e-16 ***
-## ERintref        8.688248  2.715451  3.477087   7.125 &lt;2e-16 ***
-## ERintmed        3.455813  3.331672 -0.181785   4.294      1    
-## ERpnie         23.178349  1.052793 19.199490  20.614 &lt;2e-16 ***
-## ERcde(prop)    -0.261232  0.150575 -0.293011  -0.091 &lt;2e-16 ***
-## ERintref(prop)  0.310225  0.144172  0.141240   0.335 &lt;2e-16 ***
-## ERintmed(prop)  0.123394  0.135598 -0.009312   0.173      1    
-## ERpnie(prop)    0.827613  0.142001  0.776609   0.967 &lt;2e-16 ***
-## pm              0.951007  0.006403  0.949473   0.958 &lt;2e-16 ***
-## int             0.433619  0.008574  0.314104   0.326 &lt;2e-16 ***
-## pe              1.261232  0.150575  1.090713   1.293 &lt;2e-16 ***
+## Rcde            0.377584  0.239050  0.140256   0.459 &lt;2e-16 ***
+## Rpnde           2.718239  0.319759  2.166052   2.596 &lt;2e-16 ***
+## Rtnde           1.473915  0.431172  1.005884   1.585      1    
+## Rpnie          43.363815 11.042941 39.093544  53.923 &lt;2e-16 ***
+## Rtnie          23.513220  0.873887 23.866967  25.041 &lt;2e-16 ***
+## Rte            63.914562  5.738143 54.240148  61.949 &lt;2e-16 ***
+## ERcde          -7.113482  2.684539 -9.594347  -5.988 &lt;2e-16 ***
+## ERintref        8.831722  2.364780  7.584328  10.761 &lt;2e-16 ***
+## ERintmed       18.832508 16.461325 -0.904131  21.212      1    
+## ERpnie         42.363815 11.042941 38.154515  52.991 &lt;2e-16 ***
+## ERcde(prop)    -0.113066  0.061024 -0.180484  -0.098 &lt;2e-16 ***
+## ERintref(prop)  0.140376  0.057840  0.124674   0.202 &lt;2e-16 ***
+## ERintmed(prop)  0.299335  0.271754 -0.018405   0.347      1    
+## ERpnie(prop)    0.673355  0.274938  0.627126   0.997 &lt;2e-16 ***
+## pm              0.972689  0.003184  0.973824   0.978 &lt;2e-16 ***
+## int             0.439711  0.213915  0.183977   0.471 &lt;2e-16 ***
+## pe              1.113066  0.061024  1.098498   1.180 &lt;2e-16 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Reference values: 
+## (Rcde: controlled direct effect odds ratio; Rpnde: pure natural direct effect odds ratio; Rtnde: total natural direct effect odds ratio; Rpnie: pure natural indirect effect odds ratio; Rtnie: total natural indirect effect odds ratio; Rte: total effect odds ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
+## 
+## Relevant variable values: 
 ## $a
 ## [1] 1
 ## 
 ## $astar
 ## [1] 0
 ## 
-## $yref
-## [1] 1
+## $yval
+## [1] &quot;1&quot;
 ## 
 ## $mval
 ## $mval[[1]]

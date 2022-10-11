@@ -130,7 +130,7 @@
 #' 
 #' \strong{Causal Mediation Analysis Approaches}
 #' 
-#' Let \code{Y} denote the outcome, \code{A} denote the exposure, \code{M=(M_1,...,M_k)^T} 
+#' Let \code{Y} denote \code{outcome}, \code{A} denote \code{exposure}, \code{M=(M_1,...,M_k)^T} 
 #' denote \code{mediator}, \code{C} denote \code{basec}, \code{L=(L_1,...,L_s)^T} denote \code{postc}.
 #' 
 #' \itemize{
@@ -425,7 +425,6 @@ cmest <- function(data = NULL, model = "rb",
                   nboot = 200, boot.ci.type = "per", nRep = 5, multimp = FALSE, ...) {
   # function call
   cl <- match.call()
-  n <- nrow(data)
   # output list
   out <- list(call = cl)
   
@@ -434,8 +433,10 @@ cmest <- function(data = NULL, model = "rb",
   ###################################################################################################
   # data
   if (is.null(data)) stop("Unspecified data")
-  data <- as.data.frame(data)
+  data <- as.data.frame(data)[, c(outcome, event, exposure, mediator, basec, postc)]
+  if (sum(is.na(data)) > 0 && !multimp) stop("NAs in outcome, event, exposure, mediator, basec, or postc data; delete rows with NAs in these variables from the data or set multimp = TRUE") 
   out$data <- data
+  n <- nrow(data)
   # model
   if (!model %in% c("rb", "wb", "iorw", "ne", "gformula", "msm")) stop("Select model from 'rb', 'wb', 'iorw', 'ne', 'gformula', 'msm'")
   out$methods$model <- model

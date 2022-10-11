@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+<meta name="date" content="2022-10-10" />
+
+<title>CMAverse Quickstart Guide</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">CMAverse Quickstart Guide</h1>
+<h4 class="date">2022-10-10</h4>
+
+
+
+<p>We illustrate the general workflow of the <code>CMAverse</code>
+package by a quick example. The general workflow is:</p>
+<ol style="list-style-type: decimal">
+<li><p>Plot the DAG of causal relationships using
+<code>cmdag</code>.</p></li>
+<li><p>Estimate causal effects and make inferences using
+<code>cmest</code>.</p></li>
+<li><p>Conduct sensitivity analysis for unmeasured confounding and
+measurement error using <code>cmsens</code>.</p></li>
+</ol>
+<p>Firstly, let’s load the package.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(CMAverse)</span></code></pre></div>
+<p>Next, we simulate some data and plot the DAG. The simulated dataset
+contains a binary exposure, a binary mediator, a continuous mediator, a
+continuous outcome and two baseline confounders.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>C1 <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="dv">1</span>, <span class="at">sd =</span> <span class="dv">1</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>C2 <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fl">0.6</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>pa <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fl">0.2</span> <span class="sc">-</span> <span class="fl">0.5</span><span class="sc">*</span>C1 <span class="sc">+</span> <span class="fl">0.1</span><span class="sc">*</span>C2)<span class="sc">/</span>(<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(<span class="fl">0.2</span> <span class="sc">-</span> <span class="fl">0.5</span><span class="sc">*</span>C1 <span class="sc">+</span> <span class="fl">0.1</span><span class="sc">*</span>C2))</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>A <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, pa)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>pm <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="dv">1</span> <span class="sc">+</span> <span class="fl">0.5</span><span class="sc">*</span>A <span class="sc">-</span> <span class="fl">1.5</span><span class="sc">*</span>C1 <span class="sc">+</span> <span class="fl">0.5</span><span class="sc">*</span>C2)<span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(<span class="dv">1</span> <span class="sc">+</span> <span class="fl">0.5</span><span class="sc">*</span>A <span class="sc">-</span> <span class="fl">1.5</span><span class="sc">*</span>C1 <span class="sc">+</span> <span class="fl">0.5</span><span class="sc">*</span>C2))</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>M1 <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, pm)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>M2 <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n, <span class="dv">2</span> <span class="sc">+</span> <span class="fl">0.8</span><span class="sc">*</span>A <span class="sc">-</span> M1 <span class="sc">+</span> <span class="fl">0.5</span><span class="sc">*</span>C1 <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>C2, <span class="dv">1</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>Y <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="fl">0.5</span> <span class="sc">+</span> <span class="fl">0.4</span><span class="sc">*</span>A <span class="sc">+</span> <span class="fl">0.5</span><span class="sc">*</span>M1 <span class="sc">+</span> <span class="fl">0.6</span><span class="sc">*</span>M2 <span class="sc">+</span> <span class="fl">0.3</span><span class="sc">*</span>A<span class="sc">*</span>M1 <span class="sc">+</span> <span class="fl">0.2</span><span class="sc">*</span>A<span class="sc">*</span>M2 <span class="sc">-</span> <span class="fl">0.3</span><span class="sc">*</span>C1 <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>C2, <span class="at">sd =</span> <span class="dv">1</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(A, M1, M2, Y, C1, C2)</span></code></pre></div>
+<p>The DAG can be plotted using <code>cmdag</code>.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cmdag</span>(<span class="at">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="at">exposure =</span> <span class="st">&quot;A&quot;</span>, <span class="at">mediator =</span> <span class="fu">c</span>(<span class="st">&quot;M1&quot;</span>, <span class="st">&quot;M2&quot;</span>), </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>      <span class="at">basec =</span> <span class="fu">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="at">postc =</span> <span class="cn">NULL</span>, <span class="at">node =</span> <span class="cn">FALSE</span>, <span class="at">text_col =</span> <span class="st">&quot;black&quot;</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>Then, we estimate causal effects using <code>cmest</code>. We use the
+regression-based approach for illustration. The reference values for the
+exposure are set to be 0 and 1. The reference values for the two
+mediators are set to be 1.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>est <span class="ot">&lt;-</span> <span class="fu">cmest</span>(<span class="at">data =</span> data, <span class="at">model =</span> <span class="st">&quot;rb&quot;</span>, <span class="at">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="at">exposure =</span> <span class="st">&quot;A&quot;</span>,</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">mediator =</span> <span class="fu">c</span>(<span class="st">&quot;M1&quot;</span>, <span class="st">&quot;M2&quot;</span>), <span class="at">basec =</span> <span class="fu">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="at">EMint =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">mreg =</span> <span class="fu">list</span>(<span class="st">&quot;logistic&quot;</span>, <span class="st">&quot;linear&quot;</span>), <span class="at">yreg =</span> <span class="st">&quot;linear&quot;</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">astar =</span> <span class="dv">0</span>, <span class="at">a =</span> <span class="dv">1</span>, <span class="at">mval =</span> <span class="fu">list</span>(<span class="dv">1</span>, <span class="dv">1</span>),</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">estimation =</span> <span class="st">&quot;imputation&quot;</span>, <span class="at">inference =</span> <span class="st">&quot;bootstrap&quot;</span>, <span class="at">nboot =</span> <span class="dv">20</span>)</span></code></pre></div>
+<p>Summarize and plot the results:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(est)</span></code></pre></div>
+<pre><code>## Causal Mediation Analysis
+## 
+## # Outcome regression:
+## 
+## Call:
+## glm(formula = Y ~ A + M1 + M2 + A * M1 + A * M2 + C1 + C2, family = gaussian(), 
+##     data = getCall(x$reg.output$yreg)$data, weights = getCall(x$reg.output$yreg)$weights)
+## 
+## Deviance Residuals: 
+##      Min        1Q    Median        3Q       Max  
+## -2.47763  -0.59177   0.03214   0.66470   1.92837  
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -0.429317   0.446678  -0.961   0.3390    
+## A            1.305199   0.751816   1.736   0.0859 .  
+## M1           0.762169   0.310811   2.452   0.0161 *  
+## M2           0.691868   0.132038   5.240 1.01e-06 ***
+## C1          -0.197350   0.136885  -1.442   0.1528    
+## C2           2.389790   0.355404   6.724 1.46e-09 ***
+## A:M1         0.127853   0.466496   0.274   0.7846    
+## A:M2        -0.001608   0.151163  -0.011   0.9915    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 1.100923)
+## 
+##     Null deviance: 571.51  on 99  degrees of freedom
+## Residual deviance: 101.28  on 92  degrees of freedom
+## AIC: 303.06
+## 
+## Number of Fisher Scoring iterations: 2
+## 
+## 
+## # Mediator regressions: 
+## 
+## Call:
+## glm(formula = M1 ~ A + C1 + C2, family = binomial(), data = getCall(x$reg.output$mreg[[1L]])$data, 
+##     weights = getCall(x$reg.output$mreg[[1L]])$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.9623  -0.9462  -0.4322   0.9679   2.2586  
+## 
+## Coefficients:
+##              Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  0.003446   0.547959   0.006 0.994982    
+## A            0.828694   0.456732   1.814 0.069616 .  
+## C1          -0.984454   0.292880  -3.361 0.000776 ***
+## C2           0.892199   0.511832   1.743 0.081308 .  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 138.47  on 99  degrees of freedom
+## Residual deviance: 115.67  on 96  degrees of freedom
+## AIC: 123.67
+## 
+## Number of Fisher Scoring iterations: 3
+## 
+## 
+## 
+## Call:
+## glm(formula = M2 ~ A + C1 + C2, family = gaussian(), data = getCall(x$reg.output$mreg[[2L]])$data, 
+##     weights = getCall(x$reg.output$mreg[[2L]])$weights)
+## 
+## Deviance Residuals: 
+##      Min        1Q    Median        3Q       Max  
+## -2.60482  -0.60844   0.02378   0.58801   2.59561  
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   1.6403     0.2564   6.397 5.75e-09 ***
+## A             0.2901     0.2170   1.337    0.184    
+## C1            0.6208     0.1189   5.219 1.04e-06 ***
+## C2            2.0833     0.2366   8.806 5.44e-14 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 1.110528)
+## 
+##     Null deviance: 225.08  on 99  degrees of freedom
+## Residual deviance: 106.61  on 96  degrees of freedom
+## AIC: 300.19
+## 
+## Number of Fisher Scoring iterations: 2
+## 
+## 
+## # Effect decomposition on the mean difference scale via the regression-based approach
+##  
+## Direct counterfactual imputation estimation with 
+##  bootstrap standard errors, percentile confidence intervals and p-values 
+##  
+##               Estimate Std.error   95% CIL 95% CIU  P.val    
+## cde           1.431445  0.406563  0.791552   2.177 &lt;2e-16 ***
+## pnde          1.345009  0.210568  1.034657   1.751 &lt;2e-16 ***
+## tnde          1.363720  0.222721  1.001818   1.727 &lt;2e-16 ***
+## pnie          0.315062  0.175113  0.012484   0.526    0.1 .  
+## tnie          0.333773  0.150220  0.011253   0.510 &lt;2e-16 ***
+## te            1.678782  0.282291  1.201192   2.157 &lt;2e-16 ***
+## intref       -0.086436  0.340713 -0.716350   0.427    0.7    
+## intmed        0.018712  0.094136 -0.148749   0.177    1.0    
+## cde(prop)     0.852669  0.204465  0.517111   1.231 &lt;2e-16 ***
+## intref(prop) -0.051487  0.223188 -0.496311   0.279    0.7    
+## intmed(prop)  0.011146  0.054510 -0.083948   0.103    1.0    
+## pnie(prop)    0.187673  0.099768  0.009682   0.317    0.1 .  
+## pm            0.198819  0.084045  0.008982   0.292 &lt;2e-16 ***
+## int          -0.040341  0.234302 -0.528828   0.273    0.7    
+## pe            0.147331  0.204465 -0.230814   0.483    0.6    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (cde: controlled direct effect; pnde: pure natural direct effect; tnde: total natural direct effect; pnie: pure natural indirect effect; tnie: total natural indirect effect; te: total effect; intref: reference interaction; intmed: mediated interaction; cde(prop): proportion cde; intref(prop): proportion intref; intmed(prop): proportion intmed; pnie(prop): proportion pnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
+## 
+## Relevant variable values: 
+## $a
+## [1] 1
+## 
+## $astar
+## [1] 0
+## 
+## $mval
+## $mval[[1]]
+## [1] 1
+## 
+## $mval[[2]]
+## [1] 1</code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggcmest</span>(est) <span class="sc">+</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">theme</span>(<span class="at">axis.text.x =</span> ggplot2<span class="sc">::</span><span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">30</span>, <span class="at">vjust =</span> <span class="fl">0.8</span>))</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>Lastly, we conduct sensitivity analysis for the results. Sensitivity
+analysis for unmeasured confounding:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cmsens</span>(<span class="at">object =</span> est, <span class="at">sens =</span> <span class="st">&quot;uc&quot;</span>)</span></code></pre></div>
+<pre><code>## Sensitivity Analysis For Unmeasured Confounding 
+## 
+## Evalues on the risk or rate ratio scale: 
+##         estRR   lowerRR  upperRR Evalue.estRR Evalue.lowerRR Evalue.upperRR
+## cde  1.719704 1.2724617 2.324143     2.832214       1.861272             NA
+## pnde 1.664318 1.4239257 1.945293     2.715810       2.200868             NA
+## tnde 1.676154 1.4211994 1.976847     2.740738       2.194897             NA
+## pnie 1.126739 0.9896507 1.282818     1.504631       1.000000             NA
+## tnie 1.134753 1.0152410 1.268333     1.525791       1.139632             NA
+## te   1.888589 1.5321886 2.327891     3.184035       2.435191             NA</code></pre>
+<p>Assume that <span class="math inline">\(C_1\)</span> was measured
+with error. Sensitivity analysis for measurement error using regression
+calibration with a set of assumed error standard deviations 0.1, 0.2 and
+0.3:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>me1 <span class="ot">&lt;-</span> <span class="fu">cmsens</span>(<span class="at">object =</span> est, <span class="at">sens =</span> <span class="st">&quot;me&quot;</span>, <span class="at">MEmethod =</span> <span class="st">&quot;rc&quot;</span>, </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>              <span class="at">MEvariable =</span> <span class="st">&quot;C1&quot;</span>, <span class="at">MEvartype =</span> <span class="st">&quot;con&quot;</span>, <span class="at">MEerror =</span> <span class="fu">c</span>(<span class="fl">0.1</span>, <span class="fl">0.2</span>, <span class="fl">0.3</span>))</span></code></pre></div>
+<p>Summarize and plot the results:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(me1)</span></code></pre></div>
+<pre><code>## Sensitivity Analysis For Measurement Error 
+##  
+## The variable measured with error: C1
+## Type of the variable measured with error: continuous
+## 
+## # Measurement error 1: 
+## [1] 0.1
+## 
+## ## Error-corrected regressions for measurement error 1: 
+## 
+## ### Outcome regression:
+## Call:
+## rcreg(reg = getCall(x$sens[[1L]]$reg.output$yreg)$reg, formula = Y ~ 
+##     A + M1 + M2 + A * M1 + A * M2 + C1 + C2, data = getCall(x$sens[[1L]]$reg.output$yreg)$data, 
+##     MEvariable = &quot;C1&quot;, MEerror = 0.1, variance = TRUE, nboot = 400, 
+##     weights = getCall(x$sens[[1L]]$reg.output$yreg)$weights)
+## 
+## Naive coefficient estimates: 
+##  (Intercept)            A           M1           M2           C1           C2 
+## -0.429317055  1.305199111  0.762169424  0.691868043 -0.197349688  2.389790272 
+##         A:M1         A:M2 
+##  0.127853354 -0.001607689 
+## 
+## Naive var-cov estimates: 
+##             (Intercept)            A           M1           M2           C1
+## (Intercept)  0.19952129 -0.186177297 -0.071800151 -0.042143887 -0.012473494
+## A           -0.18617730  0.565227608  0.061763824  0.035566831  0.008550886
+## M1          -0.07180015  0.061763824  0.096603550  0.011127995  0.008367323
+## M2          -0.04214389  0.035566831  0.011127995  0.017433949 -0.005541985
+## C1          -0.01247349  0.008550886  0.008367323 -0.005541985  0.018737581
+## C2           0.03202116 -0.002076496 -0.025485517 -0.031937394  0.011413789
+## A:M1         0.05250394 -0.194186113 -0.081844376  0.001218548 -0.006350845
+## A:M2         0.03868322 -0.102112096 -0.008061219 -0.010381316 -0.000334026
+##                       C2         A:M1         A:M2
+## (Intercept)  0.032021156  0.052503937  0.038683218
+## A           -0.002076496 -0.194186113 -0.102112096
+## M1          -0.025485517 -0.081844376 -0.008061219
+## M2          -0.031937394  0.001218548 -0.010381316
+## C1           0.011413789 -0.006350845 -0.000334026
+## C2           0.126311866 -0.027375016  0.006147880
+## A:M1        -0.027375016  0.217618968  0.019236723
+## A:M2         0.006147880  0.019236723  0.022850334
+## 
+## Variable measured with error:
+## C1
+## Measurement error:
+## 0.1
+## Error-corrected results:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -0.427276   0.491050  -0.870   0.3865    
+## A            1.304514   0.698672   1.867   0.0651 .  
+## M1           0.761089   0.367873   2.069   0.0414 *  
+## M2           0.692841   0.138823   4.991 2.83e-06 ***
+## C1          -0.200697   0.125629  -1.598   0.1136    
+## C2           2.387891   0.403462   5.919 5.52e-08 ***
+## A:M1         0.127853   0.419520   0.305   0.7612    
+## A:M2        -0.001608   0.146484  -0.011   0.9913    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## ### Mediator regressions: 
+## Call:
+## rcreg(reg = getCall(x$sens[[1L]]$reg.output$mreg[[1L]])$reg, 
+##     formula = M1 ~ A + C1 + C2, data = getCall(x$sens[[1L]]$reg.output$mreg[[1L]])$data, 
+##     MEvariable = &quot;C1&quot;, MEerror = 0.1, variance = TRUE, nboot = 400, 
+##     weights = getCall(x$sens[[1L]]$reg.output$mreg[[1L]])$weights)
+## 
+## Naive coefficient estimates: 
+##  (Intercept)            A           C1           C2 
+##  0.003446339  0.828694328 -0.984453987  0.892199087 
+## 
+## Naive var-cov estimates: 
+##             (Intercept)           A          C1          C2
+## (Intercept)  0.30025921 -0.07438249 -0.08381839 -0.17194314
+## A           -0.07438249  0.20860406 -0.00266003 -0.01458923
+## C1          -0.08381839 -0.00266003  0.08577848 -0.01275232
+## C2          -0.17194314 -0.01458923 -0.01275232  0.26197192
+## 
+## Variable measured with error:
+## C1
+## Measurement error:
+## 0.1
+## Error-corrected results:
+##             Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept)  0.01887    0.59405   0.032   0.9747  
+## A            0.82577    0.47531   1.737   0.0855 .
+## C1          -0.99703    0.38187  -2.611   0.0105 *
+## C2           0.89185    0.53795   1.658   0.1006  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Call:
+## rcreg(reg = getCall(x$sens[[1L]]$reg.output$mreg[[2L]])$reg, 
+##     formula = M2 ~ A + C1 + C2, data = getCall(x$sens[[1L]]$reg.output$mreg[[2L]])$data, 
+##     MEvariable = &quot;C1&quot;, MEerror = 0.1, variance = TRUE, nboot = 400, 
+##     weights = getCall(x$sens[[1L]]$reg.output$mreg[[2L]])$weights)
+## 
+## Naive coefficient estimates: 
+## (Intercept)           A          C1          C2 
+##   1.6402566   0.2901364   0.6208107   2.0833115 
+## 
+## Naive var-cov estimates: 
+##             (Intercept)            A            C1            C2
+## (Intercept)  0.06573913 -0.018924346 -0.0173562931 -0.0381103530
+## A           -0.01892435  0.047073002  0.0032931500 -0.0062472874
+## C1          -0.01735629  0.003293150  0.0141472682  0.0003964488
+## C2          -0.03811035 -0.006247287  0.0003964488  0.0559647177
+## 
+## Variable measured with error:
+## C1
+## Measurement error:
+## 0.2
+## Error-corrected results:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   1.5998     0.2463   6.494 3.68e-09 ***
+## A             0.2978     0.2096   1.421    0.159    
+## C1            0.6538     0.1424   4.591 1.34e-05 ***
+## C2            2.0842     0.1979  10.531  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## 
+## ## Error-corrected causal effects on the mean difference scale for measurement error 1: 
+##              Estimate Std.error  95% CIL 95% CIU  P.val    
+## cde           1.43076   0.48404  0.50383   2.171 &lt;2e-16 ***
+## pnde          1.34817   0.20632  1.05104   1.791 &lt;2e-16 ***
+## tnde          1.37327   0.17717  1.08960   1.675 &lt;2e-16 ***
+## pnie          0.35452   0.18379 -0.01758   0.564    0.1 .  
+## tnie          0.37962   0.19266 -0.10602   0.565    0.2    
+## te            1.72779   0.24969  1.17260   1.972 &lt;2e-16 ***
+## intref       -0.08259   0.43750 -0.63768   0.762    0.9    
+## intmed        0.02510   0.12151 -0.20516   0.206    0.8    
+## cde(prop)     0.82809   0.24952  0.32071   1.183 &lt;2e-16 ***
+## intref(prop) -0.04780   0.25965 -0.33667   0.481    0.9    
+## intmed(prop)  0.01453   0.07225 -0.12151   0.133    0.8    
+## pnie(prop)    0.20518   0.09714 -0.02255   0.294    0.1 .  
+## pm            0.21971   0.10895 -0.08306   0.297    0.2    
+## int          -0.03327   0.27433 -0.35268   0.581    0.9    
+## pe            0.17191   0.24952 -0.18337   0.679    0.5    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## ----------------------------------------------------------------
+## 
+## # Measurement error 2: 
+## [1] 0.2
+## 
+## ## Error-corrected regressions for measurement error 2: 
+## 
+## ### Outcome regression:
+## Call:
+## rcreg(reg = getCall(x$sens[[2L]]$reg.output$yreg)$reg, formula = Y ~ 
+##     A + M1 + M2 + A * M1 + A * M2 + C1 + C2, data = getCall(x$sens[[2L]]$reg.output$yreg)$data, 
+##     MEvariable = &quot;C1&quot;, MEerror = 0.2, variance = TRUE, nboot = 400, 
+##     weights = getCall(x$sens[[2L]]$reg.output$yreg)$weights)
+## 
+## Naive coefficient estimates: 
+##  (Intercept)            A           M1           M2           C1           C2 
+## -0.429317055  1.305199111  0.762169424  0.691868043 -0.197349688  2.389790272 
+##         A:M1         A:M2 
+##  0.127853354 -0.001607689 
+## 
+## Naive var-cov estimates: 
+##             (Intercept)            A           M1           M2           C1
+## (Intercept)  0.19952129 -0.186177297 -0.071800151 -0.042143887 -0.012473494
+## A           -0.18617730  0.565227608  0.061763824  0.035566831  0.008550886
+## M1          -0.07180015  0.061763824  0.096603550  0.011127995  0.008367323
+## M2          -0.04214389  0.035566831  0.011127995  0.017433949 -0.005541985
+## C1          -0.01247349  0.008550886  0.008367323 -0.005541985  0.018737581
+## C2           0.03202116 -0.002076496 -0.025485517 -0.031937394  0.011413789
+## A:M1         0.05250394 -0.194186113 -0.081844376  0.001218548 -0.006350845
+## A:M2         0.03868322 -0.102112096 -0.008061219 -0.010381316 -0.000334026
+##                       C2         A:M1         A:M2
+## (Intercept)  0.032021156  0.052503937  0.038683218
+## A           -0.002076496 -0.194186113 -0.102112096
+## M1          -0.025485517 -0.081844376 -0.008061219
+## M2          -0.031937394  0.001218548 -0.010381316
+## C1           0.011413789 -0.006350845 -0.000334026
+## C2           0.126311866 -0.027375016  0.006147880
+## A:M1        -0.027375016  0.217618968  0.019236723
+## A:M2         0.006147880  0.019236723  0.022850334
+## 
+## Variable measured with error:
+## C1
+## Measurement error:
+## 0.2
+## Error-corrected results:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -0.420717   0.445340  -0.945   0.3473    
+## A            1.302311   0.686413   1.897   0.0609 .  
+## M1           0.757615   0.336763   2.250   0.0269 *  
+## M2           0.695971   0.141661   4.913 3.89e-06 ***
+## C1          -0.211459   0.131371  -1.610   0.1109    
+## C2           2.381786   0.407953   5.838 7.85e-08 ***
+## A:M1         0.127853   0.416065   0.307   0.7593    
+## A:M2        -0.001608   0.147519  -0.011   0.9913    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## ### Mediator regressions: 
+## Call:
+## rcreg(reg = getCall(x$sens[[2L]]$reg.output$mreg[[1L]])$reg, 
+##     formula = M1 ~ A + C1 + C2, data = getCall(x$sens[[2L]]$reg.output$mreg[[1L]])$data, 
+##     MEvariable = &quot;C1&quot;, MEerror = 0.2, variance = TRUE, nboot = 400, 
+##     weights = getCall(x$sens[[2L]]$reg.output$mreg[[1L]])$weights)
+## 
+## Naive coefficient estimates: 
+##  (Intercept)            A           C1           C2 
+##  0.003446339  0.828694328 -0.984453987  0.892199087 
+## 
+## Naive var-cov estimates: 
+##             (Intercept)           A          C1          C2
+## (Intercept)  0.30025921 -0.07438249 -0.08381839 -0.17194314
+## A           -0.07438249  0.20860406 -0.00266003 -0.01458923
+## C1          -0.08381839 -0.00266003  0.08577848 -0.01275232
+## C2          -0.17194314 -0.01458923 -0.01275232  0.26197192
+## 
+## Variable measured with error:
+## C1
+## Measurement error:
+## 0.1
+## Error-corrected results:
+##             Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept)  0.01887    0.59405   0.032   0.9747  
+## A            0.82577    0.47531   1.737   0.0855 .
+## C1          -0.99703    0.38187  -2.611   0.0105 *
+## C2           0.89185    0.53795   1.658   0.1006  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Call:
+## rcreg(reg = getCall(x$sens[[2L]]$reg.output$mreg[[2L]])$reg, 
+##     formula = M2 ~ A + C1 + C2, data = getCall(x$sens[[2L]]$reg.output$mreg[[2L]])$data, 
+##     MEvariable = &quot;C1&quot;, MEerror = 0.2, variance = TRUE, nboot = 400, 
+##     weights = getCall(x$sens[[2L]]$reg.output$mreg[[2L]])$weights)
+## 
+## Naive coefficient estimates: 
+## (Intercept)           A          C1          C2 
+##   1.6402566   0.2901364   0.6208107   2.0833115 
+## 
+## Naive var-cov estimates: 
+##             (Intercept)            A            C1            C2
+## (Intercept)  0.06573913 -0.018924346 -0.0173562931 -0.0381103530
+## A           -0.01892435  0.047073002  0.0032931500 -0.0062472874
+## C1          -0.01735629  0.003293150  0.0141472682  0.0003964488
+## C2          -0.03811035 -0.006247287  0.0003964488  0.0559647177
+## 
+## Variable measured with error:
+## C1
+## Measurement error:
+## 0.2
+## Error-corrected results:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   1.5998     0.2463   6.494 3.68e-09 ***
+## A             0.2978     0.2096   1.421    0.159    
+## C1            0.6538     0.1424   4.591 1.34e-05 ***
+## C2            2.0842     0.1979  10.531  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## 
+## ## Error-corrected causal effects on the mean difference scale for measurement error 2: 
+##              Estimate Std.error  95% CIL 95% CIU  P.val    
+## cde           1.42856   0.44643  0.87142   2.265 &lt;2e-16 ***
+## pnde          1.34820   0.29883  1.02428   2.007 &lt;2e-16 ***
+## tnde          1.38608   0.23999  1.10216   1.852 &lt;2e-16 ***
+## pnie          0.43455   0.22837 -0.04455   0.762    0.2    
+## tnie          0.47243   0.22519 -0.02189   0.785    0.1 .  
+## te            1.82063   0.28524  1.29467   2.287 &lt;2e-16 ***
+## intref       -0.08036   0.28911 -0.64895   0.353    0.8    
+## intmed        0.03788   0.11409 -0.25826   0.135    0.9    
+## cde(prop)     0.78465   0.20642  0.53497   1.197 &lt;2e-16 ***
+## intref(prop) -0.04414   0.17446 -0.36559   0.241    0.8    
+## intmed(prop)  0.02080   0.06157 -0.11798   0.085    0.9    
+## pnie(prop)    0.23868   0.11705 -0.03051   0.404    0.2    
+## pm            0.25949   0.12229 -0.01219   0.434    0.1 .  
+## int          -0.02333   0.17994 -0.31283   0.241    0.6    
+## pe            0.21535   0.20642 -0.19714   0.465    0.5    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## ----------------------------------------------------------------
+## 
+## # Measurement error 3: 
+## [1] 0.3
+## 
+## ## Error-corrected regressions for measurement error 3: 
+## 
+## ### Outcome regression:
+## Call:
+## rcreg(reg = getCall(x$sens[[3L]]$reg.output$yreg)$reg, formula = Y ~ 
+##     A + M1 + M2 + A * M1 + A * M2 + C1 + C2, data = getCall(x$sens[[3L]]$reg.output$yreg)$data, 
+##     MEvariable = &quot;C1&quot;, MEerror = 0.3, variance = TRUE, nboot = 400, 
+##     weights = getCall(x$sens[[3L]]$reg.output$yreg)$weights)
+## 
+## Naive coefficient estimates: 
+##  (Intercept)            A           M1           M2           C1           C2 
+## -0.429317055  1.305199111  0.762169424  0.691868043 -0.197349688  2.389790272 
+##         A:M1         A:M2 
+##  0.127853354 -0.001607689 
+## 
+## Naive var-cov estimates: 
+##             (Intercept)            A           M1           M2           C1
+## (Intercept)  0.19952129 -0.186177297 -0.071800151 -0.042143887 -0.012473494
+## A           -0.18617730  0.565227608  0.061763824  0.035566831  0.008550886
+## M1          -0.07180015  0.061763824  0.096603550  0.011127995  0.008367323
+## M2          -0.04214389  0.035566831  0.011127995  0.017433949 -0.005541985
+## C1          -0.01247349  0.008550886  0.008367323 -0.005541985  0.018737581
+## C2           0.03202116 -0.002076496 -0.025485517 -0.031937394  0.011413789
+## A:M1         0.05250394 -0.194186113 -0.081844376  0.001218548 -0.006350845
+## A:M2         0.03868322 -0.102112096 -0.008061219 -0.010381316 -0.000334026
+##                       C2         A:M1         A:M2
+## (Intercept)  0.032021156  0.052503937  0.038683218
+## A           -0.002076496 -0.194186113 -0.102112096
+## M1          -0.025485517 -0.081844376 -0.008061219
+## M2          -0.031937394  0.001218548 -0.010381316
+## C1           0.011413789 -0.006350845 -0.000334026
+## C2           0.126311866 -0.027375016  0.006147880
+## A:M1        -0.027375016  0.217618968  0.019236723
+## A:M2         0.006147880  0.019236723  0.022850334
+## 
+## Variable measured with error:
+## C1
+## Measurement error:
+## 0.3
+## Error-corrected results:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -0.408067   0.460020  -0.887   0.3774    
+## A            1.298063   0.763918   1.699   0.0927 .  
+## M1           0.750917   0.360103   2.085   0.0398 *  
+## M2           0.702005   0.144481   4.859 4.83e-06 ***
+## C1          -0.232211   0.154111  -1.507   0.1353    
+## C2           2.370014   0.389731   6.081 2.69e-08 ***
+## A:M1         0.127853   0.422092   0.303   0.7626    
+## A:M2        -0.001608   0.156159  -0.010   0.9918    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## ### Mediator regressions: 
+## Call:
+## rcreg(reg = getCall(x$sens[[3L]]$reg.output$mreg[[1L]])$reg, 
+##     formula = M1 ~ A + C1 + C2, data = getCall(x$sens[[3L]]$reg.output$mreg[[1L]])$data, 
+##     MEvariable = &quot;C1&quot;, MEerror = 0.3, variance = TRUE, nboot = 400, 
+##     weights = getCall(x$sens[[3L]]$reg.output$mreg[[1L]])$weights)
+## 
+## Naive coefficient estimates: 
+##  (Intercept)            A           C1           C2 
+##  0.003446339  0.828694328 -0.984453987  0.892199087 
+## 
+## Naive var-cov estimates: 
+##             (Intercept)           A          C1          C2
+## (Intercept)  0.30025921 -0.07438249 -0.08381839 -0.17194314
+## A           -0.07438249  0.20860406 -0.00266003 -0.01458923
+## C1          -0.08381839 -0.00266003  0.08577848 -0.01275232
+## C2          -0.17194314 -0.01458923 -0.01275232  0.26197192
+## 
+## Variable measured with error:
+## C1
+## Measurement error:
+## 0.1
+## Error-corrected results:
+##             Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept)  0.01887    0.59405   0.032   0.9747  
+## A            0.82577    0.47531   1.737   0.0855 .
+## C1          -0.99703    0.38187  -2.611   0.0105 *
+## C2           0.89185    0.53795   1.658   0.1006  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Call:
+## rcreg(reg = getCall(x$sens[[3L]]$reg.output$mreg[[2L]])$reg, 
+##     formula = M2 ~ A + C1 + C2, data = getCall(x$sens[[3L]]$reg.output$mreg[[2L]])$data, 
+##     MEvariable = &quot;C1&quot;, MEerror = 0.3, variance = TRUE, nboot = 400, 
+##     weights = getCall(x$sens[[3L]]$reg.output$mreg[[2L]])$weights)
+## 
+## Naive coefficient estimates: 
+## (Intercept)           A          C1          C2 
+##   1.6402566   0.2901364   0.6208107   2.0833115 
+## 
+## Naive var-cov estimates: 
+##             (Intercept)            A            C1            C2
+## (Intercept)  0.06573913 -0.018924346 -0.0173562931 -0.0381103530
+## A           -0.01892435  0.047073002  0.0032931500 -0.0062472874
+## C1          -0.01735629  0.003293150  0.0141472682  0.0003964488
+## C2          -0.03811035 -0.006247287  0.0003964488  0.0559647177
+## 
+## Variable measured with error:
+## C1
+## Measurement error:
+## 0.2
+## Error-corrected results:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   1.5998     0.2463   6.494 3.68e-09 ***
+## A             0.2978     0.2096   1.421    0.159    
+## C1            0.6538     0.1424   4.591 1.34e-05 ***
+## C2            2.0842     0.1979  10.531  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## 
+## ## Error-corrected causal effects on the mean difference scale for measurement error 3: 
+##               Estimate Std.error   95% CIL 95% CIU  P.val    
+## cde           1.424309  0.496395  0.649747   2.215 &lt;2e-16 ***
+## pnde          1.351906  0.194064  1.026094   1.698 &lt;2e-16 ***
+## tnde          1.359081  0.186556  1.043619   1.733 &lt;2e-16 ***
+## pnie          0.261721  0.178343  0.003803   0.622    0.1 .  
+## tnie          0.268896  0.180014  0.010873   0.597    0.1 .  
+## te            1.620802  0.271680  1.356412   2.205 &lt;2e-16 ***
+## intref       -0.072403  0.399889 -0.517447   0.696    0.9    
+## intmed        0.007175  0.070969 -0.129360   0.105    1.0    
+## cde(prop)     0.878768  0.218673  0.438724   1.091 &lt;2e-16 ***
+## intref(prop) -0.044671  0.241895 -0.259947   0.487    0.9    
+## intmed(prop)  0.004427  0.038630 -0.068683   0.058    1.0    
+## pnie(prop)    0.161476  0.088226 -0.001076   0.306    0.1 .  
+## pm            0.165903  0.091571  0.003433   0.305    0.1 .  
+## int          -0.040244  0.250874 -0.310818   0.468    0.9    
+## pe            0.121232  0.218673 -0.091012   0.561    0.5    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## ----------------------------------------------------------------
+## 
+## (cde: controlled direct effect; pnde: pure natural direct effect; tnde: total natural direct effect; pnie: pure natural indirect effect; tnie: total natural indirect effect; te: total effect; intref: reference interaction; intmed: mediated interaction; cde(prop): proportion cde; intref(prop): proportion intref; intmed(prop): proportion intmed; pnie(prop): proportion pnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
+## 
+## Relevant variable values: 
+## $a
+## [1] 1
+## 
+## $astar
+## [1] 0
+## 
+## $mval
+## $mval[[1]]
+## [1] 1
+## 
+## $mval[[2]]
+## [1] 1</code></pre>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggcmsens</span>(me1) <span class="sc">+</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">theme</span>(<span class="at">axis.text.x =</span> ggplot2<span class="sc">::</span><span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">30</span>, <span class="at">vjust =</span> <span class="fl">0.8</span>))</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>Then, assume that the exposure was measured with error. Sensitivity
+analysis for measurement error using SIMEX with two assumed
+misclassification matrices:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>me2 <span class="ot">&lt;-</span> <span class="fu">cmsens</span>(<span class="at">object =</span> est, <span class="at">sens =</span> <span class="st">&quot;me&quot;</span>, <span class="at">MEmethod =</span> <span class="st">&quot;simex&quot;</span>, <span class="at">MEvariable =</span> <span class="st">&quot;A&quot;</span>, </span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>              <span class="at">MEvartype =</span> <span class="st">&quot;cat&quot;</span>, <span class="at">B =</span> <span class="dv">5</span>,</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">MEerror =</span> <span class="fu">list</span>(<span class="fu">matrix</span>(<span class="fu">c</span>(<span class="fl">0.95</span>, <span class="fl">0.05</span>, <span class="fl">0.05</span>, <span class="fl">0.95</span>), <span class="at">nrow =</span> <span class="dv">2</span>), </span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>                             <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="fl">0.9</span>, <span class="fl">0.1</span>, <span class="fl">0.1</span>, <span class="fl">0.9</span>), <span class="at">nrow =</span> <span class="dv">2</span>)))</span></code></pre></div>
+<p>Summarize and plot the results:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(me2)</span></code></pre></div>
+<pre><code>## Sensitivity Analysis For Measurement Error 
+##  
+## The variable measured with error: A
+## Type of the variable measured with error: categorical
+## 
+## # Measurement error 1: 
+##      [,1] [,2]
+## [1,] 0.95 0.05
+## [2,] 0.05 0.95
+## 
+## ## Error-corrected regressions for measurement error 1: 
+## 
+## ### Outcome regression:
+## Call:
+## simexreg(reg = getCall(x$sens[[1L]]$reg.output$yreg)$reg, formula = Y ~ 
+##     A + M1 + M2 + A * M1 + A * M2 + C1 + C2, data = getCall(x$sens[[1L]]$reg.output$yreg)$data, 
+##     MEvariable = &quot;A&quot;, MEvartype = &quot;categorical&quot;, MEerror = c(0.95, 
+##     0.05, 0.05, 0.95), variance = TRUE, lambda = c(0.5, 1, 1.5, 
+##     2), B = 5, weights = getCall(x$sens[[1L]]$reg.output$yreg)$weights)
+## 
+## Naive coefficient estimates: 
+##  (Intercept)            A           M1           M2           C1           C2 
+## -0.429317055  1.305199111  0.762169424  0.691868043 -0.197349688  2.389790272 
+##         A:M1         A:M2 
+##  0.127853354 -0.001607689 
+## 
+## Naive var-cov estimates: 
+##             (Intercept)            A           M1           M2           C1
+## (Intercept)  0.19952129 -0.186177297 -0.071800151 -0.042143887 -0.012473494
+## A           -0.18617730  0.565227608  0.061763824  0.035566831  0.008550886
+## M1          -0.07180015  0.061763824  0.096603550  0.011127995  0.008367323
+## M2          -0.04214389  0.035566831  0.011127995  0.017433949 -0.005541985
+## C1          -0.01247349  0.008550886  0.008367323 -0.005541985  0.018737581
+## C2           0.03202116 -0.002076496 -0.025485517 -0.031937394  0.011413789
+## A:M1         0.05250394 -0.194186113 -0.081844376  0.001218548 -0.006350845
+## A:M2         0.03868322 -0.102112096 -0.008061219 -0.010381316 -0.000334026
+##                       C2         A:M1         A:M2
+## (Intercept)  0.032021156  0.052503937  0.038683218
+## A           -0.002076496 -0.194186113 -0.102112096
+## M1          -0.025485517 -0.081844376 -0.008061219
+## M2          -0.031937394  0.001218548 -0.010381316
+## C1           0.011413789 -0.006350845 -0.000334026
+## C2           0.126311866 -0.027375016  0.006147880
+## A:M1        -0.027375016  0.217618968  0.019236723
+## A:M2         0.006147880  0.019236723  0.022850334
+## 
+## Variable measured with error:
+## A
+## Measurement error:
+##      0    1
+## 0 0.95 0.05
+## 1 0.05 0.95
+## 
+## Error-corrected results:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  -0.3948     0.3482  -1.134   0.2599    
+## A             1.8740         NA      NA       NA    
+## M1            0.4391     0.3052   1.439   0.1536    
+## M2            0.7125     0.1249   5.705 1.40e-07 ***
+## C1           -0.2333     0.1151  -2.026   0.0456 *  
+## C2            2.3301     0.3604   6.465 4.77e-09 ***
+## A:M1          0.5823     0.5425   1.073   0.2859    
+## A:M2         -0.1226         NA      NA       NA    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## ### Mediator regressions: 
+## Call:
+## simexreg(reg = getCall(x$sens[[1L]]$reg.output$mreg[[1L]])$reg, 
+##     formula = M1 ~ A + C1 + C2, data = getCall(x$sens[[1L]]$reg.output$mreg[[1L]])$data, 
+##     MEvariable = &quot;A&quot;, MEvartype = &quot;categorical&quot;, MEerror = c(0.95, 
+##     0.05, 0.05, 0.95), variance = TRUE, lambda = c(0.5, 1, 1.5, 
+##     2), B = 5, weights = getCall(x$sens[[1L]]$reg.output$mreg[[1L]])$weights)
+## 
+## Naive coefficient estimates: 
+##  (Intercept)            A           C1           C2 
+##  0.003446339  0.828694328 -0.984453987  0.892199087 
+## 
+## Naive var-cov estimates: 
+##             (Intercept)           A          C1          C2
+## (Intercept)  0.30025921 -0.07438249 -0.08381839 -0.17194314
+## A           -0.07438249  0.20860406 -0.00266003 -0.01458923
+## C1          -0.08381839 -0.00266003  0.08577848 -0.01275232
+## C2          -0.17194314 -0.01458923 -0.01275232  0.26197192
+## 
+## Variable measured with error:
+## A
+## Measurement error:
+##      0    1
+## 0 0.95 0.05
+## 1 0.05 0.95
+## 
+## Error-corrected results:
+##             Estimate Std. Error t value Pr(&gt;|t|)   
+## (Intercept)   0.1671     0.5520   0.303   0.7628   
+## A1            0.6279     0.5216   1.204   0.2317   
+## C1           -0.9362     0.2899  -3.230   0.0017 **
+## C2            0.7649     0.5134   1.490   0.1396   
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Call:
+## simexreg(reg = getCall(x$sens[[1L]]$reg.output$mreg[[2L]])$reg, 
+##     formula = M2 ~ A + C1 + C2, data = getCall(x$sens[[1L]]$reg.output$mreg[[2L]])$data, 
+##     MEvariable = &quot;A&quot;, MEvartype = &quot;categorical&quot;, MEerror = c(0.95, 
+##     0.05, 0.05, 0.95), variance = TRUE, lambda = c(0.5, 1, 1.5, 
+##     2), B = 5, weights = getCall(x$sens[[1L]]$reg.output$mreg[[2L]])$weights)
+## 
+## Naive coefficient estimates: 
+## (Intercept)           A          C1          C2 
+##   1.6402566   0.2901364   0.6208107   2.0833115 
+## 
+## Naive var-cov estimates: 
+##             (Intercept)            A            C1            C2
+## (Intercept)  0.06573913 -0.018924346 -0.0173562931 -0.0381103530
+## A           -0.01892435  0.047073002  0.0032931500 -0.0062472874
+## C1          -0.01735629  0.003293150  0.0141472682  0.0003964488
+## C2          -0.03811035 -0.006247287  0.0003964488  0.0559647177
+## 
+## Variable measured with error:
+## A
+## Measurement error:
+##     0   1
+## 0 0.9 0.1
+## 1 0.1 0.9
+## 
+## Error-corrected results:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   1.5985     0.2803   5.702 1.30e-07 ***
+## A             0.3403     0.3206   1.062    0.291    
+## C1            0.6341     0.1211   5.235 9.71e-07 ***
+## C2            2.0890     0.2390   8.741 7.49e-14 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## 
+## ## Error-corrected causal effects on the mean difference scale for measurement error 1: 
+##               Estimate Std.error   95% CIL 95% CIU  P.val    
+## cde           2.333749  0.849479  0.392715   3.134 &lt;2e-16 ***
+## pnde          1.663306  0.231381  1.264425   2.003 &lt;2e-16 ***
+## tnde          1.675689  0.215797  1.364257   2.187 &lt;2e-16 ***
+## pnie          0.195664  0.229201 -0.069716   0.751    0.2    
+## tnie          0.208046  0.198643  0.081955   0.788 &lt;2e-16 ***
+## te            1.871352  0.264569  1.473680   2.360 &lt;2e-16 ***
+## intref       -0.670443  0.732911 -1.404194   1.088    0.8    
+## intmed        0.012383  0.197096 -0.314801   0.398    0.9    
+## cde(prop)     1.247092  0.401435  0.198257   1.535 &lt;2e-16 ***
+## intref(prop) -0.358267  0.366638 -0.672400   0.549    0.8    
+## intmed(prop)  0.006617  0.092040 -0.135806   0.189    0.9    
+## pnie(prop)    0.104557  0.101725 -0.035695   0.322    0.2    
+## pm            0.111174  0.088811  0.048394   0.365 &lt;2e-16 ***
+## int          -0.351650  0.381562 -0.557131   0.686    0.8    
+## pe           -0.247092  0.401435 -0.535386   0.802    0.8    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## ----------------------------------------------------------------
+## 
+## # Measurement error 2: 
+##      [,1] [,2]
+## [1,]  0.9  0.1
+## [2,]  0.1  0.9
+## 
+## ## Error-corrected regressions for measurement error 2: 
+## 
+## ### Outcome regression:
+## Call:
+## simexreg(reg = getCall(x$sens[[2L]]$reg.output$yreg)$reg, formula = Y ~ 
+##     A + M1 + M2 + A * M1 + A * M2 + C1 + C2, data = getCall(x$sens[[2L]]$reg.output$yreg)$data, 
+##     MEvariable = &quot;A&quot;, MEvartype = &quot;categorical&quot;, MEerror = c(0.9, 
+##     0.1, 0.1, 0.9), variance = TRUE, lambda = c(0.5, 1, 1.5, 
+##     2), B = 5, weights = getCall(x$sens[[2L]]$reg.output$yreg)$weights)
+## 
+## Naive coefficient estimates: 
+##  (Intercept)            A           M1           M2           C1           C2 
+## -0.429317055  1.305199111  0.762169424  0.691868043 -0.197349688  2.389790272 
+##         A:M1         A:M2 
+##  0.127853354 -0.001607689 
+## 
+## Naive var-cov estimates: 
+##             (Intercept)            A           M1           M2           C1
+## (Intercept)  0.19952129 -0.186177297 -0.071800151 -0.042143887 -0.012473494
+## A           -0.18617730  0.565227608  0.061763824  0.035566831  0.008550886
+## M1          -0.07180015  0.061763824  0.096603550  0.011127995  0.008367323
+## M2          -0.04214389  0.035566831  0.011127995  0.017433949 -0.005541985
+## C1          -0.01247349  0.008550886  0.008367323 -0.005541985  0.018737581
+## C2           0.03202116 -0.002076496 -0.025485517 -0.031937394  0.011413789
+## A:M1         0.05250394 -0.194186113 -0.081844376  0.001218548 -0.006350845
+## A:M2         0.03868322 -0.102112096 -0.008061219 -0.010381316 -0.000334026
+##                       C2         A:M1         A:M2
+## (Intercept)  0.032021156  0.052503937  0.038683218
+## A           -0.002076496 -0.194186113 -0.102112096
+## M1          -0.025485517 -0.081844376 -0.008061219
+## M2          -0.031937394  0.001218548 -0.010381316
+## C1           0.011413789 -0.006350845 -0.000334026
+## C2           0.126311866 -0.027375016  0.006147880
+## A:M1        -0.027375016  0.217618968  0.019236723
+## A:M2         0.006147880  0.019236723  0.022850334
+## 
+## Variable measured with error:
+## A
+## Measurement error:
+##     0   1
+## 0 0.9 0.1
+## 1 0.1 0.9
+## 
+## Error-corrected results:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -0.19219    0.33891  -0.567   0.5720    
+## A            1.77271    0.77710   2.281   0.0248 *  
+## M1           0.55598    0.41379   1.344   0.1824    
+## M2           0.51478    0.11915   4.320 3.93e-05 ***
+## C1          -0.08903    0.11618  -0.766   0.4455    
+## C2           2.62126    0.31421   8.342 6.96e-13 ***
+## A:M1        -0.19204    0.65071  -0.295   0.7686    
+## A:M2         0.09880    0.17026   0.580   0.5631    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## ### Mediator regressions: 
+## Call:
+## simexreg(reg = getCall(x$sens[[2L]]$reg.output$mreg[[1L]])$reg, 
+##     formula = M1 ~ A + C1 + C2, data = getCall(x$sens[[2L]]$reg.output$mreg[[1L]])$data, 
+##     MEvariable = &quot;A&quot;, MEvartype = &quot;categorical&quot;, MEerror = c(0.9, 
+##     0.1, 0.1, 0.9), variance = TRUE, lambda = c(0.5, 1, 1.5, 
+##     2), B = 5, weights = getCall(x$sens[[2L]]$reg.output$mreg[[1L]])$weights)
+## 
+## Naive coefficient estimates: 
+##  (Intercept)            A           C1           C2 
+##  0.003446339  0.828694328 -0.984453987  0.892199087 
+## 
+## Naive var-cov estimates: 
+##             (Intercept)           A          C1          C2
+## (Intercept)  0.30025921 -0.07438249 -0.08381839 -0.17194314
+## A           -0.07438249  0.20860406 -0.00266003 -0.01458923
+## C1          -0.08381839 -0.00266003  0.08577848 -0.01275232
+## C2          -0.17194314 -0.01458923 -0.01275232  0.26197192
+## 
+## Variable measured with error:
+## A
+## Measurement error:
+##      0    1
+## 0 0.95 0.05
+## 1 0.05 0.95
+## 
+## Error-corrected results:
+##             Estimate Std. Error t value Pr(&gt;|t|)   
+## (Intercept)   0.1671     0.5520   0.303   0.7628   
+## A1            0.6279     0.5216   1.204   0.2317   
+## C1           -0.9362     0.2899  -3.230   0.0017 **
+## C2            0.7649     0.5134   1.490   0.1396   
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Call:
+## simexreg(reg = getCall(x$sens[[2L]]$reg.output$mreg[[2L]])$reg, 
+##     formula = M2 ~ A + C1 + C2, data = getCall(x$sens[[2L]]$reg.output$mreg[[2L]])$data, 
+##     MEvariable = &quot;A&quot;, MEvartype = &quot;categorical&quot;, MEerror = c(0.9, 
+##     0.1, 0.1, 0.9), variance = TRUE, lambda = c(0.5, 1, 1.5, 
+##     2), B = 5, weights = getCall(x$sens[[2L]]$reg.output$mreg[[2L]])$weights)
+## 
+## Naive coefficient estimates: 
+## (Intercept)           A          C1          C2 
+##   1.6402566   0.2901364   0.6208107   2.0833115 
+## 
+## Naive var-cov estimates: 
+##             (Intercept)            A            C1            C2
+## (Intercept)  0.06573913 -0.018924346 -0.0173562931 -0.0381103530
+## A           -0.01892435  0.047073002  0.0032931500 -0.0062472874
+## C1          -0.01735629  0.003293150  0.0141472682  0.0003964488
+## C2          -0.03811035 -0.006247287  0.0003964488  0.0559647177
+## 
+## Variable measured with error:
+## A
+## Measurement error:
+##     0   1
+## 0 0.9 0.1
+## 1 0.1 0.9
+## 
+## Error-corrected results:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   1.5985     0.2803   5.702 1.30e-07 ***
+## A             0.3403     0.3206   1.062    0.291    
+## C1            0.6341     0.1211   5.235 9.71e-07 ***
+## C2            2.0890     0.2390   8.741 7.49e-14 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## 
+## ## Error-corrected causal effects on the mean difference scale for measurement error 2: 
+##              Estimate Std.error  95% CIL 95% CIU  P.val    
+## cde           1.67947   1.08720  0.32807   3.399 &lt;2e-16 ***
+## pnde          2.07886   0.49879  1.11599   2.970 &lt;2e-16 ***
+## tnde          2.05103   0.31573  1.19583   2.285 &lt;2e-16 ***
+## pnie          0.35310   0.25901  0.01610   0.934    0.1 .  
+## tnie          0.32527   0.30363 -0.45864   0.565    0.2    
+## te            2.40413   0.32522  1.55424   2.596 &lt;2e-16 ***
+## intref        0.39939   0.77596 -1.24944   1.353    0.7    
+## intmed       -0.02783   0.34260 -0.89762   0.274    0.9    
+## cde(prop)     0.69858   0.42020  0.18019   1.376 &lt;2e-16 ***
+## intref(prop)  0.16613   0.37337 -0.52542   0.653    0.7    
+## intmed(prop) -0.01158   0.14877 -0.37550   0.135    0.9    
+## pnie(prop)    0.14687   0.10723  0.01021   0.384    0.1 .  
+## pm            0.13530   0.14201 -0.18833   0.303    0.2    
+## int           0.15455   0.47312 -0.71832   0.719    0.9    
+## pe            0.30142   0.42020 -0.37555   0.820    0.7    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## ----------------------------------------------------------------
+## 
+## (cde: controlled direct effect; pnde: pure natural direct effect; tnde: total natural direct effect; pnie: pure natural indirect effect; tnie: total natural indirect effect; te: total effect; intref: reference interaction; intmed: mediated interaction; cde(prop): proportion cde; intref(prop): proportion intref; intmed(prop): proportion intmed; pnie(prop): proportion pnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
+## 
+## Relevant variable values: 
+## $a
+## [1] 1
+## 
+## $astar
+## [1] 0
+## 
+## $mval
+## $mval[[1]]
+## [1] 1
+## 
+## $mval[[2]]
+## [1] 1</code></pre>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggcmsens</span>(me2) <span class="sc">+</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  ggplot2<span class="sc">::</span><span class="fu">theme</span>(<span class="at">axis.text.x =</span> ggplot2<span class="sc">::</span><span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">30</span>, <span class="at">vjust =</span> <span class="fl">0.8</span>))</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

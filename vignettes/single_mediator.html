@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+<meta name="date" content="2022-10-10" />
+
+<title>Statistical Modeling with a Single Mediator</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Statistical Modeling with a Single
+Mediator</h1>
+<h4 class="date">2022-10-10</h4>
+
+
+
+<p>This example demonstrates how to use <code>cmest</code> when there is
+a single mediator. For this purpose, we simulate some data containing a
+continuous baseline confounder <span class="math inline">\(C_1\)</span>,
+a binary baseline confounder <span class="math inline">\(C_2\)</span>, a
+binary exposure <span class="math inline">\(A\)</span>, a binary
+mediator <span class="math inline">\(M\)</span> and a binary outcome
+<span class="math inline">\(Y\)</span>. The true regression models for
+<span class="math inline">\(A\)</span>, <span class="math inline">\(M\)</span> and <span class="math inline">\(Y\)</span> are: <span class="math display">\[logit(E(A|C_1,C_2))=0.2+0.5C_1+0.1C_2\]</span>
+<span class="math display">\[logit(E(M|A,C_1,C_2))=1+2A+1.5C_1+0.8C_2\]</span>
+<span class="math display">\[logit(E(Y|A,M,C_1,C_2)))=-3-0.4A-1.2M+0.5AM+0.3C_1-0.6C_2\]</span></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(CMAverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>expit <span class="ot">&lt;-</span> <span class="cf">function</span>(x) <span class="fu">exp</span>(x)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">+</span><span class="fu">exp</span>(x))</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">10000</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>C1 <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="dv">1</span>, <span class="at">sd =</span> <span class="fl">0.1</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>C2 <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fl">0.6</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>A <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fu">expit</span>(<span class="fl">0.2</span> <span class="sc">+</span> <span class="fl">0.5</span><span class="sc">*</span>C1 <span class="sc">+</span> <span class="fl">0.1</span><span class="sc">*</span>C2))</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>M <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fu">expit</span>(<span class="dv">1</span> <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>A <span class="sc">+</span> <span class="fl">1.5</span><span class="sc">*</span>C1 <span class="sc">+</span> <span class="fl">0.8</span><span class="sc">*</span>C2))</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>Y <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fu">expit</span>(<span class="sc">-</span><span class="dv">3</span> <span class="sc">-</span> <span class="fl">0.4</span><span class="sc">*</span>A <span class="sc">-</span> <span class="fl">1.2</span><span class="sc">*</span>M <span class="sc">+</span> <span class="fl">0.5</span><span class="sc">*</span>A<span class="sc">*</span>M <span class="sc">+</span> <span class="fl">0.3</span><span class="sc">*</span>C1 <span class="sc">-</span> <span class="fl">0.6</span><span class="sc">*</span>C2))</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(A, M, Y, C1, C2)</span></code></pre></div>
+<p>The DAG for this scientific setting is:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cmdag</span>(<span class="at">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="at">exposure =</span> <span class="st">&quot;A&quot;</span>, <span class="at">mediator =</span> <span class="st">&quot;M&quot;</span>,</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>      <span class="at">basec =</span> <span class="fu">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="at">postc =</span> <span class="cn">NULL</span>, <span class="at">node =</span> <span class="cn">TRUE</span>, <span class="at">text_col =</span> <span class="st">&quot;white&quot;</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASAAAAEgCAMAAAAjXV6yAAAA6lBMVEUAAAAAADoAAGYAOmYAOpAAZpAAZrY6AAA6ADo6AGY6OgA6Ojo6OmY6OpA6ZmY6ZpA6ZrY6kJA6kLY6kNtmAABmADpmAGZmOgBmOjpmOmZmOpBmZjpmZmZmkGZmkJBmkLZmkNtmtttmtv+QOgCQOjqQOmaQZgCQZjqQkLaQttuQtv+Q27aQ2/+2ZgC2Zjq2Zma2kDq2kJC2tma2tpC2tra2ttu225C227a229u22/+2/9u2///bkDrbkGbbtmbbtpDb25Db27bb29vb/7bb/9vb////tmb/trb/25D/27b/29v//7b//9v///++bbb7AAAACXBIWXMAAA7DAAAOwwHHb6hkAAAOt0lEQVR4nO2dCZfbthGAKa0sxUncONXGbnoktdbbjVtp66ZtWpeKnaNStZXw//9OMDgoggQJEMSpxbwnayWCg5mPOIjhQC5Qll4pQhsQu2RACsmAFJIBKSQDUkgGpJDwgAqFhDYvcP1KPqEJZUAq+8JWr8EnMKHQ10dLgloYsvIMSFm7poQ0MWDd2nxCEsqAVDaGq3oAnwwoXkIZkMrIYDVnQOq6WzL5eofQw10GRKtu81nTI5sMiFTdkhV6eFlcrdHxOh5CMQGalqcbePtXTH0sJkCz3WEhQZMBcZmjTkDh7IwJUF8LCmdlsJrbhPrGoHBGBqtZ0oR6ZrFwRgarWTaNvaMH7nMLonW3ZPIK30n/2O5hAc2MC1CnBDQyXNU5YKauXBfPYwWk+1Dj0Qbt82MfdfWxN6DQgHQezT/qR885eUFtQNwNKHT1SEEIhW5AEQDqQxSBeeEtQJ2EwjcfFAkgOaI4bIvCCASEULP1xGFaHFaAnLnQvyKRaAyhEhUbInFZE6FkQArJgBSSAKDHvli1UsSdhAakVf9jjihaLeZC0ujgGZDiu0f64HAAiwxI8eWjzA8ahCIDUnwbzND45ocuiwJZGt/olwEpau60KIyp8Q1+GRCt14BDEFvj69l9hwJYG1+7NT3mSNICFMDc+Pp1BjSKgXd7QwAahcC3wfENexnQSAKeLY5s1KtyFwzPty9xAjJXYF1imxUyIB1A41TYlegmBZ30F59GRzfkaeUHebQ6vg4d2cPoRPtzBuRRVSQV2a7Ll+HJDncZkGd1gatxUNPjBDQkT9qP6fHMBs2dGuM1WpFYAEl3s4xTaUcimQw69kONU2pFohjq5HjUiC4HkCmfCAiF78d9eJSI3JsfHJCKT2hCwbvxSEDOHQjdi9V8AjehwIB0+IQlFHiUy4BsNKCghILOArp8+gllQEGbUMhJQJ9PwKk+5BA3AFC4JnQRgFx6EXKEswfIoRshB7gGg2mJ0B6/LxEivwo8BJA7PwJ23yYDAAS/A7wyAeTMkYC9VwYIbfDb/3dtQMGaUFSATv9E22K2+19pAMiVJwFHNwmgb9BhsUR/zYBogTag2/L0eg3/NgHp2OnGlYCjvwTQzQr9rTw8lbQgO1UaSMixTQIIT/FoP82AWJk2oNkOT2SmgJw4E3JokwDCUz38kwHRQm1A+C7xsGgD0jXTgTchh/5mK+kRq/UOEjcDm+4Ftw3IgTtBu602Hn0rre/7DdsorfOx71DgXmu3gw2u3r+6oRqtN6BLA+TiR//tumQd0GB37HYwExP8KTPRZ70BXRogFz/6b9OpGIY0q83H2AoPugaoE8cWveYz5P5Kv6hHVdraJIOvTvN5PIBkGw50fvRf8tVIQ7xqGqKsDYhTK/p/9N8/oSDjWTeBHjZD69At6EnPEFXFmEW3b0IBOuvIKj0Hz/wDGl2jX0KeB7MBE1GfEs1y46vyPZZZq83fczKvgHzPCDbq8zmUeb/nSgxQgGWfjQFvvApNLSFCc+kAsjJ7tZWqi4yvZLQGHSVunt/q6PV21zVKhys+Go0oCUDu+Hio3MMw5pSP8+qdj2LufyTb7T4F133UOR7XNrjtor5+Y11hhTvVI8/3hAeprsQYO1wOYf74KCqLFJBXPs5McTbE+/8vHvpqNDfG1QDmHU9/pdEBCsLHiUFOxq9w/591t0nWNY44Nxge1HNtTI1yML6H5NNdvX9AXYYE5tNpgaFdtvtmcDwgHYSMbLPc8qLg00nIniqvJrgQe+YZniM9Lfzwcxa5gV0HhipSnSN/RhERHtRxtVTZR7JTjOqWJogZaHIqXUlsA7WYVCzLMRyux700bfQJaLwaH2KBkBkgC1r8SOtC+gFkQYkvGT1W2nguFjEf7qC7eJA6LzdqPAih9p4G8aD576M1dwYMPT8ekZqv5V5v0Euye0L/9KhENu1quYd6gjpS0T07LpHYruceKdmjUqkjJT5F+xvzPtKtQNzlZdkThyJYruceLyxXNkhHWjLQPeXofmmEhrqXAQ0FpFaQNKHB7uncH1wQoeHuZUDDAOkpSJaQgXs6N5gXQ8jEvQxoCCB9BUkCMnLPFFCKhIzcy4AyoErcAFqi7cUCgp/9JC7u9QDJOEzWVEmagBSXf7ZDG/gXfknfFNBs9w/Jz4OnQkgwU+LDEq7+Cih1uqcCtDzdlu0GmBCgmqttwf1jO5d3keqsprqmhsNiJWmBZw1SeJFJt6Wz3Un2XzAU2oBmu30xlzXBNOLRgq9SdisknYSQLqAlOSDrYx7dNBfBUCmgadnbP1TjPO6jIDIdnlwcJ6KdDgDNdjCASYd5Xz6OEvVSfCQgepc4l/UxPx5aFfuAJmsywkuUpDFGN0QfENJtQd3i3TsLYuReDpg5AZRkDzNzzyhonygfI/fyYx+FeyaAkm1AJu4ZPHpOmI+Bezl5QeHecEBJN6Dh7g1NoEoqr0wqA90bmIKXePOhMsi9S3DYqWRACsmAFJIBKSQDUkgGpJAMSCEZkEIyIIVkQArJgBSSASkkA1JIE9Ce5SuQv5fIQPbzToUpSgPQ6eb3lX/HL0sTjYdnuw6FSUoD0H76XeXfxuzSH79YdyhMUkRAp5vl8QVrN4enJTq9XRTPd6ebFXa03D+5g7TH031RfIZ9xm9Xa9Kh8Gs/v5/+hxRGULqCW1eYpoiAMAbiH8gWu76ZvcMuov3sZ9wstlPyAb7bYCRXJf6m3GIS+LWdrHnhSkFTYZoiAAL/+MUHvw4frUn7OL3+GA6s4AM0LExsd7z+9A2iX+IXPqkqXANSV5ioCIBoth4dVGEo2fPP99C1bktoVpgNAYTQh5dXJZQ6vV5DN+KF62NQXWGiUgd0vIZrT5xngJhr+wluNgABtwjy3WZJSm1WMGXhF7zxwqSJSRQmKnVAW+IJG1ThDXrNh09L7OcW0vVfoe+nJXz3HrKDX6GH6xV2/uHlnMBhhes8BIWJSg0Qvd7QY8gn6CnvF8UVHnnn0Cy2n7/EH9h35G3yCjep4rO3SximqwN4RGK9TFSYqHQuNVpubfQmo0Patz0t6V6LNYDotoP7pCf1tnQD2j8XPmqOJGbrt4glr+YVkgEppLHUgM0dCKYt+rGrv+BZ6zxEPXwjqKjfFjb0pSgioO0ngGR/9UfyqTPeIS6vxKWEMIuJ+pIUEdA9BG9Ot3//M/nUuYgSIhqNxahwTNSXpIiL1dtvIXrx/J74CGuG/ZP74urfd8UVD31AtGPy1dMSVqUQ8Chhs8KKhUBI0KMW7RD1pSkCoMOzH57tTq//QrsWxDu2+G55M3lDFuwzFu3YPVzPdhDieLKDuAdwZCEQCHrUG5SoL00RAO3neATZz34gw0gV+MJw8N8smkHeMAsyRv/005+WMCrzEAiUrgMS9CUqYrhjeXyBuwidvFgkg7zwXSKLZtBV/BJ/ibvVJ79akFAQC4H8DPeSQrSjri9REQBtVqfb757t6AwOnh5/S6IZ8GLTN7zhRSgQw1RwGRKPpSEQMoHVoh2ivkSlDgjayv3vVnw5D0EwGnEm3YhGM/DbaTNZH55DszltpiRkxkIghFMt2iHqS1SEgNkLGG53PCAEYWgacSYvFs3YFpM/PIVQ9OmO/HW6wSMzPUaCHudoR0NfotK91DC78JcW7ehbixkNHZcW7egD1Ih3aEnSE5ZU8mpeIeKd9Edk2NlO6ajaag7iul0q9cV8Q12aIragDbh3WNBxpL2Y13gEKAzSgrpEpfXoGd8GMgwtHDoPkYXFvKAuUWklL8CdC/mbJC/wVTr0HbJu54972IH2Yr+RulCpS1Va6S/fsh80qZIXYJVO7xUB2Xb6DsaWavneXOyLraymLlVpADpeF9XVX51X6TRDATck9iywvnwXFvsNQGd1yUpzmt/yHkGezbNVOlvXb5Z8KcoO/Le12G+kT53VJStNQNXIXCUv0FU6fpF1O412sAPtxb6wmEepp76AtLoY7yE8eQFW6TRDgcQ/vniD3lcZDO3FfiOV46wuWWkAYvd2qJ68wDMUyLp9v6hlMEgW+7XFvKAuWdFPXtCSi1vM6ycv6MnFLeb1kxe05PIW83k1r5IMSCENQB9eFrCiotLVYQ6LnvXDVq+XNSInoLKttlGIqW7XgMvZeTIg7jMhMBqreViHblipztyFvrs/3bTxho6NNJ9a/Iarbs8euJydJwPCJExhiAEzErrhdXVx6GXQWGp0SUMHfGyrladFkHztVjk79xd16xkM8clqvYWRRYMY3Jh/v7gqyW9zCnEQdoDnNbDAB2QylHRDB8i5DD6RRk7AN5IAASq/ImrpqbRamhYhpEwQJ768g1/AJH1qQ9OPcDkSeFnzoAtRPXKfCYMhPDgUrhjJXRCDG1dvSNQDXywxDsIOsLwGFviATAa2oYOo42Xe8YwH8i1LgKALOh4zYdXytIhzygQhXZAMbYDDmg0Jw0wq9TfUwZH7TPifzSerAi15cKOerVDt1ICse5rXwAMf8CXb0EHspWXYiefRkCdA8AUdfucruPM3PGWCMF1Sbfj9vipH94wsed0Ijd5nwmFIWtC2yl1oBDdw5ydRj1UjDnKiB/hKnwY+2EgGGzqI7loZxpr2MJoAwQJO9FTevDb81/h5ygT5liQbwaF5bbBkWRb7896QsftMOAwxeWGJqoGqigdVwQ1o0Fgb2CLGQdgBltfAGgfZvkE3dPCPrAwkh7ArxRMgWFyJJ0iwDBKeFlGlTHC76NV79ra2L6mmHlWnkHfDfSYchpgfhDvyA+vCoLMd3MDa2nEQdoDnNdDAB/mSbujg9tIycCK/UjwB4kUp7A2h1fK0iHPKBPFhsaRZocffMG945Iqph6ALQqP3mXAY4n3Qh49h0qqqlQY3yMgoxEGqqAfJZqhnMtBJkDRVISpCIidw8WkCBB+jecxkfy4kpEwQu3+NJ7Svd2wvGm1Bk3Uj6ILQ2H0mFQzL4Q6P0r4f6pYR+0wshzs8iuaaBmTMPhO74Q5/crwe8DhgzD6TvJpXSAakkAxIIRmQQjIghWRACsmAFPILawMVu2inI3gAAAAASUVORK5CYII=" /><!-- --></p>
+<p>In this setting, we can use all of the six statistical modeling
+approaches. The results are shown below:</p>
+<div id="the-regression-based-approach" class="section level2">
+<h2>The Regression-based Approach</h2>
+<div id="closed-form-parameter-function-estimation-and-delta-method-inference" class="section level3">
+<h3>Closed-form Parameter Function Estimation and Delta Method
+Inference</h3>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>res_rb_param_delta <span class="ot">&lt;-</span> <span class="fu">cmest</span>(<span class="at">data =</span> data, <span class="at">model =</span> <span class="st">&quot;rb&quot;</span>, <span class="at">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="at">exposure =</span> <span class="st">&quot;A&quot;</span>,</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                            <span class="at">mediator =</span> <span class="st">&quot;M&quot;</span>, <span class="at">basec =</span> <span class="fu">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="at">EMint =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>                            <span class="at">mreg =</span> <span class="fu">list</span>(<span class="st">&quot;logistic&quot;</span>), <span class="at">yreg =</span> <span class="st">&quot;logistic&quot;</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>                            <span class="at">astar =</span> <span class="dv">0</span>, <span class="at">a =</span> <span class="dv">1</span>, <span class="at">mval =</span> <span class="fu">list</span>(<span class="dv">1</span>), </span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>                            <span class="at">estimation =</span> <span class="st">&quot;paramfunc&quot;</span>, <span class="at">inference =</span> <span class="st">&quot;delta&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(res_rb_param_delta)</span></code></pre></div>
+<pre><code>## Causal Mediation Analysis
+## 
+## # Outcome regression:
+## 
+## Call:
+## glm(formula = Y ~ A + M + A * M + C1 + C2, family = binomial(), 
+##     data = getCall(x$reg.output$yreg)$data, weights = getCall(x$reg.output$yreg)$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -0.5681  -0.2414  -0.1741  -0.1604   3.0521  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  -3.5731     0.7713  -4.633 3.61e-06 ***
+## A             0.7084     0.5283   1.341  0.17990    
+## M            -1.0471     0.3736  -2.803  0.00507 ** 
+## C1            0.9337     0.6973   1.339  0.18054    
+## C2           -0.8415     0.1443  -5.829 5.56e-09 ***
+## A:M          -0.4222     0.5541  -0.762  0.44607    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 2022.7  on 9999  degrees of freedom
+## Residual deviance: 1965.0  on 9994  degrees of freedom
+## AIC: 1977
+## 
+## Number of Fisher Scoring iterations: 7
+## 
+## 
+## # Mediator regressions: 
+## 
+## Call:
+## glm(formula = M ~ A + C1 + C2, family = binomial(), data = getCall(x$reg.output$mreg[[1L]])$data, 
+##     weights = getCall(x$reg.output$mreg[[1L]])$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -3.2578   0.1145   0.1647   0.2519   0.5563  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)   0.4353     0.6410   0.679  0.49712    
+## A             1.7076     0.1443  11.837  &lt; 2e-16 ***
+## C1            1.9982     0.6474   3.086  0.00203 ** 
+## C2            0.9024     0.1345   6.709 1.96e-11 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 2294.0  on 9999  degrees of freedom
+## Residual deviance: 2072.5  on 9996  degrees of freedom
+## AIC: 2080.5
+## 
+## Number of Fisher Scoring iterations: 7
+## 
+## 
+## # Effect decomposition on the odds ratio scale via the regression-based approach
+##  
+## Closed-form parameter function estimation with 
+##  delta method standard errors, confidence intervals and p-values 
+##  
+##                Estimate Std.error  95% CIL 95% CIU    P.val    
+## Rcde            1.33138   0.22278  0.95912   1.848   0.0872 .  
+## Rpnde           1.41988   0.23708  1.02358   1.970   0.0358 *  
+## Rtnde           1.34928   0.22056  0.97940   1.859   0.0669 .  
+## Rpnie           0.93338   0.03576  0.86587   1.006   0.0719 .  
+## Rtnie           0.88697   0.05295  0.78902   0.997   0.0445 *  
+## Rte             1.25939   0.19804  0.92535   1.714   0.1425    
+## ERcde           0.30416   0.20019 -0.08820   0.697   0.1287    
+## ERintref        0.11571   0.11472 -0.10914   0.341   0.3131    
+## ERintmed       -0.09387   0.09323 -0.27659   0.089   0.3140    
+## ERpnie         -0.06662   0.03576 -0.13670   0.003   0.0624 .  
+## ERcde(prop)     1.17262   0.23540  0.71124   1.634 6.32e-07 ***
+## ERintref(prop)  0.44610   0.49051 -0.51528   1.407   0.3631    
+## ERintmed(prop) -0.36189   0.39881 -1.14354   0.420   0.3642    
+## ERpnie(prop)   -0.25684   0.23474 -0.71691   0.203   0.2739    
+## pm             -0.61872   0.50289 -1.60437   0.367   0.2186    
+## int             0.08421   0.09264 -0.09736   0.266   0.3633    
+## pe             -0.17262   0.23540 -0.63400   0.289   0.4634    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Rcde: controlled direct effect odds ratio; Rpnde: pure natural direct effect odds ratio; Rtnde: total natural direct effect odds ratio; Rpnie: pure natural indirect effect odds ratio; Rtnie: total natural indirect effect odds ratio; Rte: total effect odds ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
+## 
+## Relevant variable values: 
+## $a
+## [1] 1
+## 
+## $astar
+## [1] 0
+## 
+## $yval
+## [1] &quot;1&quot;
+## 
+## $mval
+## $mval[[1]]
+## [1] 1
+## 
+## 
+## $basecval
+## $basecval[[1]]
+## [1] 0.9993463
+## 
+## $basecval[[2]]
+## [1] 0.6061</code></pre>
+</div>
+<div id="closed-form-parameter-function-estimation-and-bootstrap-inference" class="section level3">
+<h3>Closed-form Parameter Function Estimation and Bootstrap
+Inference</h3>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>res_rb_param_bootstrap <span class="ot">&lt;-</span> <span class="fu">cmest</span>(<span class="at">data =</span> data, <span class="at">model =</span> <span class="st">&quot;rb&quot;</span>, <span class="at">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="at">exposure =</span> <span class="st">&quot;A&quot;</span>,</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                                <span class="at">mediator =</span> <span class="st">&quot;M&quot;</span>, <span class="at">basec =</span> <span class="fu">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="at">EMint =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                                <span class="at">mreg =</span> <span class="fu">list</span>(<span class="st">&quot;logistic&quot;</span>), <span class="at">yreg =</span> <span class="st">&quot;logistic&quot;</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>                                <span class="at">astar =</span> <span class="dv">0</span>, <span class="at">a =</span> <span class="dv">1</span>, <span class="at">mval =</span> <span class="fu">list</span>(<span class="dv">1</span>), </span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>                                <span class="at">estimation =</span> <span class="st">&quot;paramfunc&quot;</span>, <span class="at">inference =</span> <span class="st">&quot;bootstrap&quot;</span>, <span class="at">nboot =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(res_rb_param_bootstrap)</span></code></pre></div>
+<pre><code>## Causal Mediation Analysis
+## 
+## # Outcome regression:
+## 
+## Call:
+## glm(formula = Y ~ A + M + A * M + C1 + C2, family = binomial(), 
+##     data = getCall(x$reg.output$yreg)$data, weights = getCall(x$reg.output$yreg)$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -0.5681  -0.2414  -0.1741  -0.1604   3.0521  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  -3.5731     0.7713  -4.633 3.61e-06 ***
+## A             0.7084     0.5283   1.341  0.17990    
+## M            -1.0471     0.3736  -2.803  0.00507 ** 
+## C1            0.9337     0.6973   1.339  0.18054    
+## C2           -0.8415     0.1443  -5.829 5.56e-09 ***
+## A:M          -0.4222     0.5541  -0.762  0.44607    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 2022.7  on 9999  degrees of freedom
+## Residual deviance: 1965.0  on 9994  degrees of freedom
+## AIC: 1977
+## 
+## Number of Fisher Scoring iterations: 7
+## 
+## 
+## # Mediator regressions: 
+## 
+## Call:
+## glm(formula = M ~ A + C1 + C2, family = binomial(), data = getCall(x$reg.output$mreg[[1L]])$data, 
+##     weights = getCall(x$reg.output$mreg[[1L]])$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -3.2578   0.1145   0.1647   0.2519   0.5563  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)   0.4353     0.6410   0.679  0.49712    
+## A             1.7076     0.1443  11.837  &lt; 2e-16 ***
+## C1            1.9982     0.6474   3.086  0.00203 ** 
+## C2            0.9024     0.1345   6.709 1.96e-11 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 2294.0  on 9999  degrees of freedom
+## Residual deviance: 2072.5  on 9996  degrees of freedom
+## AIC: 2080.5
+## 
+## Number of Fisher Scoring iterations: 7
+## 
+## 
+## # Effect decomposition on the odds ratio scale via the regression-based approach
+##  
+## Closed-form parameter function estimation with 
+##  bootstrap standard errors, percentile confidence intervals and p-values 
+##  
+##                 Estimate Std.error   95% CIL 95% CIU  P.val    
+## Rcde            1.331376  0.025783  1.168386   1.203 &lt;2e-16 ***
+## Rpnde           1.419875  0.122168  1.268237   1.432 &lt;2e-16 ***
+## Rtnde           1.349275  0.042976  1.188801   1.247 &lt;2e-16 ***
+## Rpnie           0.933380  0.002995  0.894425   0.898 &lt;2e-16 ***
+## Rtnie           0.886970  0.042062  0.781893   0.838 &lt;2e-16 ***
+## Rte             1.259387  0.042173  1.063293   1.120 &lt;2e-16 ***
+## ERcde           0.304162  0.023479  0.146643   0.178 &lt;2e-16 ***
+## ERintref        0.115713  0.098689  0.121859   0.254 &lt;2e-16 ***
+## ERintmed       -0.093869  0.082990 -0.211091  -0.100 &lt;2e-16 ***
+## ERpnie         -0.066620  0.002995 -0.105575  -0.102 &lt;2e-16 ***
+## ERcde(prop)     1.172621  0.625254  1.495704   2.336 &lt;2e-16 ***
+## ERintref(prop)  0.446102  0.147895  1.919311   2.118 &lt;2e-16 ***
+## ERintmed(prop) -0.361887  0.140542 -1.756808  -1.568 &lt;2e-16 ***
+## ERpnie(prop)   -0.256836  0.617901 -1.687057  -0.857 &lt;2e-16 ***
+## pm             -0.618723  0.477360 -3.255047  -2.614 &lt;2e-16 ***
+## int             0.084215  0.007353  0.351321   0.361 &lt;2e-16 ***
+## pe             -0.172621  0.625254 -1.335736  -0.496 &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Rcde: controlled direct effect odds ratio; Rpnde: pure natural direct effect odds ratio; Rtnde: total natural direct effect odds ratio; Rpnie: pure natural indirect effect odds ratio; Rtnie: total natural indirect effect odds ratio; Rte: total effect odds ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
+## 
+## Relevant variable values: 
+## $a
+## [1] 1
+## 
+## $astar
+## [1] 0
+## 
+## $yval
+## [1] &quot;1&quot;
+## 
+## $mval
+## $mval[[1]]
+## [1] 1
+## 
+## 
+## $basecval
+## $basecval[[1]]
+## [1] 0.9993463
+## 
+## $basecval[[2]]
+## [1] 0.6061</code></pre>
+</div>
+<div id="direct-counterfactual-imputation-estimation-and-bootstrap-inference" class="section level3">
+<h3>Direct Counterfactual Imputation Estimation and Bootstrap
+Inference</h3>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>res_rb_impu_bootstrap <span class="ot">&lt;-</span> <span class="fu">cmest</span>(<span class="at">data =</span> data, <span class="at">model =</span> <span class="st">&quot;rb&quot;</span>, <span class="at">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="at">exposure =</span> <span class="st">&quot;A&quot;</span>,</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                               <span class="at">mediator =</span> <span class="st">&quot;M&quot;</span>, <span class="at">basec =</span> <span class="fu">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="at">EMint =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>                               <span class="at">mreg =</span> <span class="fu">list</span>(<span class="st">&quot;logistic&quot;</span>), <span class="at">yreg =</span> <span class="st">&quot;logistic&quot;</span>,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                               <span class="at">astar =</span> <span class="dv">0</span>, <span class="at">a =</span> <span class="dv">1</span>, <span class="at">mval =</span> <span class="fu">list</span>(<span class="dv">1</span>), </span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>                               <span class="at">estimation =</span> <span class="st">&quot;imputation&quot;</span>, <span class="at">inference =</span> <span class="st">&quot;bootstrap&quot;</span>, <span class="at">nboot =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(res_rb_impu_bootstrap)</span></code></pre></div>
+<pre><code>## Causal Mediation Analysis
+## 
+## # Outcome regression:
+## 
+## Call:
+## glm(formula = Y ~ A + M + A * M + C1 + C2, family = binomial(), 
+##     data = getCall(x$reg.output$yreg)$data, weights = getCall(x$reg.output$yreg)$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -0.5681  -0.2414  -0.1741  -0.1604   3.0521  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  -3.5731     0.7713  -4.633 3.61e-06 ***
+## A             0.7084     0.5283   1.341  0.17990    
+## M            -1.0471     0.3736  -2.803  0.00507 ** 
+## C1            0.9337     0.6973   1.339  0.18054    
+## C2           -0.8415     0.1443  -5.829 5.56e-09 ***
+## A:M          -0.4222     0.5541  -0.762  0.44607    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 2022.7  on 9999  degrees of freedom
+## Residual deviance: 1965.0  on 9994  degrees of freedom
+## AIC: 1977
+## 
+## Number of Fisher Scoring iterations: 7
+## 
+## 
+## # Mediator regressions: 
+## 
+## Call:
+## glm(formula = M ~ A + C1 + C2, family = binomial(), data = getCall(x$reg.output$mreg[[1L]])$data, 
+##     weights = getCall(x$reg.output$mreg[[1L]])$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -3.2578   0.1145   0.1647   0.2519   0.5563  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)   0.4353     0.6410   0.679  0.49712    
+## A             1.7076     0.1443  11.837  &lt; 2e-16 ***
+## C1            1.9982     0.6474   3.086  0.00203 ** 
+## C2            0.9024     0.1345   6.709 1.96e-11 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 2294.0  on 9999  degrees of freedom
+## Residual deviance: 2072.5  on 9996  degrees of freedom
+## AIC: 2080.5
+## 
+## Number of Fisher Scoring iterations: 7
+## 
+## 
+## # Effect decomposition on the odds ratio scale via the regression-based approach
+##  
+## Direct counterfactual imputation estimation with 
+##  bootstrap standard errors, percentile confidence intervals and p-values 
+##  
+##                Estimate Std.error  95% CIL 95% CIU  P.val    
+## Rcde            1.33004   0.11507  1.15601   1.311 &lt;2e-16 ***
+## Rpnde           1.41330   0.18980  1.30944   1.564 &lt;2e-16 ***
+## Rtnde           1.34910   0.12277  1.18647   1.351 &lt;2e-16 ***
+## Rpnie           0.93208   0.03667  0.90049   0.950 &lt;2e-16 ***
+## Rtnie           0.88974   0.06154  0.77788   0.861 &lt;2e-16 ***
+## Rte             1.25747   0.06704  1.12685   1.217 &lt;2e-16 ***
+## ERcde           0.29546   0.09356  0.14337   0.269 &lt;2e-16 ***
+## ERintref        0.11784   0.09624  0.16667   0.296 &lt;2e-16 ***
+## ERintmed       -0.08792   0.08609 -0.24855  -0.133 &lt;2e-16 ***
+## ERpnie         -0.06792   0.03667 -0.09947  -0.050 &lt;2e-16 ***
+## ERcde(prop)     1.14758   0.08287  1.12724   1.239 &lt;2e-16 ***
+## ERintref(prop)  0.45770   0.03819  1.31196   1.363 &lt;2e-16 ***
+## ERintmed(prop) -0.34147   0.07392 -1.14420  -1.045 &lt;2e-16 ***
+## ERpnie(prop)   -0.26381   0.04714 -0.45765  -0.394 &lt;2e-16 ***
+## pm             -0.60527   0.12106 -1.60185  -1.439 &lt;2e-16 ***
+## int             0.11623   0.03573  0.21907   0.267 &lt;2e-16 ***
+## pe             -0.14758   0.08287 -0.23858  -0.127 &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Rcde: controlled direct effect odds ratio; Rpnde: pure natural direct effect odds ratio; Rtnde: total natural direct effect odds ratio; Rpnie: pure natural indirect effect odds ratio; Rtnie: total natural indirect effect odds ratio; Rte: total effect odds ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
+## 
+## Relevant variable values: 
+## $a
+## [1] 1
+## 
+## $astar
+## [1] 0
+## 
+## $yval
+## [1] &quot;1&quot;
+## 
+## $mval
+## $mval[[1]]
+## [1] 1</code></pre>
+</div>
+</div>
+<div id="the-weighting-based-approach" class="section level2">
+<h2>The Weighting-based Approach</h2>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>res_wb <span class="ot">&lt;-</span> <span class="fu">cmest</span>(<span class="at">data =</span> data, <span class="at">model =</span> <span class="st">&quot;wb&quot;</span>, <span class="at">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="at">exposure =</span> <span class="st">&quot;A&quot;</span>,</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">mediator =</span> <span class="st">&quot;M&quot;</span>, <span class="at">basec =</span> <span class="fu">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="at">EMint =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">ereg =</span> <span class="st">&quot;logistic&quot;</span>, <span class="at">yreg =</span> <span class="st">&quot;logistic&quot;</span>,</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">astar =</span> <span class="dv">0</span>, <span class="at">a =</span> <span class="dv">1</span>, <span class="at">mval =</span> <span class="fu">list</span>(<span class="dv">1</span>), </span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">estimation =</span> <span class="st">&quot;imputation&quot;</span>, <span class="at">inference =</span> <span class="st">&quot;bootstrap&quot;</span>, <span class="at">nboot =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(res_wb)</span></code></pre></div>
+<pre><code>## Causal Mediation Analysis
+## 
+## # Outcome regression:
+## 
+## Call:
+## glm(formula = Y ~ A + M + A * M + C1 + C2, family = binomial(), 
+##     data = getCall(x$reg.output$yreg)$data, weights = getCall(x$reg.output$yreg)$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -0.5681  -0.2414  -0.1741  -0.1604   3.0521  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  -3.5731     0.7713  -4.633 3.61e-06 ***
+## A             0.7084     0.5283   1.341  0.17990    
+## M            -1.0471     0.3736  -2.803  0.00507 ** 
+## C1            0.9337     0.6973   1.339  0.18054    
+## C2           -0.8415     0.1443  -5.829 5.56e-09 ***
+## A:M          -0.4222     0.5541  -0.762  0.44607    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 2022.7  on 9999  degrees of freedom
+## Residual deviance: 1965.0  on 9994  degrees of freedom
+## AIC: 1977
+## 
+## Number of Fisher Scoring iterations: 7
+## 
+## 
+## # Exposure regression for weighting: 
+## 
+## Call:
+## glm(formula = A ~ C1 + C2, family = binomial(), data = getCall(x$reg.output$ereg)$data, 
+##     weights = getCall(x$reg.output$ereg)$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.6126  -1.4791   0.8573   0.8867   0.9750  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)   
+## (Intercept)  0.08342    0.21440   0.389  0.69723   
+## C1           0.60899    0.21208   2.872  0.00409 **
+## C2           0.10532    0.04375   2.407  0.01606 * 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 12534  on 9999  degrees of freedom
+## Residual deviance: 12520  on 9997  degrees of freedom
+## AIC: 12526
+## 
+## Number of Fisher Scoring iterations: 4
+## 
+## 
+## # Effect decomposition on the odds ratio scale via the weighting-based approach
+##  
+## Direct counterfactual imputation estimation with 
+##  bootstrap standard errors, percentile confidence intervals and p-values 
+##  
+##                 Estimate Std.error   95% CIL 95% CIU  P.val    
+## Rcde            1.330044  0.113440  0.994455   1.147      1    
+## Rpnde           1.426032  0.006549  1.209372   1.218 &lt;2e-16 ***
+## Rtnde           1.350329  0.087918  1.041197   1.159 &lt;2e-16 ***
+## Rpnie           0.921510  0.032181  0.939502   0.983 &lt;2e-16 ***
+## Rtnie           0.872590  0.045139  0.839968   0.901 &lt;2e-16 ***
+## Rte             1.244342  0.049089  1.023224   1.089 &lt;2e-16 ***
+## ERcde           0.291843  0.102790 -0.005249   0.133      1    
+## ERintref        0.134189  0.109339  0.076524   0.223 &lt;2e-16 ***
+## ERintmed       -0.103201  0.087819 -0.177656  -0.060 &lt;2e-16 ***
+## ERpnie         -0.078490  0.032181 -0.060472  -0.017 &lt;2e-16 ***
+## ERcde(prop)     1.194406  1.352518 -0.364539   1.453      1    
+## ERintref(prop)  0.549186  6.895338  1.042532  10.306 &lt;2e-16 ***
+## ERintmed(prop) -0.422363  5.493348 -8.196399  -0.816 &lt;2e-16 ***
+## ERpnie(prop)   -0.321229  0.049471 -0.745499  -0.679 &lt;2e-16 ***
+## pm             -0.743592  5.542819 -8.941899  -1.495 &lt;2e-16 ***
+## int             0.126823  1.401989  0.226462   2.110 &lt;2e-16 ***
+## pe             -0.194406  1.352518 -0.452573   1.365      1    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Rcde: controlled direct effect odds ratio; Rpnde: pure natural direct effect odds ratio; Rtnde: total natural direct effect odds ratio; Rpnie: pure natural indirect effect odds ratio; Rtnie: total natural indirect effect odds ratio; Rte: total effect odds ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
+## 
+## Relevant variable values: 
+## $a
+## [1] 1
+## 
+## $astar
+## [1] 0
+## 
+## $yval
+## [1] &quot;1&quot;
+## 
+## $mval
+## $mval[[1]]
+## [1] 1</code></pre>
+</div>
+<div id="the-inverse-odds-ratio-weighting-approach" class="section level2">
+<h2>The Inverse Odds-ratio Weighting Approach</h2>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>res_iorw <span class="ot">&lt;-</span> <span class="fu">cmest</span>(<span class="at">data =</span> data, <span class="at">model =</span> <span class="st">&quot;iorw&quot;</span>, <span class="at">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="at">exposure =</span> <span class="st">&quot;A&quot;</span>,</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">mediator =</span> <span class="st">&quot;M&quot;</span>, <span class="at">basec =</span> <span class="fu">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), </span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">ereg =</span> <span class="st">&quot;logistic&quot;</span>, <span class="at">yreg =</span> <span class="st">&quot;logistic&quot;</span>,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">astar =</span> <span class="dv">0</span>, <span class="at">a =</span> <span class="dv">1</span>, <span class="at">mval =</span> <span class="fu">list</span>(<span class="dv">1</span>), </span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">estimation =</span> <span class="st">&quot;imputation&quot;</span>, <span class="at">inference =</span> <span class="st">&quot;bootstrap&quot;</span>, <span class="at">nboot =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(res_iorw)</span></code></pre></div>
+<pre><code>## Causal Mediation Analysis
+## 
+## # Outcome regression for the total effect: 
+## 
+## Call:
+## glm(formula = Y ~ A + C1 + C2, family = binomial(), data = getCall(x$reg.output$yregTot)$data, 
+##     weights = getCall(x$reg.output$yregTot)$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -0.3031  -0.2480  -0.1742  -0.1622   3.0225  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  -4.4182     0.7137  -6.191 5.98e-10 ***
+## A             0.2183     0.1565   1.395    0.163    
+## C1            0.8540     0.6956   1.228    0.220    
+## C2           -0.8831     0.1435  -6.156 7.47e-10 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 2022.7  on 9999  degrees of freedom
+## Residual deviance: 1980.4  on 9996  degrees of freedom
+## AIC: 1988.4
+## 
+## Number of Fisher Scoring iterations: 7
+## 
+## 
+## # Outcome regression for the direct effect: 
+## 
+## Call:
+## glm(formula = Y ~ A + C1 + C2, family = binomial(), data = getCall(x$reg.output$yregDir)$data, 
+##     weights = getCall(x$reg.output$yregDir)$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -0.4839  -0.2000  -0.1433  -0.1146   4.2345  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  -3.7823     0.8563  -4.417 1.00e-05 ***
+## A             0.3675     0.1735   2.118   0.0342 *  
+## C1            0.2839     0.8440   0.336   0.7366    
+## C2           -1.0638     0.1803  -5.901 3.61e-09 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 1354.8  on 9999  degrees of freedom
+## Residual deviance: 1312.7  on 9996  degrees of freedom
+## AIC: 798.25
+## 
+## Number of Fisher Scoring iterations: 7
+## 
+## 
+## # Exposure regression for weighting: 
+## 
+## Call:
+## glm(formula = A ~ M + C1 + C2, family = binomial(), data = getCall(x$reg.output$ereg)$data, 
+##     weights = getCall(x$reg.output$ereg)$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.6138  -1.5035   0.8465   0.8684   1.6561  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  -1.4666     0.2542  -5.770 7.91e-09 ***
+## M             1.7067     0.1442  11.832  &lt; 2e-16 ***
+## C1            0.5218     0.2140   2.438   0.0148 *  
+## C2            0.0648     0.0443   1.463   0.1436    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 12534  on 9999  degrees of freedom
+## Residual deviance: 12360  on 9996  degrees of freedom
+## AIC: 12368
+## 
+## Number of Fisher Scoring iterations: 4
+## 
+## 
+## # Effect decomposition on the odds ratio scale via the inverse odds ratio weighting approach
+##  
+## Direct counterfactual imputation estimation with 
+##  bootstrap standard errors, percentile confidence intervals and p-values 
+##  
+##       Estimate Std.error  95% CIL 95% CIU  P.val    
+## Rte    1.24287   0.02379  1.44449   1.476 &lt;2e-16 ***
+## Rpnde  1.44092   0.04220  1.56708   1.624 &lt;2e-16 ***
+## Rtnie  0.86256   0.03914  0.88959   0.942 &lt;2e-16 ***
+## pm    -0.81541   0.15866 -0.40379  -0.191 &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Rte: total effect odds ratio; Rpnde: pure natural direct effect odds ratio; Rtnie: total natural indirect effect odds ratio; pm: proportion mediated)
+## 
+## Relevant variable values: 
+## $a
+## [1] 1
+## 
+## $astar
+## [1] 0
+## 
+## $yval
+## [1] &quot;1&quot;</code></pre>
+</div>
+<div id="the-natural-effect-model" class="section level2">
+<h2>The Natural Effect Model</h2>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>res_ne <span class="ot">&lt;-</span> <span class="fu">cmest</span>(<span class="at">data =</span> data, <span class="at">model =</span> <span class="st">&quot;ne&quot;</span>, <span class="at">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="at">exposure =</span> <span class="st">&quot;A&quot;</span>,</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">mediator =</span> <span class="st">&quot;M&quot;</span>, <span class="at">basec =</span> <span class="fu">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="at">EMint =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">yreg =</span> <span class="st">&quot;logistic&quot;</span>,</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">astar =</span> <span class="dv">0</span>, <span class="at">a =</span> <span class="dv">1</span>, <span class="at">mval =</span> <span class="fu">list</span>(<span class="dv">1</span>), </span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">estimation =</span> <span class="st">&quot;imputation&quot;</span>, <span class="at">inference =</span> <span class="st">&quot;bootstrap&quot;</span>, <span class="at">nboot =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(res_ne)</span></code></pre></div>
+<pre><code>## Causal Mediation Analysis
+## 
+## # Outcome regression:
+## 
+## Call:
+## glm(formula = Y ~ A + M + A * M + C1 + C2, family = binomial(), 
+##     data = getCall(x$reg.output$yreg)$data, weights = getCall(x$reg.output$yreg)$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -0.5681  -0.2414  -0.1741  -0.1604   3.0521  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  -3.5731     0.7713  -4.633 3.61e-06 ***
+## A             0.7084     0.5283   1.341  0.17990    
+## M            -1.0471     0.3736  -2.803  0.00507 ** 
+## C1            0.9337     0.6973   1.339  0.18054    
+## C2           -0.8415     0.1443  -5.829 5.56e-09 ***
+## A:M          -0.4222     0.5541  -0.762  0.44607    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 2022.7  on 9999  degrees of freedom
+## Residual deviance: 1965.0  on 9994  degrees of freedom
+## AIC: 1977
+## 
+## Number of Fisher Scoring iterations: 7
+## 
+## 
+## 
+## # Effect decomposition on the odds ratio scale via the natural effect model
+##  
+## Direct counterfactual imputation estimation with 
+##  bootstrap standard errors, percentile confidence intervals and p-values 
+##  
+##                Estimate Std.error  95% CIL 95% CIU  P.val    
+## Rcde            1.33004   0.16597  1.46857   1.692 &lt;2e-16 ***
+## Rpnde           1.42769   0.08328  1.52544   1.637 &lt;2e-16 ***
+## Rtnde           1.35233   0.14557  1.48299   1.679 &lt;2e-16 ***
+## Rpnie           0.92084   0.01029  0.84532   0.859 &lt;2e-16 ***
+## Rtnie           0.87224   0.04391  0.82180   0.881 &lt;2e-16 ***
+## Rte             1.24529   0.14034  1.25360   1.442 &lt;2e-16 ***
+## ERcde           0.29180   0.13669  0.37185   0.555 &lt;2e-16 ***
+## ERintref        0.13590   0.05341  0.08193   0.154 &lt;2e-16 ***
+## ERintmed       -0.10325   0.04677 -0.11692  -0.054 &lt;2e-16 ***
+## ERpnie         -0.07916   0.01029 -0.15467  -0.141 &lt;2e-16 ***
+## ERcde(prop)     1.18961   0.15682  1.25780   1.468 &lt;2e-16 ***
+## ERintref(prop)  0.55403   0.31535  0.19003   0.614 &lt;2e-16 ***
+## ERintmed(prop) -0.42093   0.25387 -0.46724  -0.126 &lt;2e-16 ***
+## ERpnie(prop)   -0.32271   0.21830 -0.61496  -0.322 &lt;2e-16 ***
+## pm             -0.74364   0.47217 -1.08220  -0.448 &lt;2e-16 ***
+## int             0.13310   0.06148  0.06387   0.146 &lt;2e-16 ***
+## pe             -0.18961   0.15682 -0.46849  -0.258 &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Rcde: controlled direct effect odds ratio; Rpnde: pure natural direct effect odds ratio; Rtnde: total natural direct effect odds ratio; Rpnie: pure natural indirect effect odds ratio; Rtnie: total natural indirect effect odds ratio; Rte: total effect odds ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
+## 
+## Relevant variable values: 
+## $a
+## [1] 1
+## 
+## $astar
+## [1] 0
+## 
+## $yval
+## [1] &quot;1&quot;
+## 
+## $mval
+## $mval[[1]]
+## [1] 1</code></pre>
+</div>
+<div id="the-marginal-structural-model" class="section level2">
+<h2>The Marginal Structural Model</h2>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>res_msm <span class="ot">&lt;-</span> <span class="fu">cmest</span>(<span class="at">data =</span> data, <span class="at">model =</span> <span class="st">&quot;msm&quot;</span>, <span class="at">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="at">exposure =</span> <span class="st">&quot;A&quot;</span>,</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">mediator =</span> <span class="st">&quot;M&quot;</span>, <span class="at">basec =</span> <span class="fu">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="at">EMint =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">ereg =</span> <span class="st">&quot;logistic&quot;</span>, <span class="at">yreg =</span> <span class="st">&quot;logistic&quot;</span>, <span class="at">mreg =</span> <span class="fu">list</span>(<span class="st">&quot;logistic&quot;</span>),</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">wmnomreg =</span> <span class="fu">list</span>(<span class="st">&quot;logistic&quot;</span>), <span class="at">wmdenomreg =</span> <span class="fu">list</span>(<span class="st">&quot;logistic&quot;</span>),</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">astar =</span> <span class="dv">0</span>, <span class="at">a =</span> <span class="dv">1</span>, <span class="at">mval =</span> <span class="fu">list</span>(<span class="dv">1</span>), </span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">estimation =</span> <span class="st">&quot;imputation&quot;</span>, <span class="at">inference =</span> <span class="st">&quot;bootstrap&quot;</span>, <span class="at">nboot =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(res_msm)</span></code></pre></div>
+<pre><code>## Causal Mediation Analysis
+## 
+## # Outcome regression:
+## 
+## Call:
+## glm(formula = Y ~ A + M + A * M, family = binomial(), data = getCall(x$reg.output$yreg)$data, 
+##     weights = getCall(x$reg.output$yreg)$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -0.5182  -0.2088  -0.2057  -0.1827   3.4604  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  -3.1163     0.3762  -8.284   &lt;2e-16 ***
+## A             0.4632     0.6200   0.747   0.4550    
+## M            -0.9908     0.4028  -2.460   0.0139 *  
+## A:M          -0.1803     0.6421  -0.281   0.7789    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 1996.3  on 9999  degrees of freedom
+## Residual deviance: 1985.5  on 9996  degrees of freedom
+## AIC: 2014.4
+## 
+## Number of Fisher Scoring iterations: 6
+## 
+## 
+## # Mediator regressions: 
+## 
+## Call:
+## glm(formula = M ~ A, family = binomial(), data = getCall(x$reg.output$mreg[[1L]])$data, 
+##     weights = getCall(x$reg.output$mreg[[1L]])$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -3.1423   0.1427   0.1446   0.3227   0.3593  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  2.87310    0.07858   36.56   &lt;2e-16 ***
+## A            1.69598    0.14370   11.80   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 2271.0  on 9999  degrees of freedom
+## Residual deviance: 2112.9  on 9998  degrees of freedom
+## AIC: 2132.1
+## 
+## Number of Fisher Scoring iterations: 7
+## 
+## 
+## # Mediator regressions for weighting (denominator): 
+## 
+## Call:
+## glm(formula = M ~ A + C1 + C2, family = binomial(), data = getCall(x$reg.output$wmdenomreg[[1L]])$data, 
+##     weights = getCall(x$reg.output$wmdenomreg[[1L]])$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -3.2578   0.1145   0.1647   0.2519   0.5563  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)   0.4353     0.6410   0.679  0.49712    
+## A             1.7076     0.1443  11.837  &lt; 2e-16 ***
+## C1            1.9982     0.6474   3.086  0.00203 ** 
+## C2            0.9024     0.1345   6.709 1.96e-11 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 2294.0  on 9999  degrees of freedom
+## Residual deviance: 2072.5  on 9996  degrees of freedom
+## AIC: 2080.5
+## 
+## Number of Fisher Scoring iterations: 7
+## 
+## 
+## # Mediator regressions for weighting (nominator): 
+## 
+## Call:
+## glm(formula = M ~ A, family = binomial(), data = getCall(x$reg.output$wmnomreg[[1L]])$data, 
+##     weights = getCall(x$reg.output$wmnomreg[[1L]])$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -3.0301   0.1428   0.1428   0.3355   0.3355  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  2.84922    0.07775   36.65   &lt;2e-16 ***
+## A            1.73145    0.14383   12.04   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 2294  on 9999  degrees of freedom
+## Residual deviance: 2128  on 9998  degrees of freedom
+## AIC: 2132
+## 
+## Number of Fisher Scoring iterations: 7
+## 
+## 
+## # Exposure regression for weighting: 
+## 
+## Call:
+## glm(formula = A ~ C1 + C2, family = binomial(), data = getCall(x$reg.output$ereg)$data, 
+##     weights = getCall(x$reg.output$ereg)$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.6126  -1.4791   0.8573   0.8867   0.9750  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)   
+## (Intercept)  0.08342    0.21440   0.389  0.69723   
+## C1           0.60899    0.21208   2.872  0.00409 **
+## C2           0.10532    0.04375   2.407  0.01606 * 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 12534  on 9999  degrees of freedom
+## Residual deviance: 12520  on 9997  degrees of freedom
+## AIC: 12526
+## 
+## Number of Fisher Scoring iterations: 4
+## 
+## 
+## # Effect decomposition on the odds ratio scale via the marginal structural model
+##  
+## Direct counterfactual imputation estimation with 
+##  bootstrap standard errors, percentile confidence intervals and p-values 
+##  
+##                Estimate Std.error  95% CIL 95% CIU  P.val    
+## Rcde            1.32694   0.32338  1.26454   1.699 &lt;2e-16 ***
+## Rpnde           1.35698   0.11686  1.50999   1.667 &lt;2e-16 ***
+## Rtnde           1.33354   0.29004  1.30216   1.692 &lt;2e-16 ***
+## Rpnie           0.93811   0.01827  0.92265   0.947 &lt;2e-16 ***
+## Rtnie           0.92191   0.08896  0.81683   0.936 &lt;2e-16 ***
+## Rte             1.25101   0.24379  1.23340   1.561 &lt;2e-16 ***
+## ERcde           0.29539   0.27915  0.24430   0.619 &lt;2e-16 ***
+## ERintref        0.06159   0.16229  0.04786   0.266 &lt;2e-16 ***
+## ERintmed       -0.04408   0.14520 -0.22300  -0.028 &lt;2e-16 ***
+## ERpnie         -0.06189   0.01827 -0.07734  -0.053 &lt;2e-16 ***
+## ERcde(prop)     1.17681   0.04562  1.03991   1.101 &lt;2e-16 ***
+## ERintref(prop)  0.24536   0.79851  0.10206   1.175 &lt;2e-16 ***
+## ERintmed(prop) -0.17563   0.68623 -0.98616  -0.064 &lt;2e-16 ***
+## ERpnie(prop)   -0.24655   0.06666 -0.22861  -0.139 &lt;2e-16 ***
+## pm             -0.42217   0.75289 -1.21477  -0.203 &lt;2e-16 ***
+## int             0.06973   0.11228  0.03785   0.189 &lt;2e-16 ***
+## pe             -0.17681   0.04562 -0.10120  -0.040 &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Rcde: controlled direct effect odds ratio; Rpnde: pure natural direct effect odds ratio; Rtnde: total natural direct effect odds ratio; Rpnie: pure natural indirect effect odds ratio; Rtnie: total natural indirect effect odds ratio; Rte: total effect odds ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
+## 
+## Relevant variable values: 
+## $a
+## [1] 1
+## 
+## $astar
+## [1] 0
+## 
+## $yval
+## [1] &quot;1&quot;
+## 
+## $mval
+## $mval[[1]]
+## [1] 1</code></pre>
+</div>
+<div id="the-g-formula-approach" class="section level2">
+<h2>The g-formula Approach</h2>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>res_gformula <span class="ot">&lt;-</span> <span class="fu">cmest</span>(<span class="at">data =</span> data, <span class="at">model =</span> <span class="st">&quot;gformula&quot;</span>, <span class="at">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="at">exposure =</span> <span class="st">&quot;A&quot;</span>,</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">mediator =</span> <span class="st">&quot;M&quot;</span>, <span class="at">basec =</span> <span class="fu">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="at">EMint =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>                      <span class="at">mreg =</span> <span class="fu">list</span>(<span class="st">&quot;logistic&quot;</span>), <span class="at">yreg =</span> <span class="st">&quot;logistic&quot;</span>,</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>                      <span class="at">astar =</span> <span class="dv">0</span>, <span class="at">a =</span> <span class="dv">1</span>, <span class="at">mval =</span> <span class="fu">list</span>(<span class="dv">1</span>), </span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>                      <span class="at">estimation =</span> <span class="st">&quot;imputation&quot;</span>, <span class="at">inference =</span> <span class="st">&quot;bootstrap&quot;</span>, <span class="at">nboot =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(res_gformula)</span></code></pre></div>
+<pre><code>## Causal Mediation Analysis
+## 
+## # Outcome regression:
+## 
+## Call:
+## glm(formula = Y ~ A + M + A * M + C1 + C2, family = binomial(), 
+##     data = getCall(x$reg.output$yreg)$data, weights = getCall(x$reg.output$yreg)$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -0.5681  -0.2414  -0.1741  -0.1604   3.0521  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  -3.5731     0.7713  -4.633 3.61e-06 ***
+## A             0.7084     0.5283   1.341  0.17990    
+## M            -1.0471     0.3736  -2.803  0.00507 ** 
+## C1            0.9337     0.6973   1.339  0.18054    
+## C2           -0.8415     0.1443  -5.829 5.56e-09 ***
+## A:M          -0.4222     0.5541  -0.762  0.44607    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 2022.7  on 9999  degrees of freedom
+## Residual deviance: 1965.0  on 9994  degrees of freedom
+## AIC: 1977
+## 
+## Number of Fisher Scoring iterations: 7
+## 
+## 
+## # Mediator regressions: 
+## 
+## Call:
+## glm(formula = M ~ A + C1 + C2, family = binomial(), data = getCall(x$reg.output$mreg[[1L]])$data, 
+##     weights = getCall(x$reg.output$mreg[[1L]])$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -3.2578   0.1145   0.1647   0.2519   0.5563  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)   0.4353     0.6410   0.679  0.49712    
+## A             1.7076     0.1443  11.837  &lt; 2e-16 ***
+## C1            1.9982     0.6474   3.086  0.00203 ** 
+## C2            0.9024     0.1345   6.709 1.96e-11 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 2294.0  on 9999  degrees of freedom
+## Residual deviance: 2072.5  on 9996  degrees of freedom
+## AIC: 2080.5
+## 
+## Number of Fisher Scoring iterations: 7
+## 
+## 
+## # Effect decomposition on the odds ratio scale via the g-formula approach
+##  
+## Direct counterfactual imputation estimation with 
+##  bootstrap standard errors, percentile confidence intervals and p-values 
+##  
+##                  Estimate  Std.error    95% CIL 95% CIU  P.val    
+## Rcde            1.3300443  0.1823571  1.1607204   1.406 &lt;2e-16 ***
+## Rpnde           1.4187946  0.1732298  1.3326404   1.565 &lt;2e-16 ***
+## Rtnde           1.3509010  0.1842750  1.1908917   1.438 &lt;2e-16 ***
+## Rpnie           0.9278110  0.0190202  0.9333036   0.959 &lt;2e-16 ***
+## Rtnie           0.8834125  0.0350431  0.8340311   0.881 &lt;2e-16 ***
+## Rte             1.2533809  0.1993578  1.1114635   1.379 &lt;2e-16 ***
+## ERcde           0.2935587  0.1723094  0.1459481   0.377 &lt;2e-16 ***
+## ERintref        0.1252359  0.0009203  0.1871846   0.188 &lt;2e-16 ***
+## ERintmed       -0.0932248  0.0071078 -0.1542295  -0.145 &lt;2e-16 ***
+## ERpnie         -0.0721890  0.0190202 -0.0666871  -0.041 &lt;2e-16 ***
+## ERcde(prop)     1.1585669  0.2397404  0.9992694   1.321 &lt;2e-16 ***
+## ERintref(prop)  0.4942595  0.9140953  0.5191497   1.747 &lt;2e-16 ***
+## ERintmed(prop) -0.3679235  0.7748450 -1.4415037  -0.400 &lt;2e-16 ***
+## ERpnie(prop)   -0.2849029  0.3789907 -0.6270970  -0.118 &lt;2e-16 ***
+## pm             -0.6528264  1.1538357 -2.0686007  -0.518 &lt;2e-16 ***
+## int             0.1263360  0.1392503  0.1186525   0.306 &lt;2e-16 ***
+## pe             -0.1585669  0.2397404 -0.3213614   0.001      1    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Rcde: controlled direct effect odds ratio; Rpnde: pure natural direct effect odds ratio; Rtnde: total natural direct effect odds ratio; Rpnie: pure natural indirect effect odds ratio; Rtnie: total natural indirect effect odds ratio; Rte: total effect odds ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
+## 
+## Relevant variable values: 
+## $a
+## [1] 1
+## 
+## $astar
+## [1] 0
+## 
+## $yval
+## [1] &quot;1&quot;
+## 
+## $mval
+## $mval[[1]]
+## [1] 1</code></pre>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

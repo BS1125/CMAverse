@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+<meta name="date" content="2022-10-10" />
+
+<title>Statistical Modeling with Mediator-outcome Confounders Affected by the Exposure</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Statistical Modeling with Mediator-outcome
+Confounders Affected by the Exposure</h1>
+<h4 class="date">2022-10-10</h4>
+
+
+
+<p>This example demonstrates how to use <code>cmest</code> when there
+are mediator-outcome confounders affected by the exposure. For this
+purpose, we simulate some data containing a continuous baseline
+confounder <span class="math inline">\(C_1\)</span>, a binary baseline
+confounder <span class="math inline">\(C_2\)</span>, a binary exposure
+<span class="math inline">\(A\)</span>, a continuous mediator-outcome
+confounder affected by the exposure <span class="math inline">\(L\)</span>, a binary mediator <span class="math inline">\(M\)</span> and a binary outcome <span class="math inline">\(Y\)</span>. The true regression models for <span class="math inline">\(A\)</span>, <span class="math inline">\(L\)</span>, <span class="math inline">\(M\)</span>
+and <span class="math inline">\(Y\)</span> are: <span class="math display">\[logit(E(A|C_1,C_2))=0.2+0.5C_1+0.1C_2\]</span>
+<span class="math display">\[E(L|A,C_1,C_2)=1+A-C_1-0.5C_2\]</span>
+<span class="math display">\[logit(E(M|A,L,C_1,C_2))=1+2A-L+1.5C_1+0.8C_2\]</span>
+<span class="math display">\[logit(E(Y|A,L,M,C_1,C_2)))=-3-0.4A-1.2M+0.5AM-0.5L+0.3C_1-0.6C_2\]</span></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>expit <span class="ot">&lt;-</span> <span class="cf">function</span>(x) <span class="fu">exp</span>(x)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">+</span><span class="fu">exp</span>(x))</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">10000</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>C1 <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="dv">1</span>, <span class="at">sd =</span> <span class="fl">0.1</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>C2 <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fl">0.6</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>A <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fu">expit</span>(<span class="fl">0.2</span> <span class="sc">+</span> <span class="fl">0.5</span><span class="sc">*</span>C1 <span class="sc">+</span> <span class="fl">0.1</span><span class="sc">*</span>C2))</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>L <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="dv">1</span> <span class="sc">+</span> A <span class="sc">-</span> C1 <span class="sc">-</span> <span class="fl">0.5</span><span class="sc">*</span>C2, <span class="at">sd =</span> <span class="fl">0.5</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>M <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fu">expit</span>(<span class="dv">1</span> <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>A <span class="sc">-</span> L <span class="sc">+</span> <span class="fl">1.5</span><span class="sc">*</span>C1 <span class="sc">+</span> <span class="fl">0.8</span><span class="sc">*</span>C2))</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>Y <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fu">expit</span>(<span class="sc">-</span><span class="dv">3</span> <span class="sc">-</span> <span class="fl">0.4</span><span class="sc">*</span>A <span class="sc">-</span> <span class="fl">1.2</span><span class="sc">*</span>M <span class="sc">+</span> <span class="fl">0.5</span><span class="sc">*</span>A<span class="sc">*</span>M <span class="sc">-</span> <span class="fl">0.5</span><span class="sc">*</span>L <span class="sc">+</span> <span class="fl">0.3</span><span class="sc">*</span>C1 <span class="sc">-</span> <span class="fl">0.6</span><span class="sc">*</span>C2))</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(A, M, Y, C1, C2, L)</span></code></pre></div>
+<p>The DAG for this scientific setting is:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(CMAverse)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cmdag</span>(<span class="at">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="at">exposure =</span> <span class="st">&quot;A&quot;</span>, <span class="at">mediator =</span> <span class="st">&quot;M&quot;</span>,</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>      <span class="at">basec =</span> <span class="fu">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="at">postc =</span> <span class="st">&quot;L&quot;</span>, <span class="at">node =</span> <span class="cn">TRUE</span>, <span class="at">text_col =</span> <span class="st">&quot;white&quot;</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>In this setting, we can use the marginal structural model and the
+<span class="math inline">\(g\)</span>-formula approach. The results are
+shown below.</p>
+<div id="the-marginal-structural-model" class="section level2">
+<h2>The Marginal Structural Model</h2>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>res_msm <span class="ot">&lt;-</span> <span class="fu">cmest</span>(<span class="at">data =</span> data, <span class="at">model =</span> <span class="st">&quot;msm&quot;</span>, <span class="at">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="at">exposure =</span> <span class="st">&quot;A&quot;</span>,</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">mediator =</span> <span class="st">&quot;M&quot;</span>, <span class="at">basec =</span> <span class="fu">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="at">postc =</span> <span class="st">&quot;L&quot;</span>, <span class="at">EMint =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">ereg =</span> <span class="st">&quot;logistic&quot;</span>, <span class="at">yreg =</span> <span class="st">&quot;logistic&quot;</span>, <span class="at">mreg =</span> <span class="fu">list</span>(<span class="st">&quot;logistic&quot;</span>),</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">wmnomreg =</span> <span class="fu">list</span>(<span class="st">&quot;logistic&quot;</span>), <span class="at">wmdenomreg =</span> <span class="fu">list</span>(<span class="st">&quot;logistic&quot;</span>),</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">astar =</span> <span class="dv">0</span>, <span class="at">a =</span> <span class="dv">1</span>, <span class="at">mval =</span> <span class="fu">list</span>(<span class="dv">1</span>), </span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">estimation =</span> <span class="st">&quot;imputation&quot;</span>, <span class="at">inference =</span> <span class="st">&quot;bootstrap&quot;</span>, <span class="at">nboot =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(res_msm)</span></code></pre></div>
+<pre><code>## Causal Mediation Analysis
+## 
+## # Outcome regression:
+## 
+## Call:
+## glm(formula = Y ~ A + M + A * M, family = binomial(), data = getCall(x$reg.output$yreg)$data, 
+##     weights = getCall(x$reg.output$yreg)$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -0.6465  -0.1964  -0.1428  -0.1399   3.3658  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept) -3.49700    0.47457  -7.369 1.72e-13 ***
+## A            0.09466    0.67862   0.139    0.889    
+## M           -0.40808    0.49218  -0.829    0.407    
+## A:M         -0.79067    0.70198  -1.126    0.260    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 1432.5  on 9999  degrees of freedom
+## Residual deviance: 1412.9  on 9996  degrees of freedom
+## AIC: 1432.5
+## 
+## Number of Fisher Scoring iterations: 7
+## 
+## 
+## # Mediator regressions: 
+## 
+## Call:
+## glm(formula = M ~ A, family = binomial(), data = getCall(x$reg.output$mreg[[1L]])$data, 
+##     weights = getCall(x$reg.output$mreg[[1L]])$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -2.9114   0.1972   0.1999   0.3089   0.3437  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  2.96393    0.08185  36.211  &lt; 2e-16 ***
+## A            0.95266    0.11992   7.944 1.95e-15 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 2623.2  on 9999  degrees of freedom
+## Residual deviance: 2560.6  on 9998  degrees of freedom
+## AIC: 2580.5
+## 
+## Number of Fisher Scoring iterations: 6
+## 
+## 
+## # Mediator regressions for weighting (denominator): 
+## 
+## Call:
+## glm(formula = M ~ A + C1 + C2 + L, family = binomial(), data = getCall(x$reg.output$wmdenomreg[[1L]])$data, 
+##     weights = getCall(x$reg.output$wmdenomreg[[1L]])$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -3.4241   0.1334   0.1885   0.2668   0.8260  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)   0.9946     0.6067   1.639   0.1012    
+## A             1.8884     0.1726  10.944  &lt; 2e-16 ***
+## C1            1.4955     0.6090   2.456   0.0141 *  
+## C2            0.8166     0.1410   5.793 6.92e-09 ***
+## L            -0.9171     0.1215  -7.546 4.50e-14 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 2646.0  on 9999  degrees of freedom
+## Residual deviance: 2397.3  on 9995  degrees of freedom
+## AIC: 2407.3
+## 
+## Number of Fisher Scoring iterations: 7
+## 
+## 
+## # Mediator regressions for weighting (nominator): 
+## 
+## Call:
+## glm(formula = M ~ A, family = binomial(), data = getCall(x$reg.output$wmnomreg[[1L]])$data, 
+##     weights = getCall(x$reg.output$wmnomreg[[1L]])$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -2.8106   0.1972   0.1972   0.3224   0.3224  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  2.93070    0.08064  36.345   &lt;2e-16 ***
+## A            0.99963    0.11952   8.364   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 2646.0  on 9999  degrees of freedom
+## Residual deviance: 2576.3  on 9998  degrees of freedom
+## AIC: 2580.3
+## 
+## Number of Fisher Scoring iterations: 6
+## 
+## 
+## # Exposure regression for weighting: 
+## 
+## Call:
+## glm(formula = A ~ C1 + C2, family = binomial(), data = getCall(x$reg.output$ereg)$data, 
+##     weights = getCall(x$reg.output$ereg)$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.6126  -1.4791   0.8573   0.8867   0.9750  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)   
+## (Intercept)  0.08342    0.21440   0.389  0.69723   
+## C1           0.60899    0.21208   2.872  0.00409 **
+## C2           0.10532    0.04375   2.407  0.01606 * 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 12534  on 9999  degrees of freedom
+## Residual deviance: 12520  on 9997  degrees of freedom
+## AIC: 12526
+## 
+## Number of Fisher Scoring iterations: 4
+## 
+## 
+## # Effect decomposition on the odds ratio scale via the marginal structural model
+##  
+## Direct counterfactual imputation estimation with 
+##  bootstrap standard errors, percentile confidence intervals and p-values 
+##  
+##                  Estimate Std.error   95% CIL 95% CIU  P.val    
+## Rcde             0.498566  0.170341  0.389195   0.618 &lt;2e-16 ***
+## rRpnde           0.539352  0.181890  0.400160   0.644 &lt;2e-16 ***
+## rRtnde           0.515779  0.174990  0.394162   0.629 &lt;2e-16 ***
+## rRpnie           0.986516  0.008982  1.002378   1.014 &lt;2e-16 ***
+## rRtnie           0.943399  0.015324  0.978652   0.999 &lt;2e-16 ***
+## Rte              0.508824  0.171854  0.399856   0.631 &lt;2e-16 ***
+## ERcde           -0.485202  0.180346 -0.620426  -0.378 &lt;2e-16 ***
+## rERintref        0.024555  0.001544  0.022033   0.024 &lt;2e-16 ***
+## rERintmed       -0.017044  0.001054 -0.016303  -0.015 &lt;2e-16 ***
+## rERpnie         -0.013484  0.008982  0.002380   0.014 &lt;2e-16 ***
+## ERcde(prop)      0.987839  0.006280  1.027535   1.036 &lt;2e-16 ***
+## rERintref(prop) -0.049991  0.021520 -0.066008  -0.037 &lt;2e-16 ***
+## rERintmed(prop)  0.034700  0.014571  0.025062   0.045 &lt;2e-16 ***
+## rERpnie(prop)    0.027453  0.013229 -0.023940  -0.006 &lt;2e-16 ***
+## rpm              0.062152  0.027800  0.001122   0.038 &lt;2e-16 ***
+## rint            -0.015292  0.006950 -0.021369  -0.012 &lt;2e-16 ***
+## rpe              0.012161  0.006280 -0.035973  -0.028 &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Rcde: controlled direct effect odds ratio; rRpnde: randomized analogue of pure natural direct effect odds ratio; rRtnde: randomized analogue of total natural direct effect odds ratio; rRpnie: randomized analogue of pure natural indirect effect odds ratio; rRtnie: randomized analogue of total natural indirect effect odds ratio; Rte: total effect odds ratio; ERcde: excess relative risk due to controlled direct effect; rERintref: randomized analogue of excess relative risk due to reference interaction; rERintmed: randomized analogue of excess relative risk due to mediated interaction; rERpnie: randomized analogue of excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; rERintref(prop): proportion rERintref; rERintmed(prop): proportion rERintmed; rERpnie(prop): proportion rERpnie; rpm: randomized analogue of overall proportion mediated; rint: randomized analogue of overall proportion attributable to interaction; rpe: randomized analogue of overall proportion eliminated)
+## 
+## Relevant variable values: 
+## $a
+## [1] 1
+## 
+## $astar
+## [1] 0
+## 
+## $yval
+## [1] &quot;1&quot;
+## 
+## $mval
+## $mval[[1]]
+## [1] 1</code></pre>
+</div>
+<div id="the-g-formula-approach" class="section level2">
+<h2>The g-formula Approach</h2>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>res_gformula <span class="ot">&lt;-</span> <span class="fu">cmest</span>(<span class="at">data =</span> data, <span class="at">model =</span> <span class="st">&quot;gformula&quot;</span>, <span class="at">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="at">exposure =</span> <span class="st">&quot;A&quot;</span>,</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">mediator =</span> <span class="st">&quot;M&quot;</span>, <span class="at">basec =</span> <span class="fu">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="at">postc =</span> <span class="st">&quot;L&quot;</span>, <span class="at">EMint =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                      <span class="at">mreg =</span> <span class="fu">list</span>(<span class="st">&quot;logistic&quot;</span>), <span class="at">yreg =</span> <span class="st">&quot;logistic&quot;</span>, <span class="at">postcreg =</span> <span class="fu">list</span>(<span class="st">&quot;linear&quot;</span>),</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>                      <span class="at">astar =</span> <span class="dv">0</span>, <span class="at">a =</span> <span class="dv">1</span>, <span class="at">mval =</span> <span class="fu">list</span>(<span class="dv">1</span>), </span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>                      <span class="at">estimation =</span> <span class="st">&quot;imputation&quot;</span>, <span class="at">inference =</span> <span class="st">&quot;bootstrap&quot;</span>, <span class="at">nboot =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(res_gformula)</span></code></pre></div>
+<pre><code>## Causal Mediation Analysis
+## 
+## # Outcome regression:
+## 
+## Call:
+## glm(formula = Y ~ A + M + A * M + C1 + C2 + L, family = binomial(), 
+##     data = getCall(x$reg.output$yreg)$data, weights = getCall(x$reg.output$yreg)$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -0.3617  -0.1788  -0.1545  -0.1289   3.1833  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)   
+## (Intercept)  -2.7488     0.9365  -2.935  0.00333 **
+## A            -0.1267     0.6617  -0.192  0.84812   
+## M            -0.7274     0.4136  -1.759  0.07863 . 
+## C1           -0.1906     0.8705  -0.219  0.82664   
+## C2           -0.5566     0.1933  -2.880  0.00397 **
+## L            -0.2242     0.1709  -1.312  0.18964   
+## A:M          -0.3425     0.6635  -0.516  0.60572   
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 1447.7  on 9999  degrees of freedom
+## Residual deviance: 1415.5  on 9993  degrees of freedom
+## AIC: 1429.5
+## 
+## Number of Fisher Scoring iterations: 7
+## 
+## 
+## # Mediator regressions: 
+## 
+## Call:
+## glm(formula = M ~ A + C1 + C2 + L, family = binomial(), data = getCall(x$reg.output$mreg[[1L]])$data, 
+##     weights = getCall(x$reg.output$mreg[[1L]])$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -3.4241   0.1334   0.1885   0.2668   0.8260  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)   0.9946     0.6067   1.639   0.1012    
+## A             1.8884     0.1726  10.944  &lt; 2e-16 ***
+## C1            1.4955     0.6090   2.456   0.0141 *  
+## C2            0.8166     0.1410   5.793 6.92e-09 ***
+## L            -0.9171     0.1215  -7.546 4.50e-14 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 2646.0  on 9999  degrees of freedom
+## Residual deviance: 2397.3  on 9995  degrees of freedom
+## AIC: 2407.3
+## 
+## Number of Fisher Scoring iterations: 7
+## 
+## 
+## # Regressions for mediator-outcome confounders affected by the exposure: 
+## 
+## Call:
+## glm(formula = L ~ A + C1 + C2, family = gaussian(), data = getCall(x$reg.output$postcreg[[1L]])$data, 
+##     weights = getCall(x$reg.output$postcreg[[1L]])$weights)
+## 
+## Deviance Residuals: 
+##      Min        1Q    Median        3Q       Max  
+## -1.82456  -0.34194   0.00712   0.33751   1.82462  
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  1.00268    0.05077   19.75   &lt;2e-16 ***
+## A            1.00202    0.01081   92.68   &lt;2e-16 ***
+## C1          -1.00369    0.04980  -20.15   &lt;2e-16 ***
+## C2          -0.49437    0.01032  -47.92   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 0.2539334)
+## 
+##     Null deviance: 5324.2  on 9999  degrees of freedom
+## Residual deviance: 2538.3  on 9996  degrees of freedom
+## AIC: 14678
+## 
+## Number of Fisher Scoring iterations: 2
+## 
+## 
+## # Effect decomposition on the odds ratio scale via the g-formula approach
+##  
+## Direct counterfactual imputation estimation with 
+##  bootstrap standard errors, percentile confidence intervals and p-values 
+##  
+##                  Estimate Std.error   95% CIL 95% CIU  P.val    
+## Rcde             0.499970  0.003306  0.627867   0.632 &lt;2e-16 ***
+## rRpnde           0.519453  0.062605  0.540497   0.625 &lt;2e-16 ***
+## rRtnde           0.508410  0.026424  0.593114   0.629 &lt;2e-16 ***
+## rRpnie           0.971628  0.030486  0.940677   0.982 &lt;2e-16 ***
+## rRtnie           0.950972  0.032978  0.987946   1.032      1    
+## Rte              0.493985  0.044022  0.557928   0.617 &lt;2e-16 ***
+## ERcde           -0.471286  0.012399 -0.350420  -0.334 &lt;2e-16 ***
+## rERintref       -0.009261  0.075004 -0.125581  -0.025 &lt;2e-16 ***
+## rERintmed        0.002904  0.049068  0.010726   0.077 &lt;2e-16 ***
+## rERpnie         -0.028372  0.030486 -0.059300  -0.018 &lt;2e-16 ***
+## ERcde(prop)      0.931367  0.119282  0.755709   0.916 &lt;2e-16 ***
+## rERintref(prop)  0.018302  0.163331  0.063896   0.283 &lt;2e-16 ***
+## rERintmed(prop) -0.005739  0.108286 -0.172893  -0.027 &lt;2e-16 ***
+## rERpnie(prop)    0.056069  0.064238  0.047549   0.134 &lt;2e-16 ***
+## rpm              0.050330  0.044049 -0.039041   0.020      1    
+## rint             0.012564  0.055045  0.036486   0.110 &lt;2e-16 ***
+## rpe              0.068633  0.119282  0.084035   0.244 &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Rcde: controlled direct effect odds ratio; rRpnde: randomized analogue of pure natural direct effect odds ratio; rRtnde: randomized analogue of total natural direct effect odds ratio; rRpnie: randomized analogue of pure natural indirect effect odds ratio; rRtnie: randomized analogue of total natural indirect effect odds ratio; Rte: total effect odds ratio; ERcde: excess relative risk due to controlled direct effect; rERintref: randomized analogue of excess relative risk due to reference interaction; rERintmed: randomized analogue of excess relative risk due to mediated interaction; rERpnie: randomized analogue of excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; rERintref(prop): proportion rERintref; rERintmed(prop): proportion rERintmed; rERpnie(prop): proportion rERpnie; rpm: randomized analogue of overall proportion mediated; rint: randomized analogue of overall proportion attributable to interaction; rpe: randomized analogue of overall proportion eliminated)
+## 
+## Relevant variable values: 
+## $a
+## [1] 1
+## 
+## $astar
+## [1] 0
+## 
+## $yval
+## [1] &quot;1&quot;
+## 
+## $mval
+## $mval[[1]]
+## [1] 1</code></pre>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

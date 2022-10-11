@@ -26,7 +26,7 @@ cmdag(outcome = "Y", exposure = "A", mediator = "M",
 res_naive_cont <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
                         mediator = "M", basec = c("C1_error", "C2"), EMint = TRUE,
                         mreg = list("logistic"), yreg = "logistic",
-                        astar = 0, a = 1, mval = list(1), yref = 1,
+                        astar = 0, a = 1, mval = list(1), 
                         estimation = "paramfunc", inference = "delta")
 
 ## ----message=F,warning=F------------------------------------------------------
@@ -51,7 +51,7 @@ summary(res_simex_cont)
 res_naive_cat <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A_error",
                        mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                        mreg = list("logistic"), yreg = "logistic",
-                       astar = 0, a = 1, mval = list(1), yref = 1,
+                       astar = 0, a = 1, mval = list(1), 
                        estimation = "paramfunc", inference = "delta")
 
 ## ----message=F,warning=F------------------------------------------------------
@@ -69,7 +69,7 @@ summary(res_simex_cat)
 res_true <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
                        mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                        mreg = list("logistic"), yreg = "logistic",
-                       astar = 0, a = 1, mval = list(1), yref = 1,
+                       astar = 0, a = 1, mval = list(1), 
                        estimation = "paramfunc", inference = "delta")
 
 ## ----message=F,warning=F------------------------------------------------------

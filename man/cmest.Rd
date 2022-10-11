@@ -233,7 +233,7 @@ inside the \code{cmest} function.
 
 \strong{Causal Mediation Analysis Approaches}
 
-Let \code{Y} denote the outcome, \code{A} denote the exposure, \code{M=(M_1,...,M_k)^T} 
+Let \code{Y} denote \code{outcome}, \code{A} denote \code{exposure}, \code{M=(M_1,...,M_k)^T} 
 denote \code{mediator}, \code{C} denote \code{basec}, \code{L=(L_1,...,L_s)^T} denote \code{postc}.
 
 \itemize{

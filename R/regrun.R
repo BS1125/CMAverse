@@ -50,7 +50,7 @@ regrun <- function() {
                    identical(class(wmnomreg[[p]]), c("negbin", "glm", "lm")) | identical(class(wmnomreg[[p]]), c("multinom", "nnet")) |
                    identical(class(wmnomreg[[p]]), c("gam", "glm", "lm")) | identical(class(wmnomreg[[p]]), "polr"))) {
         stop(paste0("Fit wmnomreg[[", p, "]] by lm, glm, glm.nb, gam, multinom, polr"))
-      }
+      } 
     }
     if (!is.list(wmdenomreg)) stop("wmdenomreg should be a list")
     if (length(wmdenomreg) != length(mediator)) stop("length(wmdenomreg) != length(mediator)")
@@ -70,7 +70,7 @@ regrun <- function() {
                    identical(class(wmdenomreg[[p]]), c("negbin", "glm", "lm")) | identical(class(wmdenomreg[[p]]), c("multinom", "nnet")) |
                    identical(class(wmdenomreg[[p]]), c("gam", "glm", "lm")) | identical(class(wmdenomreg[[p]]), "polr"))) {
         stop(paste0("Fit wmdenomreg[[", p, "]] by lm, glm, glm.nb, gam, multinom, polr"))
-      }
+      } 
     }
   } else {
     if (!is.null(wmnomreg)) warning("wmnomreg is ignored when model is not 'msm'")
@@ -111,7 +111,7 @@ regrun <- function() {
                    identical(class(mreg[[p]]), c("negbin", "glm", "lm")) | identical(class(mreg[[p]]), c("multinom", "nnet")) |
                    identical(class(mreg[[p]]), c("gam", "glm", "lm")) | identical(class(mreg[[p]]), "polr"))) {
         stop(paste0("Fit mreg[[", p, "]] by lm, glm, glm.nb, gam, multinom, polr"))
-      }
+      } 
     }
   } else {
     if (!is.null(mreg)) warning("mreg is ignored when model is 'wb', 'iorw' or 'ne'")
@@ -146,7 +146,7 @@ regrun <- function() {
                    identical(class(postcreg[[p]]), c("negbin", "glm", "lm")) | identical(class(postcreg[[p]]), c("multinom", "nnet")) |
                    identical(class(postcreg[[p]]), c("gam", "glm", "lm")) | identical(class(postcreg[[p]]), "polr"))) {
         stop(paste0("Fit postcreg[[", p, "]] by lm, glm, glm.nb, gam, multinom, polr"))
-      }
+      } 
     }
   } else {
     if (!is.null(postcreg)) warning("postcreg is ignored when model is not 'gformula' and when length(postc) = 0")

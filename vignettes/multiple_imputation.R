@@ -21,24 +21,3 @@ library(CMAverse)
 cmdag(outcome = "Y", exposure = "A", mediator = "M",
       basec = c("C1", "C2"), postc = NULL, node = TRUE, text_col = "white")
 
-## ----message=F,warning=F,results='hide'---------------------------------------
-res_multimp <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
-                     mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
-                     mreg = list("logistic"), yreg = "logistic",
-                     astar = 0, a = 1, mval = list(1), yref = 1,
-                     estimation = "paramfunc", inference = "delta", 
-                     multimp = TRUE, m = 10)
-
-## ----message=F,warning=F------------------------------------------------------
-summary(res_multimp)
-
-## ----message=F,warning=F,results='hide'---------------------------------------
-res_noNA <- cmest(data = data_noNA, model = "rb", outcome = "Y", exposure = "A",
-                  mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
-                  mreg = list("logistic"), yreg = "logistic",
-                  astar = 0, a = 1, mval = list(1), yref = 1,
-                  estimation = "paramfunc", inference = "delta")
-
-## ----message=F,warning=F------------------------------------------------------
-summary(res_noNA)
-

@@ -11,27 +11,57 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
 
-<meta name="date" content="2020-09-11" />
+<meta name="date" content="2022-10-10" />
 
 <title>Sensitivity Analysis for Measurement Error</title>
 
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
 
 
-<style type="text/css">code{white-space: pre;}</style>
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
 <style type="text/css" data-origin="pandoc">
-code.sourceCode > span { display: inline-block; line-height: 1.25; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-code.sourceCode > span:empty { height: 1.2em; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -51,7 +81,7 @@ pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-le
 div.sourceCode
   {   }
 @media screen {
-code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -105,6 +135,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   }
 })();
 </script>
+
 
 
 
@@ -300,79 +331,152 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<h1 class="title toc-ignore">Sensitivity Analysis for Measurement Error</h1>
-<h4 class="date">2020-09-11</h4>
+<h1 class="title toc-ignore">Sensitivity Analysis for Measurement
+Error</h1>
+<h4 class="date">2022-10-10</h4>
 
 
 
-<p>This example demonstrates how to conduct sensitivity analysis for measurement error via the <code>cmsens</code> function. For this purpose, we simulate some data containing a continuous baseline confounder <span class="math inline">\(C_1\)</span>, a binary baseline confounder <span class="math inline">\(C_2\)</span>, a binary exposure <span class="math inline">\(A\)</span>, a binary mediator <span class="math inline">\(M\)</span> and a binary outcome <span class="math inline">\(Y\)</span>. The true regression models for <span class="math inline">\(A\)</span>, <span class="math inline">\(M\)</span> and <span class="math inline">\(Y\)</span> are: <span class="math display">\[logit(E(A|C_1,C_2))=0.2+0.5C_1+0.1C_2\]</span> <span class="math display">\[logit(E(M|A,C_1,C_2))=1+2A+1.5C_1+0.8C_2\]</span> <span class="math display">\[logit(E(Y|A,M,C_1,C_2)))=-3-0.4A-1.2M+0.5AM+0.3C_1-0.6C_2\]</span></p>
-<p>Then, we generate some measurement error for the continuous variable <span class="math inline">\(C_1\)</span> and the binary variable <span class="math inline">\(A\)</span>.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">set.seed</span>(<span class="dv">1</span>)</span>
-<span id="cb1-2"><a href="#cb1-2"></a>expit &lt;-<span class="st"> </span><span class="cf">function</span>(x) <span class="kw">exp</span>(x)<span class="op">/</span>(<span class="dv">1</span><span class="op">+</span><span class="kw">exp</span>(x))</span>
-<span id="cb1-3"><a href="#cb1-3"></a>n &lt;-<span class="st"> </span><span class="dv">10000</span></span>
-<span id="cb1-4"><a href="#cb1-4"></a>C1 &lt;-<span class="st"> </span><span class="kw">rnorm</span>(n, <span class="dt">mean =</span> <span class="dv">1</span>, <span class="dt">sd =</span> <span class="fl">0.5</span>)</span>
-<span id="cb1-5"><a href="#cb1-5"></a>C1_error &lt;-<span class="st"> </span>C1 <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n, <span class="dv">0</span>, <span class="fl">0.05</span>)</span>
-<span id="cb1-6"><a href="#cb1-6"></a>C2 &lt;-<span class="st"> </span><span class="kw">rbinom</span>(n, <span class="dv">1</span>, <span class="fl">0.6</span>)</span>
-<span id="cb1-7"><a href="#cb1-7"></a>A &lt;-<span class="st"> </span><span class="kw">rbinom</span>(n, <span class="dv">1</span>, <span class="kw">expit</span>(<span class="fl">0.2</span> <span class="op">+</span><span class="st"> </span><span class="fl">0.5</span><span class="op">*</span>C1 <span class="op">+</span><span class="st"> </span><span class="fl">0.1</span><span class="op">*</span>C2))</span>
-<span id="cb1-8"><a href="#cb1-8"></a>mc &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="fl">0.9</span>,<span class="fl">0.1</span>,<span class="fl">0.1</span>,<span class="fl">0.9</span>), <span class="dt">nrow =</span> <span class="dv">2</span>)</span>
-<span id="cb1-9"><a href="#cb1-9"></a>A_error &lt;-<span class="st"> </span>A</span>
-<span id="cb1-10"><a href="#cb1-10"></a><span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">2</span>) {</span>
-<span id="cb1-11"><a href="#cb1-11"></a>  A_error[<span class="kw">which</span>(A_error <span class="op">==</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>)[j])] &lt;-</span>
-<span id="cb1-12"><a href="#cb1-12"></a><span class="st">    </span><span class="kw">sample</span>(<span class="dt">x =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="dt">size =</span> <span class="kw">length</span>(<span class="kw">which</span>(A_error <span class="op">==</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>)[j])),</span>
-<span id="cb1-13"><a href="#cb1-13"></a>           <span class="dt">prob =</span> mc[, j], <span class="dt">replace =</span> <span class="ot">TRUE</span>)</span>
-<span id="cb1-14"><a href="#cb1-14"></a>}</span>
-<span id="cb1-15"><a href="#cb1-15"></a>M &lt;-<span class="st"> </span><span class="kw">rbinom</span>(n, <span class="dv">1</span>, <span class="kw">expit</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>A <span class="op">+</span><span class="st"> </span><span class="fl">1.5</span><span class="op">*</span>C1 <span class="op">+</span><span class="st"> </span><span class="fl">0.8</span><span class="op">*</span>C2))</span>
-<span id="cb1-16"><a href="#cb1-16"></a>Y &lt;-<span class="st"> </span><span class="kw">rbinom</span>(n, <span class="dv">1</span>, <span class="kw">expit</span>(<span class="op">-</span><span class="dv">3</span> <span class="op">-</span><span class="st"> </span><span class="fl">0.4</span><span class="op">*</span>A <span class="op">-</span><span class="st"> </span><span class="fl">1.2</span><span class="op">*</span>M <span class="op">+</span><span class="st"> </span><span class="fl">0.5</span><span class="op">*</span>A<span class="op">*</span>M <span class="op">+</span><span class="st"> </span><span class="fl">0.3</span><span class="op">*</span>C1 <span class="op">-</span><span class="st"> </span><span class="fl">0.6</span><span class="op">*</span>C2))</span>
-<span id="cb1-17"><a href="#cb1-17"></a>data &lt;-<span class="st"> </span><span class="kw">data.frame</span>(A, A_error, M, Y, C1, C1_error, C2)</span></code></pre></div>
+<p>This example demonstrates how to conduct sensitivity analysis for
+measurement error by using <code>cmsens</code>. For this purpose, we
+simulate some data containing a continuous baseline confounder <span class="math inline">\(C_1\)</span>, a binary baseline confounder <span class="math inline">\(C_2\)</span>, a binary exposure <span class="math inline">\(A\)</span>, a binary mediator <span class="math inline">\(M\)</span> and a binary outcome <span class="math inline">\(Y\)</span>. The true regression models for <span class="math inline">\(A\)</span>, <span class="math inline">\(M\)</span>
+and <span class="math inline">\(Y\)</span> are: <span class="math display">\[logit(E(A|C_1,C_2))=0.2+0.5C_1+0.1C_2\]</span>
+<span class="math display">\[logit(E(M|A,C_1,C_2))=1+2A+1.5C_1+0.8C_2\]</span>
+<span class="math display">\[logit(E(Y|A,M,C_1,C_2)))=-3-0.4A-1.2M+0.5AM+0.3C_1-0.6C_2\]</span></p>
+<p>Then, we generate some measurement errors for <span class="math inline">\(C_1\)</span> and <span class="math inline">\(A\)</span>.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>expit <span class="ot">&lt;-</span> <span class="cf">function</span>(x) <span class="fu">exp</span>(x)<span class="sc">/</span>(<span class="dv">1</span><span class="sc">+</span><span class="fu">exp</span>(x))</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">10000</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>C1 <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="dv">1</span>, <span class="at">sd =</span> <span class="fl">0.5</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>C1_error <span class="ot">&lt;-</span> C1 <span class="sc">+</span> <span class="fu">rnorm</span>(n, <span class="dv">0</span>, <span class="fl">0.05</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>C2 <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fl">0.6</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>A <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fu">expit</span>(<span class="fl">0.2</span> <span class="sc">+</span> <span class="fl">0.5</span><span class="sc">*</span>C1 <span class="sc">+</span> <span class="fl">0.1</span><span class="sc">*</span>C2))</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>mc <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="fl">0.9</span>,<span class="fl">0.1</span>,<span class="fl">0.1</span>,<span class="fl">0.9</span>), <span class="at">nrow =</span> <span class="dv">2</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>A_error <span class="ot">&lt;-</span> A</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>) {</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  A_error[<span class="fu">which</span>(A_error <span class="sc">==</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>)[j])] <span class="ot">&lt;-</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sample</span>(<span class="at">x =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>), <span class="at">size =</span> <span class="fu">length</span>(<span class="fu">which</span>(A_error <span class="sc">==</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>)[j])),</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>           <span class="at">prob =</span> mc[, j], <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>M <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fu">expit</span>(<span class="dv">1</span> <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>A <span class="sc">+</span> <span class="fl">1.5</span><span class="sc">*</span>C1 <span class="sc">+</span> <span class="fl">0.8</span><span class="sc">*</span>C2))</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>Y <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fu">expit</span>(<span class="sc">-</span><span class="dv">3</span> <span class="sc">-</span> <span class="fl">0.4</span><span class="sc">*</span>A <span class="sc">-</span> <span class="fl">1.2</span><span class="sc">*</span>M <span class="sc">+</span> <span class="fl">0.5</span><span class="sc">*</span>A<span class="sc">*</span>M <span class="sc">+</span> <span class="fl">0.3</span><span class="sc">*</span>C1 <span class="sc">-</span> <span class="fl">0.6</span><span class="sc">*</span>C2))</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(A, A_error, M, Y, C1, C1_error, C2)</span></code></pre></div>
 <p>The DAG for this scientific setting is:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">library</span>(CMAverse)</span>
-<span id="cb2-2"><a href="#cb2-2"></a><span class="kw">cmdag</span>(<span class="dt">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="dt">exposure =</span> <span class="st">&quot;A&quot;</span>, <span class="dt">mediator =</span> <span class="st">&quot;M&quot;</span>,</span>
-<span id="cb2-3"><a href="#cb2-3"></a>      <span class="dt">basec =</span> <span class="kw">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="dt">postc =</span> <span class="ot">NULL</span>, <span class="dt">node =</span> <span class="ot">TRUE</span>, <span class="dt">text_col =</span> <span class="st">&quot;white&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(CMAverse)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cmdag</span>(<span class="at">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="at">exposure =</span> <span class="st">&quot;A&quot;</span>, <span class="at">mediator =</span> <span class="st">&quot;M&quot;</span>,</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>      <span class="at">basec =</span> <span class="fu">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="at">postc =</span> <span class="cn">NULL</span>, <span class="at">node =</span> <span class="cn">TRUE</span>, <span class="at">text_col =</span> <span class="st">&quot;white&quot;</span>)</span></code></pre></div>
 <p><img src="data:image/png;base64,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" /><!-- --></p>
 <div id="a-continuous-variable-measured-with-error" class="section level2">
 <h2>A Continuous Variable Measured with Error</h2>
-<p>We use the regression-based approach for illustration. The naive results obtained by fitting data with measurement error:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>res_naive_cont &lt;-<span class="st"> </span><span class="kw">cmest</span>(<span class="dt">data =</span> data, <span class="dt">model =</span> <span class="st">&quot;rb&quot;</span>, <span class="dt">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="dt">exposure =</span> <span class="st">&quot;A&quot;</span>,</span>
-<span id="cb3-2"><a href="#cb3-2"></a>                        <span class="dt">mediator =</span> <span class="st">&quot;M&quot;</span>, <span class="dt">basec =</span> <span class="kw">c</span>(<span class="st">&quot;C1_error&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="dt">EMint =</span> <span class="ot">TRUE</span>,</span>
-<span id="cb3-3"><a href="#cb3-3"></a>                        <span class="dt">mreg =</span> <span class="kw">list</span>(<span class="st">&quot;logistic&quot;</span>), <span class="dt">yreg =</span> <span class="st">&quot;logistic&quot;</span>,</span>
-<span id="cb3-4"><a href="#cb3-4"></a>                        <span class="dt">astar =</span> <span class="dv">0</span>, <span class="dt">a =</span> <span class="dv">1</span>, <span class="dt">mval =</span> <span class="kw">list</span>(<span class="dv">1</span>), <span class="dt">yref =</span> <span class="dv">1</span>,</span>
-<span id="cb3-5"><a href="#cb3-5"></a>                        <span class="dt">estimation =</span> <span class="st">&quot;paramfunc&quot;</span>, <span class="dt">inference =</span> <span class="st">&quot;delta&quot;</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">summary</span>(res_naive_cont)</span></code></pre></div>
-<pre><code>## # Causal Mediation Analysis via the Regression-based Approach
+<p>Firstly, we assume <span class="math inline">\(C1\)</span> was
+measured with error. <span class="math inline">\(C_1\)</span> is
+continuous, so the measurement error can be corrected by regression
+calibration or SIMEX. We use the regression-based approach for
+illustration. The naive results obtained by fitting data with
+measurement error:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>res_naive_cont <span class="ot">&lt;-</span> <span class="fu">cmest</span>(<span class="at">data =</span> data, <span class="at">model =</span> <span class="st">&quot;rb&quot;</span>, <span class="at">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="at">exposure =</span> <span class="st">&quot;A&quot;</span>,</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">mediator =</span> <span class="st">&quot;M&quot;</span>, <span class="at">basec =</span> <span class="fu">c</span>(<span class="st">&quot;C1_error&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="at">EMint =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>                        <span class="at">mreg =</span> <span class="fu">list</span>(<span class="st">&quot;logistic&quot;</span>), <span class="at">yreg =</span> <span class="st">&quot;logistic&quot;</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>                        <span class="at">astar =</span> <span class="dv">0</span>, <span class="at">a =</span> <span class="dv">1</span>, <span class="at">mval =</span> <span class="fu">list</span>(<span class="dv">1</span>), </span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>                        <span class="at">estimation =</span> <span class="st">&quot;paramfunc&quot;</span>, <span class="at">inference =</span> <span class="st">&quot;delta&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(res_naive_cont)</span></code></pre></div>
+<pre><code>## Causal Mediation Analysis
+## 
+## # Outcome regression:
+## 
+## Call:
+## glm(formula = Y ~ A + M + A * M + C1_error + C2, family = binomial(), 
+##     data = getCall(x$reg.output$yreg)$data, weights = getCall(x$reg.output$yreg)$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -0.5658  -0.2097  -0.1763  -0.1527   3.1992  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  -2.5688     0.2608  -9.852  &lt; 2e-16 ***
+## A            -0.8882     0.7581  -1.172  0.24139    
+## M            -1.8387     0.2858  -6.434 1.24e-10 ***
+## C1_error      0.4856     0.1481   3.280  0.00104 ** 
+## C2           -0.6142     0.1500  -4.094 4.24e-05 ***
+## A:M           1.1063     0.7790   1.420  0.15555    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 1858.7  on 9999  degrees of freedom
+## Residual deviance: 1799.6  on 9994  degrees of freedom
+## AIC: 1811.6
+## 
+## Number of Fisher Scoring iterations: 7
+## 
+## 
+## # Mediator regressions: 
+## 
+## Call:
+## glm(formula = M ~ A + C1_error + C2, family = binomial(), data = getCall(x$reg.output$mreg[[1L]])$data, 
+##     weights = getCall(x$reg.output$mreg[[1L]])$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -3.4202   0.0948   0.1395   0.2539   1.0725  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)   0.9916     0.1160   8.552  &lt; 2e-16 ***
+## A             2.1481     0.1473  14.586  &lt; 2e-16 ***
+## C1_error      1.4448     0.1193  12.109  &lt; 2e-16 ***
+## C2            0.6769     0.1193   5.673  1.4e-08 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 2825.7  on 9999  degrees of freedom
+## Residual deviance: 2306.7  on 9996  degrees of freedom
+## AIC: 2314.7
+## 
+## Number of Fisher Scoring iterations: 7
+## 
+## 
+## # Effect decomposition on the odds ratio scale via the regression-based approach
 ##  
 ## Closed-form parameter function estimation with 
 ##  delta method standard errors, confidence intervals and p-values 
 ##  
-##                 Estimate Std.error   95% CIL 95% CIU   P.val    
-## Rcde             1.24383   0.22304   0.87524   1.768 0.22367    
-## Rpnde            1.01905   0.17645   0.72578   1.431 0.91323    
-## Rtnde            1.20938   0.21034   0.86004   1.701 0.27437    
-## Rpnie            0.80077   0.05414   0.70138   0.914 0.00102 ** 
-## Rtnie            0.95034   0.06599   0.82942   1.089 0.46320    
-## Rte              0.96844   0.15560   0.70683   1.327 0.84179    
-## ERcde            0.18846   8.40147 -16.27812  16.655 0.98210    
-## ERintref        -0.16941   0.16640  -0.49555   0.157 0.30864    
-## ERintmed         0.14862   0.09996  -0.04731   0.345 0.13709    
-## ERpnie          -0.19923   0.08786  -0.37142  -0.027 0.02335 *  
-## ERcde(prop)     -5.97114   0.05414  -6.07726  -5.865 &lt; 2e-16 ***
-## ERintref(prop)   5.36768  34.38901 -62.03355  72.769 0.87596    
-## ERintmed(prop)  -4.70891  26.42572 -56.50236  47.085 0.85857    
-## ERpnie(prop)     6.31237  23.17884 -39.11733  51.742 0.78537    
-## pm               1.60346  31.15632 -59.46181  62.669 0.95895    
-## int              0.65876   3.24847  -5.70811   7.026 0.83930    
-## pe               6.97114  34.38901 -60.43008  74.372 0.83936    
+##                 Estimate Std.error   95% CIL 95% CIU    P.val    
+## Rcde             1.24383   0.22304   0.87524   1.768 0.223674    
+## Rpnde            1.01905   0.17645   0.72578   1.431 0.913235    
+## Rtnde            1.20938   0.21034   0.86004   1.701 0.274370    
+## Rpnie            0.80077   0.05414   0.70138   0.914 0.001017 ** 
+## Rtnie            0.95034   0.06599   0.82942   1.089 0.463197    
+## Rte              0.96844   0.15560   0.70683   1.327 0.841789    
+## ERcde            0.18846   0.16640  -0.13769   0.515 0.257410    
+## ERintref        -0.16941   0.09996  -0.36533   0.027 0.090128 .  
+## ERintmed         0.14862   0.08786  -0.02358   0.321 0.090726 .  
+## ERpnie          -0.19923   0.05414  -0.30535  -0.093 0.000234 ***
+## ERcde(prop)     -5.97114  34.38901 -73.37236  61.430 0.862152    
+## ERintref(prop)   5.36768  26.42572 -46.42577  57.161 0.839039    
+## ERintmed(prop)  -4.70891  23.17884 -50.13861  40.721 0.839013    
+## ERpnie(prop)     6.31237  31.15632 -54.75290  67.378 0.839445    
+## pm               1.60346   8.40147 -14.86311  18.070 0.848639    
+## int              0.65876   3.24847  -5.70811   7.026 0.839298    
+## pe               6.97114  34.38901 -60.43008  74.372 0.839359    
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Reference values: 
+## (Rcde: controlled direct effect odds ratio; Rpnde: pure natural direct effect odds ratio; Rtnde: total natural direct effect odds ratio; Rpnie: pure natural indirect effect odds ratio; Rtnie: total natural indirect effect odds ratio; Rte: total effect odds ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
+## 
+## Relevant variable values: 
 ## $a
 ## [1] 1
 ## 
 ## $astar
 ## [1] 0
 ## 
-## $yref
-## [1] 1
+## $yval
+## [1] &quot;1&quot;
 ## 
 ## $mval
 ## $mval[[1]]
@@ -385,119 +489,386 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 
 ## $basecval[[2]]
 ## [1] 0.5936</code></pre>
-<p>These results can be corrected by regression calibration or SIMEX. The results obtained after regression calibration:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>res_rc_cont &lt;-<span class="st"> </span><span class="kw">cmsens</span>(<span class="dt">object =</span> res_naive_cont, <span class="dt">sens =</span> <span class="st">&quot;me&quot;</span>, <span class="dt">MEmethod =</span> <span class="st">&quot;rc&quot;</span>, </span>
-<span id="cb6-2"><a href="#cb6-2"></a>                      <span class="dt">MEvariable =</span> <span class="st">&quot;C1_error&quot;</span>, <span class="dt">MEvartype =</span> <span class="st">&quot;con&quot;</span>, <span class="dt">MEerror =</span> <span class="fl">0.05</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="kw">summary</span>(res_rc_cont)</span></code></pre></div>
+<p>The results corrected by regression calibration:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>res_rc_cont <span class="ot">&lt;-</span> <span class="fu">cmsens</span>(<span class="at">object =</span> res_naive_cont, <span class="at">sens =</span> <span class="st">&quot;me&quot;</span>, <span class="at">MEmethod =</span> <span class="st">&quot;rc&quot;</span>, </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">MEvariable =</span> <span class="st">&quot;C1_error&quot;</span>, <span class="at">MEvartype =</span> <span class="st">&quot;con&quot;</span>, <span class="at">MEerror =</span> <span class="fl">0.05</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(res_rc_cont)</span></code></pre></div>
 <pre><code>## Sensitivity Analysis For Measurement Error 
 ##  
 ## The variable measured with error: C1_error
 ## Type of the variable measured with error: continuous
 ## 
-## Measurement error 1: 
+## # Measurement error 1: 
 ## [1] 0.05
 ## 
-## Measurement error correction for measurement error 1: 
-##                 Estimate Std.error   95% CIL 95% CIU   P.val    
-## Rcde             1.24332   0.21920   0.88006   1.757 0.21673    
-## Rpnde            1.01851   0.52048   0.37410   2.773 0.97137    
-## Rtnde            1.20880   0.22133   0.84431   1.731 0.30036    
-## Rpnie            0.80064   0.05768   0.69521   0.922 0.00203 ** 
-## Rtnie            0.95024   0.40485   0.41227   2.190 0.90463    
-## Rte              0.96782   0.16337   0.69521   1.347 0.84636    
-## ERcde            0.18801  18.14749 -35.38042  35.756 0.99173    
-## ERintref        -0.16951   0.16289  -0.48877   0.150 0.29806    
-## ERintmed         0.14867   0.49743  -0.82627   1.124 0.76503    
-## ERpnie          -0.19936   0.43632  -1.05453   0.656 0.64774    
-## ERcde(prop)     -5.84268   0.05768  -5.95573  -5.730 &lt; 2e-16 ***
-## ERintref(prop)   5.26756  34.11855 -61.60356  72.139 0.87730    
-## ERintmed(prop)  -4.62011  25.39887 -54.40097  45.161 0.85566    
-## ERpnie(prop)     6.19523  22.27342 -37.45987  49.850 0.78090    
-## pm               1.57512  31.49154 -60.14716  63.297 0.96011    
-## int              0.64746   3.12706  -5.48147   6.776 0.83597    
-## pe               6.84268  34.11855 -60.02844  73.714 0.84105    
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## ----------------------------------------------------------------</code></pre>
-<p>The results obtained after SIMEX:</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>res_simex_cont &lt;-<span class="st"> </span><span class="kw">cmsens</span>(<span class="dt">object =</span> res_naive_cont, <span class="dt">sens =</span> <span class="st">&quot;me&quot;</span>, <span class="dt">MEmethod =</span> <span class="st">&quot;simex&quot;</span>, </span>
-<span id="cb9-2"><a href="#cb9-2"></a>                         <span class="dt">MEvariable =</span> <span class="st">&quot;C1_error&quot;</span>, <span class="dt">MEvartype =</span> <span class="st">&quot;con&quot;</span>, <span class="dt">MEerror =</span> <span class="fl">0.05</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="kw">summary</span>(res_simex_cont)</span></code></pre></div>
-<pre><code>## Sensitivity Analysis For Measurement Error 
-##  
-## The variable measured with error: C1_error
-## Type of the variable measured with error: continuous
+## ## Error-corrected regressions for measurement error 1: 
 ## 
-## Measurement error 1: 
-## [1] 0.05
+## ### Outcome regression:
+## Call:
+## rcreg(reg = getCall(x$sens[[1L]]$reg.output$yreg)$reg, formula = Y ~ 
+##     A + M + A * M + C1_error + C2, data = getCall(x$sens[[1L]]$reg.output$yreg)$data, 
+##     MEvariable = &quot;C1_error&quot;, MEerror = 0.05, variance = TRUE, 
+##     nboot = 400, weights = getCall(x$sens[[1L]]$reg.output$yreg)$weights)
 ## 
-## Measurement error correction for measurement error 1: 
-##                 Estimate Std.error   95% CIL 95% CIU   P.val    
-## Rcde             1.24345   0.22299   0.87495   1.767 0.22435    
-## Rpnde            1.01967   0.17650   0.72631   1.432 0.91039    
-## Rtnde            1.20914   0.21033   0.85982   1.700 0.27494    
-## Rpnie            0.80149   0.05403   0.70229   0.915 0.00103 ** 
-## Rtnie            0.95042   0.06578   0.82986   1.088 0.46249    
-## Rte              0.96912   0.15576   0.70724   1.328 0.84525    
-## ERcde            0.18835   8.75433 -16.96981  17.347 0.98283    
-## ERintref        -0.16868   0.16656  -0.49514   0.158 0.31119    
-## ERintmed         0.14795   0.09971  -0.04747   0.343 0.13784    
-## ERpnie          -0.19851   0.08762  -0.37023  -0.027 0.02347 *  
-## ERcde(prop)     -6.09885   0.05403  -6.20475  -5.993 &lt; 2e-16 ***
-## ERintref(prop)   5.46188  35.82468 -64.75321  75.677 0.87882    
-## ERintmed(prop)  -4.79066  27.50709 -58.70357  49.122 0.86174    
-## ERpnie(prop)     6.42764  24.12293 -40.85243  53.708 0.78989    
-## pm               1.63698  32.45470 -61.97307  65.247 0.95977    
-## int              0.67122   3.38575  -5.96473   7.307 0.84285    
-## pe               7.09885  35.82468 -63.11624  77.314 0.84292    
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## ----------------------------------------------------------------</code></pre>
-</div>
-<div id="a-categorical-variable-measured-with-error" class="section level2">
-<h2>A Categorical Variable Measured with Error</h2>
-<p>The naive results obtained by fitting data with measurement error:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>res_naive_cat &lt;-<span class="st"> </span><span class="kw">cmest</span>(<span class="dt">data =</span> data, <span class="dt">model =</span> <span class="st">&quot;rb&quot;</span>, <span class="dt">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="dt">exposure =</span> <span class="st">&quot;A_error&quot;</span>,</span>
-<span id="cb12-2"><a href="#cb12-2"></a>                       <span class="dt">mediator =</span> <span class="st">&quot;M&quot;</span>, <span class="dt">basec =</span> <span class="kw">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="dt">EMint =</span> <span class="ot">TRUE</span>,</span>
-<span id="cb12-3"><a href="#cb12-3"></a>                       <span class="dt">mreg =</span> <span class="kw">list</span>(<span class="st">&quot;logistic&quot;</span>), <span class="dt">yreg =</span> <span class="st">&quot;logistic&quot;</span>,</span>
-<span id="cb12-4"><a href="#cb12-4"></a>                       <span class="dt">astar =</span> <span class="dv">0</span>, <span class="dt">a =</span> <span class="dv">1</span>, <span class="dt">mval =</span> <span class="kw">list</span>(<span class="dv">1</span>), <span class="dt">yref =</span> <span class="dv">1</span>,</span>
-<span id="cb12-5"><a href="#cb12-5"></a>                       <span class="dt">estimation =</span> <span class="st">&quot;paramfunc&quot;</span>, <span class="dt">inference =</span> <span class="st">&quot;delta&quot;</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="kw">summary</span>(res_naive_cat)</span></code></pre></div>
-<pre><code>## # Causal Mediation Analysis via the Regression-based Approach
-##  
-## Closed-form parameter function estimation with 
-##  delta method standard errors, confidence intervals and p-values 
-##  
-##                Estimate Std.error  95% CIL 95% CIU   P.val    
-## Rcde            1.08912   0.18279  0.78381   1.513 0.61100    
-## Rpnde           0.98700   0.15917  0.71952   1.354 0.93531    
-## Rtnde           1.06299   0.17173  0.77449   1.459 0.70532    
-## Rpnie           0.86553   0.04070  0.78932   0.949 0.00213 ** 
-## Rtnie           0.93218   0.04836  0.84205   1.032 0.17582    
-## Rte             0.92005   0.14238  0.67934   1.246 0.59029    
-## ERcde           0.07373   1.71924 -3.29591   3.443 0.96579    
-## ERintref       -0.08673   0.14960 -0.37995   0.206 0.56208    
-## ERintmed        0.06753   0.08188 -0.09296   0.228 0.40955    
-## ERpnie         -0.13447   0.06388 -0.25966  -0.009 0.03528 *  
-## ERcde(prop)    -0.92222   0.04070 -1.00199  -0.842 &lt; 2e-16 ***
-## ERintref(prop)  1.08489   3.45691 -5.69054   7.860 0.75365    
-## ERintmed(prop) -0.84468   2.06437 -4.89077   3.201 0.68241    
-## ERpnie(prop)    1.68201   1.60658 -1.46682   4.831 0.29512    
-## pm              0.83733   3.03652 -5.11414   6.789 0.78274    
-## int             0.24020   0.45912 -0.65966   1.140 0.60085    
-## pe              1.92222   3.45691 -4.85321   8.698 0.57818    
+## Naive coefficient estimates: 
+## (Intercept)           A           M    C1_error          C2         A:M 
+##  -2.5688363  -0.8881518  -1.8387439   0.4856104  -0.6142071   1.1063464 
+## 
+## Naive var-cov estimates: 
+##              (Intercept)             A            M      C1_error            C2
+## (Intercept)  0.067990581 -0.0545603114 -0.048204212 -0.0154891419 -0.0071194416
+## A           -0.054560311  0.5747507824  0.054868704 -0.0004875592  0.0004879114
+## M           -0.048204212  0.0548687045  0.081668670 -0.0080216586 -0.0027107101
+## C1_error    -0.015489142 -0.0004875592 -0.008021659  0.0219233192 -0.0001013951
+## C2          -0.007119442  0.0004879114 -0.002710710 -0.0001013951  0.0225065272
+## A:M          0.055848645 -0.5747208888 -0.077864595 -0.0011835634 -0.0008171310
+##                      A:M
+## (Intercept)  0.055848645
+## A           -0.574720889
+## M           -0.077864595
+## C1_error    -0.001183563
+## C2          -0.000817131
+## A:M          0.606845225
+## 
+## Variable measured with error:
+## C1_error
+## Measurement error:
+## 0.05
+## Error-corrected results:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  -2.5717     0.2542 -10.116  &lt; 2e-16 ***
+## A            -0.8886     4.4880  -0.198  0.84306    
+## M            -1.8405     0.2816  -6.535 6.65e-11 ***
+## C1_error      0.4905     0.1456   3.368  0.00076 ***
+## C2           -0.6142     0.1495  -4.108 4.03e-05 ***
+## A:M           1.1063     4.5006   0.246  0.80583    
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Reference values: 
+## ### Mediator regressions: 
+## Call:
+## rcreg(reg = getCall(x$sens[[1L]]$reg.output$mreg[[1L]])$reg, 
+##     formula = M ~ A + C1_error + C2, data = getCall(x$sens[[1L]]$reg.output$mreg[[1L]])$data, 
+##     MEvariable = &quot;C1_error&quot;, MEerror = 0.05, variance = TRUE, 
+##     nboot = 400, weights = getCall(x$sens[[1L]]$reg.output$mreg[[1L]])$weights)
+## 
+## Naive coefficient estimates: 
+## (Intercept)           A    C1_error          C2 
+##   0.9915629   2.1481051   1.4448263   0.6769050 
+## 
+## Naive var-cov estimates: 
+##              (Intercept)             A      C1_error            C2
+## (Intercept)  0.013444822 -0.0040002083 -0.0092978270 -0.0070380421
+## A           -0.004000208  0.0216896845 -0.0008364503  0.0002395075
+## C1_error    -0.009297827 -0.0008364503  0.0142375505  0.0008566472
+## C2          -0.007038042  0.0002395075  0.0008566472  0.0142371683
+## 
+## Variable measured with error:
+## C1_error
+## Measurement error:
+## 0.05
+## Error-corrected results:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   0.9784     0.1208   8.101 6.10e-16 ***
+## A             2.1465     0.1509  14.229  &lt; 2e-16 ***
+## C1_error      1.4591     0.1274  11.454  &lt; 2e-16 ***
+## C2            0.6769     0.1208   5.602 2.18e-08 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## 
+## ## Error-corrected causal effects on the risk ratio scale for measurement error 1: 
+##                 Estimate Std.error   95% CIL 95% CIU    P.val    
+## Rcde             1.24332   0.21790   0.88187   1.753 0.214000    
+## Rpnde            1.01851   0.51560   0.37762   2.747 0.971104    
+## Rtnde            1.20880   0.21487   0.85320   1.713 0.286051    
+## Rpnie            0.80064   0.05377   0.70189   0.913 0.000931 ***
+## Rtnie            0.95024   0.40376   0.41320   2.185 0.904375    
+## Rte              0.96782   0.15935   0.70088   1.336 0.842532    
+## ERcde            0.18801   0.16191  -0.12932   0.505 0.245553    
+## ERintref        -0.16951   0.50414  -1.15760   0.819 0.736699    
+## ERintmed         0.14867   0.44221  -0.71805   1.015 0.736722    
+## ERpnie          -0.19936   0.05377  -0.30475  -0.094 0.000209 ***
+## ERcde(prop)     -5.84268  33.30469 -71.11868  59.433 0.860741    
+## ERintref(prop)   5.26756  25.15247 -44.03038  54.566 0.834116    
+## ERintmed(prop)  -4.62011  22.05610 -47.84926  38.609 0.834081    
+## ERpnie(prop)     6.19523  30.72226 -54.01929  66.410 0.840188    
+## pm               1.57512  17.92074 -33.54889  36.699 0.929961    
+## int              0.64746   3.09806  -5.42463   6.720 0.834458    
+## pe               6.84268  33.30469 -58.43331  72.119 0.837215    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## ----------------------------------------------------------------
+## 
+## (Rcde: controlled direct effect risk ratio; Rpnde: pure natural direct effect risk ratio; Rtnde: total natural direct effect risk ratio; Rpnie: pure natural indirect effect risk ratio; Rtnie: total natural indirect effect risk ratio; Rte: total effect risk ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
+## 
+## Relevant variable values: 
 ## $a
 ## [1] 1
 ## 
 ## $astar
 ## [1] 0
 ## 
-## $yref
+## $yval
+## [1] &quot;1&quot;
+## 
+## $mval
+## $mval[[1]]
 ## [1] 1
+## 
+## 
+## $basecval
+## $basecval[[1]]
+## [1] 0.996522
+## 
+## $basecval[[2]]
+## [1] 0.5936</code></pre>
+<p>The results corrected by SIMEX:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>res_simex_cont <span class="ot">&lt;-</span> <span class="fu">cmsens</span>(<span class="at">object =</span> res_naive_cont, <span class="at">sens =</span> <span class="st">&quot;me&quot;</span>, <span class="at">MEmethod =</span> <span class="st">&quot;simex&quot;</span>, </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">MEvariable =</span> <span class="st">&quot;C1_error&quot;</span>, <span class="at">MEvartype =</span> <span class="st">&quot;con&quot;</span>, <span class="at">MEerror =</span> <span class="fl">0.05</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(res_simex_cont)</span></code></pre></div>
+<pre><code>## Sensitivity Analysis For Measurement Error 
+##  
+## The variable measured with error: C1_error
+## Type of the variable measured with error: continuous
+## 
+## # Measurement error 1: 
+## [1] 0.05
+## 
+## ## Error-corrected regressions for measurement error 1: 
+## 
+## ### Outcome regression:
+## Call:
+## simexreg(reg = getCall(x$sens[[1L]]$reg.output$yreg)$reg, formula = Y ~ 
+##     A + M + A * M + C1_error + C2, data = getCall(x$sens[[1L]]$reg.output$yreg)$data, 
+##     MEvariable = &quot;C1_error&quot;, MEvartype = &quot;continuous&quot;, MEerror = 0.05, 
+##     variance = TRUE, lambda = c(0.5, 1, 1.5, 2), B = 200, weights = getCall(x$sens[[1L]]$reg.output$yreg)$weights)
+## 
+## Naive coefficient estimates: 
+## (Intercept)           A           M    C1_error          C2         A:M 
+##  -2.5688363  -0.8881518  -1.8387439   0.4856104  -0.6142071   1.1063464 
+## 
+## Naive var-cov estimates: 
+##              (Intercept)             A            M      C1_error            C2
+## (Intercept)  0.067990581 -0.0545603114 -0.048204212 -0.0154891419 -0.0071194416
+## A           -0.054560311  0.5747507824  0.054868704 -0.0004875592  0.0004879114
+## M           -0.048204212  0.0548687045  0.081668670 -0.0080216586 -0.0027107101
+## C1_error    -0.015489142 -0.0004875592 -0.008021659  0.0219233192 -0.0001013951
+## C2          -0.007119442  0.0004879114 -0.002710710 -0.0001013951  0.0225065272
+## A:M          0.055848645 -0.5747208888 -0.077864595 -0.0011835634 -0.0008171310
+##                      A:M
+## (Intercept)  0.055848645
+## A           -0.574720889
+## M           -0.077864595
+## C1_error    -0.001183563
+## C2          -0.000817131
+## A:M          0.606845225
+## 
+## Variable measured with error:
+## C1_error
+## Measurement error:
+## [1] 0.05
+## 
+## Error-corrected results:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  -2.5697     0.2612  -9.839  &lt; 2e-16 ***
+## A            -0.8885     0.7581  -1.172  0.24125    
+## M            -1.8396     0.2859  -6.435 1.30e-10 ***
+## C1_error      0.4875     0.1497   3.255  0.00114 ** 
+## C2           -0.6141     0.1500  -4.093 4.29e-05 ***
+## A:M           1.1065     0.7790   1.420  0.15554    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## ### Mediator regressions: 
+## Call:
+## simexreg(reg = getCall(x$sens[[1L]]$reg.output$mreg[[1L]])$reg, 
+##     formula = M ~ A + C1_error + C2, data = getCall(x$sens[[1L]]$reg.output$mreg[[1L]])$data, 
+##     MEvariable = &quot;C1_error&quot;, MEvartype = &quot;continuous&quot;, MEerror = 0.05, 
+##     variance = TRUE, lambda = c(0.5, 1, 1.5, 2), B = 200, weights = getCall(x$sens[[1L]]$reg.output$mreg[[1L]])$weights)
+## 
+## Naive coefficient estimates: 
+## (Intercept)           A    C1_error          C2 
+##   0.9915629   2.1481051   1.4448263   0.6769050 
+## 
+## Naive var-cov estimates: 
+##              (Intercept)             A      C1_error            C2
+## (Intercept)  0.013444822 -0.0040002083 -0.0092978270 -0.0070380421
+## A           -0.004000208  0.0216896845 -0.0008364503  0.0002395075
+## C1_error    -0.009297827 -0.0008364503  0.0142375505  0.0008566472
+## C2          -0.007038042  0.0002395075  0.0008566472  0.0142371683
+## 
+## Variable measured with error:
+## C1_error
+## Measurement error:
+## [1] 0.05
+## 
+## Error-corrected results:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   0.9816     0.1165   8.426  &lt; 2e-16 ***
+## A             2.1466     0.1473  14.572  &lt; 2e-16 ***
+## C1_error      1.4580     0.1205  12.102  &lt; 2e-16 ***
+## C2            0.6768     0.1194   5.670 1.47e-08 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## 
+## ## Error-corrected causal effects on the risk ratio scale for measurement error 1: 
+##                 Estimate Std.error   95% CIL 95% CIU    P.val    
+## Rcde             1.24357   0.22301   0.87503   1.767 0.224154    
+## Rpnde            1.01920   0.17645   0.72592   1.431 0.912545    
+## Rtnde            1.20915   0.21032   0.85985   1.700 0.274902    
+## Rpnie            0.80111   0.05410   0.70180   0.914 0.001024 ** 
+## Rtnie            0.95042   0.06585   0.82975   1.089 0.462970    
+## Rte              0.96867   0.15569   0.70691   1.327 0.842992    
+## ERcde            0.18834   0.16647  -0.13794   0.515 0.257913    
+## ERintref        -0.16914   0.09979  -0.36473   0.026 0.090093 .  
+## ERintmed         0.14836   0.08769  -0.02352   0.320 0.090694 .  
+## ERpnie          -0.19889   0.05410  -0.30492  -0.093 0.000237 ***
+## ERcde(prop)     -6.01072  34.85624 -74.32769  62.306 0.863089    
+## ERintref(prop)   5.39808  26.78430 -47.09817  57.894 0.840277    
+## ERintmed(prop)  -4.73472  23.48910 -50.77251  41.303 0.840252    
+## ERpnie(prop)     6.34736  31.57520 -55.53889  68.234 0.840680    
+## pm               1.61264   8.50887 -15.06443  18.290 0.849682    
+## int              0.66336   3.29679  -5.79824   7.125 0.840532    
+## pe               7.01072  34.85624 -61.30625  75.328 0.840595    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## ----------------------------------------------------------------
+## 
+## (Rcde: controlled direct effect risk ratio; Rpnde: pure natural direct effect risk ratio; Rtnde: total natural direct effect risk ratio; Rpnie: pure natural indirect effect risk ratio; Rtnie: total natural indirect effect risk ratio; Rte: total effect risk ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
+## 
+## Relevant variable values: 
+## $a
+## [1] 1
+## 
+## $astar
+## [1] 0
+## 
+## $yval
+## [1] &quot;1&quot;
+## 
+## $mval
+## $mval[[1]]
+## [1] 1
+## 
+## 
+## $basecval
+## $basecval[[1]]
+## [1] 0.996522
+## 
+## $basecval[[2]]
+## [1] 0.5936</code></pre>
+</div>
+<div id="a-categorical-variable-measured-with-error" class="section level2">
+<h2>A Categorical Variable Measured with Error</h2>
+<p>Then, we assume <span class="math inline">\(A\)</span> was measured
+with error. <span class="math inline">\(A\)</span> is categorical, so
+only SIMEX can be used. The naive results obtained by fitting data with
+measurement error:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>res_naive_cat <span class="ot">&lt;-</span> <span class="fu">cmest</span>(<span class="at">data =</span> data, <span class="at">model =</span> <span class="st">&quot;rb&quot;</span>, <span class="at">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="at">exposure =</span> <span class="st">&quot;A_error&quot;</span>,</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>                       <span class="at">mediator =</span> <span class="st">&quot;M&quot;</span>, <span class="at">basec =</span> <span class="fu">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="at">EMint =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>                       <span class="at">mreg =</span> <span class="fu">list</span>(<span class="st">&quot;logistic&quot;</span>), <span class="at">yreg =</span> <span class="st">&quot;logistic&quot;</span>,</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">astar =</span> <span class="dv">0</span>, <span class="at">a =</span> <span class="dv">1</span>, <span class="at">mval =</span> <span class="fu">list</span>(<span class="dv">1</span>), </span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">estimation =</span> <span class="st">&quot;paramfunc&quot;</span>, <span class="at">inference =</span> <span class="st">&quot;delta&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(res_naive_cat)</span></code></pre></div>
+<pre><code>## Causal Mediation Analysis
+## 
+## # Outcome regression:
+## 
+## Call:
+## glm(formula = Y ~ A_error + M + A_error * M + C1 + C2, family = binomial(), 
+##     data = getCall(x$reg.output$yreg)$data, weights = getCall(x$reg.output$yreg)$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -0.5652  -0.2098  -0.1765  -0.1529   3.1640  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  -2.5907     0.2727  -9.500  &lt; 2e-16 ***
+## A_error      -0.5077     0.5703  -0.890 0.373318    
+## M            -1.7375     0.2882  -6.029 1.65e-09 ***
+## C1            0.5037     0.1487   3.386 0.000709 ***
+## C2           -0.6133     0.1500  -4.089 4.34e-05 ***
+## A_error:M     0.5931     0.5945   0.998 0.318446    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 1858.7  on 9999  degrees of freedom
+## Residual deviance: 1801.3  on 9994  degrees of freedom
+## AIC: 1813.3
+## 
+## Number of Fisher Scoring iterations: 7
+## 
+## 
+## # Mediator regressions: 
+## 
+## Call:
+## glm(formula = M ~ A_error + C1 + C2, family = binomial(), data = getCall(x$reg.output$mreg[[1L]])$data, 
+##     weights = getCall(x$reg.output$mreg[[1L]])$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -3.3245   0.1157   0.1712   0.2666   1.0700  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)   1.1369     0.1164   9.769  &lt; 2e-16 ***
+## A_error       1.5434     0.1310  11.783  &lt; 2e-16 ***
+## C1            1.5322     0.1190  12.879  &lt; 2e-16 ***
+## C2            0.6753     0.1181   5.718 1.08e-08 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 2825.7  on 9999  degrees of freedom
+## Residual deviance: 2428.4  on 9996  degrees of freedom
+## AIC: 2436.4
+## 
+## Number of Fisher Scoring iterations: 7
+## 
+## 
+## # Effect decomposition on the odds ratio scale via the regression-based approach
+##  
+## Closed-form parameter function estimation with 
+##  delta method standard errors, confidence intervals and p-values 
+##  
+##                Estimate Std.error  95% CIL 95% CIU    P.val    
+## Rcde            1.08912   0.18279  0.78381   1.513 0.611003    
+## Rpnde           0.98700   0.15917  0.71952   1.354 0.935309    
+## Rtnde           1.06299   0.17173  0.77449   1.459 0.705322    
+## Rpnie           0.86553   0.04070  0.78932   0.949 0.002133 ** 
+## Rtnie           0.93218   0.04836  0.84205   1.032 0.175816    
+## Rte             0.92005   0.14238  0.67934   1.246 0.590294    
+## ERcde           0.07373   0.14960 -0.21949   0.367 0.622139    
+## ERintref       -0.08673   0.08188 -0.24722   0.074 0.289503    
+## ERintmed        0.06753   0.06388 -0.05767   0.193 0.290433    
+## ERpnie         -0.13447   0.04070 -0.21424  -0.055 0.000954 ***
+## ERcde(prop)    -0.92222   3.45691 -7.69764   5.853 0.789642    
+## ERintref(prop)  1.08489   2.06437 -2.96120   5.131 0.599215    
+## ERintmed(prop) -0.84468   1.60658 -3.99352   2.304 0.599050    
+## ERpnie(prop)    1.68201   3.03652 -4.26946   7.633 0.579628    
+## pm              0.83733   1.71924 -2.53231   4.207 0.626232    
+## int             0.24020   0.45912 -0.65966   1.140 0.600849    
+## pe              1.92222   3.45691 -4.85321   8.698 0.578176    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Rcde: controlled direct effect odds ratio; Rpnde: pure natural direct effect odds ratio; Rtnde: total natural direct effect odds ratio; Rpnie: pure natural indirect effect odds ratio; Rtnie: total natural indirect effect odds ratio; Rte: total effect odds ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
+## 
+## Relevant variable values: 
+## $a
+## [1] 1
+## 
+## $astar
+## [1] 0
+## 
+## $yval
+## [1] &quot;1&quot;
 ## 
 ## $mval
 ## $mval[[1]]
@@ -510,84 +881,254 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## 
 ## $basecval[[2]]
 ## [1] 0.5936</code></pre>
-<p>These results can be corrected by SIMEX. The results obtained after SIMEX:</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>res_simex_cat &lt;-<span class="st"> </span><span class="kw">cmsens</span>(<span class="dt">object =</span> res_naive_cat, <span class="dt">sens =</span> <span class="st">&quot;me&quot;</span>, <span class="dt">MEmethod =</span> <span class="st">&quot;simex&quot;</span>, </span>
-<span id="cb15-2"><a href="#cb15-2"></a>                         <span class="dt">MEvariable =</span> <span class="st">&quot;A_error&quot;</span>, <span class="dt">MEvartype =</span> <span class="st">&quot;cat&quot;</span>, <span class="dt">MEerror =</span> <span class="kw">list</span>(mc))</span></code></pre></div>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="kw">summary</span>(res_simex_cat)</span></code></pre></div>
+<p>The results corrected by SIMEX:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>res_simex_cat <span class="ot">&lt;-</span> <span class="fu">cmsens</span>(<span class="at">object =</span> res_naive_cat, <span class="at">sens =</span> <span class="st">&quot;me&quot;</span>, <span class="at">MEmethod =</span> <span class="st">&quot;simex&quot;</span>, </span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">MEvariable =</span> <span class="st">&quot;A_error&quot;</span>, <span class="at">MEvartype =</span> <span class="st">&quot;cat&quot;</span>, <span class="at">MEerror =</span> <span class="fu">list</span>(mc))</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(res_simex_cat)</span></code></pre></div>
 <pre><code>## Sensitivity Analysis For Measurement Error 
 ##  
 ## The variable measured with error: A_error
 ## Type of the variable measured with error: categorical
 ## 
-## Measurement error 1: 
+## # Measurement error 1: 
 ##      [,1] [,2]
 ## [1,]  0.9  0.1
 ## [2,]  0.1  0.9
 ## 
-## Measurement error correction for measurement error 1: 
-##                Estimate Std.error  95% CIL 95% CIU   P.val    
-## Rcde            1.09611   0.23918  0.71469   1.681 0.67406    
-## Rpnde           0.95935   0.20343  0.63311   1.454 0.84485    
-## Rtnde           1.07186   0.22602  0.70900   1.620 0.74209    
-## Rpnie           0.82689   0.05485  0.72609   0.942 0.00416 ** 
-## Rtnie           0.92386   0.07540  0.78729   1.084 0.33191    
-## Rte             0.88631   0.17227  0.60553   1.297 0.53465    
-## ERcde           0.07662   1.30608 -2.48325   2.636 0.95322    
-## ERintref       -0.11726   0.18791 -0.48556   0.251 0.53260    
-## ERintmed        0.10006   0.12130 -0.13768   0.338 0.40940    
-## ERpnie         -0.17311   0.10363 -0.37623   0.030 0.09485 .  
-## ERcde(prop)    -0.67391   0.05485 -0.78141  -0.566 &lt; 2e-16 ***
-## ERintref(prop)  1.03144   2.63192 -4.12704   6.190 0.69514    
-## ERintmed(prop) -0.88016   1.80091 -4.40989   2.650 0.62503    
-## ERpnie(prop)    1.52264   1.53634 -1.48853   4.534 0.32165    
-## pm              0.64247   2.39863 -4.05876   5.344 0.78881    
-## int             0.15128   0.26593 -0.36994   0.672 0.56946    
-## pe              1.67391   2.63192 -3.48456   6.832 0.52477    
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## ----------------------------------------------------------------</code></pre>
-<p>Compare the error-corrected results with the results obtained by fitting data without measurement error:</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a>res_true &lt;-<span class="st"> </span><span class="kw">cmest</span>(<span class="dt">data =</span> data, <span class="dt">model =</span> <span class="st">&quot;rb&quot;</span>, <span class="dt">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="dt">exposure =</span> <span class="st">&quot;A&quot;</span>,</span>
-<span id="cb18-2"><a href="#cb18-2"></a>                       <span class="dt">mediator =</span> <span class="st">&quot;M&quot;</span>, <span class="dt">basec =</span> <span class="kw">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="dt">EMint =</span> <span class="ot">TRUE</span>,</span>
-<span id="cb18-3"><a href="#cb18-3"></a>                       <span class="dt">mreg =</span> <span class="kw">list</span>(<span class="st">&quot;logistic&quot;</span>), <span class="dt">yreg =</span> <span class="st">&quot;logistic&quot;</span>,</span>
-<span id="cb18-4"><a href="#cb18-4"></a>                       <span class="dt">astar =</span> <span class="dv">0</span>, <span class="dt">a =</span> <span class="dv">1</span>, <span class="dt">mval =</span> <span class="kw">list</span>(<span class="dv">1</span>), <span class="dt">yref =</span> <span class="dv">1</span>,</span>
-<span id="cb18-5"><a href="#cb18-5"></a>                       <span class="dt">estimation =</span> <span class="st">&quot;paramfunc&quot;</span>, <span class="dt">inference =</span> <span class="st">&quot;delta&quot;</span>)</span></code></pre></div>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a><span class="kw">summary</span>(res_true)</span></code></pre></div>
-<pre><code>## # Causal Mediation Analysis via the Regression-based Approach
-##  
-## Closed-form parameter function estimation with 
-##  delta method standard errors, confidence intervals and p-values 
-##  
-##                 Estimate Std.error   95% CIL 95% CIU   P.val    
-## Rcde             1.24309   0.22291   0.87472   1.767 0.22495    
-## Rpnde            1.01814   0.17635   0.72506   1.430 0.91733    
-## Rtnde            1.20855   0.21018   0.85947   1.699 0.27607    
-## Rpnie            0.80040   0.05419   0.70093   0.914 0.00101 ** 
-## Rtnie            0.95009   0.06605   0.82906   1.089 0.46146    
-## Rte              0.96733   0.15543   0.70599   1.325 0.83621    
-## ERcde            0.18777   7.88784 -15.27212  15.648 0.98101    
-## ERintref        -0.16963   0.16621  -0.49539   0.156 0.30746    
-## ERintmed         0.14878   0.10003  -0.04729   0.345 0.13694    
-## ERpnie          -0.19960   0.08790  -0.37188  -0.027 0.02317 *  
-## ERcde(prop)     -5.74662   0.05419  -5.85284  -5.640 &lt; 2e-16 ***
-## ERintref(prop)   5.19141  32.11420 -57.75127  68.134 0.87158    
-## ERintmed(prop)  -4.55337  24.66335 -52.89265  43.786 0.85353    
-## ERpnie(prop)     6.10859  21.62860 -36.28269  48.500 0.77761    
-## pm               1.55521  29.09367 -55.46733  58.578 0.95737    
-## int              0.63803   3.03635  -5.31311   6.589 0.83357    
-## pe               6.74662  32.11420 -56.19606  69.689 0.83360    
+## ## Error-corrected regressions for measurement error 1: 
+## 
+## ### Outcome regression:
+## Call:
+## simexreg(reg = getCall(x$sens[[1L]]$reg.output$yreg)$reg, formula = Y ~ 
+##     A_error + M + A_error * M + C1 + C2, data = getCall(x$sens[[1L]]$reg.output$yreg)$data, 
+##     MEvariable = &quot;A_error&quot;, MEvartype = &quot;categorical&quot;, MEerror = c(0.9, 
+##     0.1, 0.1, 0.9), variance = TRUE, lambda = c(0.5, 1, 1.5, 
+##     2), B = 200, weights = getCall(x$sens[[1L]]$reg.output$yreg)$weights)
+## 
+## Naive coefficient estimates: 
+## (Intercept)     A_error           M          C1          C2   A_error:M 
+##  -2.5906738  -0.5077290  -1.7374904   0.5036807  -0.6133152   0.5930976 
+## 
+## Naive var-cov estimates: 
+##              (Intercept)       A_error            M            C1            C2
+## (Intercept)  0.074373396 -0.0608915941 -0.054071017 -1.576936e-02 -7.164751e-03
+## A_error     -0.060891594  0.3252487905  0.060788376 -1.130950e-04  5.120972e-04
+## M           -0.054071017  0.0607883762  0.083061875 -8.233291e-03 -2.664520e-03
+## C1          -0.015769362 -0.0001130950 -0.008233291  2.212526e-02 -9.887795e-05
+## C2          -0.007164751  0.0005120972 -0.002664520 -9.887795e-05  2.250262e-02
+## A_error:M    0.062066763 -0.3252496367 -0.079058624 -1.368648e-03 -8.758372e-04
+##                 A_error:M
+## (Intercept)  0.0620667626
+## A_error     -0.3252496367
+## M           -0.0790586237
+## C1          -0.0013686479
+## C2          -0.0008758372
+## A_error:M    0.3534194114
+## 
+## Variable measured with error:
+## A_error
+## Measurement error:
+##     0   1
+## 0 0.9 0.1
+## 1 0.1 0.9
+## 
+## Error-corrected results:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  -2.5706     0.2726  -9.429  &lt; 2e-16 ***
+## A_error1     -0.6697     0.7186  -0.932 0.351439    
+## M            -1.7728     0.2976  -5.957 2.66e-09 ***
+## C1            0.5014     0.1490   3.366 0.000764 ***
+## C2           -0.6139     0.1500  -4.092 4.31e-05 ***
+## A_error1:M    0.7803     0.7398   1.055 0.291608    
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Reference values: 
+## ### Mediator regressions: 
+## Call:
+## simexreg(reg = getCall(x$sens[[1L]]$reg.output$mreg[[1L]])$reg, 
+##     formula = M ~ A_error + C1 + C2, data = getCall(x$sens[[1L]]$reg.output$mreg[[1L]])$data, 
+##     MEvariable = &quot;A_error&quot;, MEvartype = &quot;categorical&quot;, MEerror = c(0.9, 
+##     0.1, 0.1, 0.9), variance = TRUE, lambda = c(0.5, 1, 1.5, 
+##     2), B = 200, weights = getCall(x$sens[[1L]]$reg.output$mreg[[1L]])$weights)
+## 
+## Naive coefficient estimates: 
+## (Intercept)     A_error          C1          C2 
+##   1.1368565   1.5434255   1.5321997   0.6752983 
+## 
+## Naive var-cov estimates: 
+##              (Intercept)       A_error            C1            C2
+## (Intercept)  0.013541986 -0.0044464941 -0.0091359634 -0.0068278415
+## A_error     -0.004446494  0.0171570798 -0.0006625250  0.0001919242
+## C1          -0.009135963 -0.0006625250  0.0141546164  0.0007819793
+## C2          -0.006827841  0.0001919242  0.0007819793  0.0139496499
+## 
+## Variable measured with error:
+## A_error
+## Measurement error:
+##     0   1
+## 0 0.9 0.1
+## 1 0.1 0.9
+## 
+## Error-corrected results:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   1.0152     0.1193   8.512  &lt; 2e-16 ***
+## A_error1      1.9701     0.1676  11.757  &lt; 2e-16 ***
+## C1            1.4739     0.1203  12.255  &lt; 2e-16 ***
+## C2            0.6761     0.1197   5.649 1.66e-08 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## 
+## ## Error-corrected causal effects on the risk ratio scale for measurement error 1: 
+##                Estimate Std.error  95% CIL 95% CIU    P.val    
+## Rcde            1.11696   0.23958  0.73360   1.701 0.606087    
+## Rpnde           0.96730   0.20112  0.64354   1.454 0.872960    
+## Rtnde           1.09045   0.22744  0.72455   1.641 0.678042    
+## Rpnie           0.82467   0.05202  0.72876   0.933 0.002245 ** 
+## Rtnie           0.92966   0.06727  0.80674   1.071 0.313472    
+## Rte             0.89926   0.17449  0.61478   1.315 0.584228    
+## ERcde           0.09294   0.18747 -0.27449   0.460 0.620044    
+## ERintref       -0.12564   0.10510 -0.33164   0.080 0.231910    
+## ERintmed        0.10729   0.08991 -0.06894   0.284 0.232769    
+## ERpnie         -0.17533   0.05202 -0.27729  -0.073 0.000751 ***
+## ERcde(prop)    -0.92262   3.41032 -7.60672   5.761 0.786746    
+## ERintref(prop)  1.24722   2.29278 -3.24654   5.741 0.586456    
+## ERintmed(prop) -1.06501   1.95713 -4.90092   2.771 0.586326    
+## ERpnie(prop)    1.74041   3.09718 -4.32996   7.811 0.574162    
+## pm              0.67540   1.48233 -2.22991   3.581 0.648653    
+## int             0.18221   0.33721 -0.47870   0.843 0.588946    
+## pe              1.92262   3.41032 -4.76148   8.607 0.572913    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## ----------------------------------------------------------------
+## 
+## (Rcde: controlled direct effect risk ratio; Rpnde: pure natural direct effect risk ratio; Rtnde: total natural direct effect risk ratio; Rpnie: pure natural indirect effect risk ratio; Rtnie: total natural indirect effect risk ratio; Rte: total effect risk ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
+## 
+## Relevant variable values: 
 ## $a
 ## [1] 1
 ## 
 ## $astar
 ## [1] 0
 ## 
-## $yref
+## $yval
+## [1] &quot;1&quot;
+## 
+## $mval
+## $mval[[1]]
 ## [1] 1
+## 
+## 
+## $basecval
+## $basecval[[1]]
+## [1] 0.9967315
+## 
+## $basecval[[2]]
+## [1] 0.5936</code></pre>
+<p>Compare the error-corrected results with the true results:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>res_true <span class="ot">&lt;-</span> <span class="fu">cmest</span>(<span class="at">data =</span> data, <span class="at">model =</span> <span class="st">&quot;rb&quot;</span>, <span class="at">outcome =</span> <span class="st">&quot;Y&quot;</span>, <span class="at">exposure =</span> <span class="st">&quot;A&quot;</span>,</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>                       <span class="at">mediator =</span> <span class="st">&quot;M&quot;</span>, <span class="at">basec =</span> <span class="fu">c</span>(<span class="st">&quot;C1&quot;</span>, <span class="st">&quot;C2&quot;</span>), <span class="at">EMint =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>                       <span class="at">mreg =</span> <span class="fu">list</span>(<span class="st">&quot;logistic&quot;</span>), <span class="at">yreg =</span> <span class="st">&quot;logistic&quot;</span>,</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>                       <span class="at">astar =</span> <span class="dv">0</span>, <span class="at">a =</span> <span class="dv">1</span>, <span class="at">mval =</span> <span class="fu">list</span>(<span class="dv">1</span>), </span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>                       <span class="at">estimation =</span> <span class="st">&quot;paramfunc&quot;</span>, <span class="at">inference =</span> <span class="st">&quot;delta&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(res_true)</span></code></pre></div>
+<pre><code>## Causal Mediation Analysis
+## 
+## # Outcome regression:
+## 
+## Call:
+## glm(formula = Y ~ A + M + A * M + C1 + C2, family = binomial(), 
+##     data = getCall(x$reg.output$yreg)$data, weights = getCall(x$reg.output$yreg)$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -0.5659  -0.2096  -0.1762  -0.1524   3.1928  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  -2.5768     0.2611  -9.869  &lt; 2e-16 ***
+## A            -0.8888     0.7581  -1.172 0.241026    
+## M            -1.8429     0.2859  -6.447 1.14e-10 ***
+## C1            0.4970     0.1489   3.337 0.000845 ***
+## C2           -0.6144     0.1500  -4.095 4.22e-05 ***
+## A:M           1.1064     0.7790   1.420 0.155512    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 1858.7  on 9999  degrees of freedom
+## Residual deviance: 1799.2  on 9994  degrees of freedom
+## AIC: 1811.2
+## 
+## Number of Fisher Scoring iterations: 7
+## 
+## 
+## # Mediator regressions: 
+## 
+## Call:
+## glm(formula = M ~ A + C1 + C2, family = binomial(), data = getCall(x$reg.output$mreg[[1L]])$data, 
+##     weights = getCall(x$reg.output$mreg[[1L]])$weights)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -3.4257   0.0947   0.1396   0.2558   1.0542  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)   0.9817     0.1163   8.442  &lt; 2e-16 ***
+## A             2.1466     0.1473  14.574  &lt; 2e-16 ***
+## C1            1.4572     0.1200  12.145  &lt; 2e-16 ***
+## C2            0.6764     0.1193   5.668 1.44e-08 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 2825.7  on 9999  degrees of freedom
+## Residual deviance: 2305.6  on 9996  degrees of freedom
+## AIC: 2313.6
+## 
+## Number of Fisher Scoring iterations: 7
+## 
+## 
+## # Effect decomposition on the odds ratio scale via the regression-based approach
+##  
+## Closed-form parameter function estimation with 
+##  delta method standard errors, confidence intervals and p-values 
+##  
+##                 Estimate Std.error   95% CIL 95% CIU    P.val    
+## Rcde             1.24309   0.22291   0.87472   1.767 0.224946    
+## Rpnde            1.01814   0.17635   0.72506   1.430 0.917328    
+## Rtnde            1.20855   0.21018   0.85947   1.699 0.276073    
+## Rpnie            0.80040   0.05419   0.70093   0.914 0.001009 ** 
+## Rtnie            0.95009   0.06605   0.82906   1.089 0.461459    
+## Rte              0.96733   0.15543   0.70599   1.325 0.836210    
+## ERcde            0.18777   0.16621  -0.13800   0.514 0.258600    
+## ERintref        -0.16963   0.10003  -0.36569   0.026 0.089947 .  
+## ERintmed         0.14878   0.08790  -0.02351   0.321 0.090547 .  
+## ERpnie          -0.19960   0.05419  -0.30582  -0.093 0.000231 ***
+## ERcde(prop)     -5.74662  32.11420 -68.68930  57.196 0.857982    
+## ERintref(prop)   5.19141  24.66335 -43.14787  53.531 0.833285    
+## ERintmed(prop)  -4.55337  21.62860 -46.94465  37.838 0.833257    
+## ERpnie(prop)     6.10859  29.09367 -50.91396  63.131 0.833697    
+## pm               1.55521   7.88784 -13.90468  17.015 0.843698    
+## int              0.63803   3.03635  -5.31311   6.589 0.833565    
+## pe               6.74662  32.11420 -56.19606  69.689 0.833604    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Rcde: controlled direct effect odds ratio; Rpnde: pure natural direct effect odds ratio; Rtnde: total natural direct effect odds ratio; Rpnie: pure natural indirect effect odds ratio; Rtnie: total natural indirect effect odds ratio; Rte: total effect odds ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
+## 
+## Relevant variable values: 
+## $a
+## [1] 1
+## 
+## $astar
+## [1] 0
+## 
+## $yval
+## [1] &quot;1&quot;
 ## 
 ## $mval
 ## $mval[[1]]
