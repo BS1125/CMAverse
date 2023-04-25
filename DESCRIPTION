@@ -45,8 +45,7 @@ Imports:
     msm,
     Matrix,
     EValue,
-    ggplot2,
-    medflex
+    ggplot2
 RoxygenNote: 7.1.1
 Suggests: 
     knitr,
