@@ -465,12 +465,17 @@ cmest <- function(data = NULL, model = "rb",
   if (model == "rb" && !estimation %in% c("paramfunc", "imputation")) stop("When model = 'rb', select estimation from 'paramfunc', 'imputation'")
   if (model != "rb" && !estimation == "imputation") stop("Use estimation = 'imputation'")
   if (estimation == "paramfunc") {
+    if (!is.character(yreg) | length(yreg) != 1) stop(
+      "When estimation = 'paramfunc', select yreg from 'linear', 'logistic', 
+                       'loglinear', 'poisson', 'quasipoisson', 'negbin', 'coxph', 'aft_exp', 'aft_weibull'")
     if (!yreg %in% c("linear", "logistic", "loglinear", "poisson",
                      "quasipoisson", "negbin", "coxph", "aft_exp", "aft_weibull")) stop(
                        "When estimation = 'paramfunc', select yreg from 'linear', 'logistic', 
                        'loglinear', 'poisson', 'quasipoisson', 'negbin', 'coxph', 'aft_exp', 'aft_weibull'")
     if (length(mediator) > 1) stop("'paramfunc' only supports a single mediator")
-    if (!mreg[[1]] %in% c("linear", "logistic", "multinomial")) stop(
+    if (!is.character(mreg[[1]]) | length(mreg[[1]]) != 1) stop(
+      "When estimation = 'paramfunc', select mreg[[1]] from 'linear', 'logistic', 'multinomial'")
+    if(!mreg[[1]] %in% c("linear", "logistic", "multinomial")) stop(
       "When estimation = 'paramfunc', select mreg[[1]] from 'linear', 'logistic', 'multinomial'")
   }
   out$methods$estimation <- estimation

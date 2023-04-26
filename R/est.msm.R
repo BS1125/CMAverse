@@ -438,7 +438,7 @@ est.msm <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     
     ## output effects on the odds ratio scale for logistic regressions
     if (is_glm_yreg && family_yreg$family %in% c("binomial", "quasibinomial") &&
-        yreg$family$link == "logit") {
+        family_yreg$link == "logit") {
       logRRcde <- log(EY1m/(1-EY1m)) - log(EY0m/(1-EY0m))
       logRRpnde <- log(EY10/(1-EY10)) - log(EY00/(1-EY00))
       logRRtnde <- log(EY11/(1-EY11)) - log(EY01/(1-EY01))

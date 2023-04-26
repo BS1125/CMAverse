@@ -6,7 +6,6 @@
 #' @param reg naive regression object. See \code{Details}.
 #' @param formula regression formula
 #' @param data new dataset for \code{reg}
-#' @param weights new weights for \code{reg}
 #' @param MEvariable variable measured with error
 #' @param MEvartype type of the variable measured with error. Can be \code{continuous} or 
 #' \code{categorical} (first 3 letters are enough).
