@@ -538,24 +538,24 @@ test_that("cmest works correctly for count Y and count M", {
   mreg <- glm(M ~ A + C1 + C2, family = quasipoisson(), data = data)
 
   # results of cmest
-  res_countcount_rb <- cmest(data = data, model = "rb", outcome = "Y", event = "delta",
+  res_countcount_rb <- cmest(data = data, model = "rb", outcome = "Y", 
                              exposure = "A", mediator = "M", basec = c("C1", "C2"),
                              EMint = TRUE,
                              mreg = list("quasipoisson"), yreg = "quasipoisson",
                              astar = 0, a = 1, mval = list(1),
                              estimation = "imputation", inference = "bootstrap")
-  res_countcount_wb <- cmest(data = data, model = "wb", outcome = "Y", event = "delta", exposure = "A",
+  res_countcount_wb <- cmest(data = data, model = "wb", outcome = "Y", exposure = "A",
                              mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                              ereg = "logistic", yreg = "quasipoisson",
                              astar = 0, a = 1, mval = list(1),
                              estimation = "imputation", inference = "bootstrap")
   res_countcount_iorw <- cmest(data = data, model = "iorw", outcome = "Y", exposure = "A",
-                               mediator = "M", basec = c("C1", "C2"), EMint = TRUE, event = "delta",
+                               mediator = "M", basec = c("C1", "C2"), EMint = TRUE, 
                                ereg = "logistic", yreg = "quasipoisson",
                                astar = 0, a = 1,
                                estimation = "imputation", inference = "bootstrap")
   res_countcount_gformula <- cmest(data = data, model = "gformula", outcome = "Y", exposure = "A",
-                                   mediator = "M", basec = c("C1", "C2"), EMint = TRUE, event = "delta",
+                                   mediator = "M", basec = c("C1", "C2"), EMint = TRUE, 
                                    mreg = list("quasipoisson"), yreg = "quasipoisson",
                                    astar = 0, a = 1, mval = list(1),
                                    estimation = "imputation", inference = "bootstrap")
@@ -691,14 +691,14 @@ test_that("cmest works correctly for ordinal Y and ordinal M", {
   mreg <- MASS::polr(M ~ A + C1 + C2, data = data)
 
   # results of cmest
-  res_ordinalordinal_rb <- cmest(data = data, model = "rb", outcome = "Y", event = "delta",
+  res_ordinalordinal_rb <- cmest(data = data, model = "rb", outcome = "Y", 
                                  exposure = "A", mediator = "M", basec = c("C1", "C2"),
                                  EMint = TRUE,
                                  mreg = list("ordinal"), yreg = "ordinal", yref = "1",
                                  astar = 0, a = 1, mval = list(1),
                                  estimation = "imputation", inference = "bootstrap")
   res_ordinalordinal_iorw <- cmest(data = data, model = "iorw", outcome = "Y", exposure = "A",
-                                   mediator = "M", basec = c("C1", "C2"), EMint = TRUE, event = "delta",
+                                   mediator = "M", basec = c("C1", "C2"), EMint = TRUE, 
                                    ereg = "ordinal", yreg = "ordinal", yref = "1",
                                    astar = 0, a = 1,
                                    estimation = "imputation", inference = "bootstrap")
@@ -710,7 +710,7 @@ test_that("cmest works correctly for ordinal Y and ordinal M", {
                                   astar = 0, a = 1, mval = list(1), yref = "1",
                                   estimation = "imputation", inference = "bootstrap")
   res_ordinalordinal_gformula <- cmest(data = data, model = "gformula", outcome = "Y", exposure = "A",
-                                       mediator = "M", basec = c("C1", "C2"), EMint = TRUE, event = "delta",
+                                       mediator = "M", basec = c("C1", "C2"), EMint = TRUE, 
                                        mreg = list("ordinal"), yreg = "ordinal",
                                        astar = 0, a = 1, mval = list(1), yref = "1",
                                        estimation = "imputation", inference = "bootstrap")
