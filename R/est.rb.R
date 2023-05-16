@@ -347,10 +347,10 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
         mid_astar <- rpois(n_full, lambda = mpred_astar[full_index])
         # quasipoisson M
       } else if (is_glm_mreg[p] && family_mreg[[p]]$family == "quasipoisson") {
-        phi <- summary(mreg[[p]])$dispersion
-        mid_a <- rqpois(n_full, lambda = mpred_a[full_index], phi = phi)
-        mid_astar <- rqpois(n_full, lambda = mpred_astar[full_index], phi = phi)
-        rm(phi)
+        dispersion <- summary(mreg[[p]])$dispersion
+        mid_a <- MASS::rnegbin(n_full, mu = mpred_a[full_index], theta = dispersion)
+        mid_astar <- MASS::rnegbin(n_full, mu = mpred_astar[full_index], theta = dispersion)
+        rm(dispersion)
         # negative binomial M
       } else if ( is_glm_mreg[p] && startsWith(family_mreg[[p]]$family, "Negative Binomial")) {
         theta <- summary(mreg[[p]])$theta
