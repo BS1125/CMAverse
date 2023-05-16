@@ -45,7 +45,8 @@ Imports:
     msm,
     Matrix,
     EValue,
-    ggplot2
+    ggplot2,
+    predint
 RoxygenNote: 7.1.1
 Suggests: 
     knitr,

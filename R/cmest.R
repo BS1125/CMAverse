@@ -411,7 +411,8 @@
 #' @importFrom simex check.mc.matrix
 #' @importFrom ggplot2 ggproto ggplot geom_errorbar aes geom_point ylab geom_hline position_dodge2 
 #' scale_colour_hue theme element_blank facet_grid 
-#'
+#' @importFrom predint rqpois
+#' 
 #' @export
 
 cmest <- function(data = NULL, model = "rb",

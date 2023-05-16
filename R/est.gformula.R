@@ -184,8 +184,13 @@ est.gformula <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRU
         # quasipoisson L
       } else if (is_glm_postcreg[p] && family_postcreg[[p]]$family == "quasipoisson") {
         dispersion <- summary(postcreg[[p]])$dispersion
-        mid_a <- MASS::rnegbin(n_full, mu = postcpred_a[full_index], theta = dispersion)
-        mid_astar <- MASS::rnegbin(n_full, mu = postcpred_astar[full_index], theta = dispersion)
+        if (dispersion > 1) {
+          mid_a <- sapply(1:n_full, function(i) predint::rqpois(1, lambda = postcpred_a[full_index][i], phi = dispersion)[,1])
+          mid_astar <- sapply(1:n_full, function(i) predint::rqpois(1, lambda = postcpred_astar[full_index][i], phi = dispersion)[,1])
+        } else {
+          mid_a <- postcpred_a[full_index]
+          mid_astar <- postcpred_astar[full_index]
+        }
         rm(dispersion)
         # negative binomial L
       } else if (is_glm_postcreg[p] && startsWith(family_postcreg[[p]]$family, "Negative Binomial")) {
@@ -271,8 +276,13 @@ est.gformula <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRU
       # quasipoisson M
     } else if (is_glm_mreg[p] && family_mreg[[p]]$family == "quasipoisson") {
       dispersion <- summary(mreg[[p]])$dispersion
-      mid_a <- MASS::rnegbin(n_full, mu = mpred_a[full_index], theta = dispersion)
-      mid_astar <- MASS::rnegbin(n_full, mu = mpred_astar[full_index], theta = dispersion)
+      if (dispersion > 1) {
+        mid_a <- sapply(1:n_full, function(i) predint::rqpois(1, lambda = mpred_a[full_index][i], phi = dispersion)[,1])
+        mid_astar <- sapply(1:n_full, function(i) predint::rqpois(1, lambda = mpred_astar[full_index][i], phi = dispersion)[,1])
+      } else {
+        mid_a <- mpred_a[full_index]
+        mid_astar <- mpred_astar[full_index]
+      }
       rm(dispersion)
       # negative binomial M
     } else if ( is_glm_mreg[p] && startsWith(family_mreg[[p]]$family, "Negative Binomial")) {
