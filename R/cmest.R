@@ -494,8 +494,11 @@ cmest <- function(data = NULL, model = "rb",
   if (length(outcome) > 1) stop("length(outcome) > 1")
   out$variables$outcome <- outcome
   # event
-  if (yreg %in% c("coxph", "aft_exp", "aft_weibull") && !is.null(event)) out$variables$event <- event
-  if (!is.character(yreg) && !is.null(event)) warning("event is ignored when yreg is not character")
+  if (is.character(yreg)) {
+    if (yreg %in% c("coxph", "aft_exp", "aft_weibull") && !is.null(event)) out$variables$event <- event
+  } else {
+    if (!is.null(event)) warning("event is ignored when yreg is not character")
+  }
   # exposure
   if (length(exposure) == 0) stop("Unspecified exposure")
   if (length(exposure) > 1) stop("length(exposure) > 1")
