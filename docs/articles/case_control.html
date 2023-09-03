@@ -57,7 +57,7 @@
   <a href="../articles/quickstart.html">Quickstart</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Examples
      
     <span class="caret"></span>
@@ -109,13 +109,13 @@
 
       
 
-      </header><script src="case_control_files/accessible-code-block-0.0.1/empty-anchor.js"></script><link href="case_control_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
-<script src="case_control_files/anchor-sections-1.0/anchor-sections.js"></script><div class="row">
+      </header><script src="case_control_files/header-attrs-2.14/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>Statistical Modeling for a Case Control Study</h1>
+      <h1 data-toc-skip>Statistical Modeling for a Case Control
+Study</h1>
             
-            <h4 class="date">2021-06-03</h4>
+            <h4 class="date">2023-09-03</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BS1125/CMAverse/blob/master/vignettes/case_control.Rmd"><code>vignettes/case_control.Rmd</code></a></small>
       <div class="hidden name"><code>case_control.Rmd</code></div>
@@ -124,7 +124,17 @@
 
     
     
-<p>This example demonstrates how to use <code>cmest</code> for a case control study. For this purpose, we simulate some data containing a continuous baseline confounder <span class="math inline">\(C_1\)</span>, a binary baseline confounder <span class="math inline">\(C_2\)</span>, a binary exposure <span class="math inline">\(A\)</span>, a binary mediator <span class="math inline">\(M\)</span> and a binary outcome <span class="math inline">\(Y\)</span>. We sample 2000 cases out of all cases and sample 2000 controls out of all controls. The true regression models for <span class="math inline">\(A\)</span>, <span class="math inline">\(M\)</span> and <span class="math inline">\(Y\)</span> are: <span class="math display">\[logit(E(A|C_1,C_2))=0.2+0.5C_1+0.1C_2\]</span> <span class="math display">\[logit(E(M|A,C_1,C_2))=1+2A+1.5C_1+0.8C_2\]</span> <span class="math display">\[logit(E(Y|A,M,C_1,C_2)))=-5+0.8A-1.8M+0.5AM+0.3C_1-0.6C_2\]</span></p>
+<p>This example demonstrates how to use <code>cmest</code> for a case
+control study. For this purpose, we simulate some data containing a
+continuous baseline confounder <span class="math inline">\(C_1\)</span>,
+a binary baseline confounder <span class="math inline">\(C_2\)</span>, a
+binary exposure <span class="math inline">\(A\)</span>, a binary
+mediator <span class="math inline">\(M\)</span> and a binary outcome
+<span class="math inline">\(Y\)</span>. We sample 2000 cases out of all
+cases and sample 2000 controls out of all controls. The true regression
+models for <span class="math inline">\(A\)</span>, <span class="math inline">\(M\)</span> and <span class="math inline">\(Y\)</span> are: <span class="math display">\[logit(E(A|C_1,C_2))=0.2+0.5C_1+0.1C_2\]</span>
+<span class="math display">\[logit(E(M|A,C_1,C_2))=1+2A+1.5C_1+0.8C_2\]</span>
+<span class="math display">\[logit(E(Y|A,M,C_1,C_2)))=-5+0.8A-1.8M+0.5AM+0.3C_1-0.6C_2\]</span></p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
 <span class="co"># data simulation</span>
@@ -146,8 +156,12 @@
 <span class="fu"><a href="../reference/cmdag.html">cmdag</a></span><span class="op">(</span>outcome <span class="op">=</span> <span class="st">"Y"</span>, exposure <span class="op">=</span> <span class="st">"A"</span>, mediator <span class="op">=</span> <span class="st">"M"</span>,
       basec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C1"</span>, <span class="st">"C2"</span><span class="op">)</span>, postc <span class="op">=</span> <span class="cn">NULL</span>, node <span class="op">=</span> <span class="cn">TRUE</span>, text_col <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span></code></pre></div>
 <p><img src="case_control_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
-<p>For a case control study, we set the <code>casecontrol</code> argument to be <code>TRUE</code>. It requires that either the prevalence of the case be known or the case be rare. We use the regression-based approach for illustration.</p>
-<p>If the prevalence of the case is known, we specify it by the <code>yprevalence</code> argument. The results are:</p>
+<p>For a case control study, we set the <code>casecontrol</code>
+argument to be <code>TRUE</code>. It requires that either the prevalence
+of the case be known or the case be rare. We use the regression-based
+approach for illustration.</p>
+<p>If the prevalence of the case is known, we specify it by the
+<code>yprevalence</code> argument. The results are:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">res_yprevelence</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data</span>, model <span class="op">=</span> <span class="st">"rb"</span>, casecontrol <span class="op">=</span> <span class="cn">TRUE</span>, yprevalence <span class="op">=</span> <span class="va">yprevalence</span>,
                          outcome <span class="op">=</span> <span class="st">"Y"</span>, exposure <span class="op">=</span> <span class="st">"A"</span>,
@@ -209,7 +223,7 @@
 ## Number of Fisher Scoring iterations: 7
 ## 
 ## 
-## # Effect decomposition on the risk ratio scale for a case control study via the regression-based approach
+## # Effect decomposition on the odds ratio scale for a case control study via the regression-based approach
 ##  
 ## Closed-form parameter function estimation with 
 ##  delta method standard errors, confidence intervals and p-values 
@@ -235,7 +249,7 @@
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## (Rcde: controlled direct effect risk ratio; Rpnde: pure natural direct effect risk ratio; Rtnde: total natural direct effect risk ratio; Rpnie: pure natural indirect effect risk ratio; Rtnie: total natural indirect effect risk ratio; Rte: total effect risk ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
+## (Rcde: controlled direct effect odds ratio; Rpnde: pure natural direct effect odds ratio; Rtnde: total natural direct effect odds ratio; Rpnie: pure natural indirect effect odds ratio; Rtnie: total natural indirect effect odds ratio; Rte: total effect odds ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
 ## 
 ## Relevant variable values: 
 ## $a
@@ -258,7 +272,9 @@
 ## 
 ## $basecval[[2]]
 ## [1] 0.5255</code></pre>
-<p>If the prevalence of the case is unknown but we know the case is rare, we set the <code>yrare</code> argument to be <code>TRUE</code>. The results are:</p>
+<p>If the prevalence of the case is unknown but we know the case is
+rare, we set the <code>yrare</code> argument to be <code>TRUE</code>.
+The results are:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">res_yrare</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data</span>, model <span class="op">=</span> <span class="st">"rb"</span>, casecontrol <span class="op">=</span> <span class="cn">TRUE</span>, yrare <span class="op">=</span> <span class="cn">TRUE</span>,
                    outcome <span class="op">=</span> <span class="st">"Y"</span>, exposure <span class="op">=</span> <span class="st">"A"</span>,
@@ -328,7 +344,7 @@
 ## Number of Fisher Scoring iterations: 7
 ## 
 ## 
-## # Effect decomposition on the risk ratio scale for a case control study via the regression-based approach
+## # Effect decomposition on the odds ratio scale for a case control study via the regression-based approach
 ##  
 ## Closed-form parameter function estimation with 
 ##  delta method standard errors, confidence intervals and p-values 
@@ -354,7 +370,7 @@
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## (Rcde: controlled direct effect risk ratio; Rpnde: pure natural direct effect risk ratio; Rtnde: total natural direct effect risk ratio; Rpnie: pure natural indirect effect risk ratio; Rtnie: total natural indirect effect risk ratio; Rte: total effect risk ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
+## (Rcde: controlled direct effect odds ratio; Rpnde: pure natural direct effect odds ratio; Rtnde: total natural direct effect odds ratio; Rpnie: pure natural indirect effect odds ratio; Rtnie: total natural indirect effect odds ratio; Rte: total effect odds ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
 ## 
 ## Relevant variable values: 
 ## $a
@@ -388,7 +404,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Baoyi Shi, <a href="https://scholar.harvard.edu/cchoirat">Christine Choirat</a>, <a href="https://www.lindavaleri.com/">Linda Valeri</a>.</p>
+  <p>Developed by Baoyi Shi, Christine Choirat, <a href="https://www.lindavaleri.com/">Linda Valeri</a>.</p>
 </div>
 
 <div class="pkgdown">

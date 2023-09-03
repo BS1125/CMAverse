@@ -57,7 +57,7 @@
   <a href="../articles/quickstart.html">Quickstart</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Examples
      
     <span class="caret"></span>
@@ -109,13 +109,12 @@
 
       
 
-      </header><script src="measurement_error_files/accessible-code-block-0.0.1/empty-anchor.js"></script><link href="measurement_error_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
-<script src="measurement_error_files/anchor-sections-1.0/anchor-sections.js"></script><div class="row">
+      </header><script src="measurement_error_files/header-attrs-2.14/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Sensitivity Analysis for Measurement Error</h1>
             
-            <h4 class="date">2021-06-03</h4>
+            <h4 class="date">2023-09-03</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BS1125/CMAverse/blob/master/vignettes/measurement_error.Rmd"><code>vignettes/measurement_error.Rmd</code></a></small>
       <div class="hidden name"><code>measurement_error.Rmd</code></div>
@@ -124,7 +123,12 @@
 
     
     
-<p>This example demonstrates how to conduct sensitivity analysis for measurement error by using <code>cmsens</code>. For this purpose, we simulate some data containing a continuous baseline confounder <span class="math inline">\(C_1\)</span>, a binary baseline confounder <span class="math inline">\(C_2\)</span>, a binary exposure <span class="math inline">\(A\)</span>, a binary mediator <span class="math inline">\(M\)</span> and a binary outcome <span class="math inline">\(Y\)</span>. The true regression models for <span class="math inline">\(A\)</span>, <span class="math inline">\(M\)</span> and <span class="math inline">\(Y\)</span> are: <span class="math display">\[logit(E(A|C_1,C_2))=0.2+0.5C_1+0.1C_2\]</span> <span class="math display">\[logit(E(M|A,C_1,C_2))=1+2A+1.5C_1+0.8C_2\]</span> <span class="math display">\[logit(E(Y|A,M,C_1,C_2)))=-3-0.4A-1.2M+0.5AM+0.3C_1-0.6C_2\]</span></p>
+<p>This example demonstrates how to conduct sensitivity analysis for
+measurement error by using <code>cmsens</code>. For this purpose, we
+simulate some data containing a continuous baseline confounder <span class="math inline">\(C_1\)</span>, a binary baseline confounder <span class="math inline">\(C_2\)</span>, a binary exposure <span class="math inline">\(A\)</span>, a binary mediator <span class="math inline">\(M\)</span> and a binary outcome <span class="math inline">\(Y\)</span>. The true regression models for <span class="math inline">\(A\)</span>, <span class="math inline">\(M\)</span>
+and <span class="math inline">\(Y\)</span> are: <span class="math display">\[logit(E(A|C_1,C_2))=0.2+0.5C_1+0.1C_2\]</span>
+<span class="math display">\[logit(E(M|A,C_1,C_2))=1+2A+1.5C_1+0.8C_2\]</span>
+<span class="math display">\[logit(E(Y|A,M,C_1,C_2)))=-3-0.4A-1.2M+0.5AM+0.3C_1-0.6C_2\]</span></p>
 <p>Then, we generate some measurement errors for <span class="math inline">\(C_1\)</span> and <span class="math inline">\(A\)</span>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
@@ -153,7 +157,12 @@
 <div id="a-continuous-variable-measured-with-error" class="section level2">
 <h2 class="hasAnchor">
 <a href="#a-continuous-variable-measured-with-error" class="anchor"></a>A Continuous Variable Measured with Error</h2>
-<p>Firstly, we assume <span class="math inline">\(C1\)</span> was measured with error. <span class="math inline">\(C_1\)</span> is continuous, so the measurement error can be corrected by regression calibration or SIMEX. We use the regression-based approach for illustration. The naive results obtained by fitting data with measurement error:</p>
+<p>Firstly, we assume <span class="math inline">\(C1\)</span> was
+measured with error. <span class="math inline">\(C_1\)</span> is
+continuous, so the measurement error can be corrected by regression
+calibration or SIMEX. We use the regression-based approach for
+illustration. The naive results obtained by fitting data with
+measurement error:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">res_naive_cont</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data</span>, model <span class="op">=</span> <span class="st">"rb"</span>, outcome <span class="op">=</span> <span class="st">"Y"</span>, exposure <span class="op">=</span> <span class="st">"A"</span>,
                         mediator <span class="op">=</span> <span class="st">"M"</span>, basec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C1_error"</span>, <span class="st">"C2"</span><span class="op">)</span>, EMint <span class="op">=</span> <span class="cn">TRUE</span>,
@@ -222,7 +231,7 @@
 ## Number of Fisher Scoring iterations: 7
 ## 
 ## 
-## # Effect decomposition on the risk ratio scale via the regression-based approach
+## # Effect decomposition on the odds ratio scale via the regression-based approach
 ##  
 ## Closed-form parameter function estimation with 
 ##  delta method standard errors, confidence intervals and p-values 
@@ -248,7 +257,7 @@
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## (Rcde: controlled direct effect risk ratio; Rpnde: pure natural direct effect risk ratio; Rtnde: total natural direct effect risk ratio; Rpnie: pure natural indirect effect risk ratio; Rtnie: total natural indirect effect risk ratio; Rte: total effect risk ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
+## (Rcde: controlled direct effect odds ratio; Rpnde: pure natural direct effect odds ratio; Rtnde: total natural direct effect odds ratio; Rpnie: pure natural indirect effect odds ratio; Rtnie: total natural indirect effect odds ratio; Rte: total effect odds ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
 ## 
 ## Relevant variable values: 
 ## $a
@@ -549,7 +558,10 @@
 <div id="a-categorical-variable-measured-with-error" class="section level2">
 <h2 class="hasAnchor">
 <a href="#a-categorical-variable-measured-with-error" class="anchor"></a>A Categorical Variable Measured with Error</h2>
-<p>Then, we assume <span class="math inline">\(A\)</span> was measured with error. <span class="math inline">\(A\)</span> is categorical, so only SIMEX can be used. The naive results obtained by fitting data with measurement error:</p>
+<p>Then, we assume <span class="math inline">\(A\)</span> was measured
+with error. <span class="math inline">\(A\)</span> is categorical, so
+only SIMEX can be used. The naive results obtained by fitting data with
+measurement error:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">res_naive_cat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data</span>, model <span class="op">=</span> <span class="st">"rb"</span>, outcome <span class="op">=</span> <span class="st">"Y"</span>, exposure <span class="op">=</span> <span class="st">"A_error"</span>,
                        mediator <span class="op">=</span> <span class="st">"M"</span>, basec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C1"</span>, <span class="st">"C2"</span><span class="op">)</span>, EMint <span class="op">=</span> <span class="cn">TRUE</span>,
@@ -618,7 +630,7 @@
 ## Number of Fisher Scoring iterations: 7
 ## 
 ## 
-## # Effect decomposition on the risk ratio scale via the regression-based approach
+## # Effect decomposition on the odds ratio scale via the regression-based approach
 ##  
 ## Closed-form parameter function estimation with 
 ##  delta method standard errors, confidence intervals and p-values 
@@ -644,7 +656,7 @@
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## (Rcde: controlled direct effect risk ratio; Rpnde: pure natural direct effect risk ratio; Rtnde: total natural direct effect risk ratio; Rpnie: pure natural indirect effect risk ratio; Rtnie: total natural indirect effect risk ratio; Rte: total effect risk ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
+## (Rcde: controlled direct effect odds ratio; Rpnde: pure natural direct effect odds ratio; Rtnde: total natural direct effect odds ratio; Rpnie: pure natural indirect effect odds ratio; Rtnie: total natural indirect effect odds ratio; Rte: total effect odds ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
 ## 
 ## Relevant variable values: 
 ## $a
@@ -882,7 +894,7 @@
 ## Number of Fisher Scoring iterations: 7
 ## 
 ## 
-## # Effect decomposition on the risk ratio scale via the regression-based approach
+## # Effect decomposition on the odds ratio scale via the regression-based approach
 ##  
 ## Closed-form parameter function estimation with 
 ##  delta method standard errors, confidence intervals and p-values 
@@ -908,7 +920,7 @@
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## (Rcde: controlled direct effect risk ratio; Rpnde: pure natural direct effect risk ratio; Rtnde: total natural direct effect risk ratio; Rpnie: pure natural indirect effect risk ratio; Rtnie: total natural indirect effect risk ratio; Rte: total effect risk ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
+## (Rcde: controlled direct effect odds ratio; Rpnde: pure natural direct effect odds ratio; Rtnde: total natural direct effect odds ratio; Rpnie: pure natural indirect effect odds ratio; Rtnie: total natural indirect effect odds ratio; Rte: total effect odds ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
 ## 
 ## Relevant variable values: 
 ## $a
@@ -945,7 +957,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Baoyi Shi, <a href="https://scholar.harvard.edu/cchoirat">Christine Choirat</a>, <a href="https://www.lindavaleri.com/">Linda Valeri</a>.</p>
+  <p>Developed by Baoyi Shi, Christine Choirat, <a href="https://www.lindavaleri.com/">Linda Valeri</a>.</p>
 </div>
 
 <div class="pkgdown">

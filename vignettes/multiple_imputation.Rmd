@@ -50,7 +50,7 @@ res_multimp <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
                      mreg = list("logistic"), yreg = "logistic",
                      astar = 0, a = 1, mval = list(1), 
                      estimation = "paramfunc", inference = "delta", 
-                     multimp = TRUE, m = 10)
+                     multimp = TRUE, args_mice = list(m = 10))
 ```
 
 ```{r message=F,warning=F}

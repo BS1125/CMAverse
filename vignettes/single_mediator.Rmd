@@ -109,17 +109,17 @@ summary(res_iorw)
 
 ## The Natural Effect Model
 
-```{r message=F,warning=F,results='hide'}
-res_ne <- cmest(data = data, model = "ne", outcome = "Y", exposure = "A",
-                mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
-                yreg = "logistic",
-                astar = 0, a = 1, mval = list(1), 
-                estimation = "imputation", inference = "bootstrap", nboot = 2)
-```
-
-```{r message=F,warning=F}
-summary(res_ne)
-```
+# ```{r message=F,warning=F,results='hide'}
+# res_ne <- cmest(data = data, model = "ne", outcome = "Y", exposure = "A",
+#                 mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
+#                 yreg = "logistic",
+#                 astar = 0, a = 1, mval = list(1), 
+#                 estimation = "imputation", inference = "bootstrap", nboot = 2)
+# ```
+# 
+# ```{r message=F,warning=F}
+# summary(res_ne)
+# ```
 
 ## The Marginal Structural Model
 

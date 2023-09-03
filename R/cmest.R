@@ -77,7 +77,7 @@
 #' @param multimp a logical value (used when \code{data} contains missing values). If 
 #' \code{TRUE}, conduct multiple imputations using the \link[mice]{mice} function. Default is 
 #' \code{FALSE}.
-#' @param ... Additional arguments passed to the \link[mice]{mice} function. See \link[mice]{mice}
+#' @param args_mice a list of additional arguments passed to the \link[mice]{mice} function. See \link[mice]{mice}
 #' for details.
 #' @param x an object of class \code{cmest}
 #' @param object an object of class \code{cmest}
@@ -423,7 +423,7 @@ cmest <- function(data = NULL, model = "rb",
                   yreg = NULL, mreg = NULL, wmnomreg = NULL, wmdenomreg = NULL, ereg = NULL, 
                   postcreg = NULL,
                   astar = 0, a = 1, mval = NULL, yval = NULL, basecval = NULL,
-                  nboot = 200, boot.ci.type = "per", nRep = 5, multimp = FALSE, ...) {
+                  nboot = 200, boot.ci.type = "per", nRep = 5, multimp = FALSE, args_mice = NULL) {
   # function call
   cl <- match.call()
   # output list
@@ -547,7 +547,8 @@ cmest <- function(data = NULL, model = "rb",
   if (!is.logical(multimp)) stop("multimp should be TRUE or FALSE")
   # args_mice
   if (multimp) {
-    args_mice <- list(...)
+    if (!is.null(args_mice) && !is.list(args_mice)) stop("args_mice should be a list")
+    if (is.null(args_mice)) args_mice <- list()
     args_mice$print <- FALSE
     if (!is.null(args_mice$data)) warning("args_mice$data is overwritten by data")
     args_mice$data <- data

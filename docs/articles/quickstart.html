@@ -57,7 +57,7 @@
   <a href="../articles/quickstart.html">Quickstart</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Examples
      
     <span class="caret"></span>
@@ -109,13 +109,12 @@
 
       
 
-      </header><script src="quickstart_files/accessible-code-block-0.0.1/empty-anchor.js"></script><link href="quickstart_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
-<script src="quickstart_files/anchor-sections-1.0/anchor-sections.js"></script><div class="row">
+      </header><script src="quickstart_files/header-attrs-2.14/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>CMAverse Quickstart Guide</h1>
             
-            <h4 class="date">2021-06-03</h4>
+            <h4 class="date">2023-09-03</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BS1125/CMAverse/blob/master/vignettes/quickstart.Rmd"><code>vignettes/quickstart.Rmd</code></a></small>
       <div class="hidden name"><code>quickstart.Rmd</code></div>
@@ -124,16 +123,22 @@
 
     
     
-<p>We illustrate the general workflow of the <code>CMAverse</code> package by a quick example. The general workflow is:</p>
+<p>We illustrate the general workflow of the <code>CMAverse</code>
+package by a quick example. The general workflow is:</p>
 <ol style="list-style-type: decimal">
-<li><p>Plot the DAG of causal relationships using <code>cmdag</code>.</p></li>
-<li><p>Estimate causal effects and make inferences using <code>cmest</code>.</p></li>
-<li><p>Conduct sensitivity analysis for unmeasured confounding and measurement error using <code>cmsens</code>.</p></li>
+<li><p>Plot the DAG of causal relationships using
+<code>cmdag</code>.</p></li>
+<li><p>Estimate causal effects and make inferences using
+<code>cmest</code>.</p></li>
+<li><p>Conduct sensitivity analysis for unmeasured confounding and
+measurement error using <code>cmsens</code>.</p></li>
 </ol>
 <p>Firstly, let’s load the package.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://bs1125.github.io/CMAverse/">CMAverse</a></span><span class="op">)</span></code></pre></div>
-<p>Next, we simulate some data and plot the DAG. The simulated dataset contains a binary exposure, a binary mediator, a continuous mediator, a continuous outcome and two baseline confounders.</p>
+<p>Next, we simulate some data and plot the DAG. The simulated dataset
+contains a binary exposure, a binary mediator, a continuous mediator, a
+continuous outcome and two baseline confounders.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
 <span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">100</span>
@@ -151,7 +156,10 @@
 <code class="sourceCode R"><span class="fu"><a href="../reference/cmdag.html">cmdag</a></span><span class="op">(</span>outcome <span class="op">=</span> <span class="st">"Y"</span>, exposure <span class="op">=</span> <span class="st">"A"</span>, mediator <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"M1"</span>, <span class="st">"M2"</span><span class="op">)</span>, 
       basec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C1"</span>, <span class="st">"C2"</span><span class="op">)</span>, postc <span class="op">=</span> <span class="cn">NULL</span>, node <span class="op">=</span> <span class="cn">FALSE</span>, text_col <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span></code></pre></div>
 <p><img src="quickstart_files/figure-html/plot_dag-1.png" width="700"></p>
-<p>Then, we estimate causal effects using <code>cmest</code>. We use the regression-based approach for illustration. The reference values for the exposure are set to be 0 and 1. The reference values for the two mediators are set to be 1.</p>
+<p>Then, we estimate causal effects using <code>cmest</code>. We use the
+regression-based approach for illustration. The reference values for the
+exposure are set to be 0 and 1. The reference values for the two
+mediators are set to be 1.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">est</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data</span>, model <span class="op">=</span> <span class="st">"rb"</span>, outcome <span class="op">=</span> <span class="st">"Y"</span>, exposure <span class="op">=</span> <span class="st">"A"</span>,
                 mediator <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"M1"</span>, <span class="st">"M2"</span><span class="op">)</span>, basec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C1"</span>, <span class="st">"C2"</span><span class="op">)</span>, EMint <span class="op">=</span> <span class="cn">TRUE</span>,
@@ -293,7 +301,8 @@
 <code class="sourceCode R"><span class="fu"><a href="../reference/ggcmest.html">ggcmest</a></span><span class="op">(</span><span class="va">est</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>axis.text.x <span class="op">=</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">30</span>, vjust <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p><img src="quickstart_files/figure-html/plot_cmest-1.png" width="768"></p>
-<p>Lastly, we conduct sensitivity analysis for the results. Sensitivity analysis for unmeasured confounding:</p>
+<p>Lastly, we conduct sensitivity analysis for the results. Sensitivity
+analysis for unmeasured confounding:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/cmsens.html">cmsens</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">est</span>, sens <span class="op">=</span> <span class="st">"uc"</span><span class="op">)</span></code></pre></div>
 <pre><code>## Sensitivity Analysis For Unmeasured Confounding 
@@ -306,7 +315,10 @@
 ## pnie 1.126739 0.9896507 1.282818     1.504631       1.000000             NA
 ## tnie 1.134753 1.0152410 1.268333     1.525791       1.139632             NA
 ## te   1.888589 1.5321886 2.327891     3.184035       2.435191             NA</code></pre>
-<p>Assume that <span class="math inline">\(C_1\)</span> was measured with error. Sensitivity analysis for measurement error using regression calibration with a set of assumed error standard deviations 0.1, 0.2 and 0.3:</p>
+<p>Assume that <span class="math inline">\(C_1\)</span> was measured
+with error. Sensitivity analysis for measurement error using regression
+calibration with a set of assumed error standard deviations 0.1, 0.2 and
+0.3:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">me1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cmsens.html">cmsens</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">est</span>, sens <span class="op">=</span> <span class="st">"me"</span>, MEmethod <span class="op">=</span> <span class="st">"rc"</span>, 
               MEvariable <span class="op">=</span> <span class="st">"C1"</span>, MEvartype <span class="op">=</span> <span class="st">"con"</span>, MEerror <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.2</span>, <span class="fl">0.3</span><span class="op">)</span><span class="op">)</span></code></pre></div>
@@ -751,7 +763,9 @@
 <code class="sourceCode R"><span class="fu"><a href="../reference/ggcmsens.html">ggcmsens</a></span><span class="op">(</span><span class="va">me1</span><span class="op">)</span> <span class="op">+</span>
   <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>axis.text.x <span class="op">=</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html">element_text</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">30</span>, vjust <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p><img src="quickstart_files/figure-html/plot_cmsens_me_con-1.png" width="768"></p>
-<p>Then, assume that the exposure was measured with error. Sensitivity analysis for measurement error using SIMEX with two assumed misclassification matrices:</p>
+<p>Then, assume that the exposure was measured with error. Sensitivity
+analysis for measurement error using SIMEX with two assumed
+misclassification matrices:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">me2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cmsens.html">cmsens</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">est</span>, sens <span class="op">=</span> <span class="st">"me"</span>, MEmethod <span class="op">=</span> <span class="st">"simex"</span>, MEvariable <span class="op">=</span> <span class="st">"A"</span>, 
               MEvartype <span class="op">=</span> <span class="st">"cat"</span>, B <span class="op">=</span> <span class="fl">5</span>,
@@ -1099,7 +1113,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Baoyi Shi, <a href="https://scholar.harvard.edu/cchoirat">Christine Choirat</a>, <a href="https://www.lindavaleri.com/">Linda Valeri</a>.</p>
+  <p>Developed by Baoyi Shi, Christine Choirat, <a href="https://www.lindavaleri.com/">Linda Valeri</a>.</p>
 </div>
 
 <div class="pkgdown">

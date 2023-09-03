@@ -57,7 +57,7 @@
   <a href="../articles/quickstart.html">Quickstart</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Examples
      
     <span class="caret"></span>
@@ -109,13 +109,12 @@
 
       
 
-      </header><script src="multiple_imputation_files/accessible-code-block-0.0.1/empty-anchor.js"></script><link href="multiple_imputation_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
-<script src="multiple_imputation_files/anchor-sections-1.0/anchor-sections.js"></script><div class="row">
+      </header><script src="multiple_imputation_files/header-attrs-2.14/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Multiple Imputations with Missing Data</h1>
             
-            <h4 class="date">2021-06-03</h4>
+            <h4 class="date">2023-09-03</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BS1125/CMAverse/blob/master/vignettes/multiple_imputation.Rmd"><code>vignettes/multiple_imputation.Rmd</code></a></small>
       <div class="hidden name"><code>multiple_imputation.Rmd</code></div>
@@ -124,8 +123,15 @@
 
     
     
-<p>This example demonstrates how to estimate causal effects with multiple imputations by using <code>cmest</code> when the dataset contains missing values. For this purpose, we simulate some data containing a continuous baseline confounder <span class="math inline">\(C_1\)</span>, a binary baseline confounder <span class="math inline">\(C_2\)</span>, a binary exposure <span class="math inline">\(A\)</span>, a binary mediator <span class="math inline">\(M\)</span> and a binary outcome <span class="math inline">\(Y\)</span>. The true regression models for <span class="math inline">\(A\)</span>, <span class="math inline">\(M\)</span> and <span class="math inline">\(Y\)</span> are: <span class="math display">\[logit(E(A|C_1,C_2))=0.2+0.5C_1+0.1C_2\]</span> <span class="math display">\[logit(E(M|A,C_1,C_2))=1+2A+1.5C_1+0.8C_2\]</span> <span class="math display">\[logit(E(Y|A,M,C_1,C_2)))=-3-0.4A-1.2M+0.5AM+0.3C_1-0.6C_2\]</span></p>
-<p>To create the dataset with missing values, we randomly delete 10% of values in the dataset.</p>
+<p>This example demonstrates how to estimate causal effects with
+multiple imputations by using <code>cmest</code> when the dataset
+contains missing values. For this purpose, we simulate some data
+containing a continuous baseline confounder <span class="math inline">\(C_1\)</span>, a binary baseline confounder <span class="math inline">\(C_2\)</span>, a binary exposure <span class="math inline">\(A\)</span>, a binary mediator <span class="math inline">\(M\)</span> and a binary outcome <span class="math inline">\(Y\)</span>. The true regression models for <span class="math inline">\(A\)</span>, <span class="math inline">\(M\)</span>
+and <span class="math inline">\(Y\)</span> are: <span class="math display">\[logit(E(A|C_1,C_2))=0.2+0.5C_1+0.1C_2\]</span>
+<span class="math display">\[logit(E(M|A,C_1,C_2))=1+2A+1.5C_1+0.8C_2\]</span>
+<span class="math display">\[logit(E(Y|A,M,C_1,C_2)))=-3-0.4A-1.2M+0.5AM+0.3C_1-0.6C_2\]</span></p>
+<p>To create the dataset with missing values, we randomly delete 10% of
+values in the dataset.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
 <span class="va">expit</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span><span class="op">+</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span>
@@ -149,14 +155,16 @@
 <span class="fu"><a href="../reference/cmdag.html">cmdag</a></span><span class="op">(</span>outcome <span class="op">=</span> <span class="st">"Y"</span>, exposure <span class="op">=</span> <span class="st">"A"</span>, mediator <span class="op">=</span> <span class="st">"M"</span>,
       basec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C1"</span>, <span class="st">"C2"</span><span class="op">)</span>, postc <span class="op">=</span> <span class="cn">NULL</span>, node <span class="op">=</span> <span class="cn">TRUE</span>, text_col <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span></code></pre></div>
 <p><img src="multiple_imputation_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
-<p>To conduct multiple imputations, we set the <code>multimp</code> argument to be <code>TRUE</code>. The regression-based approach is used for illustration. The multiple imputation results:</p>
+<p>To conduct multiple imputations, we set the <code>multimp</code>
+argument to be <code>TRUE</code>. The regression-based approach is used
+for illustration. The multiple imputation results:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">res_multimp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data</span>, model <span class="op">=</span> <span class="st">"rb"</span>, outcome <span class="op">=</span> <span class="st">"Y"</span>, exposure <span class="op">=</span> <span class="st">"A"</span>,
                      mediator <span class="op">=</span> <span class="st">"M"</span>, basec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C1"</span>, <span class="st">"C2"</span><span class="op">)</span>, EMint <span class="op">=</span> <span class="cn">TRUE</span>,
                      mreg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">"logistic"</span><span class="op">)</span>, yreg <span class="op">=</span> <span class="st">"logistic"</span>,
                      astar <span class="op">=</span> <span class="fl">0</span>, a <span class="op">=</span> <span class="fl">1</span>, mval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>, 
                      estimation <span class="op">=</span> <span class="st">"paramfunc"</span>, inference <span class="op">=</span> <span class="st">"delta"</span>, 
-                     multimp <span class="op">=</span> <span class="cn">TRUE</span>, m <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></code></pre></div>
+                     multimp <span class="op">=</span> <span class="cn">TRUE</span>, args_mice <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>m <span class="op">=</span> <span class="fl">10</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">res_multimp</span><span class="op">)</span></code></pre></div>
 <pre><code>## Causal Mediation Analysis
@@ -171,24 +179,24 @@
 ## 
 ## Deviance Residuals: 
 ##     Min       1Q   Median       3Q      Max  
-## -0.5603  -0.2432  -0.1779  -0.1640   3.0447  
+## -0.6544  -0.2446  -0.1733  -0.1571   3.0818  
 ## 
 ## Coefficients:
 ##             Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)  -3.5224     0.7620  -4.622 3.79e-06 ***
-## A             0.6683     0.5283   1.265  0.20585    
-## M            -1.0747     0.3738  -2.875  0.00404 ** 
-## C1            0.8998     0.6909   1.302  0.19280    
-## C2           -0.8122     0.1427  -5.690 1.27e-08 ***
-## A:M          -0.3553     0.5540  -0.641  0.52132    
+## (Intercept)  -3.6155     0.7563  -4.781 1.75e-06 ***
+## A             0.8454     0.4866   1.737 0.082324 .  
+## M            -1.1828     0.3592  -3.293 0.000993 ***
+## C1            1.1130     0.6888   1.616 0.106133    
+## C2           -0.9115     0.1442  -6.322 2.58e-10 ***
+## A:M          -0.5107     0.5149  -0.992 0.321299    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## (Dispersion parameter for binomial family taken to be 1)
 ## 
-##     Null deviance: 2053.5  on 9999  degrees of freedom
-## Residual deviance: 1997.1  on 9994  degrees of freedom
-## AIC: 2009.1
+##     Null deviance: 2061.1  on 9999  degrees of freedom
+## Residual deviance: 1986.3  on 9994  degrees of freedom
+## AIC: 1998.3
 ## 
 ## Number of Fisher Scoring iterations: 7
 ## 
@@ -201,22 +209,22 @@
 ## 
 ## Deviance Residuals: 
 ##     Min       1Q   Median       3Q      Max  
-## -3.2944   0.1110   0.1624   0.2412   0.5924  
+## -3.2753   0.1143   0.1637   0.2465   0.5893  
 ## 
 ## Coefficients:
 ##             Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)  0.01294    0.64619   0.020  0.98402    
-## A            1.70241    0.14542  11.707  &lt; 2e-16 ***
-## C1           2.42112    0.65530   3.695  0.00022 ***
-## C2           0.97261    0.13661   7.120 1.08e-12 ***
+## (Intercept)  0.04186    0.63872   0.066 0.947748    
+## A            1.68676    0.14358  11.748  &lt; 2e-16 ***
+## C1           2.39526    0.64720   3.701 0.000215 ***
+## C2           0.92552    0.13464   6.874 6.24e-12 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## (Dispersion parameter for binomial family taken to be 1)
 ## 
-##     Null deviance: 2264.5  on 9999  degrees of freedom
-## Residual deviance: 2035.7  on 9996  degrees of freedom
-## AIC: 2043.7
+##     Null deviance: 2301.4  on 9999  degrees of freedom
+## Residual deviance: 2075.6  on 9996  degrees of freedom
+## AIC: 2083.6
 ## 
 ## Number of Fisher Scoring iterations: 7
 ## 
@@ -231,24 +239,24 @@
 ## 
 ## Deviance Residuals: 
 ##     Min       1Q   Median       3Q      Max  
-## -0.6003  -0.2437  -0.1724  -0.1610   3.0547  
+## -0.5705  -0.2402  -0.1732  -0.1601   3.0503  
 ## 
 ## Coefficients:
 ##             Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)  -3.3781     0.7686  -4.395 1.11e-05 ***
-## A             0.8585     0.5115   1.678  0.09328 .  
-## M            -1.0685     0.3742  -2.856  0.00429 ** 
-## C1            0.7463     0.6968   1.071  0.28412    
-## C2           -0.8598     0.1448  -5.939 2.87e-09 ***
-## A:M          -0.5478     0.5386  -1.017  0.30910    
+## (Intercept)  -3.5202     0.7726  -4.556 5.21e-06 ***
+## A             0.7264     0.5289   1.374  0.16959    
+## M            -1.0590     0.3737  -2.834  0.00459 ** 
+## C1            0.8821     0.6995   1.261  0.20727    
+## C2           -0.8319     0.1452  -5.728 1.01e-08 ***
+## A:M          -0.4478     0.5548  -0.807  0.41961    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## (Dispersion parameter for binomial family taken to be 1)
 ## 
-##     Null deviance: 2022.7  on 9999  degrees of freedom
-## Residual deviance: 1960.1  on 9994  degrees of freedom
-## AIC: 1972.1
+##     Null deviance: 2007.3  on 9999  degrees of freedom
+## Residual deviance: 1950.4  on 9994  degrees of freedom
+## AIC: 1962.4
 ## 
 ## Number of Fisher Scoring iterations: 7
 ## 
@@ -261,22 +269,22 @@
 ## 
 ## Deviance Residuals: 
 ##     Min       1Q   Median       3Q      Max  
-## -3.2720   0.1133   0.1625   0.2496   0.5705  
+## -3.2907   0.1102   0.1616   0.2451   0.5747  
 ## 
 ## Coefficients:
 ##             Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)   0.2632     0.6391   0.412 0.680508    
-## A             1.7188     0.1450  11.853  &lt; 2e-16 ***
-## C1            2.1723     0.6470   3.357 0.000787 ***
-## C2            0.9131     0.1350   6.765 1.33e-11 ***
+## (Intercept)   0.2246     0.6457   0.348 0.727979    
+## A             1.7384     0.1467  11.852  &lt; 2e-16 ***
+## C1            2.2056     0.6532   3.377 0.000734 ***
+## C2            0.9561     0.1366   6.998 2.59e-12 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## (Dispersion parameter for binomial family taken to be 1)
 ## 
-##     Null deviance: 2286.6  on 9999  degrees of freedom
-## Residual deviance: 2060.8  on 9996  degrees of freedom
-## AIC: 2068.8
+##     Null deviance: 2264.5  on 9999  degrees of freedom
+## Residual deviance: 2034.0  on 9996  degrees of freedom
+## AIC: 2042
 ## 
 ## Number of Fisher Scoring iterations: 7
 ## 
@@ -291,24 +299,24 @@
 ## 
 ## Deviance Residuals: 
 ##     Min       1Q   Median       3Q      Max  
-## -0.5452  -0.2430  -0.1729  -0.1611   3.0363  
+## -0.6001  -0.2442  -0.1722  -0.1596   3.0502  
 ## 
 ## Coefficients:
 ##             Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)  -3.4209     0.7681  -4.454 8.43e-06 ***
-## A             0.6180     0.5279   1.171  0.24176    
-## M            -1.0370     0.3726  -2.783  0.00539 ** 
-## C1            0.8083     0.6970   1.160  0.24623    
-## C2           -0.8459     0.1442  -5.865 4.49e-09 ***
-## A:M          -0.3704     0.5531  -0.670  0.50309    
+## (Intercept)  -3.4724     0.7663  -4.532 5.85e-06 ***
+## A             0.8326     0.5111   1.629  0.10332    
+## M            -1.0319     0.3731  -2.766  0.00568 ** 
+## C1            0.8459     0.6935   1.220  0.22259    
+## C2           -0.8750     0.1443  -6.063 1.34e-09 ***
+## A:M          -0.5568     0.5375  -1.036  0.30027    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## (Dispersion parameter for binomial family taken to be 1)
 ## 
-##     Null deviance: 2030.4  on 9999  degrees of freedom
-## Residual deviance: 1973.7  on 9994  degrees of freedom
-## AIC: 1985.7
+##     Null deviance: 2038.1  on 9999  degrees of freedom
+## Residual deviance: 1974.7  on 9994  degrees of freedom
+## AIC: 1986.7
 ## 
 ## Number of Fisher Scoring iterations: 7
 ## 
@@ -321,22 +329,22 @@
 ## 
 ## Deviance Residuals: 
 ##     Min       1Q   Median       3Q      Max  
-## -3.2646   0.1145   0.1658   0.2469   0.5667  
+## -3.2757   0.1151   0.1629   0.2471   0.5941  
 ## 
 ## Coefficients:
 ##             Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)   0.2910     0.6446   0.451 0.651683    
-## A             1.6746     0.1438  11.647  &lt; 2e-16 ***
-## C1            2.1524     0.6519   3.302 0.000961 ***
-## C2            0.9278     0.1352   6.864 6.71e-12 ***
+## (Intercept)  -0.0388     0.6391  -0.061 0.951589    
+## A             1.6807     0.1436  11.706  &lt; 2e-16 ***
+## C1            2.4881     0.6482   3.838 0.000124 ***
+## C2            0.9087     0.1344   6.762 1.36e-11 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## (Dispersion parameter for binomial family taken to be 1)
 ## 
-##     Null deviance: 2286.6  on 9999  degrees of freedom
-## Residual deviance: 2067.3  on 9996  degrees of freedom
-## AIC: 2075.3
+##     Null deviance: 2301.4  on 9999  degrees of freedom
+## Residual deviance: 2077.1  on 9996  degrees of freedom
+## AIC: 2085.1
 ## 
 ## Number of Fisher Scoring iterations: 7
 ## 
@@ -351,24 +359,24 @@
 ## 
 ## Deviance Residuals: 
 ##     Min       1Q   Median       3Q      Max  
-## -0.5517  -0.2469  -0.1710  -0.1617   3.0467  
+## -0.5675  -0.2413  -0.1751  -0.1606   3.0619  
 ## 
 ## Coefficients:
 ##             Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)  -3.2476     0.7689  -4.224 2.40e-05 ***
-## A             0.7042     0.5288   1.332  0.18299    
-## M            -1.0429     0.3735  -2.792  0.00523 ** 
-## C1            0.6137     0.6974   0.880  0.37888    
-## C2           -0.8758     0.1451  -6.035 1.59e-09 ***
-## A:M          -0.4094     0.5547  -0.738  0.46048    
+## (Intercept)  -3.6023     0.7713  -4.671 3.00e-06 ***
+## A             0.6911     0.5286   1.307  0.19111    
+## M            -1.0792     0.3742  -2.884  0.00392 ** 
+## C1            0.9686     0.6978   1.388  0.16515    
+## C2           -0.8408     0.1445  -5.817 5.98e-09 ***
+## A:M          -0.3692     0.5548  -0.665  0.50575    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## (Dispersion parameter for binomial family taken to be 1)
 ## 
 ##     Null deviance: 2022.7  on 9999  degrees of freedom
-## Residual deviance: 1962.9  on 9994  degrees of freedom
-## AIC: 1974.9
+## Residual deviance: 1964.0  on 9994  degrees of freedom
+## AIC: 1976
 ## 
 ## Number of Fisher Scoring iterations: 7
 ## 
@@ -381,22 +389,22 @@
 ## 
 ## Deviance Residuals: 
 ##     Min       1Q   Median       3Q      Max  
-## -3.2841   0.1103   0.1624   0.2477   0.5675  
+## -3.2808   0.1111   0.1632   0.2465   0.5690  
 ## 
 ## Coefficients:
 ##             Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)   0.3423     0.6427   0.533  0.59430    
-## A             1.7518     0.1464  11.962  &lt; 2e-16 ***
-## C1            2.0718     0.6497   3.189  0.00143 ** 
-## C2            0.9545     0.1360   7.018 2.24e-12 ***
+## (Intercept)   0.3146     0.6450   0.488  0.62577    
+## A             1.7271     0.1458  11.845  &lt; 2e-16 ***
+## C1            2.1044     0.6523   3.226  0.00125 ** 
+## C2            0.9591     0.1360   7.054 1.74e-12 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## (Dispersion parameter for binomial family taken to be 1)
 ## 
 ##     Null deviance: 2279.3  on 9999  degrees of freedom
-## Residual deviance: 2046.0  on 9996  degrees of freedom
-## AIC: 2054
+## Residual deviance: 2048.9  on 9996  degrees of freedom
+## AIC: 2056.9
 ## 
 ## Number of Fisher Scoring iterations: 7
 ## 
@@ -411,24 +419,24 @@
 ## 
 ## Deviance Residuals: 
 ##     Min       1Q   Median       3Q      Max  
-## -0.5654  -0.2397  -0.1732  -0.1600   3.0569  
+## -0.5604  -0.2433  -0.1709  -0.1579   3.0599  
 ## 
 ## Coefficients:
 ##             Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)  -3.5296     0.7754  -4.552 5.32e-06 ***
-## A             0.7121     0.5285   1.347  0.17787    
-## M            -1.0714     0.3741  -2.864  0.00419 ** 
-## C1            0.8859     0.7035   1.259  0.20797    
-## C2           -0.8338     0.1455  -5.732 9.93e-09 ***
-## A:M          -0.4124     0.5549  -0.743  0.45736    
+## (Intercept)  -3.5033     0.7704  -4.547 5.44e-06 ***
+## A             0.6653     0.5285   1.259  0.20812    
+## M            -1.0524     0.3737  -2.816  0.00486 ** 
+## C1            0.8870     0.6969   1.273  0.20308    
+## C2           -0.8892     0.1456  -6.105 1.03e-09 ***
+## A:M          -0.3842     0.5545  -0.693  0.48840    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## (Dispersion parameter for binomial family taken to be 1)
 ## 
-##     Null deviance: 1999.6  on 9999  degrees of freedom
-## Residual deviance: 1942.5  on 9994  degrees of freedom
-## AIC: 1954.5
+##     Null deviance: 2015.0  on 9999  degrees of freedom
+## Residual deviance: 1953.6  on 9994  degrees of freedom
+## AIC: 1965.6
 ## 
 ## Number of Fisher Scoring iterations: 7
 ## 
@@ -441,22 +449,22 @@
 ## 
 ## Deviance Residuals: 
 ##     Min       1Q   Median       3Q      Max  
-## -3.2857   0.1114   0.1619   0.2469   0.5815  
+## -3.2809   0.1115   0.1641   0.2454   0.5732  
 ## 
 ## Coefficients:
 ##             Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)   0.1650     0.6421   0.257 0.797241    
-## A             1.7349     0.1457  11.909  &lt; 2e-16 ***
-## C1            2.2561     0.6500   3.471 0.000519 ***
-## C2            0.9456     0.1355   6.977 3.03e-12 ***
+## (Intercept)   0.2656     0.6424   0.413 0.679244    
+## A             1.7167     0.1452  11.827  &lt; 2e-16 ***
+## C1            2.1534     0.6495   3.315 0.000916 ***
+## C2            0.9635     0.1360   7.086 1.38e-12 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## (Dispersion parameter for binomial family taken to be 1)
 ## 
-##     Null deviance: 2286.6  on 9999  degrees of freedom
-## Residual deviance: 2054.0  on 9996  degrees of freedom
-## AIC: 2062
+##     Null deviance: 2279.3  on 9999  degrees of freedom
+## Residual deviance: 2050.7  on 9996  degrees of freedom
+## AIC: 2058.7
 ## 
 ## Number of Fisher Scoring iterations: 7
 ## 
@@ -471,24 +479,24 @@
 ## 
 ## Deviance Residuals: 
 ##     Min       1Q   Median       3Q      Max  
-## -0.6038  -0.2447  -0.1726  -0.1601   3.0703  
+## -0.5671  -0.2411  -0.1711  -0.1576   3.0601  
 ## 
 ## Coefficients:
 ##             Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)  -3.3346     0.7611  -4.381 1.18e-05 ***
-## A             0.7255     0.5008   1.449 0.147373    
-## M            -1.2184     0.3598  -3.386 0.000709 ***
-## C1            0.8314     0.6959   1.195 0.232159    
-## C2           -0.8757     0.1450  -6.041 1.53e-09 ***
-## A:M          -0.3815     0.5288  -0.721 0.470610    
+## (Intercept)  -3.4978     0.7662  -4.565 4.99e-06 ***
+## A             0.6005     0.5175   1.160  0.24591    
+## M            -1.1364     0.3582  -3.172  0.00151 ** 
+## C1            0.9577     0.7003   1.368  0.17145    
+## C2           -0.8730     0.1455  -5.999 1.98e-09 ***
+## A:M          -0.3284     0.5441  -0.604  0.54612    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## (Dispersion parameter for binomial family taken to be 1)
 ## 
-##     Null deviance: 2030.4  on 9999  degrees of freedom
-## Residual deviance: 1963.2  on 9994  degrees of freedom
-## AIC: 1975.2
+##     Null deviance: 2007.3  on 9999  degrees of freedom
+## Residual deviance: 1945.8  on 9994  degrees of freedom
+## AIC: 1957.8
 ## 
 ## Number of Fisher Scoring iterations: 7
 ## 
@@ -501,22 +509,22 @@
 ## 
 ## Deviance Residuals: 
 ##     Min       1Q   Median       3Q      Max  
-## -3.2844   0.1127   0.1614   0.2450   0.5849  
+## -3.2673   0.1146   0.1624   0.2531   0.5829  
 ## 
 ## Coefficients:
 ##             Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)  0.06128    0.64567   0.095 0.924385    
-## A            1.70250    0.14526  11.720  &lt; 2e-16 ***
-## C1           2.39068    0.65431   3.654 0.000258 ***
-## C2           0.92563    0.13585   6.814 9.52e-12 ***
+## (Intercept)   0.1661     0.6337   0.262 0.793244    
+## A             1.7269     0.1437  12.015  &lt; 2e-16 ***
+## C1            2.2465     0.6415   3.502 0.000461 ***
+## C2            0.9027     0.1333   6.775 1.25e-11 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## (Dispersion parameter for binomial family taken to be 1)
 ## 
-##     Null deviance: 2271.9  on 9999  degrees of freedom
-## Residual deviance: 2047.1  on 9996  degrees of freedom
-## AIC: 2055.1
+##     Null deviance: 2330.8  on 9999  degrees of freedom
+## Residual deviance: 2097.8  on 9996  degrees of freedom
+## AIC: 2105.8
 ## 
 ## Number of Fisher Scoring iterations: 7
 ## 
@@ -531,24 +539,24 @@
 ## 
 ## Deviance Residuals: 
 ##     Min       1Q   Median       3Q      Max  
-## -0.5621  -0.2412  -0.1745  -0.1606   3.0527  
+## -0.5652  -0.2426  -0.1738  -0.1608   3.0640  
 ## 
 ## Coefficients:
 ##             Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)  -3.5515     0.7683  -4.623 3.79e-06 ***
-## A             0.6686     0.5284   1.265  0.20573    
-## M            -1.0724     0.3737  -2.869  0.00411 ** 
-## C1            0.9297     0.6964   1.335  0.18189    
-## C2           -0.8361     0.1445  -5.787 7.16e-09 ***
-## A:M          -0.3752     0.5543  -0.677  0.49846    
+## (Intercept)  -3.4733     0.7707  -4.507 6.58e-06 ***
+## A             0.6897     0.5285   1.305  0.19189    
+## M            -1.1095     0.3750  -2.958  0.00309 ** 
+## C1            0.8568     0.6994   1.225  0.22061    
+## C2           -0.8486     0.1449  -5.855 4.77e-09 ***
+## A:M          -0.3552     0.5551  -0.640  0.52227    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## (Dispersion parameter for binomial family taken to be 1)
 ## 
-##     Null deviance: 2022.7  on 9999  degrees of freedom
-## Residual deviance: 1965.1  on 9994  degrees of freedom
-## AIC: 1977.1
+##     Null deviance: 2015.0  on 9999  degrees of freedom
+## Residual deviance: 1955.7  on 9994  degrees of freedom
+## AIC: 1967.7
 ## 
 ## Number of Fisher Scoring iterations: 7
 ## 
@@ -561,22 +569,22 @@
 ## 
 ## Deviance Residuals: 
 ##     Min       1Q   Median       3Q      Max  
-## -3.2768   0.1122   0.1641   0.2454   0.5672  
+## -3.2870   0.1124   0.1613   0.2440   0.5882  
 ## 
 ## Coefficients:
 ##             Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)   0.2980     0.6440   0.463  0.64353    
-## A             1.7011     0.1453  11.710  &lt; 2e-16 ***
-## C1            2.1390     0.6519   3.281  0.00103 ** 
-## C2            0.9495     0.1361   6.977 3.01e-12 ***
+## (Intercept)  0.03183    0.64602   0.049 0.960703    
+## A            1.70552    0.14538  11.731  &lt; 2e-16 ***
+## C1           2.41571    0.65432   3.692 0.000223 ***
+## C2           0.93227    0.13603   6.853 7.22e-12 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## (Dispersion parameter for binomial family taken to be 1)
 ## 
-##     Null deviance: 2271.9  on 9999  degrees of freedom
-## Residual deviance: 2047.4  on 9996  degrees of freedom
-## AIC: 2055.4
+##     Null deviance: 2264.5  on 9999  degrees of freedom
+## Residual deviance: 2039.8  on 9996  degrees of freedom
+## AIC: 2047.8
 ## 
 ## Number of Fisher Scoring iterations: 7
 ## 
@@ -591,24 +599,24 @@
 ## 
 ## Deviance Residuals: 
 ##     Min       1Q   Median       3Q      Max  
-## -0.5715  -0.2448  -0.1721  -0.1582   3.0600  
+## -0.5849  -0.2491  -0.1701  -0.1614   3.0541  
 ## 
 ## Coefficients:
 ##             Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)  -3.5523     0.7673  -4.630 3.66e-06 ***
-## A             0.6917     0.5288   1.308  0.19089    
-## M            -1.0386     0.3731  -2.784  0.00538 ** 
-## C1            0.9411     0.6932   1.358  0.17459    
-## C2           -0.9014     0.1445  -6.237 4.47e-10 ***
-## A:M          -0.4069     0.5543  -0.734  0.46285    
+## (Intercept)  -3.0819     0.7609  -4.050 5.12e-05 ***
+## A             0.7038     0.5002   1.407 0.159435    
+## M            -1.1883     0.3593  -3.307 0.000942 ***
+## C1            0.5817     0.6971   0.834 0.404029    
+## C2           -0.8908     0.1449  -6.147 7.89e-10 ***
+## A:M          -0.3894     0.5279  -0.738 0.460721    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## (Dispersion parameter for binomial family taken to be 1)
 ## 
-##     Null deviance: 2038.1  on 9999  degrees of freedom
-## Residual deviance: 1975.1  on 9994  degrees of freedom
-## AIC: 1987.1
+##     Null deviance: 2030.4  on 9999  degrees of freedom
+## Residual deviance: 1963.7  on 9994  degrees of freedom
+## AIC: 1975.7
 ## 
 ## Number of Fisher Scoring iterations: 7
 ## 
@@ -621,22 +629,22 @@
 ## 
 ## Deviance Residuals: 
 ##     Min       1Q   Median       3Q      Max  
-## -3.2663   0.1143   0.1622   0.2518   0.5674  
+## -3.2753   0.1142   0.1640   0.2446   0.5847  
 ## 
 ## Coefficients:
 ##             Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)   0.2690     0.6423   0.419 0.675350    
-## A             1.7138     0.1450  11.821  &lt; 2e-16 ***
-## C1            2.1813     0.6492   3.360 0.000779 ***
-## C2            0.8835     0.1345   6.571    5e-11 ***
+## (Intercept)  0.06976    0.64465   0.108 0.913822    
+## A            1.67172    0.14392  11.615  &lt; 2e-16 ***
+## C1           2.37882    0.65253   3.646 0.000267 ***
+## C2           0.93134    0.13539   6.879 6.03e-12 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## (Dispersion parameter for binomial family taken to be 1)
 ## 
-##     Null deviance: 2286.6  on 9999  degrees of freedom
-## Residual deviance: 2065.7  on 9996  degrees of freedom
-## AIC: 2073.7
+##     Null deviance: 2279.3  on 9999  degrees of freedom
+## Residual deviance: 2058.5  on 9996  degrees of freedom
+## AIC: 2066.5
 ## 
 ## Number of Fisher Scoring iterations: 7
 ## 
@@ -651,24 +659,24 @@
 ## 
 ## Deviance Residuals: 
 ##     Min       1Q   Median       3Q      Max  
-## -0.5511  -0.2427  -0.1731  -0.1611   3.0410  
+## -0.5696  -0.2417  -0.1702  -0.1580   3.0560  
 ## 
 ## Coefficients:
 ##             Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)  -3.3264     0.7595  -4.380 1.19e-05 ***
-## A             0.5437     0.5175   1.051  0.29339    
-## M            -1.1552     0.3580  -3.227  0.00125 ** 
-## C1            0.8108     0.6951   1.167  0.24340    
-## C2           -0.8389     0.1443  -5.813 6.15e-09 ***
-## A:M          -0.2790     0.5436  -0.513  0.60773    
+## (Intercept)  -3.4477     0.7728  -4.461 8.14e-06 ***
+## A             0.6996     0.5294   1.322  0.18631    
+## M            -1.0701     0.3737  -2.863  0.00419 ** 
+## C1            0.8415     0.7009   1.201  0.22994    
+## C2           -0.8754     0.1461  -5.993 2.07e-09 ***
+## A:M          -0.4294     0.5554  -0.773  0.43942    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## (Dispersion parameter for binomial family taken to be 1)
 ## 
-##     Null deviance: 2030.4  on 9999  degrees of freedom
-## Residual deviance: 1971.7  on 9994  degrees of freedom
-## AIC: 1983.7
+##     Null deviance: 1999.6  on 9999  degrees of freedom
+## Residual deviance: 1939.4  on 9994  degrees of freedom
+## AIC: 1951.4
 ## 
 ## Number of Fisher Scoring iterations: 7
 ## 
@@ -681,22 +689,22 @@
 ## 
 ## Deviance Residuals: 
 ##     Min       1Q   Median       3Q      Max  
-## -3.2797   0.1120   0.1655   0.2430   0.5746  
+## -3.2908   0.1099   0.1594   0.2463   0.5717  
 ## 
 ## Coefficients:
 ##             Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)   0.2267     0.6412   0.354 0.723653    
-## A             1.6866     0.1446  11.667  &lt; 2e-16 ***
-## C1            2.2028     0.6497   3.390 0.000698 ***
-## C2            0.9728     0.1362   7.141 9.25e-13 ***
+## (Intercept)   0.2425     0.6477   0.374 0.708141    
+## A             1.7544     0.1476  11.889  &lt; 2e-16 ***
+## C1            2.1962     0.6549   3.354 0.000798 ***
+## C2            0.9334     0.1367   6.830 8.51e-12 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## (Dispersion parameter for binomial family taken to be 1)
 ## 
-##     Null deviance: 2279.3  on 9999  degrees of freedom
-## Residual deviance: 2052.9  on 9996  degrees of freedom
-## AIC: 2060.9
+##     Null deviance: 2249.6  on 9999  degrees of freedom
+## Residual deviance: 2021.0  on 9996  degrees of freedom
+## AIC: 2029
 ## 
 ## Number of Fisher Scoring iterations: 7
 ## 
@@ -711,24 +719,24 @@
 ## 
 ## Deviance Residuals: 
 ##     Min       1Q   Median       3Q      Max  
-## -0.6092  -0.2405  -0.1749  -0.1602   3.0630  
+## -0.5648  -0.2429  -0.1716  -0.1598   3.0392  
 ## 
 ## Coefficients:
 ##             Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)  -3.5684     0.7693  -4.639 3.51e-06 ***
-## A             0.8190     0.5116   1.601  0.10944    
-## M            -1.1175     0.3743  -2.985  0.00283 ** 
-## C1            0.9642     0.6974   1.383  0.16679    
-## C2           -0.8361     0.1445  -5.786 7.21e-09 ***
-## A:M          -0.4960     0.5387  -0.921  0.35720    
+## (Intercept)  -3.4182     0.7682  -4.450 8.59e-06 ***
+## A             0.6923     0.5289   1.309  0.19056    
+## M            -1.0344     0.3727  -2.775  0.00552 ** 
+## C1            0.8076     0.6967   1.159  0.24639    
+## C2           -0.8595     0.1447  -5.940 2.85e-09 ***
+## A:M          -0.4509     0.5541  -0.814  0.41578    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## (Dispersion parameter for binomial family taken to be 1)
 ## 
 ##     Null deviance: 2022.7  on 9999  degrees of freedom
-## Residual deviance: 1960.7  on 9994  degrees of freedom
-## AIC: 1972.7
+## Residual deviance: 1964.4  on 9994  degrees of freedom
+## AIC: 1976.4
 ## 
 ## Number of Fisher Scoring iterations: 7
 ## 
@@ -741,53 +749,53 @@
 ## 
 ## Deviance Residuals: 
 ##     Min       1Q   Median       3Q      Max  
-## -3.2796   0.1141   0.1610   0.2463   0.5836  
+## -3.2811   0.1121   0.1615   0.2459   0.5713  
 ## 
 ## Coefficients:
 ##             Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)  0.02446    0.64559   0.038 0.969771    
-## A            1.68768    0.14535  11.611  &lt; 2e-16 ***
-## C1           2.45189    0.65446   3.746 0.000179 ***
-## C2           0.89215    0.13547   6.585 4.53e-11 ***
+## (Intercept)   0.2112     0.6472   0.326 0.744143    
+## A             1.7095     0.1461  11.700  &lt; 2e-16 ***
+## C1            2.2442     0.6551   3.426 0.000613 ***
+## C2            0.9230     0.1362   6.779 1.21e-11 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## (Dispersion parameter for binomial family taken to be 1)
 ## 
-##     Null deviance: 2264.5  on 9999  degrees of freedom
-## Residual deviance: 2045.9  on 9996  degrees of freedom
-## AIC: 2053.9
+##     Null deviance: 2257.0  on 9999  degrees of freedom
+## Residual deviance: 2035.2  on 9996  degrees of freedom
+## AIC: 2043.2
 ## 
 ## Number of Fisher Scoring iterations: 7
 ## 
 ## 
-## # Effect decomposition on the risk ratio scale via the regression-based approach with multiple imputation
+## # Effect decomposition on the odds ratio scale via the regression-based approach with multiple imputation
 ##  
 ## Closed-form parameter function estimation with 
 ##  delta method standard errors, confidence intervals and p-values 
 ##  
 ##                Estimate Std.error  95% CIL 95% CIU    P.val    
-## Rcde            1.34659   0.22892  0.96501   1.879   0.0800 .  
-## Rpnde           1.43309   0.24492  1.02518   2.003   0.0353 *  
-## Rtnde           1.36413   0.22702  0.98445   1.890   0.0621 .  
-## Rpnie           0.93070   0.03640  0.86202   1.005   0.0664 .  
-## Rtnie           0.88592   0.05343  0.78715   0.997   0.0446 *  
-## Rte             1.26960   0.20277  0.92836   1.736   0.1350    
-## ERcde           0.31730   0.20479 -0.08409   0.719   0.1213    
-## ERintref        0.11667   0.11739 -0.11340   0.347   0.3203    
-## ERintmed       -0.09468   0.09544 -0.28175   0.092   0.3212    
-## ERpnie         -0.06928   0.03639 -0.14061   0.002   0.0569 .  
-## ERcde(prop)     1.17873   0.24213  0.70417   1.653 1.13e-06 ***
-## ERintref(prop)  0.43015   0.47475 -0.50035   1.361   0.3649    
-## ERintmed(prop) -0.34900   0.38596 -1.10547   0.407   0.3659    
-## ERpnie(prop)   -0.25988   0.24107 -0.73236   0.213   0.2810    
-## pm             -0.60888   0.49210 -1.57338   0.356   0.2160    
-## int             0.08115   0.08977 -0.09480   0.257   0.3660    
-## pe             -0.17873   0.24213 -0.65329   0.296   0.4604    
+## Rcde            1.33974   0.22906  0.95827   1.873   0.0871 .  
+## Rpnde           1.43121   0.24439  1.02413   2.000   0.0358 *  
+## Rtnde           1.35828   0.22703  0.97885   1.885   0.0669 .  
+## Rpnie           0.92992   0.03662  0.86084   1.005   0.0651 .  
+## Rtnie           0.88254   0.05397  0.78285   0.995   0.0410 *  
+## Rte             1.26309   0.20237  0.92269   1.729   0.1449    
+## ERcde           0.31081   0.20477 -0.09053   0.712   0.1291    
+## ERintref        0.12117   0.11823 -0.11056   0.353   0.3055    
+## ERintmed       -0.09834   0.09609 -0.28667   0.090   0.3061    
+## ERpnie         -0.07006   0.03661 -0.14182   0.002   0.0556 .  
+## ERcde(prop)     1.18229   0.24912  0.69402   1.671 2.08e-06 ***
+## ERintref(prop)  0.46292   0.50976 -0.53619   1.462   0.3638    
+## ERintmed(prop) -0.37585   0.41497 -1.18916   0.437   0.3651    
+## ERpnie(prop)   -0.26937   0.25241 -0.76409   0.225   0.2859    
+## pm             -0.64522   0.53551 -1.69480   0.404   0.2283    
+## int             0.08708   0.09587 -0.10083   0.275   0.3638    
+## pe             -0.18229   0.24912 -0.67057   0.306   0.4643    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## (Rcde: controlled direct effect risk ratio; Rpnde: pure natural direct effect risk ratio; Rtnde: total natural direct effect risk ratio; Rpnie: pure natural indirect effect risk ratio; Rtnie: total natural indirect effect risk ratio; Rte: total effect risk ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
+## (Rcde: controlled direct effect odds ratio; Rpnde: pure natural direct effect odds ratio; Rtnde: total natural direct effect odds ratio; Rpnie: pure natural indirect effect odds ratio; Rtnie: total natural indirect effect odds ratio; Rte: total effect odds ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
 ## 
 ## Relevant variable values: 
 ## $a
@@ -879,7 +887,7 @@
 ## Number of Fisher Scoring iterations: 7
 ## 
 ## 
-## # Effect decomposition on the risk ratio scale via the regression-based approach
+## # Effect decomposition on the odds ratio scale via the regression-based approach
 ##  
 ## Closed-form parameter function estimation with 
 ##  delta method standard errors, confidence intervals and p-values 
@@ -905,7 +913,7 @@
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## (Rcde: controlled direct effect risk ratio; Rpnde: pure natural direct effect risk ratio; Rtnde: total natural direct effect risk ratio; Rpnie: pure natural indirect effect risk ratio; Rtnie: total natural indirect effect risk ratio; Rte: total effect risk ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
+## (Rcde: controlled direct effect odds ratio; Rpnde: pure natural direct effect odds ratio; Rtnde: total natural direct effect odds ratio; Rpnie: pure natural indirect effect odds ratio; Rtnie: total natural indirect effect odds ratio; Rte: total effect odds ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
 ## 
 ## Relevant variable values: 
 ## $a
@@ -939,7 +947,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Baoyi Shi, <a href="https://scholar.harvard.edu/cchoirat">Christine Choirat</a>, <a href="https://www.lindavaleri.com/">Linda Valeri</a>.</p>
+  <p>Developed by Baoyi Shi, Christine Choirat, <a href="https://www.lindavaleri.com/">Linda Valeri</a>.</p>
 </div>
 
 <div class="pkgdown">

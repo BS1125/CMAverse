@@ -57,7 +57,7 @@
   <a href="../articles/quickstart.html">Quickstart</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Examples
      
     <span class="caret"></span>
@@ -109,13 +109,13 @@
 
       
 
-      </header><script src="multiple_mediators_files/accessible-code-block-0.0.1/empty-anchor.js"></script><link href="multiple_mediators_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
-<script src="multiple_mediators_files/anchor-sections-1.0/anchor-sections.js"></script><div class="row">
+      </header><script src="multiple_mediators_files/header-attrs-2.14/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>Statistical Modeling with Multiple Mediators</h1>
+      <h1 data-toc-skip>Statistical Modeling with Multiple
+Mediators</h1>
             
-            <h4 class="date">2021-06-03</h4>
+            <h4 class="date">2023-09-03</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BS1125/CMAverse/blob/master/vignettes/multiple_mediators.Rmd"><code>vignettes/multiple_mediators.Rmd</code></a></small>
       <div class="hidden name"><code>multiple_mediators.Rmd</code></div>
@@ -124,7 +124,13 @@
 
     
     
-<p>This example demonstrates how to use <code>cmest</code> when there are multiple mediators. For this purpose, we simulate some data containing a continuous baseline confounder <span class="math inline">\(C_1\)</span>, a binary baseline confounder <span class="math inline">\(C_2\)</span>, a binary exposure <span class="math inline">\(A\)</span>, a count mediator <span class="math inline">\(M_1\)</span>, a categorical mediator <span class="math inline">\(M_2\)</span> and a binary outcome <span class="math inline">\(Y\)</span>. The true regression models for <span class="math inline">\(A\)</span>, <span class="math inline">\(M_1\)</span>, <span class="math inline">\(M_2\)</span> and <span class="math inline">\(Y\)</span> are: <span class="math display">\[logit(E(A|C_1,C_2))=0.2+0.5C_1+0.1C_2\]</span> <span class="math display">\[log(E(M_1|A,C_1,C_2))=1-2A+0.5C_1+0.8C_2\]</span> <span class="math display">\[log\frac{E[M_2=1|A,M_1,C_1,C_2]}{E[M_2=0|A,M_1,C_1,C_2]}=0.1+0.1A+0.4M_1-0.5C_1+0.1C_2\]</span> <span class="math display">\[log\frac{E[M_2=2|A,M_1,C_1,C_2]}{E[M_2=0|A,M_1,C_1,C_2]}=0.4+0.2A-0.1M_1-C_1+0.5C_2\]</span> <span class="math display">\[logit(E(Y|A,M_1,M_2,C_1,C_2)))=-4+0.8A-1.8M_1+0.5(M_2==1)+0.8(M_2==2)+0.5AM_1-0.4A(M_2==1)-1.4A(M_2==2)+0.3*C_1-0.6C_2\]</span></p>
+<p>This example demonstrates how to use <code>cmest</code> when there
+are multiple mediators. For this purpose, we simulate some data
+containing a continuous baseline confounder <span class="math inline">\(C_1\)</span>, a binary baseline confounder <span class="math inline">\(C_2\)</span>, a binary exposure <span class="math inline">\(A\)</span>, a count mediator <span class="math inline">\(M_1\)</span>, a categorical mediator <span class="math inline">\(M_2\)</span> and a binary outcome <span class="math inline">\(Y\)</span>. The true regression models for <span class="math inline">\(A\)</span>, <span class="math inline">\(M_1\)</span>, <span class="math inline">\(M_2\)</span> and <span class="math inline">\(Y\)</span> are: <span class="math display">\[logit(E(A|C_1,C_2))=0.2+0.5C_1+0.1C_2\]</span>
+<span class="math display">\[log(E(M_1|A,C_1,C_2))=1-2A+0.5C_1+0.8C_2\]</span>
+<span class="math display">\[log\frac{E[M_2=1|A,M_1,C_1,C_2]}{E[M_2=0|A,M_1,C_1,C_2]}=0.1+0.1A+0.4M_1-0.5C_1+0.1C_2\]</span>
+<span class="math display">\[log\frac{E[M_2=2|A,M_1,C_1,C_2]}{E[M_2=0|A,M_1,C_1,C_2]}=0.4+0.2A-0.1M_1-C_1+0.5C_2\]</span>
+<span class="math display">\[logit(E(Y|A,M_1,M_2,C_1,C_2)))=-4+0.8A-1.8M_1+0.5(M_2==1)+0.8(M_2==2)+0.5AM_1-0.4A(M_2==1)-1.4A(M_2==2)+0.3*C_1-0.6C_2\]</span></p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
 <span class="va">expit</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span><span class="op">+</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span>
@@ -135,10 +141,10 @@
 <span class="va">M1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html">rpois</a></span><span class="op">(</span><span class="va">n</span>, <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="fl">2</span><span class="op">*</span><span class="va">A</span> <span class="op">+</span> <span class="fl">0.5</span><span class="op">*</span><span class="va">C1</span> <span class="op">+</span> <span class="fl">0.8</span><span class="op">*</span><span class="va">C2</span><span class="op">)</span><span class="op">)</span>
 <span class="va">linpred1</span> <span class="op">&lt;-</span> <span class="fl">0.1</span> <span class="op">+</span> <span class="fl">0.1</span><span class="op">*</span><span class="va">A</span> <span class="op">+</span> <span class="fl">0.4</span><span class="op">*</span><span class="va">M1</span> <span class="op">-</span> <span class="fl">0.5</span><span class="op">*</span><span class="va">C1</span> <span class="op">+</span> <span class="fl">0.1</span><span class="op">*</span><span class="va">C2</span>
 <span class="va">linpred2</span> <span class="op">&lt;-</span> <span class="fl">0.4</span> <span class="op">+</span> <span class="fl">0.2</span><span class="op">*</span><span class="va">A</span> <span class="op">-</span> <span class="fl">0.1</span><span class="op">*</span><span class="va">M1</span> <span class="op">-</span> <span class="va">C1</span> <span class="op">+</span> <span class="fl">0.5</span><span class="op">*</span><span class="va">C2</span>
-<span class="va">probm0</span> <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">linpred1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">linpred2</span><span class="op">)</span><span class="op">)</span>
-<span class="va">probm1</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">linpred1</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">linpred1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">linpred2</span><span class="op">)</span><span class="op">)</span>
-<span class="va">probm2</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">linpred2</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">linpred1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">linpred2</span><span class="op">)</span><span class="op">)</span>
-<span class="va">M2</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html">sapply</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span>, FUN <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">1</span>, replace <span class="op">=</span> <span class="cn">TRUE</span>,
+<span class="va">probm0</span> <span class="op">&lt;-</span> <span class="fl">1</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">linpred1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">linpred2</span><span class="op">)</span><span class="op">)</span>
+<span class="va">probm1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">linpred1</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">linpred1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">linpred2</span><span class="op">)</span><span class="op">)</span>
+<span class="va">probm2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">linpred2</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">linpred1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">linpred2</span><span class="op">)</span><span class="op">)</span>
+<span class="va">M2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html">sapply</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">n</span>, FUN <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">1</span>, replace <span class="op">=</span> <span class="cn">TRUE</span>,
                                                  prob<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">probm0</span><span class="op">[</span><span class="va">x</span><span class="op">]</span>,
                                                         <span class="va">probm1</span><span class="op">[</span><span class="va">x</span><span class="op">]</span>,
                                                         <span class="va">probm2</span><span class="op">[</span><span class="va">x</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>
@@ -151,7 +157,9 @@
 <span class="fu"><a href="../reference/cmdag.html">cmdag</a></span><span class="op">(</span>outcome <span class="op">=</span> <span class="st">"Y"</span>, exposure <span class="op">=</span> <span class="st">"A"</span>, mediator <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"M1"</span>, <span class="st">"M2"</span><span class="op">)</span>,
       basec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C1"</span>, <span class="st">"C2"</span><span class="op">)</span>, postc <span class="op">=</span> <span class="cn">NULL</span>, node <span class="op">=</span> <span class="cn">TRUE</span>, text_col <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span></code></pre></div>
 <p><img src="multiple_mediators_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
-<p>In this setting, we have a count mediator, so the marginal structural model is not available. We can use the rest five statistical modeling approaches. The results are shown below.</p>
+<p>In this setting, we have a count mediator, so the marginal structural
+model is not available. We can use the rest five statistical modeling
+approaches. The results are shown below.</p>
 <div id="the-regression-based-approach" class="section level2">
 <h2 class="hasAnchor">
 <a href="#the-regression-based-approach" class="anchor"></a>The Regression-based Approach</h2>
@@ -244,33 +252,33 @@
 ## Residual Deviance: 17966.15 
 ## AIC: 17982.15 
 ## 
-## # Effect decomposition on the risk ratio scale via the regression-based approach
+## # Effect decomposition on the odds ratio scale via the regression-based approach
 ##  
 ## Direct counterfactual imputation estimation with 
 ##  bootstrap standard errors, percentile confidence intervals and p-values 
 ##  
 ##                 Estimate Std.error   95% CIL 95% CIU  P.val    
-## Rcde            0.840859  0.046685  0.788612   0.851 &lt;2e-16 ***
-## Rpnde           2.540010  0.249404  2.203176   2.538 &lt;2e-16 ***
-## Rtnde           1.198066  0.147841  1.024302   1.223 &lt;2e-16 ***
-## Rpnie          22.289482  0.880313 22.434122  23.617 &lt;2e-16 ***
-## Rtnie          10.513453  0.127523 10.808614  10.980 &lt;2e-16 ***
-## Rte            26.704271  2.414681 24.190746  27.435 &lt;2e-16 ***
+## Rcde            0.377584  0.210028  0.124803   0.405 &lt;2e-16 ***
+## Rpnde           2.627117  0.263412  2.268273   2.622 &lt;2e-16 ***
+## Rtnde           1.453067  0.334983  1.054599   1.504 &lt;2e-16 ***
+## Rpnie          41.152523  8.052787 40.529554  51.346 &lt;2e-16 ***
+## Rtnie          22.761604  0.461080 23.252971  23.872 &lt;2e-16 ***
+## Rte            59.797387  5.079004 54.149180  60.972 &lt;2e-16 ***
 ## ERcde          -6.683714  1.717727 -8.708034  -6.400 &lt;2e-16 ***
-## ERintref        8.223724  1.468323  7.939139   9.912 &lt;2e-16 ***
-## ERintmed        2.874780  3.045590 -0.625298   3.466      1    
-## ERpnie         21.289482  0.880313 21.434936  22.618 &lt;2e-16 ***
-## ERcde(prop)    -0.260023  0.099297 -0.375913  -0.243 &lt;2e-16 ***
-## ERintref(prop)  0.319936  0.094601  0.300688   0.428 &lt;2e-16 ***
-## ERintmed(prop)  0.111841  0.117704 -0.027554   0.131      1    
-## ERpnie(prop)    0.828247  0.122399  0.811238   0.976 &lt;2e-16 ***
-## pm              0.940087  0.004695  0.941819   0.948 &lt;2e-16 ***
-## int             0.431777  0.023102  0.400231   0.431 &lt;2e-16 ***
-## pe              1.260023  0.099297  1.242507   1.376 &lt;2e-16 ***
+## ERintref        8.310831  1.454315  8.023107   9.977 &lt;2e-16 ***
+## ERintmed       17.017747 12.868379  1.509260  18.798 &lt;2e-16 ***
+## ERpnie         40.152523  8.052787 39.562749  50.382 &lt;2e-16 ***
+## ERcde(prop)    -0.113674  0.042524 -0.164006  -0.107 &lt;2e-16 ***
+## ERintref(prop)  0.141347  0.040152  0.133921   0.188 &lt;2e-16 ***
+## ERintmed(prop)  0.289430  0.212212  0.027403   0.313 &lt;2e-16 ***
+## ERpnie(prop)    0.682896  0.214583  0.660446   0.949 &lt;2e-16 ***
+## pm              0.972327  0.002371  0.972955   0.976 &lt;2e-16 ***
+## int             0.430777  0.172059  0.215268   0.446 &lt;2e-16 ***
+## pe              1.113674  0.042524  1.106876   1.164 &lt;2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## (Rcde: controlled direct effect risk ratio; Rpnde: pure natural direct effect risk ratio; Rtnde: total natural direct effect risk ratio; Rpnie: pure natural indirect effect risk ratio; Rtnie: total natural indirect effect risk ratio; Rte: total effect risk ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
+## (Rcde: controlled direct effect odds ratio; Rpnde: pure natural direct effect odds ratio; Rtnde: total natural direct effect odds ratio; Rpnie: pure natural indirect effect odds ratio; Rtnie: total natural indirect effect odds ratio; Rte: total effect odds ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
 ## 
 ## Relevant variable values: 
 ## $a
@@ -363,33 +371,33 @@
 ## Number of Fisher Scoring iterations: 4
 ## 
 ## 
-## # Effect decomposition on the risk ratio scale via the weighting-based approach
+## # Effect decomposition on the odds ratio scale via the weighting-based approach
 ##  
 ## Direct counterfactual imputation estimation with 
 ##  bootstrap standard errors, percentile confidence intervals and p-values 
 ##  
-##                 Estimate Std.error   95% CIL 95% CIU  P.val    
-## Rcde            0.840859  0.001153  0.843270   0.845 &lt;2e-16 ***
-## Rpnde           2.184496  0.124689  2.056035   2.224 &lt;2e-16 ***
-## Rtnde           1.197960  0.017578  1.135918   1.160 &lt;2e-16 ***
-## Rpnie          20.345349  1.376126 18.331408  20.180 &lt;2e-16 ***
-## Rtnie          11.157227  0.294594 10.127728  10.524 &lt;2e-16 ***
-## Rte            24.372911  1.917943 20.822968  23.400 &lt;2e-16 ***
-## ERcde          -6.150317  0.544402 -5.782384  -5.051 &lt;2e-16 ***
-## ERintref        7.334812  0.669092  6.107188   7.006 &lt;2e-16 ***
-## ERintmed        2.843066  0.417128  1.436970   1.997 &lt;2e-16 ***
-## ERpnie         19.345349  1.376126 17.333768  19.183 &lt;2e-16 ***
-## ERcde(prop)    -0.263139  0.002492 -0.258089  -0.255 &lt;2e-16 ***
-## ERintref(prop)  0.313817  0.003497  0.308008   0.313 &lt;2e-16 ***
-## ERintmed(prop)  0.121639  0.012419  0.072417   0.089 &lt;2e-16 ***
-## ERpnie(prop)    0.827682  0.013425  0.856280   0.874 &lt;2e-16 ***
-## pm              0.949322  0.001005  0.945382   0.947 &lt;2e-16 ***
-## int             0.435456  0.015916  0.380425   0.402 &lt;2e-16 ***
-## pe              1.263139  0.002492  1.254741   1.258 &lt;2e-16 ***
+##                  Estimate  Std.error    95% CIL 95% CIU  P.val    
+## Rcde            0.3775843  0.0227470  0.3752670   0.406 &lt;2e-16 ***
+## Rpnde           2.2468828  0.1302465  2.1177910   2.293 &lt;2e-16 ***
+## Rtnde           1.4481237  0.0423478  1.3086198   1.366 &lt;2e-16 ***
+## Rpnie          37.2271375  2.3490397 35.1601269  38.316 &lt;2e-16 ***
+## Rtnie          23.9930181  0.8142279 21.7260533  22.820 &lt;2e-16 ***
+## Rte            53.9094991  4.6968302 46.0112396  52.321 &lt;2e-16 ***
+## ERcde          -6.1503170  0.5444024 -5.7823835  -5.051 &lt;2e-16 ***
+## ERintref        7.3971997  0.6746489  6.1689534   7.075 &lt;2e-16 ***
+## ERintmed       15.4354789  2.2175440  9.7402420  12.720 &lt;2e-16 ***
+## ERpnie         36.2271375  2.3490397 34.1637376  37.320 &lt;2e-16 ***
+## ERcde(prop)    -0.1162422  0.0003405 -0.1126449  -0.112 &lt;2e-16 ***
+## ERintref(prop)  0.1398085  0.0006058  0.1370179   0.138 &lt;2e-16 ***
+## ERintmed(prop)  0.2917336  0.0234156  0.2162252   0.248 &lt;2e-16 ***
+## ERpnie(prop)    0.6847001  0.0236809  0.7271290   0.759 &lt;2e-16 ***
+## pm              0.9764337  0.0002654  0.9748130   0.975 &lt;2e-16 ***
+## int             0.4315421  0.0240214  0.3532431   0.386 &lt;2e-16 ***
+## pe              1.1162422  0.0003405  1.1121875   1.113 &lt;2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## (Rcde: controlled direct effect risk ratio; Rpnde: pure natural direct effect risk ratio; Rtnde: total natural direct effect risk ratio; Rpnie: pure natural indirect effect risk ratio; Rtnie: total natural indirect effect risk ratio; Rte: total effect risk ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
+## (Rcde: controlled direct effect odds ratio; Rpnde: pure natural direct effect odds ratio; Rtnde: total natural direct effect odds ratio; Rpnie: pure natural indirect effect odds ratio; Rtnie: total natural indirect effect odds ratio; Rte: total effect odds ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
 ## 
 ## Relevant variable values: 
 ## $a
@@ -507,20 +515,20 @@
 ## Number of Fisher Scoring iterations: 8
 ## 
 ## 
-## # Effect decomposition on the risk ratio scale via the inverse odds ratio weighting approach
+## # Effect decomposition on the odds ratio scale via the inverse odds ratio weighting approach
 ##  
 ## Direct counterfactual imputation estimation with 
 ##  bootstrap standard errors, percentile confidence intervals and p-values 
 ##  
 ##        Estimate Std.error   95% CIL 95% CIU  P.val    
-## Rte   23.713831  1.745561 24.962887  27.308 &lt;2e-16 ***
-## Rpnde  4.483896  0.448867  4.168979   4.772 &lt;2e-16 ***
-## Rtnie  5.288667  0.197403  5.722561   5.988 &lt;2e-16 ***
-## pm     0.846618  0.008286  0.856622   0.868 &lt;2e-16 ***
+## Rte   52.434074  4.686177 54.249690  60.545 &lt;2e-16 ***
+## Rpnde  4.974916  0.521379  4.560246   5.261 &lt;2e-16 ***
+## Rtnie 10.539691  0.288168 11.509069  11.896 &lt;2e-16 ***
+## pm     0.922718  0.003494  0.928448   0.933 &lt;2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## (Rte: total effect risk ratio; Rpnde: pure natural direct effect risk ratio; Rtnie: total natural indirect effect risk ratio; pm: proportion mediated)
+## (Rte: total effect odds ratio; Rpnde: pure natural direct effect odds ratio; Rtnie: total natural indirect effect odds ratio; pm: proportion mediated)
 ## 
 ## Relevant variable values: 
 ## $a
@@ -535,106 +543,29 @@
 <div id="the-natural-effect-model" class="section level2">
 <h2 class="hasAnchor">
 <a href="#the-natural-effect-model" class="anchor"></a>The Natural Effect Model</h2>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">res_ne</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data</span>, model <span class="op">=</span> <span class="st">"ne"</span>, outcome <span class="op">=</span> <span class="st">"Y"</span>, exposure <span class="op">=</span> <span class="st">"A"</span>,
-                mediator <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"M1"</span>, <span class="st">"M2"</span><span class="op">)</span>, basec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C1"</span>, <span class="st">"C2"</span><span class="op">)</span>, EMint <span class="op">=</span> <span class="cn">TRUE</span>,
-                yreg <span class="op">=</span> <span class="st">"logistic"</span>,
-                astar <span class="op">=</span> <span class="fl">0</span>, a <span class="op">=</span> <span class="fl">1</span>, mval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">2</span><span class="op">)</span>, 
-                estimation <span class="op">=</span> <span class="st">"imputation"</span>, inference <span class="op">=</span> <span class="st">"bootstrap"</span>, nboot <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">res_ne</span><span class="op">)</span></code></pre></div>
-<pre><code>## Causal Mediation Analysis
-## 
-## # Outcome regression:
-## 
-## Call:
-## glm(formula = Y ~ A + M1 + M2 + A * M1 + A * M2 + C1 + C2, family = binomial(), 
-##     data = getCall(x$reg.output$yreg)$data, weights = getCall(x$reg.output$yreg)$weights)
-## 
-## Deviance Residuals: 
-##     Min       1Q   Median       3Q      Max  
-## -2.2066  -0.5055  -0.0007   0.6383   3.3715  
-## 
-## Coefficients:
-##              Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)  1.125104   0.478893   2.349 0.018804 *  
-## A            0.460265   0.400463   1.149 0.250419    
-## M1          -1.809307   0.180027 -10.050  &lt; 2e-16 ***
-## M21         -0.007101   0.364067  -0.020 0.984438    
-## M22          0.841167   0.405154   2.076 0.037879 *  
-## C1           0.504243   0.284671   1.771 0.076508 .  
-## C2          -0.643001   0.062025 -10.367  &lt; 2e-16 ***
-## A:M1         0.535812   0.183808   2.915 0.003556 ** 
-## A:M21        0.129896   0.370967   0.350 0.726222    
-## A:M22       -1.447096   0.412172  -3.511 0.000447 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## (Dispersion parameter for binomial family taken to be 1)
-## 
-##     Null deviance: 13336.6  on 9999  degrees of freedom
-## Residual deviance:  7347.9  on 9990  degrees of freedom
-## AIC: 7367.9
-## 
-## Number of Fisher Scoring iterations: 10
-## 
-## 
-## 
-## # Effect decomposition on the risk ratio scale via the natural effect model
-##  
-## Direct counterfactual imputation estimation with 
-##  bootstrap standard errors, percentile confidence intervals and p-values 
-##  
-##                 Estimate Std.error   95% CIL 95% CIU  P.val    
-## Rcde            0.840859  0.086137  0.895442   1.011      1    
-## Rpnde           2.397002  0.104623  2.429955   2.571 &lt;2e-16 ***
-## Rtnde           1.212344  0.101779  1.330542   1.467 &lt;2e-16 ***
-## Rpnie          20.806505  1.917377 18.176285  20.752 &lt;2e-16 ***
-## Rtnie          10.523413  0.173974 10.741630  10.975 &lt;2e-16 ***
-## Rte            25.224641  0.701059 26.669640  27.612 &lt;2e-16 ***
-## ERcde          -6.332043  3.477253 -4.288821   0.383      1    
-## ERintref        7.729045  3.581876  1.047182   5.859 &lt;2e-16 ***
-## ERintmed        3.021133  1.320940  5.284538   7.059 &lt;2e-16 ***
-## ERpnie         19.806505  1.917377 17.180793  19.757 &lt;2e-16 ***
-## ERcde(prop)    -0.261389  0.131063 -0.160993   0.015      1    
-## ERintref(prop)  0.319057  0.133527  0.040616   0.220 &lt;2e-16 ***
-## ERintmed(prop)  0.124713  0.056884  0.198651   0.275 &lt;2e-16 ***
-## ERpnie(prop)    0.817618  0.054420  0.669220   0.742 &lt;2e-16 ***
-## pm              0.942331  0.002464  0.940984   0.944 &lt;2e-16 ***
-## int             0.443770  0.076643  0.315690   0.419 &lt;2e-16 ***
-## pe              1.261389  0.131063  0.984910   1.161 &lt;2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## (Rcde: controlled direct effect risk ratio; Rpnde: pure natural direct effect risk ratio; Rtnde: total natural direct effect risk ratio; Rpnie: pure natural indirect effect risk ratio; Rtnie: total natural indirect effect risk ratio; Rte: total effect risk ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
-## 
-## Relevant variable values: 
-## $a
-## [1] 1
-## 
-## $astar
-## [1] 0
-## 
-## $yval
-## [1] "1"
-## 
-## $mval
-## $mval[[1]]
-## [1] 0
-## 
-## $mval[[2]]
-## [1] 2</code></pre>
 </div>
+<div id="r-messagefwarningfresultshide-res_ne---cmestdata-data-model-ne-outcome-y-exposure-a-mediator-cm1-m2-basec-cc1-c2-emint-true-yreg-logistic-astar-0-a-1-mval-list0-2-estimation-imputation-inference-bootstrap-nboot-2" class="section level1">
+<h1 class="hasAnchor">
+<a href="#r-messagefwarningfresultshide-res_ne---cmestdata-data-model-ne-outcome-y-exposure-a-mediator-cm1-m2-basec-cc1-c2-emint-true-yreg-logistic-astar-0-a-1-mval-list0-2-estimation-imputation-inference-bootstrap-nboot-2" class="anchor"></a><code>{r message=F,warning=F,results='hide'} # res_ne &lt;- cmest(data = data, model = "ne", outcome = "Y", exposure = "A", #                 mediator = c("M1", "M2"), basec = c("C1", "C2"), EMint = TRUE, #                 yreg = "logistic", #                 astar = 0, a = 1, mval = list(0, 2),  #                 estimation = "imputation", inference = "bootstrap", nboot = 2) #</code>
+</h1>
+</div>
+<div id="section" class="section level1">
+<h1></h1>
+</div>
+<div id="r-messagefwarningf-summaryres_ne" class="section level1">
+<h1 class="hasAnchor">
+<a href="#r-messagefwarningf-summaryres_ne" class="anchor"></a><code>{r message=F,warning=F} # summary(res_ne) #</code>
+</h1>
 <div id="the-g-formula-approach" class="section level2">
 <h2 class="hasAnchor">
 <a href="#the-g-formula-approach" class="anchor"></a>The g-formula Approach</h2>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">res_gformula</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data</span>, model <span class="op">=</span> <span class="st">"gformula"</span>, outcome <span class="op">=</span> <span class="st">"Y"</span>, exposure <span class="op">=</span> <span class="st">"A"</span>,
                       mediator <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"M1"</span>, <span class="st">"M2"</span><span class="op">)</span>, basec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C1"</span>, <span class="st">"C2"</span><span class="op">)</span>, EMint <span class="op">=</span> <span class="cn">TRUE</span>,
                       mreg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">"poisson"</span>, <span class="st">"multinomial"</span><span class="op">)</span>, yreg <span class="op">=</span> <span class="st">"logistic"</span>,
                       astar <span class="op">=</span> <span class="fl">0</span>, a <span class="op">=</span> <span class="fl">1</span>, mval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">2</span><span class="op">)</span>, 
                       estimation <span class="op">=</span> <span class="st">"imputation"</span>, inference <span class="op">=</span> <span class="st">"bootstrap"</span>, nboot <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">res_gformula</span><span class="op">)</span></code></pre></div>
 <pre><code>## Causal Mediation Analysis
 ## 
@@ -717,33 +648,33 @@
 ## Residual Deviance: 17966.15 
 ## AIC: 17982.15 
 ## 
-## # Effect decomposition on the risk ratio scale via the g-formula approach
+## # Effect decomposition on the odds ratio scale via the g-formula approach
 ##  
 ## Direct counterfactual imputation estimation with 
 ##  bootstrap standard errors, percentile confidence intervals and p-values 
 ##  
-##                 Estimate Std.error   95% CIL 95% CIU  P.val    
-## Rcde            0.840859  0.065592  0.771998   0.860 &lt;2e-16 ***
-## Rpnde           2.628791  0.301244  2.110514   2.515 &lt;2e-16 ***
-## Rtnde           1.206834  0.190209  1.003274   1.259      1    
-## Rpnie          23.580908  1.786324 22.156678  24.556 &lt;2e-16 ***
-## Rtnie          10.825600  0.435251 11.088659  11.673 &lt;2e-16 ***
-## Rte            28.458238  2.421510 24.636897  27.890 &lt;2e-16 ***
-## ERcde          -7.113482  2.684539 -9.594347  -5.988 &lt;2e-16 ***
-## ERintref        8.742273  2.383294  7.503828  10.706 &lt;2e-16 ***
-## ERintmed        3.248539  3.906589 -1.029096   4.219      1    
-## ERpnie         22.580908  1.786324 21.159954  23.560 &lt;2e-16 ***
-## ERcde(prop)    -0.259065  0.136412 -0.406495  -0.223 &lt;2e-16 ***
-## ERintref(prop)  0.318384  0.129441  0.279567   0.453 &lt;2e-16 ***
-## ERintmed(prop)  0.118308  0.149237 -0.044273   0.156      1    
-## ERpnie(prop)    0.822373  0.156208  0.787431   0.997 &lt;2e-16 ***
-## pm              0.940681  0.006971  0.943658   0.953 &lt;2e-16 ***
-## int             0.436693  0.019796  0.409198   0.436 &lt;2e-16 ***
-## pe              1.259065  0.136412  1.223225   1.406 &lt;2e-16 ***
+##                  Estimate  Std.error    95% CIL 95% CIU  P.val    
+## Rcde            0.3775843  0.0001090  0.5856582   0.586 &lt;2e-16 ***
+## Rpnde           2.6759571  0.0504529  2.6574057   2.725 &lt;2e-16 ***
+## Rtnde           1.4616207  0.0608864  1.5571605   1.639 &lt;2e-16 ***
+## Rpnie          44.5825480  4.3829136 35.3768867  41.265 &lt;2e-16 ***
+## Rtnie          24.3512032  2.1615388 21.2760736  24.180 &lt;2e-16 ***
+## Rte            65.1627748  4.6704478 57.9813237  64.256 &lt;2e-16 ***
+## ERcde          -7.3006667  0.2990695 -4.4320239  -4.030 &lt;2e-16 ***
+## ERintref        8.9766238  0.2486166  5.7554354   6.089 &lt;2e-16 ***
+## ERintmed       18.9042697  0.3379871 20.8758549  21.330 &lt;2e-16 ***
+## ERpnie         43.5825480  4.3829136 34.3888139  40.277 &lt;2e-16 ***
+## ERcde(prop)    -0.1137835  0.0004936 -0.0707202  -0.070 &lt;2e-16 ***
+## ERintref(prop)  0.1399039  0.0035268  0.0962663   0.101 &lt;2e-16 ***
+## ERintmed(prop)  0.2946299  0.0217063  0.3372324   0.366 &lt;2e-16 ***
+## ERpnie(prop)    0.6792497  0.0247395  0.6033208   0.637 &lt;2e-16 ***
+## pm              0.9738796  0.0030332  0.9697156   0.974 &lt;2e-16 ***
+## int             0.4345338  0.0252331  0.4334987   0.467 &lt;2e-16 ***
+## pe              1.1137835  0.0004936  1.0700571   1.071 &lt;2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
-## (Rcde: controlled direct effect risk ratio; Rpnde: pure natural direct effect risk ratio; Rtnde: total natural direct effect risk ratio; Rpnie: pure natural indirect effect risk ratio; Rtnie: total natural indirect effect risk ratio; Rte: total effect risk ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
+## (Rcde: controlled direct effect odds ratio; Rpnde: pure natural direct effect odds ratio; Rtnde: total natural direct effect odds ratio; Rpnie: pure natural indirect effect odds ratio; Rtnie: total natural indirect effect odds ratio; Rte: total effect odds ratio; ERcde: excess relative risk due to controlled direct effect; ERintref: excess relative risk due to reference interaction; ERintmed: excess relative risk due to mediated interaction; ERpnie: excess relative risk due to pure natural indirect effect; ERcde(prop): proportion ERcde; ERintref(prop): proportion ERintref; ERintmed(prop): proportion ERintmed; ERpnie(prop): proportion ERpnie; pm: overall proportion mediated; int: overall proportion attributable to interaction; pe: overall proportion eliminated)
 ## 
 ## Relevant variable values: 
 ## $a
@@ -762,6 +693,7 @@
 ## $mval[[2]]
 ## [1] 2</code></pre>
 </div>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -775,7 +707,7 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Baoyi Shi, <a href="https://scholar.harvard.edu/cchoirat">Christine Choirat</a>, <a href="https://www.lindavaleri.com/">Linda Valeri</a>.</p>
+  <p>Developed by Baoyi Shi, Christine Choirat, <a href="https://www.lindavaleri.com/">Linda Valeri</a>.</p>
 </div>
 
 <div class="pkgdown">
