@@ -204,7 +204,7 @@ model</em> by VanderWeele et al. (2017), and <em>the g-formula approach</em> by 
   boot.ci.type <span class='op'>=</span> <span class='st'>"per"</span>,
   nRep <span class='op'>=</span> <span class='fl'>5</span>,
   multimp <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  <span class='va'>...</span>
+  args_mice <span class='op'>=</span> <span class='cn'>NULL</span>
 <span class='op'>)</span>
 
 <span class='co'># S3 method for cmest</span>
@@ -380,8 +380,8 @@ each observation unit (used when <code>model</code> is <code>ne</code>). Default
 <code>FALSE</code>.</p></td>
     </tr>
     <tr>
-      <th>...</th>
-      <td><p>Additional arguments passed to the <a href='https://rdrr.io/pkg/mice/man/mice.html'>mice</a> function. See <a href='https://rdrr.io/pkg/mice/man/mice.html'>mice</a>
+      <th>args_mice</th>
+      <td><p>a list of additional arguments passed to the <a href='https://rdrr.io/pkg/mice/man/mice.html'>mice</a> function. See <a href='https://rdrr.io/pkg/mice/man/mice.html'>mice</a>
 for details.</p></td>
     </tr>
     <tr>

@@ -134,8 +134,15 @@ mediator <span class="math inline">\(M\)</span> and a binary outcome
 <span class="math display">\[logit(E(M|A,C_1,C_2))=1+2A+1.5C_1+0.8C_2\]</span>
 <span class="math display">\[logit(E(Y|A,M,C_1,C_2)))=-3-0.4A-1.2M+0.5AM+0.3C_1-0.6C_2\]</span></p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://bs1125.github.io/CMAverse/">CMAverse</a></span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://bs1125.github.io/CMAverse/">CMAverse</a></span><span class="op">)</span></code></pre></div>
+<pre><code>## Registered S3 methods overwritten by 'lme4':
+##   method                          from
+##   cooks.distance.influence.merMod car 
+##   influence.merMod                car 
+##   dfbeta.influence.merMod         car 
+##   dfbetas.influence.merMod        car</code></pre>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>
 <span class="va">expit</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">/</span><span class="op">(</span><span class="fl">1</span><span class="op">+</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span>
 <span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">10000</span>
 <span class="va">C1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="va">n</span>, mean <span class="op">=</span> <span class="fl">1</span>, sd <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span>
@@ -145,7 +152,7 @@ mediator <span class="math inline">\(M\)</span> and a binary outcome
 <span class="va">Y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html">rbinom</a></span><span class="op">(</span><span class="va">n</span>, <span class="fl">1</span>, <span class="fu">expit</span><span class="op">(</span><span class="op">-</span><span class="fl">3</span> <span class="op">-</span> <span class="fl">0.4</span><span class="op">*</span><span class="va">A</span> <span class="op">-</span> <span class="fl">1.2</span><span class="op">*</span><span class="va">M</span> <span class="op">+</span> <span class="fl">0.5</span><span class="op">*</span><span class="va">A</span><span class="op">*</span><span class="va">M</span> <span class="op">+</span> <span class="fl">0.3</span><span class="op">*</span><span class="va">C1</span> <span class="op">-</span> <span class="fl">0.6</span><span class="op">*</span><span class="va">C2</span><span class="op">)</span><span class="op">)</span>
 <span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span><span class="va">A</span>, <span class="va">M</span>, <span class="va">Y</span>, <span class="va">C1</span>, <span class="va">C2</span><span class="op">)</span></code></pre></div>
 <p>The DAG for this scientific setting is:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/cmdag.html">cmdag</a></span><span class="op">(</span>outcome <span class="op">=</span> <span class="st">"Y"</span>, exposure <span class="op">=</span> <span class="st">"A"</span>, mediator <span class="op">=</span> <span class="st">"M"</span>,
       basec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C1"</span>, <span class="st">"C2"</span><span class="op">)</span>, postc <span class="op">=</span> <span class="cn">NULL</span>, node <span class="op">=</span> <span class="cn">TRUE</span>, text_col <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span></code></pre></div>
 <p><img src="single_mediator_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
@@ -158,13 +165,13 @@ approaches. The results are shown below:</p>
 <h3 class="hasAnchor">
 <a href="#closed-form-parameter-function-estimation-and-delta-method-inference" class="anchor"></a>Closed-form Parameter Function Estimation and Delta Method
 Inference</h3>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">res_rb_param_delta</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data</span>, model <span class="op">=</span> <span class="st">"rb"</span>, outcome <span class="op">=</span> <span class="st">"Y"</span>, exposure <span class="op">=</span> <span class="st">"A"</span>,
                             mediator <span class="op">=</span> <span class="st">"M"</span>, basec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C1"</span>, <span class="st">"C2"</span><span class="op">)</span>, EMint <span class="op">=</span> <span class="cn">TRUE</span>,
                             mreg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">"logistic"</span><span class="op">)</span>, yreg <span class="op">=</span> <span class="st">"logistic"</span>,
                             astar <span class="op">=</span> <span class="fl">0</span>, a <span class="op">=</span> <span class="fl">1</span>, mval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>, 
                             estimation <span class="op">=</span> <span class="st">"paramfunc"</span>, inference <span class="op">=</span> <span class="st">"delta"</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">res_rb_param_delta</span><span class="op">)</span></code></pre></div>
 <pre><code>## Causal Mediation Analysis
 ## 
@@ -280,13 +287,13 @@ Inference</h3>
 <h3 class="hasAnchor">
 <a href="#closed-form-parameter-function-estimation-and-bootstrap-inference" class="anchor"></a>Closed-form Parameter Function Estimation and Bootstrap
 Inference</h3>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">res_rb_param_bootstrap</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data</span>, model <span class="op">=</span> <span class="st">"rb"</span>, outcome <span class="op">=</span> <span class="st">"Y"</span>, exposure <span class="op">=</span> <span class="st">"A"</span>,
                                 mediator <span class="op">=</span> <span class="st">"M"</span>, basec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C1"</span>, <span class="st">"C2"</span><span class="op">)</span>, EMint <span class="op">=</span> <span class="cn">TRUE</span>,
                                 mreg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">"logistic"</span><span class="op">)</span>, yreg <span class="op">=</span> <span class="st">"logistic"</span>,
                                 astar <span class="op">=</span> <span class="fl">0</span>, a <span class="op">=</span> <span class="fl">1</span>, mval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>, 
                                 estimation <span class="op">=</span> <span class="st">"paramfunc"</span>, inference <span class="op">=</span> <span class="st">"bootstrap"</span>, nboot <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">res_rb_param_bootstrap</span><span class="op">)</span></code></pre></div>
 <pre><code>## Causal Mediation Analysis
 ## 
@@ -402,13 +409,13 @@ Inference</h3>
 <h3 class="hasAnchor">
 <a href="#direct-counterfactual-imputation-estimation-and-bootstrap-inference" class="anchor"></a>Direct Counterfactual Imputation Estimation and Bootstrap
 Inference</h3>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">res_rb_impu_bootstrap</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data</span>, model <span class="op">=</span> <span class="st">"rb"</span>, outcome <span class="op">=</span> <span class="st">"Y"</span>, exposure <span class="op">=</span> <span class="st">"A"</span>,
                                mediator <span class="op">=</span> <span class="st">"M"</span>, basec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C1"</span>, <span class="st">"C2"</span><span class="op">)</span>, EMint <span class="op">=</span> <span class="cn">TRUE</span>,
                                mreg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">"logistic"</span><span class="op">)</span>, yreg <span class="op">=</span> <span class="st">"logistic"</span>,
                                astar <span class="op">=</span> <span class="fl">0</span>, a <span class="op">=</span> <span class="fl">1</span>, mval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>, 
                                estimation <span class="op">=</span> <span class="st">"imputation"</span>, inference <span class="op">=</span> <span class="st">"bootstrap"</span>, nboot <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">res_rb_impu_bootstrap</span><span class="op">)</span></code></pre></div>
 <pre><code>## Causal Mediation Analysis
 ## 
@@ -516,13 +523,13 @@ Inference</h3>
 <div id="the-weighting-based-approach" class="section level2">
 <h2 class="hasAnchor">
 <a href="#the-weighting-based-approach" class="anchor"></a>The Weighting-based Approach</h2>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">res_wb</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data</span>, model <span class="op">=</span> <span class="st">"wb"</span>, outcome <span class="op">=</span> <span class="st">"Y"</span>, exposure <span class="op">=</span> <span class="st">"A"</span>,
                 mediator <span class="op">=</span> <span class="st">"M"</span>, basec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C1"</span>, <span class="st">"C2"</span><span class="op">)</span>, EMint <span class="op">=</span> <span class="cn">TRUE</span>,
                 ereg <span class="op">=</span> <span class="st">"logistic"</span>, yreg <span class="op">=</span> <span class="st">"logistic"</span>,
                 astar <span class="op">=</span> <span class="fl">0</span>, a <span class="op">=</span> <span class="fl">1</span>, mval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>, 
                 estimation <span class="op">=</span> <span class="st">"imputation"</span>, inference <span class="op">=</span> <span class="st">"bootstrap"</span>, nboot <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">res_wb</span><span class="op">)</span></code></pre></div>
 <pre><code>## Causal Mediation Analysis
 ## 
@@ -628,13 +635,13 @@ Inference</h3>
 <div id="the-inverse-odds-ratio-weighting-approach" class="section level2">
 <h2 class="hasAnchor">
 <a href="#the-inverse-odds-ratio-weighting-approach" class="anchor"></a>The Inverse Odds-ratio Weighting Approach</h2>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">res_iorw</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data</span>, model <span class="op">=</span> <span class="st">"iorw"</span>, outcome <span class="op">=</span> <span class="st">"Y"</span>, exposure <span class="op">=</span> <span class="st">"A"</span>,
                   mediator <span class="op">=</span> <span class="st">"M"</span>, basec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C1"</span>, <span class="st">"C2"</span><span class="op">)</span>, 
                   ereg <span class="op">=</span> <span class="st">"logistic"</span>, yreg <span class="op">=</span> <span class="st">"logistic"</span>,
                   astar <span class="op">=</span> <span class="fl">0</span>, a <span class="op">=</span> <span class="fl">1</span>, mval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>, 
                   estimation <span class="op">=</span> <span class="st">"imputation"</span>, inference <span class="op">=</span> <span class="st">"bootstrap"</span>, nboot <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">res_iorw</span><span class="op">)</span></code></pre></div>
 <pre><code>## Causal Mediation Analysis
 ## 
@@ -766,14 +773,14 @@ Inference</h3>
 <div id="the-marginal-structural-model" class="section level2">
 <h2 class="hasAnchor">
 <a href="#the-marginal-structural-model" class="anchor"></a>The Marginal Structural Model</h2>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">res_msm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data</span>, model <span class="op">=</span> <span class="st">"msm"</span>, outcome <span class="op">=</span> <span class="st">"Y"</span>, exposure <span class="op">=</span> <span class="st">"A"</span>,
                  mediator <span class="op">=</span> <span class="st">"M"</span>, basec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C1"</span>, <span class="st">"C2"</span><span class="op">)</span>, EMint <span class="op">=</span> <span class="cn">TRUE</span>,
                  ereg <span class="op">=</span> <span class="st">"logistic"</span>, yreg <span class="op">=</span> <span class="st">"logistic"</span>, mreg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">"logistic"</span><span class="op">)</span>,
                  wmnomreg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">"logistic"</span><span class="op">)</span>, wmdenomreg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">"logistic"</span><span class="op">)</span>,
                  astar <span class="op">=</span> <span class="fl">0</span>, a <span class="op">=</span> <span class="fl">1</span>, mval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>, 
                  estimation <span class="op">=</span> <span class="st">"imputation"</span>, inference <span class="op">=</span> <span class="st">"bootstrap"</span>, nboot <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">res_msm</span><span class="op">)</span></code></pre></div>
 <pre><code>## Causal Mediation Analysis
 ## 
@@ -957,13 +964,13 @@ Inference</h3>
 <div id="the-g-formula-approach" class="section level2">
 <h2 class="hasAnchor">
 <a href="#the-g-formula-approach" class="anchor"></a>The g-formula Approach</h2>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">res_gformula</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cmest.html">cmest</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">data</span>, model <span class="op">=</span> <span class="st">"gformula"</span>, outcome <span class="op">=</span> <span class="st">"Y"</span>, exposure <span class="op">=</span> <span class="st">"A"</span>,
                       mediator <span class="op">=</span> <span class="st">"M"</span>, basec <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"C1"</span>, <span class="st">"C2"</span><span class="op">)</span>, EMint <span class="op">=</span> <span class="cn">TRUE</span>,
                       mreg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">"logistic"</span><span class="op">)</span>, yreg <span class="op">=</span> <span class="st">"logistic"</span>,
                       astar <span class="op">=</span> <span class="fl">0</span>, a <span class="op">=</span> <span class="fl">1</span>, mval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>, 
                       estimation <span class="op">=</span> <span class="st">"imputation"</span>, inference <span class="op">=</span> <span class="st">"bootstrap"</span>, nboot <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">res_gformula</span><span class="op">)</span></code></pre></div>
 <pre><code>## Causal Mediation Analysis
 ## 

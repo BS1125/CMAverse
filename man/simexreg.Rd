@@ -57,8 +57,6 @@ simexreg(
 
 \item{data}{new dataset for \code{reg}}
 
-\item{weights}{new weights for \code{reg}}
-
 \item{MEvariable}{variable measured with error}
 
 \item{MEvartype}{type of the variable measured with error. Can be \code{continuous} or 

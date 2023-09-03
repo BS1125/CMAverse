@@ -38,7 +38,7 @@ cmest(
   boot.ci.type = "per",
   nRep = 5,
   multimp = FALSE,
-  ...
+  args_mice = NULL
 )
 
 \method{print}{cmest}(x, ...)
@@ -148,7 +148,7 @@ each observation unit (used when \code{model} is \code{ne}). Default is \code{5}
 \code{TRUE}, conduct multiple imputations using the \link[mice]{mice} function. Default is 
 \code{FALSE}.}
 
-\item{...}{Additional arguments passed to the \link[mice]{mice} function. See \link[mice]{mice}
+\item{args_mice}{a list of additional arguments passed to the \link[mice]{mice} function. See \link[mice]{mice}
 for details.}
 
 \item{x}{an object of class \code{cmest}}
