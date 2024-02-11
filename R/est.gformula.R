@@ -154,8 +154,8 @@ est.gformula <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRU
         }
         
         if (is.numeric(data[, postc[p]])) {
-          mid_a <- as.numeric(l_lev[mid_a])
-          mid_astar <- as.numeric(l_lev[mid_astar])
+          mid_a <- as.numeric(mid_a)
+          mid_astar <- as.numeric(mid_astar)
         } 
         
         rm(prob_a, prob_astar, l_lev)
@@ -226,7 +226,7 @@ est.gformula <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRU
     type <- ifelse(is_multinom_mreg[p] | is_polr_mreg[p], "probs", "response")
     mpred_a <- predict(mreg[[p]], newdata = mdesign_a, type = type)
     mpred_astar <- predict(mreg[[p]], newdata = mdesign_astar, type = type)
-    full_index <- which(rowSums(is.na(mdesign_a))==0)
+    full_index <- which(rowSums(is.na(mdesign_a)) == 0)
     n_full <- length(full_index)
     # categorical M
     if ((is_glm_mreg[p] && ((family_mreg[[p]]$family %in% c("binomial", "multinom")) |
