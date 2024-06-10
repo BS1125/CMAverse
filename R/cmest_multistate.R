@@ -20,28 +20,65 @@
 #' If \code{NULL}, the mean of each confounder is used.
 #' @param ymreg type of multistate survival model to be used. Currently supporting coxph only.
 #' @param multistate_seed The seed to be used when generating bootstrap datasets for multistate modeling.
-#' @param s The time beyond which survival probability is interested in multistate modeling.
+#' @param s The time point(s) beyond which survival probability is interested in multistate modeling.
 #' @param bh_method Method for estimating baseline hazards in multistate modeling. Currently supporting "breslow" only.
 #' @param mediator_event Event indicator for the mediator in multistate modeling.
 #' @param nboot (used when \code{inference} is \code{bootstrap}) the number of bootstraps applied. 
 #' Default is 200.
-#' @param multimp a logical value. If 
-#' \code{TRUE}, conduct multiple imputations using the \link[mice]{mice} function. Default is 
-#' \code{FALSE}.
-#' @param args_mice a list of additional arguments passed to the \link[mice]{mice} function. See \link[mice]{mice}
-#' for details.
 #' 
 #' @details
-#' # add modeling details/supplementary description of how to set the arguments above
+#' # modeling details/supplementary description of how to set the arguments above
+#' \strong{Assumptions of the multistate method}
+#' \itemize{
+#' \item{\emph{Consistency of potential outcomes:} }{For each i and each t, the survival in a world where we intervene, i.e., setting the time to treatment to a specific value t (via a fixed or stochastic intervention) is the same as the survival in the real world where we observe a time to treatment equal to t.}
+#' \item{\emph{There is no unmeasured mediator-outcome confounding:} }{given \code{exposure} and 
+#' \code{basec}, \code{mediator} is independent of \code{outcome}.}
+#' \item{\emph{Non-informative censoring of event times:} }{The observed censoring time is conditionally independent of all potential event times.}
+#' \item{\emph{Positivity:} }{Each exposure-covariate combination has a non-zero probability of occurring.}
+#' }
 #' 
 #' @references
-#' # references of papers you use for this code
+#' Valeri L, Proust-Lima C, Fan W, Chen JT, Jacqmin-Gadda H. A multistate approach for the study of interventions on an intermediate time-to-event in health disparities research. Statistical Methods in Medical Research. 2023;32(8):1445-1460.
 #' 
 #' @examples
-#' # give some code examples
+#' \dontrun{
+#' library(CMAverse)
+#' # run multistate method
+#' multistate_out = cmest_multistate(data = sc_data, 
+#' s = s_vec,
+#' multistate_seed = 1,
+#' exposure = 'A', mediator = 'M', outcome = 'S',
+#' yevent = "ind_S", mevent = "ind_M",
+#' basec = c("C1", "C2"),
+#' basecval = c("C1" = "1", "C2" = as.character(mean(sc_data$C2))),
+#' astar="0", a="1", 
+#' nboot=1, EMint=F, 
+#' bh_method = "breslow")
+#' multistate_out
+#' }
+#' where in the example, \code{sc_data} is a data frame that contains a binary exposure \code{A} that has
+#' the reference level \code{astar=0} and active level \code{a=1}, a time-to event \code{mediator} with event indicator \code{ind_M},
+#' a time_to_event \code{outcome} with event indicator \code{ind_S}, a factor baseline covariate \code{C1} conditioned on level 1, 
+#' a and continuous baseline covariate \code{C2} conditioned on its mean. 
 #' 
-#' @importFrom
-#' # add functions you use from other packages here
+#' @return 
+#' The output is a list that consists of 4 elements: 1) The model summary
+#' of the joint multistate Cox proportional hazards model fitted on the
+#' original dataset, 2) the point estimates of RD and SD for each of the
+#' user-specified time points of interest on the original dataset, 3) the
+#' summary of the bootstrapped RD, SD, and TE estimates for each of the
+#' user-specified time point of interest, including the 2.5%, 50%, and
+#' 97.5% percentiles, and 4) the estimated RD, SD, TD for each of the
+#' user-specified time point of interest for each bootstrap dataset.
+#' 
+#' @importFrom mstate msprep expand.covs msfit
+#' @importFrom stats as.formula getCall
+#' @importFrom survival coxph
+#' @importFrom dplyrr arrange filter pull group_by summarize
+#' @importFrom utils txtProgressBar
+#' @importFrom parallel detectCores makeCluster stopCluster
+#' @importFrom doSNOW registerDoSNOW
+#' @importFrom foreach foreach
 #' 
 #' @export
 
