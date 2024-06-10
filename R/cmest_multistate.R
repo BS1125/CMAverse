@@ -27,11 +27,10 @@
 #' Default is 200.
 #' 
 #' @details
-#' # modeling details/supplementary description of how to set the arguments above
 #' \strong{Assumptions of the multistate method}
 #' \itemize{
 #' \item{\emph{Consistency of potential outcomes:} }{For each i and each t, the survival in a world where we intervene, i.e., setting the time to treatment to a specific value t (via a fixed or stochastic intervention) is the same as the survival in the real world where we observe a time to treatment equal to t.}
-#' \item{\emph{There is no unmeasured mediator-outcome confounding:} }{given \code{exposure} and 
+#' \item{\emph{There is no unmeasured mediator-outcome confounding:} }{Given \code{exposure} and 
 #' \code{basec}, \code{mediator} is independent of \code{outcome}.}
 #' \item{\emph{Non-informative censoring of event times:} }{The observed censoring time is conditionally independent of all potential event times.}
 #' \item{\emph{Positivity:} }{Each exposure-covariate combination has a non-zero probability of occurring.}
@@ -43,7 +42,6 @@
 #' @examples
 #' \dontrun{
 #' library(CMAverse)
-#' # run multistate method
 #' multistate_out = cmest_multistate(data = sc_data, 
 #' s = s_vec,
 #' multistate_seed = 1,
@@ -62,19 +60,22 @@
 #' a and continuous baseline covariate \code{C2} conditioned on its mean. 
 #' 
 #' @return 
-#' The output is a list that consists of 4 elements: 1) The model summary
-#' of the joint multistate Cox proportional hazards model fitted on the
-#' original dataset, 2) the point estimates of RD and SD for each of the
-#' user-specified time points of interest on the original dataset, 3) the
-#' summary of the bootstrapped RD, SD, and TE estimates for each of the
-#' user-specified time point of interest, including the 2.5%, 50%, and
-#' 97.5% percentiles, and 4) the estimated RD, SD, TD for each of the
-#' user-specified time point of interest for each bootstrap dataset.
+#' The output is a list that consists of 4 elements:
+#' \itemize{
+#' \item{the model summary of the joint multistate Cox proportional hazards model fitted on the
+#' original dataset}
+#' \item{the point estimates of RD and SD for each of the
+#' user-specified time points of interest on the original dataset}
+#' \item{the summary of the bootstrapped RD, SD, and TE estimates for each of the
+#' user-specified time point of interest, including the 2.5, 50, and
+#' 97.5th percentiles}
+#' \item{the estimated RD, SD, TD for each of the
+#' user-specified time point of interest for each bootstrap dataset}}
 #' 
 #' @importFrom mstate msprep expand.covs msfit
 #' @importFrom stats as.formula getCall
 #' @importFrom survival coxph
-#' @importFrom dplyrr arrange filter pull group_by summarize
+#' @importFrom dplyr arrange filter pull group_by summarize
 #' @importFrom utils txtProgressBar
 #' @importFrom parallel detectCores makeCluster stopCluster
 #' @importFrom doSNOW registerDoSNOW
