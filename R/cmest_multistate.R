@@ -22,7 +22,7 @@
 #' @param multistate_seed The seed to be used when generating bootstrap datasets for multistate modeling.
 #' @param s The time point(s) beyond which survival probability is interested in multistate modeling.
 #' @param bh_method Method for estimating baseline hazards in multistate modeling. Currently supporting "breslow" only.
-#' @param mediator_event Event indicator for the mediator in multistate modeling.
+#' @param mevent Event indicator for the mediator in multistate modeling.
 #' @param nboot (used when \code{inference} is \code{bootstrap}) the number of bootstraps applied. 
 #' Default is 200.
 #' 
@@ -54,10 +54,6 @@
 #' bh_method = "breslow")
 #' multistate_out
 #' }
-#' where in the example, \code{sc_data} is a data frame that contains a binary exposure \code{A} that has
-#' the reference level \code{astar=0} and active level \code{a=1}, a time-to event \code{mediator} with event indicator \code{ind_M},
-#' a time_to_event \code{outcome} with event indicator \code{ind_S}, a factor baseline covariate \code{C1} conditioned on level 1, 
-#' a and continuous baseline covariate \code{C2} conditioned on its mean. 
 #' 
 #' @return 
 #' The output is a list that consists of 4 elements:
@@ -72,14 +68,14 @@
 #' \item{the estimated RD, SD, TD for each of the
 #' user-specified time point of interest for each bootstrap dataset}}
 #' 
-#' @importFrom mstate msprep expand.covs msfit
-#' @importFrom stats as.formula getCall
+#' @importFrom mstate transMat msprep expand.covs msfit
+#' @importFrom stats as.formula getCall median
 #' @importFrom survival coxph
-#' @importFrom dplyr arrange filter pull group_by summarize
+#' @importFrom dplyr arrange filter pull group_by summarize %>% row_number
 #' @importFrom utils txtProgressBar
 #' @importFrom parallel detectCores makeCluster stopCluster
-#' @importFrom doSNOW registerDoSNOW
-#' @importFrom foreach foreach
+#' @importFrom doSNOW registerDoSNOW 
+#' @importFrom foreach foreach %dopar%
 #' 
 #' @export
 

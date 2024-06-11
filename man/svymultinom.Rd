@@ -65,25 +65,28 @@ estimate of the variance-covariance matrix of coefficients for a multinomial reg
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{coef}: Extract coefficients
+\item \code{coef(svymultinom)}: Extract coefficients
 
-\item \code{vcov}: Extract the var-cov matrix of coefficients
+\item \code{vcov(svymultinom)}: Extract the var-cov matrix of coefficients
 
-\item \code{formula}: Extract the regression formula
+\item \code{formula(svymultinom)}: Extract the regression formula
 
-\item \code{predict}: Predict with new data
+\item \code{predict(svymultinom)}: Predict with new data
 
-\item \code{model.frame}: Extract the model frame
+\item \code{model.frame(svymultinom)}: Extract the model frame
 
-\item \code{print}: Print results of \code{svymultinom} nicely
+\item \code{print(svymultinom)}: Print results of \code{svymultinom} nicely
 
-\item \code{summary}: Summarize results of \code{svymultinom} nicely
+\item \code{summary(svymultinom)}: Summarize results of \code{svymultinom} nicely
 
-\item \code{print}: Print summary of \code{svymultinom} nicely
+\item \code{update(svymultinom)}: Update \code{svymultinom}
 
-\item \code{update}: Update \code{svymultinom}
 }}
+\section{Functions}{
+\itemize{
+\item \code{print(summary.svymultinom)}: Print summary of \code{svymultinom} nicely
 
+}}
 \examples{
 
 \dontrun{

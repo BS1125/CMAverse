@@ -102,30 +102,33 @@ measured with error via \emph{regression calibration} by Carroll et al. (1995).
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{coef}: Extract coefficients corrected by \code{rcreg}
+\item \code{coef(rcreg)}: Extract coefficients corrected by \code{rcreg}
 
-\item \code{vcov}: Extract the var-cov matrix of coefficients corrected by \code{rcreg}
+\item \code{vcov(rcreg)}: Extract the var-cov matrix of coefficients corrected by \code{rcreg}
 
-\item \code{sigma}: Extract the residual standard deviation of a linear regression object 
+\item \code{sigma(rcreg)}: Extract the residual standard deviation of a linear regression object 
 corrected by \code{rcreg}
 
-\item \code{formula}: Extract the regression formula
+\item \code{formula(rcreg)}: Extract the regression formula
 
-\item \code{family}: Extract the family of a regression of class \code{lm} or \code{glm}
+\item \code{family(rcreg)}: Extract the family of a regression of class \code{lm} or \code{glm}
 
-\item \code{predict}: Predict with new data
+\item \code{predict(rcreg)}: Predict with new data
 
-\item \code{model.frame}: Extract the model frame
+\item \code{model.frame(rcreg)}: Extract the model frame
 
-\item \code{print}: Print results of \code{rcreg} nicely
+\item \code{print(rcreg)}: Print results of \code{rcreg} nicely
 
-\item \code{summary}: Summarize results of \code{rcreg} nicely
+\item \code{summary(rcreg)}: Summarize results of \code{rcreg} nicely
 
-\item \code{print}: Print summary of \code{rcreg} nicely
+\item \code{update(rcreg)}: Update \code{rcreg}
 
-\item \code{update}: Update \code{rcreg}
 }}
+\section{Functions}{
+\itemize{
+\item \code{print(summary.rcreg)}: Print summary of \code{rcreg} nicely
 
+}}
 \examples{
 
 \dontrun{
