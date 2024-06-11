@@ -70,7 +70,7 @@
 #' 
 #' @importFrom mstate transMat msprep expand.covs msfit
 #' @importFrom stats as.formula getCall median
-#' @importFrom survival coxph
+#' @importFrom survival coxph strata
 #' @importFrom dplyr arrange filter pull group_by summarize %>% row_number
 #' @importFrom utils txtProgressBar
 #' @importFrom parallel detectCores makeCluster stopCluster
