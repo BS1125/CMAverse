@@ -28,7 +28,8 @@ jobs:
         with:
           r-version: ${{ matrix.r-version }}
       - name: Install Pandoc
-        run: brew install pandoc
+        run: |
+            brew install pandoc
       - name: Install system dependencies
         run: |
           brew install --cask r
