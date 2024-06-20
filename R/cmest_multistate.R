@@ -88,7 +88,8 @@ cmest_multistate <- function(data = NULL, outcome = NULL, yevent = NULL,
                      nboot = 200, 
                      bh_method = "breslow",
                      s = NULL, 
-                     multistate_seed = 123) {
+                     multistate_seed = 123,
+                     n_workers = NULL) {
   # function call
   cl <- match.call()
   # output list
@@ -216,10 +217,15 @@ cmest_multistate <- function(data = NULL, outcome = NULL, yevent = NULL,
   cat("Started bootstrapping...")
   i_grid = seq(1, nboot, 1)
   ## run in parallel
-  no_cores <- parallel::detectCores() 
-  cl <- parallel::makeCluster(no_cores-1)
-  #registerDoParallel(cl)
-  doSNOW::registerDoSNOW(cl)
+  if (!is.null(n_workers)){
+    cl <- parallel::makeCluster(n_workers) # user-specified number of cores to use
+    doSNOW::registerDoSNOW(cl)
+  }else{
+    no_cores <- parallel::detectCores() 
+    cl <- parallel::makeCluster(no_cores-1)
+    #registerDoParallel(cl)
+    doSNOW::registerDoSNOW(cl)
+  }
   
   pb <- txtProgressBar(max = nboot, style = 3)
   progress <- function(n) setTxtProgressBar(pb, n)

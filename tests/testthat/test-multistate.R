@@ -99,7 +99,8 @@ test_that("cmest_multistate correctly estimates RD and SD for a multicategorical
                                                  "C2" = as.character(mean(sc_data$C2))),
                                     astar="1", a="2", 
                                     nboot=1, EMint=F, 
-                                    bh_method = "breslow") 
+                                    bh_method = "breslow",
+                                    n_workers = 2) 
   sc_data_pt_est = sc_data_result[[2]]
   print(sc_data_pt_est)
   
@@ -279,7 +280,8 @@ test_that("cmest_multistate correctly estimates RD and SD for a continuous expos
                                                  "C2" = as.character(mean(sc_data$C2))),
                                     astar=as.character(a_low), a=as.character(a_high), 
                                     nboot=1, EMint=F, 
-                                    bh_method = "breslow") 
+                                    bh_method = "breslow",
+                                    n_workers = 2) 
   sc_data_pt_est = sc_data_result[[2]]
   #print(sc_data_pt_est)
   
@@ -455,7 +457,8 @@ test_that("cmest_multistate correctly estimates RD and SD for a binary exposure"
                                       "C2" = as.character(mean(sc_data$C2))),
                          astar="0", a="1", 
                          nboot=1, EMint=F, 
-                         bh_method = "breslow") 
+                         bh_method = "breslow",
+                         n_workers = 2) 
   sc_data_pt_est = sc_data_result[[2]]
   
   # get true values
