@@ -243,7 +243,8 @@ test_that("sensitivity analysis for unmeasured confounding works correctly for c
                                       mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                                       mreg = list("logistic"), yreg = "linear",
                                       astar = 0, a = 1, mval = list(1),
-                                      estimation = "imputation", inference = "bootstrap", multimp = T, m = 2)
+                                      estimation = "imputation", inference = "bootstrap", 
+                             multimp = T, args_mice = list(m = 2))
 
   # cmsens results
   res_contbin_cmsens_uc <- cmsens(object = res_contbin_naive, sens = "uc")
@@ -300,7 +301,7 @@ test_that("sensitivity analysis for measurement error works correctly for binary
                             mediator = "M", basec = c("C1_error", "C2"), EMint = TRUE,
                             mreg = list("logistic"), yreg = "logistic",
                             astar = 0, a = 1, mval = list(1),
-                            estimation = "paramfunc", inference = "delta", multimp = TRUE, m = 5)
+                            estimation = "paramfunc", inference = "delta", multimp = TRUE, args_mice = list(m = 2))
 
   # cmsens-corrected results
   res_binbin_cmsens_rc <- cmsens(object = res_binbin_naive, sens = "me", MEmethod = "rc",
