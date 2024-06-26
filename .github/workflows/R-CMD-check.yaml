@@ -26,8 +26,8 @@ jobs:
 
       - name: Install R dependencies
         run: |
-          install.packages('remotes')
-          remotes::install_deps(dependencies = TRUE)
+          Rscript -e "install.packages('remotes')"
+          Rscript -e "remotes::install_deps(dependencies = TRUE)"
 
       - name: Install package
         run: R CMD INSTALL .
