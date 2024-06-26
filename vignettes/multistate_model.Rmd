@@ -1,0 +1,250 @@
+---
+title: "Multistate approach for stochastic interventions on a time-to event mediator in the presence of competing risks"
+output: rmarkdown::html_vignette
+date: "`r Sys.Date()`"
+vignette: >
+  %\VignetteIndexEntry{Multistate approach for stochastic interventions on a time-to event mediator in the presence of competing risks}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(cache=TRUE)
+knitr::opts_chunk$set(fig.width=6, fig.height=4)
+library(tidyverse)
+library(survminer)
+library(mstate)
+library(CMAverse)
+library(foreach)
+```
+
+The DAG for this scientific setting is as follows:
+
+```{r DAG of interest}
+cmdag(outcome = "S", exposure = "A", mediator = "M",
+      basec = c("C1", "C2"), postc = NULL, node = TRUE, text_col = "white")
+```
+
+An example is given to demonstrate how to use `cmest_multistate` when there is a
+time-to-event mediator and a time-to-event outcome, and the estimation
+of RD and SD is of interest. For this purpose, we simulate a dataset
+with a binary exposure A, a time-to-event mediator M, a timeto-event
+outcome S, and two baseline covariates: one continuous (C1), and one
+binary (C2).
+
+## Data simulation
+
+We simulate data following the structure shown in the above DAG.
+Specifically, we separately generate the following transitions under a
+Cox proportional hazards model with the constant baseline hazard, i.e.,
+assuming exponential time to event:
+
+-   Transition 1 ($A \rightarrow M$):
+    $\lambda_{01}(t|A,C1,C2) = \lambda_{01}^0(t)e^{a_1A+a_2C1+a_3C2} = 1.5 \cdot e^{=1.9A+0.2C1+0.5C2}$
+-   Transition 2 ($A \rightarrow S$):
+    $\lambda_{02}(t|A,C1,C2) = \lambda_{02}^0(t)e^{b_1A+b_3C1+b_4C2} = 1 \cdot e^{A-0.5C1-0.3C2}$
+-   Transition 3 ($M \rightarrow S$):
+    $\lambda_{12}(t|A,C1,C2) = \lambda_{12}^0(t)e^{c_1A+c_2M+c_3C1+c_4C2} = 0.8 \cdot e^{0.55A-0.15M -0.1C1-0.2C2}$
+
+The code for generating the aforementioned data is as follows:
+
+```{r data generation}
+# set up coefficients 
+# transition 1 (A to M)
+a1 = -1.9 
+a2 = 0.2 
+a3 = 0.5 
+
+# transition 2 (A to S)
+b1 = 1 
+b3 = -0.5
+b4 = 0.3
+
+# transition 3 (M to S)
+c1 = 0.55
+c2 = -0.15 
+c3 = -0.1 
+c4 = -0.2 
+
+set.seed(8) 
+
+# build a function to generate time-to-event data
+gen_srv <- function(n, lambda, beta, X){
+  X = as.matrix(X)
+  beta = as.matrix(beta, ncol=1)
+  time = -log(runif(n)) / (lambda * exp(X %*% beta)) 
+  return(time)
+}
+
+n <- 2000 
+A = sample(c(0,1),replace=TRUE, size=n, c(0.5,0.5)) #binary exposure
+C1 = sample(c(0,1),replace=TRUE, size=n,c(0.6, 0.4)) #binary baseline covariate
+C2 = rnorm(n, mean = 1, sd = 1) #continuous baseline covariate
+id=c(1:n)
+full = data.frame(id,A,C1,C2)
+M = gen_srv(n=n, lambda = 1.5, beta = c(a1,a2,a3), X=data.frame(A,C1,C2)) #time to event mediator
+S = gen_srv(n=n, lambda = 1, beta = c(b1,b3,b4), X=data.frame(A,C1,C2)) #time to event outcome
+data = data.frame(id = c(1:n), M = M, S = S)
+# indicator for event
+data$ind_M = ifelse(data$M <= data$S, 1, 0)
+data$ind_S = 1
+data <- merge(data,full , by = "id")
+# modify S distribution
+trans_matrix = transMat(x = list(c(2, 3), c(3), c()), names = c("A", "M", "S"))
+covs = c("A","M", "C1","C2")
+pre_data = msprep(time = c(NA, "M", "S"), status = c(NA, "ind_M", "ind_S"),
+                         data = data, trans = trans_matrix, keep = covs)
+pre_data = expand.covs(pre_data, covs, append = TRUE, longnames = FALSE)
+# resample for T < S
+data_23 = pre_data[which(pre_data$trans == 3),]
+data_23_tem = data.frame(id = rep(NA,dim(data_23)[1]),
+                         new_y = rep(NA,dim(data_23)[1]))
+paste("# to resample is ", nrow(data_23))
+
+for(i in 1:dim(data_23)[1]){
+  data_23_tem$id[i] = data_23$id[i]
+  repeat {
+    time_test = gen_srv(n = 1, 
+                        lambda = 0.8,
+                        beta = c(as.numeric(c1),
+                                 c2,
+                                 as.numeric(c3),
+                                 as.numeric(c4)), 
+                        X = data_23[i, c("A.3", "M.3", "C1.3","C2.3")])
+    # exit if the condition is met
+    if (time_test > data_23[i,"M.3"]) break
+  }
+  data_23_tem$new_y[i] = time_test
+}
+data_temp = merge(data, data_23_tem, by = "id", all = T)
+# modify M and S
+data_temp$S[which(data_temp$ind_M == 1)] = data_temp$new_y[which(data_temp$ind_M == 1)]
+data_temp$M[which(data_temp$ind_M == 0)] = data_temp$S[which(data_temp$ind_M == 0)]
+data_final = data_temp
+data_final$A = as.factor(data_final$A) 
+
+sc_data = data_final %>% dplyr::select(id,A,M,S,ind_M,ind_S,C1,C2)
+
+# generate time to censoring and update event indicator
+time_to_censor = runif(n, 0, 2*max(sc_data$S))
+sc_data$ind_S = ifelse(sc_data$S > time_to_censor, 0, 1)
+sc_data$A = factor(sc_data$A)
+sc_data$C1 = factor(sc_data$C1)
+
+```
+
+We fit the multistate Cox proportional hazards model to the simulated
+data. We can see that the regression coefficient estimates are close to
+the set-up values, which is expected:
+
+```{r check coefficient values}
+## prepare the simulated data into counting process format
+mstate_sc_data = msprep(time = c(NA, "M", "S"), status = c(NA, "ind_M", "ind_S"),
+                         data = sc_data, trans = trans_matrix, keep = covs)
+mstate_sc_data = expand.covs(mstate_sc_data, covs, append = TRUE, longnames = FALSE)
+
+## fit mstate model to the simulated data
+sc_joint_mod = coxph(Surv(Tstart, Tstop, status) ~ A.1 + A.2 + A.3 +
+                         M.3 + C1.1 + C1.2 + C1.3 + C2.1 + C2.2 + C2.3 + strata(trans),
+                      data = mstate_sc_data)
+summary(sc_joint_mod)
+```
+
+Below, we visualize the time-to-mediator and the time-to-event
+distributions by exposure group for all subjects with $C1=1$:
+
+```{r Take a look at the simulated data}
+# overlayed histogram of time to mediator and outcome distributions
+hist_sc <- data.frame(value = c(sc_data$M, sc_data$S),
+                 group = c(rep("M", length(sc_data$M)),
+                           rep("S", length(sc_data$S))))
+ggplot(hist_sc, aes(x = value, fill = group)) +
+  geom_histogram(position = "identity", alpha = 0.5, bins = 50) +
+  labs(title = "Overlayed Histogram of M and S",
+       x = "Observed time",
+       y = "Frequency") +
+  scale_fill_manual(values = c("blue", "red"))
+
+# survival curve by treatment group (A=1 vs. A=0) within strata C1=1
+survival_fit_sc <- survfit(Surv(S, ind_S) ~ A, data = sc_data %>% filter(C1==1))
+ggsurvplot(survival_fit_sc, data = sc_data, pval = T)
+ggsurvplot(survfit(Surv(M, ind_M) ~ A, data = sc_data %>% filter(C1==1)), data = sc_data, pval = T)
+```
+
+## Demonstration
+
+In this setting, we can use a multistate modeling approach to compute
+the causal estimands of interest (RD, SD, and TE) in the presence of
+semi-competing risks. We demonstrate how to achieve this using `cmest_multistate`.
+In this example, we use the `cmest_multistate` function to calculate RD and SD for
+time points 0.1, 0.5, 1, 2, 3, 4, 5, 6. For demonstration purposes, we
+only run 2 bootstraps here. More number of bootstraps are required in
+real-world settings (usually \>1000). Note this may result in longer
+computation time. We have implemented parallel computing to speed-up
+processing time.
+
+```{r run multistate method on simulated data, results='hide'}
+# specificy time points (s)
+time_to_predict_sc <- c(0.1, 0.5, 1, 2, 3, 4, 5, 6)
+# run cmest_multistate()
+sc_data_result100_10 = cmest_multistate(data = sc_data, 
+                                  model = 'multistate', 
+                                  s = time_to_predict_sc,
+                                  multistate_seed = 10,
+                                  exposure = 'A', mediator = 'M', outcome = 'S',
+                                  event = "ind_S",mediator_event = "ind_M",
+                                  basec = c("C1", "C2"),
+                                  basecval = c("C1" = "1", 
+                                               "C2" = as.character(mean(sc_data$C2))),
+                                  astar="0", a="1", 
+                                  nboot=100, EMint=F, 
+                                  bh_method = "breslow")   
+
+saveRDS(sc_data_result100_10, file="/Users/apple/Desktop//sc_data_result100_10.Rds")
+
+```
+
+The output is a list that consists of 4 elements: 1) The model summary
+of the joint multistate Cox proportional hazards model fitted on the
+original dataset, 2) the point estimates of RD and SD for each of the
+user-specified time points of interest on the original dataset, 3) the
+summary of the bootstrapped RD, SD, and TE estimates for each of the
+user-specified time point of interest, including the 2.5%, 50%, and
+97.5% percentiles, and 4) the estimated RD, SD, TD for each of the
+user-specified time point of interest for each bootstrap dataset. These
+4 elements of the example output are extracted in order below:
+
+```{r display cmest outputs}
+sc_data_result$model_summary
+sc_data_result$pt_est
+sc_data_result$bootstrap_summary
+sc_data_result$raw_output
+```
+
+We here provide an interpretation of RD and SD estimated from this simulated dataset:
+
+-   TE=x can be interpreted as: The probability of surviving beyond time
+    point s among the exposed group is x higher than that among the
+    unexposed group, controlling for baseline covariates,
+
+-   RD=x can be interpreted as: The probability of surviving beyond time
+    point s among the exposed group is x higher than that among the
+    unexposed group, controlling for baseline covariates, had the
+    mediator distribution g been the fixed to that of the unexposed
+    group.
+
+-   SD=x can be interpreted as: The probability of surviving beyond time
+    point s among the exposed group is estimated to increase by x, had
+    the time to mediator distribution among the exposed group been
+    changed to that of the unexposed group, controlling for baseline
+    covariates,
+
+## Reference
+
+[1] Valeri, L., Proust-Lima, C., Fan, W., Chen, J. T., & Jacqmin-Gadda,
+H. (2023). A multistate approach for the study of interventions on an
+intermediate time-to-event in health disparities research. Statistical
+Methods in Medical Research, 09622802231163331.
