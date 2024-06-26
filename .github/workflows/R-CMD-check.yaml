@@ -17,7 +17,7 @@ jobs:
 
       - name: Install Pandoc
         run: |
-          sudo apt-get install pandoc
+          brew install pandoc
 
       - name: Install gfortran
         run: |
