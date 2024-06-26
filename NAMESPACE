@@ -96,12 +96,9 @@ importFrom(mstate,msfit)
 importFrom(mstate,msprep)
 importFrom(mstate,transMat)
 importFrom(nnet,multinom)
-<<<<<<< HEAD
-=======
 importFrom(parallel,detectCores)
 importFrom(parallel,makeCluster)
 importFrom(parallel,stopCluster)
->>>>>>> 7c8d5d7b6beeeb48c6bc90286ce6d5316452da2a
 importFrom(predint,rqpois)
 importFrom(simex,check.mc.matrix)
 importFrom(stats,as.formula)
