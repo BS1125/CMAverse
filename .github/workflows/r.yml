@@ -23,7 +23,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        R -e 'install.packages(c("remotes", "testthat"))'
+        R -e 'install.packages(c("remotes", "knitr", "testthat"))'
 
     - name: Test
       run: |
