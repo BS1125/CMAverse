@@ -8,37 +8,34 @@
 
 name: R
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  R-CMD-check:
-    runs-on: macos-latest
+  build:
+
+    runs-on: macOS-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
+    - uses: actions/checkout@v2
 
-      - name: Setup R
-        uses: r-lib/actions/setup-r@v2
+    - name: Set up R
+      uses: r-lib/actions/setup-r@v2
 
-      - name: Install gfortran
-        run: |
-          brew install gcc
-          ln -s $(brew --prefix)/bin/gfortran-$(brew list --versions gcc | awk '{print $2}') /usr/local/bin/gfortran
+    - name: Install dependencies
+      run: |
+        R -e 'install.packages(c("remotes", "testthat"))'
 
-      - name: Install other system dependencies
-        run: |
-          brew install qpdf pkg-config checkbashisms
+    - name: Test
+      run: |
+        R CMD build .
+        R CMD check --as-cran *.tar.gz
 
-      - name: Install R dependencies
-        run: |
-          Rscript -e "install.packages('remotes')"
-          Rscript -e "remotes::install_deps(dependencies = TRUE)"
-
-      - name: Install package
-        run: R CMD INSTALL .
-
-      - name: Run R CMD check
-        run: |
-          R CMD build .
-          R CMD check *.tar.gz --no-manual --as-cran
+    - name: Render R Markdown documents
+      run: |
+        R -e 'rmarkdown::render("your_document.Rmd")'
