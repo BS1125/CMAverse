@@ -111,17 +111,17 @@ continuous variable in the regression it's involved in. SIMEX supports a continu
 categorical variable measured with error. Quadratic extrapolation method is implemented for
 SIMEX.
 }
-\section{Methods (by generic)}{
+\section{Functions}{
 \itemize{
-\item \code{print}: Print results of \code{cmsens.uc} nicely
+\item \code{print(cmsens.uc)}: Print results of \code{cmsens.uc} nicely
 
-\item \code{print}: Print results of \code{cmsens.me} nicely
+\item \code{print(cmsens.me)}: Print results of \code{cmsens.me} nicely
 
-\item \code{summary}: Summarize results of \code{cmsens.me} nicely
+\item \code{summary(cmsens.me)}: Summarize results of \code{cmsens.me} nicely
 
-\item \code{print}: Print the summary of \code{cmsens.me} nicely
+\item \code{print(summary.cmsens.me)}: Print the summary of \code{cmsens.me} nicely
+
 }}
-
 \examples{
 
 \dontrun{

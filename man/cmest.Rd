@@ -380,13 +380,16 @@ When \code{model = "iorw"}, \code{Rte}, \code{Rpnde}, \code{Rtnie} and \code{pm}
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{print}: Print the results of \code{cmest} nicely
+\item \code{print(cmest)}: Print the results of \code{cmest} nicely
 
-\item \code{summary}: Summarize the results of \code{cmest} nicely
+\item \code{summary(cmest)}: Summarize the results of \code{cmest} nicely
 
-\item \code{print}: Print the summary of \code{cmest} nicely
 }}
+\section{Functions}{
+\itemize{
+\item \code{print(summary.cmest)}: Print the summary of \code{cmest} nicely
 
+}}
 \examples{
 
 \dontrun{

@@ -1,14 +1,10 @@
 # updated semicompete script
-## JAN 2024 update
-### ymreg = "cox"
-### EMint = T or F
-### revert back to using foreach instead of boot(); attempt to add progress bar
-### avoids using the super-assignment operator <<-
-library(tidyverse)
-library(mstate)
-library(foreach)
-library(doParallel)
-library(doSNOW)
+#library(tidyverse)
+#library(dplyr)
+#library(mstate)
+#library(foreach)
+#library(doParallel)
+#library(doSNOW)
 #library(progressr) ## use progressr for procession updates
 #library(doFuture)  ## attaches also foreach and future
 
@@ -66,9 +62,9 @@ mstate_formula <- function(data, exposure, mediator, basec, EMint) {
 }
 
 ## function to convert the original survival data to mstate format
-make_mstate_dat <- function(dat, mediator, outcome, mediator_event, event, trans, covs_df) {
+make_mstate_dat <- function(dat, mediator, outcome, mevent, yevent, trans, covs_df) {
   ## convert the bootstrap data to multistate format
-  mstate_dat <- msprep(time = c(NA, mediator, outcome), status = c(NA, mediator_event, event),
+  mstate_dat <- msprep(time = c(NA, mediator, outcome), status = c(NA, mevent, yevent),
                        data = dat, trans = trans, keep = covs_df)
   #print(str(mstate_data))  # Add this line for debugging
   mstate_dat <- expand.covs(mstate_dat, covs_df, append = TRUE, longnames = FALSE)
@@ -81,6 +77,7 @@ fixed_newd <- function(mstate_data, trans, a, astar, exposure, mediator, basec, 
   mstate_data = data.frame(mstate_data)
   # create individual components
   ## exposure block
+  #print(class(mstate_data[,exposure]))
   if (class(mstate_data[,exposure]) %in% c("numeric", "integer")){
     A_blk = matrix(rep(as.numeric(astar),9), nrow=3)
     colnames(A_blk) = paste(exposure, ".", seq(1,3), sep="")

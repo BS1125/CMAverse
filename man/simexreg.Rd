@@ -108,31 +108,34 @@ error via \emph{SIMEX} by Cook et al. (1994) and Küchenhoff et al. (2006).
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{coef}: Extract coefficients corrected by \code{simexreg}
+\item \code{coef(simexreg)}: Extract coefficients corrected by \code{simexreg}
 
-\item \code{vcov}: Extract the var-cov matrix of coefficients corrected by 
+\item \code{vcov(simexreg)}: Extract the var-cov matrix of coefficients corrected by 
 \code{simexreg}
 
-\item \code{sigma}: Extract the residual standard deviation of a linear regression object 
+\item \code{sigma(simexreg)}: Extract the residual standard deviation of a linear regression object 
 corrected by \code{simexreg}
 
-\item \code{formula}: Extract the regression formula
+\item \code{formula(simexreg)}: Extract the regression formula
 
-\item \code{family}: Extract the family of a regression of class \code{lm} or \code{glm}
+\item \code{family(simexreg)}: Extract the family of a regression of class \code{lm} or \code{glm}
 
-\item \code{predict}: Predict with new data
+\item \code{predict(simexreg)}: Predict with new data
 
-\item \code{model.frame}: Extract the model frame
+\item \code{model.frame(simexreg)}: Extract the model frame
 
-\item \code{print}: Print results of \code{simexreg} nicely
+\item \code{print(simexreg)}: Print results of \code{simexreg} nicely
 
-\item \code{summary}: Summarize results of \code{simexreg} nicely
+\item \code{summary(simexreg)}: Summarize results of \code{simexreg} nicely
 
-\item \code{print}: Print summary of \code{simexreg} nicely
+\item \code{update(simexreg)}: Update \code{simexreg}
 
-\item \code{update}: Update \code{simexreg}
 }}
+\section{Functions}{
+\itemize{
+\item \code{print(summary.simexreg)}: Print summary of \code{simexreg} nicely
 
+}}
 \examples{
 
 \dontrun{

@@ -7,61 +7,89 @@
 #' containing the variables in the model. 
 #' @param outcome variable name of the outcome.
 #' @param yevent variable name of the event for the outcome.
-#' @param mediator a vector of variable name(s) of the mediator(s).
+#' @param mediator variable name of the mediator.
 #' @param mevent variable name of the event for the mediator
 #' @param exposure variable name of the exposure.
 #' @param EMint a logical value. \code{TRUE} indicates there is 
 #' exposure-mediator interaction in \code{yreg}. 
 #' @param basec a vector of variable names of the confounders.
-#' @param yreg outcome regression model. See \code{Details}.
-#' @param mreg a list of mediator regression models following the order in \code{mediator}. See \code{Details}.
 #' @param astar the control value of the exposure. 
 #' @param a the treatment value of the exposure. 
-#' @param mval a list of values at which each mediator is controlled to calculate the \code{cde}, following the order in \code{mediator}.
 #' @param basecval (required when \code{estimation} is \code{paramfunc} and \code{EMint} is \code{TRUE}) 
 #' a list of values at which each confounder is conditioned on, following the order in \code{basec}. 
 #' If \code{NULL}, the mean of each confounder is used.
 #' @param ymreg type of multistate survival model to be used. Currently supporting coxph only.
 #' @param multistate_seed The seed to be used when generating bootstrap datasets for multistate modeling.
-#' @param s The time beyond which survival probability is interested in multistate modeling.
+#' @param s The time point(s) beyond which survival probability is interested in multistate modeling.
 #' @param bh_method Method for estimating baseline hazards in multistate modeling. Currently supporting "breslow" only.
-#' @param mediator_event Event indicator for the mediator in multistate modeling.
+#' @param mevent Event indicator for the mediator in multistate modeling.
 #' @param nboot (used when \code{inference} is \code{bootstrap}) the number of bootstraps applied. 
 #' Default is 200.
-#' @param boot.ci.type (used when \code{inference} is \code{bootstrap}) the type of bootstrap confidence interval. If \code{per}, percentile bootstrap
-#' confidence intervals are estimated; if \code{bca}, bias-corrected and accelerated (BCa) bootstrap 
-#' confidence intervals are estimated. Default is \code{per}.
-#' @param multimp a logical value. If 
-#' \code{TRUE}, conduct multiple imputations using the \link[mice]{mice} function. Default is 
-#' \code{FALSE}.
-#' @param args_mice a list of additional arguments passed to the \link[mice]{mice} function. See \link[mice]{mice}
-#' for details.
-#' @param x an object of class \code{cmest}.
-#' @param object an object of class \code{cmest}.
-#' @param digits minimal number of significant digits. See \link{print.default}.
-#' 
-#' 
 #' 
 #' @details
-#' # add modeling details/supplementary description of how to set the arguments above
+#' \strong{Assumptions of the multistate method}
+#' \itemize{
+#' \item{\emph{Consistency of potential outcomes:} }{For each i and each t, the survival in a world where we intervene, i.e., setting the time to treatment to a specific value t (via a fixed or stochastic intervention) is the same as the survival in the real world where we observe a time to treatment equal to t.}
+#' \item{\emph{There is no unmeasured mediator-outcome confounding:} }{Given \code{exposure} and 
+#' \code{basec}, \code{mediator} is independent of \code{outcome}.}
+#' \item{\emph{Non-informative censoring of event times:} }{The observed censoring time is conditionally independent of all potential event times.}
+#' \item{\emph{Positivity:} }{Each exposure-covariate combination has a non-zero probability of occurring.}
+#' }
 #' 
 #' @references
-#' # references of papers you use for this code
+#' Valeri L, Proust-Lima C, Fan W, Chen JT, Jacqmin-Gadda H. A multistate approach for the study of interventions on an intermediate time-to-event in health disparities research. Statistical Methods in Medical Research. 2023;32(8):1445-1460.
 #' 
 #' @examples
-#' # give some code examples
+#' \dontrun{
+#' library(CMAverse)
+#' multistate_out = cmest_multistate(data = sc_data, 
+#' s = s_vec,
+#' multistate_seed = 1,
+#' exposure = 'A', mediator = 'M', outcome = 'S',
+#' yevent = "ind_S", mevent = "ind_M",
+#' basec = c("C1", "C2"),
+#' basecval = c("C1" = "1", "C2" = as.character(mean(sc_data$C2))),
+#' astar="0", a="1", 
+#' nboot=1, EMint=F, 
+#' bh_method = "breslow")
+#' multistate_out
+#' }
 #' 
-#' @importFrom
-#' # add functions you use from other packages here
+#' @return 
+#' The output is a list that consists of 4 elements:
+#' \itemize{
+#' \item{the model summary of the joint multistate Cox proportional hazards model fitted on the
+#' original dataset}
+#' \item{the point estimates of RD and SD for each of the
+#' user-specified time points of interest on the original dataset}
+#' \item{the summary of the bootstrapped RD, SD, and TE estimates for each of the
+#' user-specified time point of interest, including the 2.5, 50, and
+#' 97.5th percentiles}
+#' \item{the estimated RD, SD, TD for each of the
+#' user-specified time point of interest for each bootstrap dataset}}
+#' 
+#' @importFrom mstate transMat msprep expand.covs msfit
+#' @importFrom stats as.formula getCall median
+#' @importFrom survival coxph strata
+#' @importFrom dplyr arrange filter pull group_by summarize %>% row_number
+#' @importFrom utils txtProgressBar
+#' @importFrom parallel detectCores makeCluster stopCluster
+#' @importFrom doSNOW registerDoSNOW 
+#' @importFrom foreach foreach %dopar%
 #' 
 #' @export
 
 cmest_multistate <- function(data = NULL, outcome = NULL, yevent = NULL, 
-                     mediator = NULL, mevent = NULL, exposure = NULL, EMint = NULL, basec = NULL, 
-                     yreg = NULL, mreg = NULL, 
-                     astar = NULL, a = NULL, basecval = NULL, 
-                     nboot = 200, boot.ci.type = "per", 
-                     multimp = FALSE, args_mice = NULL) {
+                     mediator = NULL, mevent = NULL, 
+                     exposure = NULL, EMint = NULL, 
+                     basec = NULL, basecval = NULL,
+                     ymreg = "coxph",
+                     astar = NULL, a = NULL, 
+                     nboot = 200, 
+                     bh_method = "breslow",
+                     s = NULL, 
+                     multistate_seed = 123,
+                     n_workers = NULL) {
   # function call
   cl <- match.call()
   # output list
@@ -74,16 +102,17 @@ cmest_multistate <- function(data = NULL, outcome = NULL, yevent = NULL,
   if (is.null(data)) stop("Unspecified data")
   data <- as.data.frame(data)
   if (!all(c(outcome, yevent, mediator, mevent, exposure, basec) %in% colnames(data))) stop("Variables specified in outcome, yevent, mediator, mevent, exposure and basec not found in data")
-  if (sum(is.na(data[, c(outcome, yevent, mediator, mevent, exposure, basec)])) > 0 && !multimp) stop("NAs in outcome, yevent, mediator, mevent, exposure or basec data; delete rows with NAs in these variables from the data or set multimp = TRUE") 
+  #if (sum(is.na(data[, c(outcome, yevent, mediator, mevent, exposure, basec)])) > 0 && !multimp) stop("NAs in outcome, yevent, mediator, mevent, exposure or basec data; delete rows with NAs in these variables from the data or set multimp = TRUE") 
+  if (sum(is.na(data[, c(outcome, yevent, mediator, mevent, exposure, basec)])) > 0) stop("NAs in outcome, yevent, mediator, mevent, exposure or basec data; delete rows with NAs in these variables from the data.") 
   out$data <- data
   n <- nrow(data)
   
   # nboot
   if (!is.numeric(nboot)) stop("nboot should be numeric")
   if (nboot <= 0) stop("nboot must be greater than 0") 
-  if (!boot.ci.type %in% c("per", "bca")) stop("Select boot.ci.type from 'per', 'bca'")
+  #if (!boot.ci.type %in% c("per", "bca")) stop("Select boot.ci.type from 'per', 'bca'")
   out$methods$nboot <- nboot
-  out$methods$boot.ci.type <- boot.ci.type
+  #out$methods$boot.ci.type <- boot.ci.type
   
   # outcome
   if (length(outcome) == 0) stop("Unspecified outcome")
@@ -107,30 +136,48 @@ cmest_multistate <- function(data = NULL, outcome = NULL, yevent = NULL,
   if (!is.logical(EMint)) stop("EMint must be TRUE or FALSE")
   out$variables$EMint <- EMint
   
+  # s
+  if(is.null(s)) stop("Unspecified s")
+  if(!is.numeric(s)) stop("Specified s must be numeric")
+  
   # basec
   if (!is.null(basec)) out$variables$basec <- basec
   
-  #regs
-  out$reg.input <- list(yreg = yreg, mreg = mreg)
+  # regs
+  out$reg.input <- list(ymreg = ymreg)
   
   # a, astar
   if (is.null(a) | is.null(astar)) stop("Unspecified a or astar")
   
   # basecval
-  
-  # multimp
-  out$multimp <- list(multimp = multimp)
-  if (!is.logical(multimp)) stop("multimp must be TRUE or FALSE")
-  # args_mice
-  if (multimp) {
-    if (!is.null(args_mice) && !is.list(args_mice)) stop("args_mice must be a list")
-    if (is.null(args_mice)) args_mice <- list()
-    args_mice$print <- FALSE
-    if (!is.null(args_mice$data)) warning("args_mice$data is overwritten by data")
-    args_mice$data <- data
-    out$multimp$args_mice <- args_mice
+  if(length(basec) != 0){
+    if(!all(names(basecval) %in% basec) == T){
+      stop("basec and basecval variable names mismatch.")
+    }else if(length(basec) != length(names(basecval))){
+      stop("There must be the same number of variables in basec and basecval. Please double check and rerun.")
+    }
+    for (i in length(basec)){
+      curr_basec = basec[i] # current basec column name
+      if (!is.numeric(data[,curr_basec]) && !is.factor(data[,curr_basec])){
+        stop("Baseline covariates must be of type numeric or factor.")
+      }
+    }
   }
   
+  # multimp
+  #out$multimp <- list(multimp = multimp)
+  #if (!is.logical(multimp)) stop("multimp must be TRUE or FALSE")
+  # args_mice
+  #if (multimp) {
+  #  if (!is.null(args_mice) && !is.list(args_mice)) stop("args_mice must be a list")
+  #  if (is.null(args_mice)) args_mice <- list()
+  #  args_mice$print <- FALSE
+  #  if (!is.null(args_mice$data)) warning("args_mice$data is overwritten by data")
+  #  args_mice$data <- data
+  #  out$multimp$args_mice <- args_mice
+  #}
+  
+  # run multistate method
   set.seed(multistate_seed)
   data = data.frame(data)
   s_grid = s
@@ -144,14 +191,14 @@ cmest_multistate <- function(data = NULL, outcome = NULL, yevent = NULL,
   boot_ind_list = boot_ind_df$boot_ind
   mstate_bootlist <- lapply(boot_ind_list, function(ind){
     boot_dat = data[ind,]
-    mstate_boot_dat <- make_mstate_dat(dat=boot_dat, mediator, outcome, mediator_event, event, trans, covs_df)
+    mstate_boot_dat <- make_mstate_dat(dat=boot_dat, mediator, outcome, mevent, yevent, trans, covs_df)
     return(mstate_boot_dat)
   })
   ## create the formula object for joint mstate modeling
   mstate_form = mstate_formula(data=data, exposure=exposure, mediator=mediator, basec=basec, EMint=EMint)
   mstate_form <- as.formula(mstate_form)
   ## create fixed newdata dfs for msfit()
-  mstate_data_orig = make_mstate_dat(dat=data, mediator=mediator, outcome=outcome, mediator_event=mediator_event, event=event, trans=trans, covs_df=covs_df)
+  mstate_data_orig = make_mstate_dat(dat=data, mediator=mediator, outcome=outcome, mevent=mevent, yevent=yevent, trans=trans, covs_df=covs_df)
   fixed_newd = fixed_newd(mstate_data=mstate_data_orig, trans=trans, a=a, astar=astar, exposure=exposure, mediator=mediator, basec=basec, basecval=basecval)
   
   # fit the joint multistate model on the original data and save the summary table
@@ -170,10 +217,15 @@ cmest_multistate <- function(data = NULL, outcome = NULL, yevent = NULL,
   cat("Started bootstrapping...")
   i_grid = seq(1, nboot, 1)
   ## run in parallel
-  no_cores <- parallel::detectCores() 
-  cl <- parallel::makeCluster(no_cores-1)
-  #registerDoParallel(cl)
-  doSNOW::registerDoSNOW(cl)
+  if (!is.null(n_workers)){
+    cl <- parallel::makeCluster(n_workers) # user-specified number of cores to use
+    doSNOW::registerDoSNOW(cl)
+  }else{
+    no_cores <- parallel::detectCores() 
+    cl <- parallel::makeCluster(no_cores-1)
+    #registerDoParallel(cl)
+    doSNOW::registerDoSNOW(cl)
+  }
   
   pb <- txtProgressBar(max = nboot, style = 3)
   progress <- function(n) setTxtProgressBar(pb, n)
