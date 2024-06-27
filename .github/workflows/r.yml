@@ -23,7 +23,7 @@ jobs:
 
     - name: Install R dependencies
       run: |
-        Rscript -e "install.packages('remotes', "knitr", "testthat")"
+        Rscript -e "install.packages(c('remotes', "knitr", "testthat"))"
         Rscript -e "remotes::install_deps(dependencies = TRUE)"
 
     - name: Test
