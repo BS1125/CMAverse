@@ -14,11 +14,11 @@ editor_options:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(cache=TRUE)
 knitr::opts_chunk$set(fig.width=6, fig.height=4)
-#library(dplyr)
-#library(survminer)
-#library(mstate)
+library(dplyr)
+library(survminer)
+library(mstate)
 library(CMAverse)
-#library(foreach)
+library(foreach)
 ```
 
 The DAG for this scientific setting is as follows:
