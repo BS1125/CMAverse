@@ -190,20 +190,17 @@ processing time.
 # specificy time points (s)
 time_to_predict_sc <- c(0.1, 0.5, 1, 2, 3, 4, 5, 6)
 # run cmest_multistate()
-sc_data_result100_10 = cmest_multistate(data = sc_data, 
-                                  model = 'multistate', 
+sc_data_result = cmest_multistate(data = sc_data, 
                                   s = time_to_predict_sc,
                                   multistate_seed = 10,
                                   exposure = 'A', mediator = 'M', outcome = 'S',
-                                  event = "ind_S",mediator_event = "ind_M",
+                                  yevent = "ind_S",mevent = "ind_M",
                                   basec = c("C1", "C2"),
                                   basecval = c("C1" = "1", 
                                                "C2" = as.character(mean(sc_data$C2))),
                                   astar="0", a="1", 
                                   nboot=100, EMint=F, 
                                   bh_method = "breslow")   
-
-saveRDS(sc_data_result100_10, file="/Users/apple/Desktop//sc_data_result100_10.Rds")
 
 ```
 
