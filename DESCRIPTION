@@ -55,6 +55,7 @@ Imports:
 RoxygenNote: 7.3.1
 Suggests: 
     knitr,
+    tidyverse,
     kableExtra,
     dagitty,
     rmarkdown,
