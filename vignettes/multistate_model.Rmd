@@ -181,7 +181,7 @@ the causal estimands of interest (RD, SD, and TE) in the presence of
 semi-competing risks. We demonstrate how to achieve this using `cmest_multistate`.
 In this example, we use the `cmest_multistate` function to calculate RD and SD for
 time points 0.1, 0.5, 1, 2, 3, 4, 5, 6. For demonstration purposes, we
-only run 2 bootstraps here. More number of bootstraps are required in
+only run 10 bootstraps here. More number of bootstraps are required in
 real-world settings (usually \>1000). Note this may result in longer
 computation time. We have implemented parallel computing to speed-up
 processing time.
@@ -199,7 +199,7 @@ sc_data_result = cmest_multistate(data = sc_data,
                                   basecval = c("C1" = "1", 
                                                "C2" = as.character(mean(sc_data$C2))),
                                   astar="0", a="1", 
-                                  nboot=100, EMint=F, 
+                                  nboot=10, EMint=F, 
                                   bh_method = "breslow")   
 
 ```
