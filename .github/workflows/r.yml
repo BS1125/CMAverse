@@ -33,7 +33,7 @@ jobs:
     - name: Test
       run: |
         R CMD build --no-manual .
-        R CMD check --as-cran *.tar.gz
+        R CMD check --no-manual --as-cran *.tar.gz
 
     - name: Render R Markdown documents
       run: |
