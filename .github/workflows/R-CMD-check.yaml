@@ -38,5 +38,5 @@ jobs:
 
       - name: Run R CMD check
         run: |
-          R CMD build .
+          R CMD build --no-manual .
           R CMD check *.tar.gz --no-manual --as-cran
