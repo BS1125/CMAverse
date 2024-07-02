@@ -79,6 +79,9 @@
       <a href="../articles/post_exposure_confounding.html">Statistical Modeling with Post-exposure Confounding</a>
     </li>
     <li>
+      <a href="../articles/multistate_model.html">Multistate Modeling with a Time-to-event Mediator in the Presence of Competing Risks</a>
+    </li>
+    <li>
       <a href="../articles/measurement_error.html">Sensitivity Analysis for Measurement Error</a>
     </li>
   </ul>
@@ -116,7 +119,7 @@
       <h1 data-toc-skip>Overview of Modeling Approaches for Causal
 Mediation Analysis</h1>
             
-            <h4 class="date">2023-09-03</h4>
+            <h4 class="date">2024-07-01</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BS1125/CMAverse/blob/master/vignettes/overview.Rmd"><code>vignettes/overview.Rmd</code></a></small>
       <div class="hidden name"><code>overview.Rmd</code></div>
@@ -127,13 +130,13 @@ Mediation Analysis</h1>
     
 <p>This document describes how the six causal mediation analysis
 approaches including <em>the regression-based approach</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3659198/">Valeri et
-al. (2013)</a> and <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/">VanderWeele
-et al. (2014)</a>, <em>the weighting-based approach</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/">VanderWeele
-et al. (2014)</a>, <em>the inverse odd-ratio weighting approach</em> by
+al. (2013)</a> and <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/">VanderWeele
+et al. (2014)</a>, <em>the weighting-based approach</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4287269/">VanderWeele
+et al. (2014)</a>, <em>the inverse odd-ratio weighting approach</em> by
 <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3954805/">Tchetgen
 Tchetgen (2013)</a>, <em>the natural effect model</em> by <a href="https://www.degruyter.com/view/journals/em/1/1/article-p131.xml?language=en">Vansteelandt
-et al. (2012)</a>, <em>the marginal structural model</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5560424/">VanderWeele
-et al. (2017)</a>, and <em>the <span class="math inline">\(g\)</span>-formula approach</em> by <a href="https://www.sciencedirect.com/science/article/pii/0270025586900886">Robins
+et al. (2012)</a>, <em>the marginal structural model</em> by <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5560424/">VanderWeele
+et al. (2017)</a>, and <em>the</em> <span class="math inline">\(g\)</span>-formula approach by <a href="https://www.sciencedirect.com/science/article/pii/0270025586900886">Robins
 (1986)</a> are implemented by the <code>CMAverse</code> package. See
 publications of these approaches for methodological details.</p>
 <p><code>CMAverse</code> currently supports a single exposure, multiple
@@ -144,8 +147,8 @@ varying confounders preceding the mediators.</p>
 <p>We categorize the causal mediation analysis approaches based on
 whether the approach can deal with mediator-outcome confounders affected
 by the exposure. Among the six approaches, only <em>The marginal
-structural model</em> and <em>the <span class="math inline">\(g\)</span>-formula approach</em> are able to deal
-with mediator-outcome confounders affected by the exposure.</p>
+structural model</em> and <em>the</em> <span class="math inline">\(g\)</span>-formula approach are able to deal with
+mediator-outcome confounders affected by the exposure.</p>
 <p>In this document, the outcome and the exposure are denoted as <span class="math inline">\(Y\)</span> and <span class="math inline">\(A\)</span> respectively. The set of
 exposure-mediator confounders, exposure-outcome confounders and
 mediator-outcome confounders not affected by the exposure is denoted as
@@ -173,7 +176,7 @@ mediator(s).</p>
 difference scale (summarized in table 1). For a categorical, count, or
 survival outcome, causal effects are estimated on the ratio scale
 (summarized in table 2). See <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3659198/">Valeri et
-al. (2013)</a> and <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4220271/">VanderWeele
+al. (2013)</a> and <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4220271/">VanderWeele
 (2015)</a> for details about these effects.</p>
 <table class="table table table-bordered table-striped table-hover table-responsive table-condensed">
 <caption>
@@ -354,6 +357,30 @@ Proportion Eliminated
 </td>
 <td style="text-align:left;width: 10em; ">
 <span class="math inline">\((INT_{ref}+INT_{med}+PNIE)/TE\)</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 20em; ">
+Residual Disparity
+</td>
+<td style="text-align:left;width: 8em; ">
+<span class="math inline">\(RD\)</span>
+</td>
+<td style="text-align:left;width: 10em; ">
+<span class="math inline">\(P(S_g&amp;gt;s|A=a,C) -
+P(S_g&amp;gt;s|A=a^*,C)\)</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 20em; ">
+Shifting Distribution Effect
+</td>
+<td style="text-align:left;width: 8em; ">
+<span class="math inline">\(SD\)</span>
+</td>
+<td style="text-align:left;width: 10em; ">
+<span class="math inline">\(P(S_{g'}&amp;gt;s|A=a,C) -
+P(S_g&amp;gt;s|A=a,C)\)</span>
 </td>
 </tr>
 </tbody>
@@ -1113,7 +1140,7 @@ survival outcome, causal effects are estimated on the ratio scale
 (summarized in table 4). Because of the existence of <span class="math inline">\(L\)</span>, some causal effects in table 1 and
 table 2 are not identifiable. However, their randomized analogues are
 still identifiable. See <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4214081/">VanderWeele
-et al. (2014)</a> for details about randomized analogues of causal
+et al. (2014)</a> for details about randomized analogues of causal
 effects.</p>
 <table class="table table table-bordered table-striped table-hover table-responsive table-condensed">
 <caption>
@@ -1682,7 +1709,7 @@ an average of <span class="math inline">\(\{E[Y_i|A=a^*,M=G_{a,i},L=L_{a^*,i},C=
 
 
       <footer><div class="copyright">
-  <p>Developed by Baoyi Shi, Christine Choirat, <a href="https://www.lindavaleri.com/">Linda Valeri</a>.</p>
+  <p>Developed by Baoyi Shi, Ziqing Wang, Christine Choirat, <a href="https://www.lindavaleri.com/">Linda Valeri</a>.</p>
 </div>
 
 <div class="pkgdown">

@@ -30,6 +30,8 @@ navbar:
          href: articles/multiple_imputation.html
       -  text: Statistical Modeling with Post-exposure Confounding
          href: articles/post_exposure_confounding.html
+      -  text: Multistate Modeling with a Time-to-event Mediator in the Presence of Competing Risks
+         href: articles/multistate_model.html
       -  text: Sensitivity Analysis for Measurement Error
          href: articles/measurement_error.html
   right:

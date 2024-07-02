@@ -122,6 +122,9 @@ measured with error via regression calibration by Carroll et al. (1995)." />
       <a href="../articles/post_exposure_confounding.html">Statistical Modeling with Post-exposure Confounding</a>
     </li>
     <li>
+      <a href="../articles/multistate_model.html">Multistate Modeling with a Time-to-event Mediator in the Presence of Competing Risks</a>
+    </li>
+    <li>
       <a href="../articles/measurement_error.html">Sensitivity Analysis for Measurement Error</a>
     </li>
   </ul>
@@ -292,18 +295,23 @@ regression calibration,</p></dd>
 
     
 <ul>
-<li><p><code>coef</code>: Extract coefficients corrected by <code>rcreg</code></p></li>
-<li><p><code>vcov</code>: Extract the var-cov matrix of coefficients corrected by <code>rcreg</code></p></li>
-<li><p><code>sigma</code>: Extract the residual standard deviation of a linear regression object 
+<li><p><code><a href='https://rdrr.io/r/stats/coef.html'>coef(rcreg)</a></code>: Extract coefficients corrected by <code>rcreg</code></p></li>
+<li><p><code><a href='https://rdrr.io/r/stats/vcov.html'>vcov(rcreg)</a></code>: Extract the var-cov matrix of coefficients corrected by <code>rcreg</code></p></li>
+<li><p><code><a href='https://rdrr.io/r/stats/sigma.html'>sigma(rcreg)</a></code>: Extract the residual standard deviation of a linear regression object 
 corrected by <code>rcreg</code></p></li>
-<li><p><code>formula</code>: Extract the regression formula</p></li>
-<li><p><code>family</code>: Extract the family of a regression of class <code>lm</code> or <code>glm</code></p></li>
-<li><p><code>predict</code>: Predict with new data</p></li>
-<li><p><code>model.frame</code>: Extract the model frame</p></li>
-<li><p><code>print</code>: Print results of <code>rcreg</code> nicely</p></li>
-<li><p><code>summary</code>: Summarize results of <code>rcreg</code> nicely</p></li>
-<li><p><code>print</code>: Print summary of <code>rcreg</code> nicely</p></li>
-<li><p><code>update</code>: Update <code>rcreg</code></p></li>
+<li><p><code><a href='https://rdrr.io/r/stats/formula.html'>formula(rcreg)</a></code>: Extract the regression formula</p></li>
+<li><p><code><a href='https://rdrr.io/r/stats/family.html'>family(rcreg)</a></code>: Extract the family of a regression of class <code>lm</code> or <code>glm</code></p></li>
+<li><p><code><a href='https://rdrr.io/r/stats/predict.html'>predict(rcreg)</a></code>: Predict with new data</p></li>
+<li><p><code><a href='https://rdrr.io/r/stats/model.frame.html'>model.frame(rcreg)</a></code>: Extract the model frame</p></li>
+<li><p><code><a href='https://rdrr.io/r/base/print.html'>print(rcreg)</a></code>: Print results of <code>rcreg</code> nicely</p></li>
+<li><p><code><a href='https://rdrr.io/r/base/summary.html'>summary(rcreg)</a></code>: Summarize results of <code>rcreg</code> nicely</p></li>
+<li><p><code><a href='https://rdrr.io/r/stats/update.html'>update(rcreg)</a></code>: Update <code>rcreg</code></p></li>
+</ul>
+    <h2 class="hasAnchor" id="functions"><a class="anchor" href="#functions"></a>Functions</h2>
+
+    
+<ul>
+<li><p><code><a href='https://rdrr.io/r/base/print.html'>print(summary.rcreg)</a></code>: Print summary of <code>rcreg</code> nicely</p></li>
 </ul>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
@@ -394,7 +402,7 @@ variance <span class='op'>=</span> <span class='cn'>TRUE</span>, nboot <span cla
 
       <footer>
       <div class="copyright">
-  <p>Developed by Baoyi Shi, Christine Choirat, <a href='https://www.lindavaleri.com/'>Linda Valeri</a>.</p>
+  <p>Developed by Baoyi Shi, Ziqing Wang, Christine Choirat, <a href='https://www.lindavaleri.com/'>Linda Valeri</a>.</p>
 </div>
 
 <div class="pkgdown">

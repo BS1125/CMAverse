@@ -96,6 +96,9 @@
       <a href="articles/post_exposure_confounding.html">Statistical Modeling with Post-exposure Confounding</a>
     </li>
     <li>
+      <a href="articles/multistate_model.html">Multistate Modeling with a Time-to-event Mediator in the Presence of Competing Risks</a>
+    </li>
+    <li>
       <a href="articles/measurement_error.html">Sensitivity Analysis for Measurement Error</a>
     </li>
   </ul>
@@ -145,8 +148,12 @@ DAG visualization, <code>cmest</code> for statistical modeling and
 guide, an overview of statistical modeling approaches and examples.</p>
 <p>Cite the paper: <a href="https://journals.lww.com/epidem/citation/9000/cmaverse__a_suite_of_functions_for_reproducible.98264.aspx">CMAverse
 a suite of functions for reproducible causal mediation analyses</a></p>
-<p>We welcome your feedback and questions (email
-<a href="mailto:bs3141@cumc.columbia.edu" class="email">bs3141@cumc.columbia.edu</a>)!</p>
+<p>We welcome your feedback and questions:</p>
+<ul>
+<li><p>Email <a href="mailto:bs3141@columbia.edu" class="email">bs3141@columbia.edu</a> for general questions</p></li>
+<li><p>Email <a href="mailto:zw2899@cumc.columbia.edu" class="email">zw2899@cumc.columbia.edu</a> for questions related to
+<code>cmest_multistate</code></p></li>
+</ul>
 <div id="dag-visualization" class="section level3">
 <h3 class="hasAnchor">
 <a href="#dag-visualization" class="anchor"></a>DAG Visualization</h3>
@@ -172,10 +179,14 @@ of interest, <code>cmest</code> estimates the joint mediated effect
 through the set of mediators. <code>cmest</code> also allows for time
 varying confounders preceding mediators. The two causal scenarios
 supported are:</p>
-<p>(1) There are no confounders affected by the exposure:</p>
+<ol>
+<li>There are no confounders affected by the exposure:</li>
+</ol>
 <p><img src="reference/figures/unnamed-chunk-1-1.png"></p>
-<p>(2) There are mediator-outcome confounders affected by the exposure
-and these confounders precede all of the mediators:</p>
+<ol>
+<li>There are mediator-outcome confounders affected by the exposure and
+these confounders precede all of the mediators:</li>
+</ol>
 <p><img src="reference/figures/unnamed-chunk-2-1.png"></p>
 <table class="table">
 <caption>
@@ -206,8 +217,7 @@ gformula<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>
 <tbody>
 <tr class="odd">
 <td>
-Continuous
-Y<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>
+Continuous Y<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>
 </td>
 <td style="text-align: center;">
 √
@@ -805,7 +815,7 @@ Effects Conditional on C
 </tr>
 </tbody>
 </table>
-<section class="footnotes" role="doc-endnotes"><hr>
+<section class="footnotes footnotes-end-of-document" role="doc-endnotes"><hr>
 <ol>
 <li id="fn1" role="doc-endnote">
 <p>
@@ -856,25 +866,23 @@ mediator.<a href="#fnref7" class="footnote-back" role="doc-backlink">↩︎</a>
 <li id="fn8" role="doc-endnote">
 <p>
 delta method inference is available only when closed-form parameter
-function estimation is
-used.<a href="#fnref8" class="footnote-back" role="doc-backlink">↩︎</a>
+function estimation is used.<a href="#fnref8" class="footnote-back" role="doc-backlink">↩︎</a>
 </p>
 </li>
 <li id="fn9" role="doc-endnote">
 <p>
 marginal effects are estimated when direct counterfactual imputation
-estimation is
-used.<a href="#fnref9" class="footnote-back" role="doc-backlink">↩︎</a>
+estimation is used.<a href="#fnref9" class="footnote-back" role="doc-backlink">↩︎</a>
 </p>
 </li>
 <li id="fn10" role="doc-endnote">
 <p>
 conditional effects are estimated when closed-form parameter function
-estimation is
-used.<a href="#fnref10" class="footnote-back" role="doc-backlink">↩︎</a>
+estimation is used.<a href="#fnref10" class="footnote-back" role="doc-backlink">↩︎</a>
 </p>
 </li>
-</ol></section>
+</ol></section><p>Table: Supported Data Types and Functionalities of
+<code>cmest</code></p>
 </div>
 <div id="multiple-imputation" class="section level3">
 <h3 class="hasAnchor">
@@ -987,6 +995,7 @@ American Statistical Association. 82(397): 171-185.</p>
 <h2>Developers</h2>
 <ul class="list-unstyled">
 <li>Baoyi Shi <br><small class="roles"> Author, maintainer </small>  </li>
+<li>Ziqing Wang <br><small class="roles"> Author, maintainer </small>  </li>
 <li>Christine Choirat <br><small class="roles"> Author </small>  </li>
 <li>
 <a href="https://www.lindavaleri.com/">Linda Valeri</a> <br><small class="roles"> Author </small>  </li>
@@ -1007,7 +1016,7 @@ American Statistical Association. 82(397): 171-185.</p>
 
 
       <footer><div class="copyright">
-  <p>Developed by Baoyi Shi, Christine Choirat, <a href="https://www.lindavaleri.com/">Linda Valeri</a>.</p>
+  <p>Developed by Baoyi Shi, Ziqing Wang, Christine Choirat, <a href="https://www.lindavaleri.com/">Linda Valeri</a>.</p>
 </div>
 
 <div class="pkgdown">

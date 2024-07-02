@@ -6,11 +6,12 @@ articles:
   measurement_error: measurement_error.html
   multiple_imputation: multiple_imputation.html
   multiple_mediators: multiple_mediators.html
+  multistate_model: multistate_model.html
   overview: overview.html
   post_exposure_confounding: post_exposure_confounding.html
   quickstart: quickstart.html
   single_mediator: single_mediator.html
-last_built: 2023-09-03T05:16Z
+last_built: 2024-07-02T04:43Z
 urls:
   reference: https://bs1125.github.io/CMAverse//reference
   article: https://bs1125.github.io/CMAverse//articles

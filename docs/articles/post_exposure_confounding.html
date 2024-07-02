@@ -79,6 +79,9 @@
       <a href="../articles/post_exposure_confounding.html">Statistical Modeling with Post-exposure Confounding</a>
     </li>
     <li>
+      <a href="../articles/multistate_model.html">Multistate Modeling with a Time-to-event Mediator in the Presence of Competing Risks</a>
+    </li>
+    <li>
       <a href="../articles/measurement_error.html">Sensitivity Analysis for Measurement Error</a>
     </li>
   </ul>
@@ -115,7 +118,7 @@
       <h1 data-toc-skip>Statistical Modeling with Mediator-outcome
 Confounders Affected by the Exposure</h1>
             
-            <h4 class="date">2023-09-03</h4>
+            <h4 class="date">2024-07-01</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BS1125/CMAverse/blob/master/vignettes/post_exposure_confounding.Rmd"><code>vignettes/post_exposure_confounding.Rmd</code></a></small>
       <div class="hidden name"><code>post_exposure_confounding.Rmd</code></div>
@@ -318,23 +321,23 @@ shown below.</p>
 ##  bootstrap standard errors, percentile confidence intervals and p-values 
 ##  
 ##                  Estimate Std.error   95% CIL 95% CIU  P.val    
-## Rcde             0.498566  0.170341  0.389195   0.618 &lt;2e-16 ***
-## rRpnde           0.539352  0.181890  0.400160   0.644 &lt;2e-16 ***
-## rRtnde           0.515779  0.174990  0.394162   0.629 &lt;2e-16 ***
-## rRpnie           0.986516  0.008982  1.002378   1.014 &lt;2e-16 ***
-## rRtnie           0.943399  0.015324  0.978652   0.999 &lt;2e-16 ***
-## Rte              0.508824  0.171854  0.399856   0.631 &lt;2e-16 ***
-## ERcde           -0.485202  0.180346 -0.620426  -0.378 &lt;2e-16 ***
-## rERintref        0.024555  0.001544  0.022033   0.024 &lt;2e-16 ***
-## rERintmed       -0.017044  0.001054 -0.016303  -0.015 &lt;2e-16 ***
-## rERpnie         -0.013484  0.008982  0.002380   0.014 &lt;2e-16 ***
-## ERcde(prop)      0.987839  0.006280  1.027535   1.036 &lt;2e-16 ***
-## rERintref(prop) -0.049991  0.021520 -0.066008  -0.037 &lt;2e-16 ***
-## rERintmed(prop)  0.034700  0.014571  0.025062   0.045 &lt;2e-16 ***
-## rERpnie(prop)    0.027453  0.013229 -0.023940  -0.006 &lt;2e-16 ***
-## rpm              0.062152  0.027800  0.001122   0.038 &lt;2e-16 ***
-## rint            -0.015292  0.006950 -0.021369  -0.012 &lt;2e-16 ***
-## rpe              0.012161  0.006280 -0.035973  -0.028 &lt;2e-16 ***
+## Rcde             0.498566  0.170135  0.389190   0.618 &lt;2e-16 ***
+## rRpnde           0.538980  0.183557  0.399533   0.646 &lt;2e-16 ***
+## rRtnde           0.516082  0.175401  0.393873   0.629 &lt;2e-16 ***
+## rRpnie           0.986900  0.008207  1.002534   1.014 &lt;2e-16 ***
+## rRtnie           0.944972  0.016691  0.976778   0.999 &lt;2e-16 ***
+## Rte              0.509321  0.172602  0.399214   0.631 &lt;2e-16 ***
+## ERcde           -0.485305  0.179358 -0.619447  -0.378 &lt;2e-16 ***
+## rERintref        0.024285  0.004199  0.020452   0.026 &lt;2e-16 ***
+## rERintmed       -0.016558  0.002748 -0.017719  -0.014 &lt;2e-16 ***
+## rERpnie         -0.013100  0.008207  0.002535   0.014 &lt;2e-16 ***
+## ERcde(prop)      0.989048  0.002742  1.029616   1.033 &lt;2e-16 ***
+## rERintref(prop) -0.049493  0.027626 -0.071621  -0.035 &lt;2e-16 ***
+## rERintmed(prop)  0.033746  0.018586  0.023662   0.049 &lt;2e-16 ***
+## rERpnie(prop)    0.026698  0.011783 -0.022457  -0.007 &lt;2e-16 ***
+## rpm              0.060445  0.030369  0.001204   0.042 &lt;2e-16 ***
+## rint            -0.015747  0.009040 -0.022989  -0.011 &lt;2e-16 ***
+## rpe              0.010952  0.002742 -0.033300  -0.030 &lt;2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
@@ -461,23 +464,23 @@ shown below.</p>
 ##  bootstrap standard errors, percentile confidence intervals and p-values 
 ##  
 ##                  Estimate Std.error   95% CIL 95% CIU  P.val    
-## Rcde             0.499970  0.003306  0.627867   0.632 &lt;2e-16 ***
-## rRpnde           0.519453  0.062605  0.540497   0.625 &lt;2e-16 ***
-## rRtnde           0.508410  0.026424  0.593114   0.629 &lt;2e-16 ***
-## rRpnie           0.971628  0.030486  0.940677   0.982 &lt;2e-16 ***
-## rRtnie           0.950972  0.032978  0.987946   1.032      1    
-## Rte              0.493985  0.044022  0.557928   0.617 &lt;2e-16 ***
-## ERcde           -0.471286  0.012399 -0.350420  -0.334 &lt;2e-16 ***
-## rERintref       -0.009261  0.075004 -0.125581  -0.025 &lt;2e-16 ***
-## rERintmed        0.002904  0.049068  0.010726   0.077 &lt;2e-16 ***
-## rERpnie         -0.028372  0.030486 -0.059300  -0.018 &lt;2e-16 ***
-## ERcde(prop)      0.931367  0.119282  0.755709   0.916 &lt;2e-16 ***
-## rERintref(prop)  0.018302  0.163331  0.063896   0.283 &lt;2e-16 ***
-## rERintmed(prop) -0.005739  0.108286 -0.172893  -0.027 &lt;2e-16 ***
-## rERpnie(prop)    0.056069  0.064238  0.047549   0.134 &lt;2e-16 ***
-## rpm              0.050330  0.044049 -0.039041   0.020      1    
-## rint             0.012564  0.055045  0.036486   0.110 &lt;2e-16 ***
-## rpe              0.068633  0.119282  0.084035   0.244 &lt;2e-16 ***
+## Rcde             0.499968  0.003306  0.627867   0.632 &lt;2e-16 ***
+## rRpnde           0.518971  0.062605  0.540497   0.625 &lt;2e-16 ***
+## rRtnde           0.508831  0.026424  0.593114   0.629 &lt;2e-16 ***
+## rRpnie           0.973863  0.030486  0.940677   0.982 &lt;2e-16 ***
+## rRtnie           0.954837  0.032978  0.987946   1.032      1    
+## Rte              0.495532  0.044022  0.557928   0.617 &lt;2e-16 ***
+## ERcde           -0.471832  0.012399 -0.350420  -0.334 &lt;2e-16 ***
+## rERintref       -0.009197  0.075004 -0.125581  -0.025 &lt;2e-16 ***
+## rERintmed        0.002698  0.049068  0.010726   0.077 &lt;2e-16 ***
+## rERpnie         -0.026137  0.030486 -0.059300  -0.018 &lt;2e-16 ***
+## ERcde(prop)      0.935307  0.119282  0.755709   0.916 &lt;2e-16 ***
+## rERintref(prop)  0.018231  0.163331  0.063896   0.283 &lt;2e-16 ***
+## rERintmed(prop) -0.005349  0.108286 -0.172893  -0.027 &lt;2e-16 ***
+## rERpnie(prop)    0.051810  0.064238  0.047549   0.134 &lt;2e-16 ***
+## rpm              0.046462  0.044049 -0.039041   0.020      1    
+## rint             0.012883  0.055045  0.036486   0.110 &lt;2e-16 ***
+## rpe              0.064693  0.119282  0.084035   0.244 &lt;2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
@@ -510,7 +513,7 @@ shown below.</p>
 
 
       <footer><div class="copyright">
-  <p>Developed by Baoyi Shi, Christine Choirat, <a href="https://www.lindavaleri.com/">Linda Valeri</a>.</p>
+  <p>Developed by Baoyi Shi, Ziqing Wang, Christine Choirat, <a href="https://www.lindavaleri.com/">Linda Valeri</a>.</p>
 </div>
 
 <div class="pkgdown">
