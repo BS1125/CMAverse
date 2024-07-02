@@ -694,12 +694,12 @@ test_that("cmest works correctly for ordinal Y and ordinal M", {
   res_ordinalordinal_rb <- cmest(data = data, model = "rb", outcome = "Y", 
                                  exposure = "A", mediator = "M", basec = c("C1", "C2"),
                                  EMint = TRUE,
-                                 mreg = list("ordinal"), yreg = "ordinal", yref = "1",
+                                 mreg = list("ordinal"), yreg = "ordinal", yval = "1",
                                  astar = 0, a = 1, mval = list(1),
                                  estimation = "imputation", inference = "bootstrap")
   res_ordinalordinal_iorw <- cmest(data = data, model = "iorw", outcome = "Y", exposure = "A",
                                    mediator = "M", basec = c("C1", "C2"), EMint = TRUE, 
-                                   ereg = "ordinal", yreg = "ordinal", yref = "1",
+                                   ereg = "ordinal", yreg = "ordinal", yval = "1",
                                    astar = 0, a = 1,
                                    estimation = "imputation", inference = "bootstrap")
   res_ordinalordinal_msm <- cmest(data = data, model = "msm",
@@ -707,12 +707,12 @@ test_that("cmest works correctly for ordinal Y and ordinal M", {
                                   mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                                   ereg = "ordinal", yreg = "ordinal", mreg = list("ordinal"),
                                   wmnomreg = list("ordinal"), wmdenomreg = list("ordinal"),
-                                  astar = 0, a = 1, mval = list(1), yref = "1",
+                                  astar = 0, a = 1, mval = list(1), yval = "1",
                                   estimation = "imputation", inference = "bootstrap")
   res_ordinalordinal_gformula <- cmest(data = data, model = "gformula", outcome = "Y", exposure = "A",
                                        mediator = "M", basec = c("C1", "C2"), EMint = TRUE, 
                                        mreg = list("ordinal"), yreg = "ordinal",
-                                       astar = 0, a = 1, mval = list(1), yref = "1",
+                                       astar = 0, a = 1, mval = list(1), yval = "1",
                                        estimation = "imputation", inference = "bootstrap")
 
   # test
