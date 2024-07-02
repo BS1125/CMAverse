@@ -440,7 +440,7 @@ cmest <- function(data = NULL, model = "rb",
   n <- nrow(data)
   # model
   if (!model %in% c("rb", "wb", "iorw", "ne", "gformula", "msm")) stop("Select model from 'rb', 'wb', 'iorw', 'ne', 'gformula', 'msm'")
-  if (model == "ne") stop("The natural effect model ('ne') is temporarily unavailable")
+
   out$methods$model <- model
   # full
   if (!is.logical(full)) stop("full should be TRUE or FALSE")
