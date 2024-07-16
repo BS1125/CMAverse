@@ -35,6 +35,3 @@ jobs:
         R CMD build --no-manual .
         R CMD check --no-manual --as-cran *.tar.gz
 
-    - name: Render R Markdown documents
-      run: |
-        R -e 'rmarkdown::render("your_document.Rmd")'

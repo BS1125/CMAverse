@@ -79,6 +79,9 @@
       <a href="../articles/post_exposure_confounding.html">Statistical Modeling with Post-exposure Confounding</a>
     </li>
     <li>
+      <a href="../articles/multistate_model.html">Multistate Modeling with a Time-to-event Mediator in the Presence of Competing Risks</a>
+    </li>
+    <li>
       <a href="../articles/measurement_error.html">Sensitivity Analysis for Measurement Error</a>
     </li>
   </ul>
@@ -115,7 +118,7 @@
       <h1 data-toc-skip>Statistical Modeling with Multiple
 Mediators</h1>
             
-            <h4 class="date">2023-09-03</h4>
+            <h4 class="date">2024-07-01</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/BS1125/CMAverse/blob/master/vignettes/multiple_mediators.Rmd"><code>vignettes/multiple_mediators.Rmd</code></a></small>
       <div class="hidden name"><code>multiple_mediators.Rmd</code></div>
@@ -266,22 +269,22 @@ approaches. The results are shown below.</p>
 ##  
 ##                 Estimate Std.error   95% CIL 95% CIU  P.val    
 ## Rcde            0.377584  0.210028  0.124803   0.405 &lt;2e-16 ***
-## Rpnde           2.627117  0.263412  2.268273   2.622 &lt;2e-16 ***
-## Rtnde           1.453067  0.334983  1.054599   1.504 &lt;2e-16 ***
-## Rpnie          41.152523  8.052787 40.529554  51.346 &lt;2e-16 ***
-## Rtnie          22.761604  0.461080 23.252971  23.872 &lt;2e-16 ***
-## Rte            59.797387  5.079004 54.149180  60.972 &lt;2e-16 ***
-## ERcde          -6.683714  1.717727 -8.708034  -6.400 &lt;2e-16 ***
-## ERintref        8.310831  1.454315  8.023107   9.977 &lt;2e-16 ***
-## ERintmed       17.017747 12.868379  1.509260  18.798 &lt;2e-16 ***
-## ERpnie         40.152523  8.052787 39.562749  50.382 &lt;2e-16 ***
-## ERcde(prop)    -0.113674  0.042524 -0.164006  -0.107 &lt;2e-16 ***
-## ERintref(prop)  0.141347  0.040152  0.133921   0.188 &lt;2e-16 ***
-## ERintmed(prop)  0.289430  0.212212  0.027403   0.313 &lt;2e-16 ***
-## ERpnie(prop)    0.682896  0.214583  0.660446   0.949 &lt;2e-16 ***
-## pm              0.972327  0.002371  0.972955   0.976 &lt;2e-16 ***
-## int             0.430777  0.172059  0.215268   0.446 &lt;2e-16 ***
-## pe              1.113674  0.042524  1.106876   1.164 &lt;2e-16 ***
+## Rpnde           2.627088  0.263412  2.268273   2.622 &lt;2e-16 ***
+## Rtnde           1.460973  0.334983  1.054599   1.504 &lt;2e-16 ***
+## Rpnie          41.072338  8.052787 40.529554  51.346 &lt;2e-16 ***
+## Rtnie          22.841102  0.461080 23.252971  23.872 &lt;2e-16 ***
+## Rte            60.005575  5.079004 54.149180  60.972 &lt;2e-16 ***
+## ERcde          -6.683723  1.717727 -8.708034  -6.400 &lt;2e-16 ***
+## ERintref        8.310810  1.454315  8.023107   9.977 &lt;2e-16 ***
+## ERintmed       17.306149 12.868379  1.509260  18.798 &lt;2e-16 ***
+## ERpnie         40.072338  8.052787 39.562749  50.382 &lt;2e-16 ***
+## ERcde(prop)    -0.113273  0.042524 -0.164006  -0.107 &lt;2e-16 ***
+## ERintref(prop)  0.140848  0.040152  0.133921   0.188 &lt;2e-16 ***
+## ERintmed(prop)  0.293297  0.212212  0.027403   0.313 &lt;2e-16 ***
+## ERpnie(prop)    0.679128  0.214583  0.660446   0.949 &lt;2e-16 ***
+## pm              0.972425  0.002371  0.972955   0.976 &lt;2e-16 ***
+## int             0.434145  0.172059  0.215268   0.446 &lt;2e-16 ***
+## pe              1.113273  0.042524  1.106876   1.164 &lt;2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
@@ -714,7 +717,7 @@ approaches. The results are shown below.</p>
 
 
       <footer><div class="copyright">
-  <p>Developed by Baoyi Shi, Christine Choirat, <a href="https://www.lindavaleri.com/">Linda Valeri</a>.</p>
+  <p>Developed by Baoyi Shi, Ziqing Wang, Christine Choirat, <a href="https://www.lindavaleri.com/">Linda Valeri</a>.</p>
 </div>
 
 <div class="pkgdown">

@@ -122,6 +122,9 @@ error via SIMEX by Cook et al. (1994) and Küchenhoff et al. (2006)." />
       <a href="../articles/post_exposure_confounding.html">Statistical Modeling with Post-exposure Confounding</a>
     </li>
     <li>
+      <a href="../articles/multistate_model.html">Multistate Modeling with a Time-to-event Mediator in the Presence of Competing Risks</a>
+    </li>
+    <li>
       <a href="../articles/measurement_error.html">Sensitivity Analysis for Measurement Error</a>
     </li>
   </ul>
@@ -300,19 +303,24 @@ SIMEX,</p></dd>
 
     
 <ul>
-<li><p><code>coef</code>: Extract coefficients corrected by <code>simexreg</code></p></li>
-<li><p><code>vcov</code>: Extract the var-cov matrix of coefficients corrected by 
+<li><p><code><a href='https://rdrr.io/r/stats/coef.html'>coef(simexreg)</a></code>: Extract coefficients corrected by <code>simexreg</code></p></li>
+<li><p><code><a href='https://rdrr.io/r/stats/vcov.html'>vcov(simexreg)</a></code>: Extract the var-cov matrix of coefficients corrected by 
 <code>simexreg</code></p></li>
-<li><p><code>sigma</code>: Extract the residual standard deviation of a linear regression object 
+<li><p><code><a href='https://rdrr.io/r/stats/sigma.html'>sigma(simexreg)</a></code>: Extract the residual standard deviation of a linear regression object 
 corrected by <code>simexreg</code></p></li>
-<li><p><code>formula</code>: Extract the regression formula</p></li>
-<li><p><code>family</code>: Extract the family of a regression of class <code>lm</code> or <code>glm</code></p></li>
-<li><p><code>predict</code>: Predict with new data</p></li>
-<li><p><code>model.frame</code>: Extract the model frame</p></li>
-<li><p><code>print</code>: Print results of <code>simexreg</code> nicely</p></li>
-<li><p><code>summary</code>: Summarize results of <code>simexreg</code> nicely</p></li>
-<li><p><code>print</code>: Print summary of <code>simexreg</code> nicely</p></li>
-<li><p><code>update</code>: Update <code>simexreg</code></p></li>
+<li><p><code><a href='https://rdrr.io/r/stats/formula.html'>formula(simexreg)</a></code>: Extract the regression formula</p></li>
+<li><p><code><a href='https://rdrr.io/r/stats/family.html'>family(simexreg)</a></code>: Extract the family of a regression of class <code>lm</code> or <code>glm</code></p></li>
+<li><p><code><a href='https://rdrr.io/r/stats/predict.html'>predict(simexreg)</a></code>: Predict with new data</p></li>
+<li><p><code><a href='https://rdrr.io/r/stats/model.frame.html'>model.frame(simexreg)</a></code>: Extract the model frame</p></li>
+<li><p><code><a href='https://rdrr.io/r/base/print.html'>print(simexreg)</a></code>: Print results of <code>simexreg</code> nicely</p></li>
+<li><p><code><a href='https://rdrr.io/r/base/summary.html'>summary(simexreg)</a></code>: Summarize results of <code>simexreg</code> nicely</p></li>
+<li><p><code><a href='https://rdrr.io/r/stats/update.html'>update(simexreg)</a></code>: Update <code>simexreg</code></p></li>
+</ul>
+    <h2 class="hasAnchor" id="functions"><a class="anchor" href="#functions"></a>Functions</h2>
+
+    
+<ul>
+<li><p><code><a href='https://rdrr.io/r/base/print.html'>print(summary.simexreg)</a></code>: Print summary of <code>simexreg</code> nicely</p></li>
 </ul>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
@@ -395,7 +403,7 @@ MEvariable <span class='op'>=</span> <span class='st'>"x2_error"</span>, MEerror
 
       <footer>
       <div class="copyright">
-  <p>Developed by Baoyi Shi, Christine Choirat, <a href='https://www.lindavaleri.com/'>Linda Valeri</a>.</p>
+  <p>Developed by Baoyi Shi, Ziqing Wang, Christine Choirat, <a href='https://www.lindavaleri.com/'>Linda Valeri</a>.</p>
 </div>
 
 <div class="pkgdown">

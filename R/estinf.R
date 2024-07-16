@@ -59,99 +59,99 @@ estinf <- function() {
           startsWith(family_yreg$family, "Ordered Categorical"))) |
         is_multinom_yreg | is_polr_yreg | is_survreg_yreg | is_coxph_yreg |
         inference == "delta")) stop("Unsupported yreg")
-  yreg_formula <- formula(yreg)
-  d_var <- unique(all.vars(yreg_formula[[2]]))
-  ind_var <- unique(all.vars(yreg_formula[[3]]))
-  if (model %in% c("rb", "wb", "ne") && (!(outcome %in% d_var) | !all(ind_var %in% c(exposure, mediator, basec)))) stop(
-    "For yreg, please regress outcome on variables in c(exposure, mediator, basec) when model is rb or wb or ne")
-  if (model == "iorw" && (!(outcome %in% d_var) | !all(ind_var %in% c(exposure, basec)))) stop(
-    "For yreg, please regress outcome on variables in c(exposure, basec) when model is iorw")
-  if (model == "msm" && (!(outcome %in% d_var) | !all(ind_var %in% c(exposure, mediator)))) stop(
-    "For yreg, please regress outcome on variables in c(exposure, mediator) when model is msm")
-  if (model == "gformula" && (!(outcome %in% d_var) | !all(ind_var %in% c(exposure, mediator, basec, postc)))) stop(
-    "For yreg, please regress outcome on variables in c(exposure, mediator, basec, postc) when model is gformula")
-  rm(yreg_formula, d_var, ind_var)
-  if (!is.null(ereg)) {
-    if (!(((is_lm_ereg | is_glm_ereg) && 
-           (family_ereg$family %in% c("binomial", "quasibinomial", "multinom") |
-            startsWith(family_ereg$family, "Ordered Categorical"))) |
-          is_multinom_ereg | is_polr_ereg)) stop("Unsupported ereg")
-    ereg_formula <- formula(ereg)
-    d_var <- unique(all.vars(ereg_formula[[2]]))
-    ind_var <- unique(all.vars(ereg_formula[[3]]))
-    if (model != "iorw" && ((exposure != d_var) | !all(ind_var %in% basec))) stop("For ereg, please regress the exposure on variables in basec when model is wb or msm")
-    if (model == "iorw" && ((exposure != d_var) | !all(mediator %in% ind_var) | 
-                            !all(ind_var %in% c(mediator, basec)))) stop("For ereg, please regress the exposure on variables in basec and all mediators when model is iorw")
-    rm(ereg_formula, d_var, ind_var)
-  }
-  if (!is.null(mreg) && inference == "bootstrap") {
-    for (p in 1:length(mreg)) {
-      if (!(((is_lm_mreg[[p]] | is_glm_mreg[[p]]) && 
-             (family_mreg[[p]]$family %in% 
-              c("gaussian", "inverse.gaussian", "poisson", "quasipoisson", 
-                "Gamma", "binomial", "multinom") |
-              startsWith(family_mreg[[p]]$family, "Negative Binomial") |
-              startsWith(family_mreg[[p]]$family, "Ordered Categorical"))) |
-            is_multinom_mreg[[p]] | is_polr_mreg[[p]])) stop(paste0("Unsupported mreg[[", p, "]]"))
-      mreg_formula <- formula(mreg[[p]])
-      d_var <- unique(all.vars(mreg_formula[[2]]))
-      ind_var <- unique(all.vars(mreg_formula[[3]]))
-      if (model == "rb" && ((mediator[p] != d_var) | !all(ind_var %in% c(exposure, basec)))) stop(
-        paste0("For mreg[[", p, "]], please regress mediator[", p, "] on variables in c(exposure, basec) when model is rb"))
-      if (model == "msm" && ((mediator[p] != d_var) | !all(ind_var %in% c(exposure)))) stop(
-        paste0("For mreg[[", p, "]], please regress mediator[", p, "] on exposure when model is msm"))
-      if (model == "gformula" && ((mediator[p] != d_var) | !all(ind_var %in% c(exposure, basec, postc)))) stop(
-        paste0("For mreg[[", p, "]], please regress mediator[", p, "] on variables in c(exposure, basec, postc) when model is gformula"))
-      rm(mreg_formula, d_var, ind_var)
-    }
-  }
-  if (!is.null(wmnomreg)) {
-    for (p in 1:length(wmnomreg)) {
-      if (!((((is_lm_wmnomreg[[p]] | is_glm_wmnomreg[[p]]) && 
-              (family_wmnomreg[[p]]$family %in% 
-               c("binomial", "quasibinomial", "multinom") |
-               startsWith(family_wmnomreg[[p]]$family, "Ordered Categorical"))) |
-             is_multinom_wmnomreg[[p]] | is_polr_wmnomreg[[p]]))) stop(paste0("Unsupported wmnomreg[[", p, "]]"))
-      wmnomreg_formula <- formula(wmnomreg[[p]])
-      d_var <- unique(all.vars(wmnomreg_formula[[2]]))
-      ind_var <- unique(all.vars(wmnomreg_formula[[3]]))
-      if ((mediator[p] != d_var) | !all(ind_var %in% c(exposure, mediator[0:(p-1)]))) stop(
-        paste0("For wmnomreg[[", p, "]], please regress mediator[", p, "] on variables in c(exposure, mediator[0:", p-1, "])"))
-      rm(wmnomreg_formula, d_var, ind_var)
-    }
-  }
-  if (!is.null(wmdenomreg)) {
-    for (p in 1:length(wmdenomreg)) {
-      if (!((((is_lm_wmdenomreg[[p]] | is_glm_wmdenomreg[[p]]) && 
-              (family_wmdenomreg[[p]]$family %in% 
-               c("binomial", "quasibinomial", "multinom") |
-               startsWith(family_wmdenomreg[[p]]$family, "Ordered Categorical"))) |
-             is_multinom_wmdenomreg[[p]] | is_polr_wmdenomreg[[p]]))) stop(paste0("Unsupported wmdenomreg[[", p, "]]"))
-      wmdenomreg_formula <- formula(wmdenomreg[[p]])
-      d_var <- unique(all.vars(wmdenomreg_formula[[2]]))
-      ind_var <- unique(all.vars(wmdenomreg_formula[[3]]))
-      if ((mediator[p] != d_var) | !all(ind_var %in% c(exposure, mediator[0:(p-1)], basec, postc))) stop(
-        paste0("For wmdenomreg[[", p, "]], please regress mediator[", p, "] on variables in c(exposure, mediator[0:", p-1, "], basec, postc)"))
-      rm(wmdenomreg_formula, d_var, ind_var)
-    }
-  }
-  if (!is.null(postcreg)) {
-    for (p in 1:length(postcreg)) {
-      if (!(((is_lm_postcreg[[p]] | is_glm_postcreg[[p]]) && 
-             (family_postcreg[[p]]$family %in% 
-              c("gaussian", "inverse.gaussian", "poisson", "quasipoisson", 
-                "Gamma", "binomial", "multinom") |
-              startsWith(family_postcreg[[p]]$family, "Negative Binomial") |
-              startsWith(family_postcreg[[p]]$family, "Ordered Categorical"))) |
-            is_multinom_postcreg[[p]] | is_polr_postcreg[[p]])) stop(paste0("Unsupported postcreg[[", p, "]]"))
-      postcreg_formula <- formula(postcreg[[p]])
-      d_var <- unique(all.vars(postcreg_formula[[2]]))
-      ind_var <- unique(all.vars(postcreg_formula[[3]]))
-      if ((postc[p] != d_var) | !all(ind_var %in% c(exposure, basec))) stop(
-        paste0("For postcreg[[", p, "]], please regress postc[", p, "] on variables in c(exposure, basec)"))
-      rm(postcreg_formula, d_var, ind_var)
-    }
-  }
+  # yreg_formula <- formula(yreg)
+  # d_var <- unique(all.vars(yreg_formula[[2]]))
+  # ind_var <- unique(all.vars(yreg_formula[[3]]))
+  # if (model %in% c("rb", "wb", "ne") && (!(outcome %in% d_var) | !all(ind_var %in% c(exposure, mediator, basec)))) stop(
+  #   "For yreg, please regress outcome on variables in c(exposure, mediator, basec) when model is rb, wb or ne")
+  # if (model == "iorw" && (!(outcome %in% d_var) | !all(ind_var %in% c(exposure, basec)))) stop(
+  #   "For yreg, please regress outcome on variables in c(exposure, basec) when model is iorw")
+  # if (model == "msm" && (!(outcome %in% d_var) | !all(ind_var %in% c(exposure, mediator)))) stop(
+  #   "For yreg, please regress outcome on variables in c(exposure, mediator) when model is msm")
+  # if (model == "gformula" && (!(outcome %in% d_var) | !all(ind_var %in% c(exposure, mediator, basec, postc)))) stop(
+  #   "For yreg, please regress outcome on variables in c(exposure, mediator, basec, postc) when model is gformula")
+  # rm(yreg_formula, d_var, ind_var)
+  # if (!is.null(ereg)) {
+  #   if (!(((is_lm_ereg | is_glm_ereg) && 
+  #          (family_ereg$family %in% c("binomial", "quasibinomial", "multinom") |
+  #           startsWith(family_ereg$family, "Ordered Categorical"))) |
+  #         is_multinom_ereg | is_polr_ereg)) stop("Unsupported ereg")
+  #   ereg_formula <- formula(ereg)
+  #   d_var <- unique(all.vars(ereg_formula[[2]]))
+  #   ind_var <- unique(all.vars(ereg_formula[[3]]))
+  #   if (model != "iorw" && ((exposure != d_var) | !all(ind_var %in% basec))) stop("For ereg, please regress the exposure on variables in basec when model is wb or msm")
+  #   if (model == "iorw" && ((exposure != d_var) | !all(mediator %in% ind_var) | 
+  #                           !all(ind_var %in% c(mediator, basec)))) stop("For ereg, please regress the exposure on variables in basec and all mediators when model is iorw")
+  #   rm(ereg_formula, d_var, ind_var)
+  # }
+  # if (!is.null(mreg) && inference == "bootstrap") {
+  #   for (p in 1:length(mreg)) {
+  #     if (!(((is_lm_mreg[[p]] | is_glm_mreg[[p]]) && 
+  #            (family_mreg[[p]]$family %in% 
+  #             c("gaussian", "inverse.gaussian", "poisson", "quasipoisson", 
+  #               "Gamma", "binomial", "multinom") |
+  #             startsWith(family_mreg[[p]]$family, "Negative Binomial") |
+  #             startsWith(family_mreg[[p]]$family, "Ordered Categorical"))) |
+  #           is_multinom_mreg[[p]] | is_polr_mreg[[p]])) stop(paste0("Unsupported mreg[[", p, "]]"))
+  #     mreg_formula <- formula(mreg[[p]])
+  #     d_var <- unique(all.vars(mreg_formula[[2]]))
+  #     ind_var <- unique(all.vars(mreg_formula[[3]]))
+  #     if (model == "rb" && ((mediator[p] != d_var) | !all(ind_var %in% c(exposure, basec)))) stop(
+  #       paste0("For mreg[[", p, "]], please regress mediator[", p, "] on variables in c(exposure, basec) when model is rb"))
+  #     if (model == "msm" && ((mediator[p] != d_var) | !all(ind_var %in% c(exposure)))) stop(
+  #       paste0("For mreg[[", p, "]], please regress mediator[", p, "] on exposure when model is msm"))
+  #     if (model == "gformula" && ((mediator[p] != d_var) | !all(ind_var %in% c(exposure, basec, postc)))) stop(
+  #       paste0("For mreg[[", p, "]], please regress mediator[", p, "] on variables in c(exposure, basec, postc) when model is gformula"))
+  #     rm(mreg_formula, d_var, ind_var)
+  #   }
+  # }
+  # if (!is.null(wmnomreg)) {
+  #   for (p in 1:length(wmnomreg)) {
+  #     if (!((((is_lm_wmnomreg[[p]] | is_glm_wmnomreg[[p]]) && 
+  #             (family_wmnomreg[[p]]$family %in% 
+  #              c("binomial", "quasibinomial", "multinom") |
+  #              startsWith(family_wmnomreg[[p]]$family, "Ordered Categorical"))) |
+  #            is_multinom_wmnomreg[[p]] | is_polr_wmnomreg[[p]]))) stop(paste0("Unsupported wmnomreg[[", p, "]]"))
+  #     wmnomreg_formula <- formula(wmnomreg[[p]])
+  #     d_var <- unique(all.vars(wmnomreg_formula[[2]]))
+  #     ind_var <- unique(all.vars(wmnomreg_formula[[3]]))
+  #     if ((mediator[p] != d_var) | !all(ind_var %in% c(exposure, mediator[0:(p-1)]))) stop(
+  #       paste0("For wmnomreg[[", p, "]], please regress mediator[", p, "] on variables in c(exposure, mediator[0:", p-1, "])"))
+  #     rm(wmnomreg_formula, d_var, ind_var)
+  #   }
+  # }
+  # if (!is.null(wmdenomreg)) {
+  #   for (p in 1:length(wmdenomreg)) {
+  #     if (!((((is_lm_wmdenomreg[[p]] | is_glm_wmdenomreg[[p]]) && 
+  #             (family_wmdenomreg[[p]]$family %in% 
+  #              c("binomial", "quasibinomial", "multinom") |
+  #              startsWith(family_wmdenomreg[[p]]$family, "Ordered Categorical"))) |
+  #            is_multinom_wmdenomreg[[p]] | is_polr_wmdenomreg[[p]]))) stop(paste0("Unsupported wmdenomreg[[", p, "]]"))
+  #     wmdenomreg_formula <- formula(wmdenomreg[[p]])
+  #     d_var <- unique(all.vars(wmdenomreg_formula[[2]]))
+  #     ind_var <- unique(all.vars(wmdenomreg_formula[[3]]))
+  #     if ((mediator[p] != d_var) | !all(ind_var %in% c(exposure, mediator[0:(p-1)], basec, postc))) stop(
+  #       paste0("For wmdenomreg[[", p, "]], please regress mediator[", p, "] on variables in c(exposure, mediator[0:", p-1, "], basec, postc)"))
+  #     rm(wmdenomreg_formula, d_var, ind_var)
+  #   }
+  # }
+  # if (!is.null(postcreg)) {
+  #   for (p in 1:length(postcreg)) {
+  #     if (!(((is_lm_postcreg[[p]] | is_glm_postcreg[[p]]) && 
+  #            (family_postcreg[[p]]$family %in% 
+  #             c("gaussian", "inverse.gaussian", "poisson", "quasipoisson", 
+  #               "Gamma", "binomial", "multinom") |
+  #             startsWith(family_postcreg[[p]]$family, "Negative Binomial") |
+  #             startsWith(family_postcreg[[p]]$family, "Ordered Categorical"))) |
+  #           is_multinom_postcreg[[p]] | is_polr_postcreg[[p]])) stop(paste0("Unsupported postcreg[[", p, "]]"))
+  #     postcreg_formula <- formula(postcreg[[p]])
+  #     d_var <- unique(all.vars(postcreg_formula[[2]]))
+  #     ind_var <- unique(all.vars(postcreg_formula[[3]]))
+  #     if ((postc[p] != d_var) | !all(ind_var %in% c(exposure, basec))) stop(
+  #       paste0("For postcreg[[", p, "]], please regress postc[", p, "] on variables in c(exposure, basec)"))
+  #     rm(postcreg_formula, d_var, ind_var)
+  #   }
+  # }
   
   # reference values for the exposure
   if (is.factor(data[, exposure]) | is.character(data[, exposure])) {

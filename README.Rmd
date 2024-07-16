@@ -11,7 +11,6 @@ knitr::opts_chunk$set(fig.path = "man/figures/")
 # CMAverse: a suite of functions for causal mediation analysis<img src="man/figures/logo.png" align="right" width="240" />
 
 [![Project Status: Active](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
-[![Travis build status](https://travis-ci.com/BS1125/CMAverse.svg?branch=master)](https://travis-ci.com/BS1125/CMAverse)
 [![R build status](https://github.com/BS1125/CMAverse/workflows/R-CMD-check/badge.svg)](https://github.com/BS1125/CMAverse/actions)
 [![Codecov test coverage](https://codecov.io/gh/BS1125/CMAverse/branch/master/graph/badge.svg)](https://codecov.io/gh/BS1125/CMAverse)
 
@@ -25,7 +24,11 @@ See the package [website](https://bs1125.github.io/CMAverse/) for a quickstart g
 Cite the paper: [CMAverse
 a suite of functions for reproducible causal mediation analyses](https://journals.lww.com/epidem/citation/9000/cmaverse__a_suite_of_functions_for_reproducible.98264.aspx)
 
-We welcome your feedback and questions (email bs3141@cumc.columbia.edu)!
+We welcome your feedback and questions:
+
+- Email bs3141@columbia.edu for general questions
+
+- Email zw2899@cumc.columbia.edu for questions related to `cmest_multistate`
 
 ### DAG Visualization
 

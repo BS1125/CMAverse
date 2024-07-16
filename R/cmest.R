@@ -434,13 +434,13 @@ cmest <- function(data = NULL, model = "rb",
   ###################################################################################################
   # data
   if (is.null(data)) stop("Unspecified data")
-  data <- as.data.frame(data)[, c(outcome, event, exposure, mediator, basec, postc)]
-  if (sum(is.na(data)) > 0 && !multimp) stop("NAs in outcome, event, exposure, mediator, basec, or postc data; delete rows with NAs in these variables from the data or set multimp = TRUE") 
+  data <- as.data.frame(data)
+  if (sum(is.na(data)) > 0 && !multimp) stop("NAs in the data; delete rows with NAs from the data or set multimp = TRUE") 
   out$data <- data
   n <- nrow(data)
   # model
   if (!model %in% c("rb", "wb", "iorw", "ne", "gformula", "msm")) stop("Select model from 'rb', 'wb', 'iorw', 'ne', 'gformula', 'msm'")
-  if (model == "ne") stop("The natural effect model ('ne') is temporarily unavailable")
+
   out$methods$model <- model
   # full
   if (!is.logical(full)) stop("full should be TRUE or FALSE")
