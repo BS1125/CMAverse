@@ -283,17 +283,18 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       astar_sim <- c(rep(astar, n))
     }
     
-    # simulate C
-    basec_sim <- data[, basec]
-    
-    # design matrices for simulating mediator[p]
-    mdesign_a <- data.frame(a_sim, basec_sim)
-    mdesign_astar <- data.frame(astar_sim, basec_sim)
-    colnames(mdesign_a) <- colnames(mdesign_astar) <- c(exposure, basec)
-    m_a <- m_astar <- data.frame(matrix(nrow = n, ncol = length(mediator)))
-    colnames(m_a) <- colnames(m_astar) <- mediator
     # simulating mediator[p]
     for (p in 1:length(mediator)) {
+      # design matrices for simulating mediator[p]
+      mreg_formula <- formula(mreg[[p]])
+      mreg_ind_var <- unique(all.vars(mreg_formula[[3]]))
+      other_sim <- data[, c(mreg_ind_var, basec)]
+      mdesign_a <- data.frame(a_sim, other_sim)
+      mdesign_astar <- data.frame(astar_sim, other_sim)
+      colnames(mdesign_a) <- colnames(mdesign_astar) <- c(exposure, mreg_ind_var, basec)
+      m_a <- m_astar <- data.frame(matrix(nrow = n, ncol = length(mediator)))
+      colnames(m_a) <- colnames(m_astar) <- mediator
+      
       # predict mediator[p]
       type <- ifelse(is_multinom_mreg[p] | is_polr_mreg[p], "probs", "response")
       mpred_a <- predict(mreg[[p]], newdata = mdesign_a, type = type)
@@ -373,7 +374,8 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
         m_astar[, p] <- factor(m_astar[, p], levels = m_lev)
       }
     }
-    rm(mdesign_a, mdesign_astar, type, mpred_a, mpred_astar, mid_a, mid_astar, full_index, n_full)
+    rm(mreg_formula, mreg_ind_var, other_sim, mdesign_a, mdesign_astar, type, 
+       mpred_a, mpred_astar, mid_a, mid_astar, full_index, n_full)
     
     # simulate mstar for cde
     mstar_sim <- do.call(cbind, lapply(1:length(mediator), function(x)
@@ -382,15 +384,18 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
       } else data.frame(rep(mval[[x]], n))))
     
     # design matrices for outcome simulation
-    ydesign0m <- data.frame(astar_sim, mstar_sim, basec_sim)
-    ydesign1m <- data.frame(a_sim, mstar_sim, basec_sim)
-    ydesign00 <- data.frame(astar_sim, m_astar, basec_sim)
-    ydesign01 <- data.frame(astar_sim, m_a, basec_sim)
-    ydesign10 <- data.frame(a_sim, m_astar, basec_sim)
-    ydesign11 <- data.frame(a_sim, m_a, basec_sim)
-    rm(a_sim, astar_sim, m_a, m_astar, mstar_sim, basec_sim)
+    yreg_formula <- formula(yreg)
+    yreg_ind_var <- unique(all.vars(yreg_formula[[3]]))
+    other_sim <- data[, c(yreg_ind_var, basec)]
+    ydesign0m <- data.frame(astar_sim, mstar_sim, other_sim)
+    ydesign1m <- data.frame(a_sim, mstar_sim, other_sim)
+    ydesign00 <- data.frame(astar_sim, m_astar, other_sim)
+    ydesign01 <- data.frame(astar_sim, m_a, other_sim)
+    ydesign10 <- data.frame(a_sim, m_astar, other_sim)
+    ydesign11 <- data.frame(a_sim, m_a, other_sim)
+    rm(a_sim, astar_sim, m_a, m_astar, mstar_sim, other_sim)
     colnames(ydesign0m) <- colnames(ydesign1m) <- colnames(ydesign00) <- colnames(ydesign01) <-
-      colnames(ydesign10) <- colnames(ydesign11) <- c(exposure, mediator, basec)
+      colnames(ydesign10) <- colnames(ydesign11) <- c(exposure, mediator, yreg_ind_var, basec)
     
     # predict Y
     type <- ifelse(is_coxph_yreg, "risk", ifelse(is_multinom_yreg | is_polr_yreg, "probs", "response"))
@@ -400,7 +405,8 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     EY01_pred <- as.matrix(predict(yreg, newdata =  ydesign01, type = type))
     EY10_pred <- as.matrix(predict(yreg, newdata =  ydesign10, type = type))
     EY11_pred <- as.matrix(predict(yreg, newdata =  ydesign11, type = type))
-    rm(type, ydesign0m, ydesign1m, ydesign00, ydesign01, ydesign10, ydesign11)
+    rm(yreg_formula, yreg_ind_var, other_sim, type, ydesign0m, ydesign1m, ydesign00, 
+       ydesign01, ydesign10, ydesign11)
     
     # weights of yreg
     weightsEY <- as.vector(model.frame(yreg)$'(weights)')
