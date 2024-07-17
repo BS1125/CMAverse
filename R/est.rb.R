@@ -284,16 +284,16 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     }
     
     # simulating mediator[p]
+    m_a <- m_astar <- data.frame(matrix(nrow = n, ncol = length(mediator)))
+    colnames(m_a) <- colnames(m_astar) <- mediator
     for (p in 1:length(mediator)) {
       # design matrices for simulating mediator[p]
       mreg_formula <- formula(mreg[[p]])
       mreg_ind_var <- unique(all.vars(mreg_formula[[3]]))
-      other_sim <- data[, c(mreg_ind_var, basec)]
+      other_sim <- data[, unique(c(mreg_ind_var, basec))]
       mdesign_a <- data.frame(a_sim, other_sim)
       mdesign_astar <- data.frame(astar_sim, other_sim)
-      colnames(mdesign_a) <- colnames(mdesign_astar) <- c(exposure, mreg_ind_var, basec)
-      m_a <- m_astar <- data.frame(matrix(nrow = n, ncol = length(mediator)))
-      colnames(m_a) <- colnames(m_astar) <- mediator
+      colnames(mdesign_a) <- colnames(mdesign_astar) <- c(exposure, unique(c(mreg_ind_var, basec)))
       
       # predict mediator[p]
       type <- ifelse(is_multinom_mreg[p] | is_polr_mreg[p], "probs", "response")
@@ -386,7 +386,7 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     # design matrices for outcome simulation
     yreg_formula <- formula(yreg)
     yreg_ind_var <- unique(all.vars(yreg_formula[[3]]))
-    other_sim <- data[, c(yreg_ind_var, basec)]
+    other_sim <- data[, unique(c(yreg_ind_var, basec))]
     ydesign0m <- data.frame(astar_sim, mstar_sim, other_sim)
     ydesign1m <- data.frame(a_sim, mstar_sim, other_sim)
     ydesign00 <- data.frame(astar_sim, m_astar, other_sim)
@@ -395,7 +395,7 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     ydesign11 <- data.frame(a_sim, m_a, other_sim)
     rm(a_sim, astar_sim, m_a, m_astar, mstar_sim, other_sim)
     colnames(ydesign0m) <- colnames(ydesign1m) <- colnames(ydesign00) <- colnames(ydesign01) <-
-      colnames(ydesign10) <- colnames(ydesign11) <- c(exposure, mediator, yreg_ind_var, basec)
+      colnames(ydesign10) <- colnames(ydesign11) <- c(exposure, mediator, unique(c(yreg_ind_var, basec)))
     
     # predict Y
     type <- ifelse(is_coxph_yreg, "risk", ifelse(is_multinom_yreg | is_polr_yreg, "probs", "response"))
