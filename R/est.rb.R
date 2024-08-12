@@ -393,9 +393,9 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     ydesign01 <- data.frame(astar_sim, m_a, other_sim)
     ydesign10 <- data.frame(a_sim, m_astar, other_sim)
     ydesign11 <- data.frame(a_sim, m_a, other_sim)
-    rm(a_sim, astar_sim, m_a, m_astar, mstar_sim, other_sim)
     colnames(ydesign0m) <- colnames(ydesign1m) <- colnames(ydesign00) <- colnames(ydesign01) <-
       colnames(ydesign10) <- colnames(ydesign11) <- c(exposure, mediator, unique(c(yreg_ind_var, basec)))
+    rm(yreg_formula, yreg_ind_var, other_sim, a_sim, astar_sim, m_a, m_astar, mstar_sim)
     
     # predict Y
     type <- ifelse(is_coxph_yreg, "risk", ifelse(is_multinom_yreg | is_polr_yreg, "probs", "response"))
@@ -405,8 +405,7 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     EY01_pred <- as.matrix(predict(yreg, newdata =  ydesign01, type = type))
     EY10_pred <- as.matrix(predict(yreg, newdata =  ydesign10, type = type))
     EY11_pred <- as.matrix(predict(yreg, newdata =  ydesign11, type = type))
-    rm(yreg_formula, yreg_ind_var, other_sim, type, ydesign0m, ydesign1m, ydesign00, 
-       ydesign01, ydesign10, ydesign11)
+    rm(type, ydesign0m, ydesign1m, ydesign00, ydesign01, ydesign10, ydesign11)
     
     # weights of yreg
     weightsEY <- as.vector(model.frame(yreg)$'(weights)')

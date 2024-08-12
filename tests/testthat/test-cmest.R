@@ -168,11 +168,6 @@ test_that("cmest works correctly for continuous Y and binary M", {
                                          mreg = list("logistic"), yreg = "linear",
                                          astar = 0, a = 1, mval = list(1),
                                          estimation = "imputation", inference = "bootstrap")
-  # res_contbin_rb_impu_bootstrap <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
-  #                                        mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
-  #                                        mreg = list("multinomial"), yreg = "linear",
-  #                                        astar = 0, a = 1, mval = list(1),
-  #                                        estimation = "imputation", inference = "bootstrap")
   res_contbin_wb <- cmest(data = data, model = "wb", outcome = "Y", exposure = "A",
                           mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
                           ereg = "logistic", yreg = "linear",
