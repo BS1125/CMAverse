@@ -181,9 +181,9 @@ est.iorw <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
   rm(type, totdesign0, totdesign1, dirdesign0, dirdesign1)
   
   # weights for calculating counterfactuals
-  weightsEY_tot <- as.vector(model.frame(yreg_tot)$'(weights)')
+  weightsEY_tot <- as.vector(eval(yreg_tot$call$weights, data))
   if (is.null(weightsEY_tot)) weightsEY_tot <- rep(1, n)
-  weightsEY_dir <- as.vector(model.frame(yreg_dir)$'(weights)')
+  weightsEY_dir <- as.vector(eval(yreg_dir$call$weights, data))
   if (is.null(weightsEY_dir)) weightsEY_dir <- rep(1, n)
   
   # categorical Y

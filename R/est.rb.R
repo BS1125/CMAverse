@@ -408,7 +408,7 @@ est.rb <- function(data = NULL, indices = NULL, outReg = FALSE, full = TRUE) {
     rm(type, ydesign0m, ydesign1m, ydesign00, ydesign01, ydesign10, ydesign11)
     
     # weights of yreg
-    weightsEY <- as.vector(model.frame(yreg)$'(weights)')
+    weightsEY <- as.vector(eval(yreg$call$weights, data))
     if (is.null(weightsEY)) weightsEY <- rep(1, n)
     
     # categorical Y

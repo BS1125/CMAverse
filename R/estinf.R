@@ -26,7 +26,7 @@ estinf <- function() {
           assign(paste0("is_coxph_", reg_name), inherits(reg_mid, "coxph"))
         }
         if (get(paste0("is_svyglm_", reg_name))) {assign(paste0("weights_", reg_name), get(reg_name)$data$.survey.prob.weights)
-        } else assign(paste0("weights_", reg_name), model.frame(get(reg_name))$'(weights)')  
+        } else assign(paste0("weights_", reg_name), eval(get(reg_name)$call$weights, data))  
       } else {
         assign(paste0("call_", reg_name), lapply(1:length(reg), function(x) getCall(reg[[x]])))
         assign("reg_mid", lapply(1:length(reg), function(x)
@@ -41,8 +41,8 @@ estinf <- function() {
         assign(paste0("is_svymultinom_", reg_name), sapply(1:length(reg_mid), function(x) inherits(reg_mid[[x]], "svymultinom")))
         assign(paste0("is_polr_", reg_name), sapply(1:length(reg_mid), function(x) inherits(reg_mid[[x]], "polr")))
         assign(paste0("weights_", reg_name), lapply(1:length(reg_mid), function(x) {
-          if (get(paste0("is_svyglm_", reg_name))[x]) { get(reg_name)[[x]]$data$.survey.prob.weights
-          } else model.frame(get(reg_name)[[x]])$'(weights)'
+          if (get(paste0("is_svyglm_", reg_name))[x]) {get(reg_name)[[x]]$data$.survey.prob.weights
+          } else eval(get(reg_name)[[x]]$call$weights, data)
         }))
       }
       rm(reg_mid)
