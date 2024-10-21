@@ -256,7 +256,6 @@ s_point_est <- function(i, mstate_bootlist, mstate_orig,
   cat("\n")
   cat("Preparing for numerical integration (1)...\n")
   newdA1Mt_list_cumhaz = lapply(1:length(newdA1Mt_list), function(i){
-    Sys.sleep(0.1)
     setTxtProgressBar(pb1, i)
     newdA1Mt_msfit = msfit(joint_mod2, newdA1Mt_list[[i]], trans=trans)
     cumhaz_A1Mt = newdA1Mt_msfit$Haz
@@ -266,7 +265,6 @@ s_point_est <- function(i, mstate_bootlist, mstate_orig,
   cat("\n")
   cat("Preparing for numerical integration (2)...\n")
   newdA0Mt_list_cumhaz = lapply(1:length(newdA0Mt_list), function(i){
-    Sys.sleep(0.1)
     setTxtProgressBar(pb2, i)
     newdA0Mt_msfit = msfit(joint_mod2, newdA0Mt_list[[i]], trans=trans)
     cumhaz_A0Mt = newdA0Mt_msfit$Haz
