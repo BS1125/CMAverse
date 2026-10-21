@@ -71,6 +71,68 @@ test_that("cmest works correctly for binary Y and continuous M", {
 
 })
 
+test_that("cmest delta-method SEs are correct for binary Y and continuous M", {
+
+  set.seed(1)
+  # data simulation
+  expit <- function(x) exp(x)/(1+exp(x))
+  n <- 10000
+  C1 <- rnorm(n, mean = 1, sd = 1)
+  C2 <- rbinom(n, 1, 0.6)
+  pa <- expit(0.2 + 0.5*C1 + 0.1*C2)
+  A <- rbinom(n, 1, pa)
+  M <- rnorm(n, 0.5*A + 0.5*C1 + 0.3*C2, 1)
+  py <- expit(-4 + 0.4*A + 0.5*M + 0.3*A*M + 0.3*C1 - 0.6*C2)
+  Y <- rbinom(n, 1, py)
+  data <- data.frame(A, M, Y, C1, C2)
+
+  # results of cmest
+  res_bincont <- cmest(data = data, model = "rb", outcome = "Y", exposure = "A",
+                       mediator = "M", basec = c("C1", "C2"), EMint = TRUE,
+                       mreg = list("linear"), yreg = "logistic",
+                       astar = 0, a = 1, mval = list(1),
+                       estimation = "paramfunc", inference = "delta")
+
+  # reference: delta method with a numerical gradient of the closed-form
+  # excess relative risks and proportions, sigma^2 of the mediator model held fixed
+  yreg <- glm(Y ~ A*M + C1 + C2, family = binomial, data = data)
+  mreg <- lm(M ~ A + C1 + C2, data = data)
+  s2 <- sigma(mreg)^2
+  m <- 1
+  a <- 1
+  astar <- 0
+  meanc <- c(mean(C1), mean(C2))
+  err <- function(par) {
+    theta1 <- par[2]; theta2 <- par[3]; theta3 <- par[6]
+    beta0 <- par[7]; beta1 <- par[8]; beta2 <- par[9:10]
+    mu <- beta0 + beta1*astar + sum(beta2*meanc)
+    pnde <- exp((theta1+theta3*(mu+theta2*s2))*(a-astar)+0.5*theta3^2*s2*(a-astar)^2)
+    pnie <- exp((theta2*beta1+theta3*beta1*astar)*(a-astar))
+    tnie <- exp((theta2*beta1+theta3*beta1*a)*(a-astar))
+    cde_err <- (exp(theta1*(a-astar)+theta3*a*m)-exp(theta3*astar*m))*
+      exp(theta2*m-(theta2+theta3*astar)*mu-0.5*(theta2+theta3*astar)^2*s2)
+    er <- c(cde_err, pnde - 1 - cde_err, tnie * pnde - pnde - pnie + 1, pnie - 1)
+    total_err <- pnde * tnie - 1
+    c(er, er / total_err, (er[3] + er[4]) / total_err, (er[2] + er[3]) / total_err,
+      sum(er[2:4]) / total_err)
+  }
+  par <- unname(c(coef(yreg), coef(mreg)))
+  vcov_par <- as.matrix(Matrix::bdiag(vcov(yreg), vcov(mreg)))
+  h <- 1e-6
+  grad <- sapply(seq_along(par), function(j) {
+    e <- replace(numeric(length(par)), j, h)
+    (err(par + e) - err(par - e)) / (2 * h)
+  })
+  se_ref <- sqrt(diag(grad %*% vcov_par %*% t(grad)))
+  keep <- c("ERcde", "ERintref", "ERintmed", "ERpnie", "ERcde(prop)", "ERintref(prop)",
+            "ERintmed(prop)", "ERpnie(prop)", "pm", "int", "pe")
+
+  # test
+  expect_equal(unname(res_bincont$effect.pe[keep]), err(par))
+  expect_equal(unname(res_bincont$effect.se[keep]), se_ref, tolerance = 1e-5)
+
+})
+
 test_that("cmest works correctly for continuous Y and continuous M", {
 
   set.seed(1)
