@@ -219,9 +219,9 @@ inf.delta <- function(data = NULL, yreg = NULL, mreg = NULL) {
                                 paste(theta3, paste0("(", a, ")"), sep = "*", collapse = "+"), ")*((",
                                 paste(beta1, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
                                 paste(beta1, paste0("(", astar, ")"), sep = "*", collapse = "+"), "))")
-      if (full && EMint) cde_err_formula <- paste0("exp(((", paste(theta1, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
+      if (full && EMint) cde_err_formula <- paste0("(exp(((", paste(theta1, paste0("(", a, ")"), sep = "*", collapse = "+"), ")-(",
                                           paste(theta1, paste0("(", astar, ")"), sep = "*", collapse = "+"), "))+(",
-                                          paste(theta3, paste0("(", a, ")"), sep = "*", collapse = "+"), ")*", mstar, "-exp((",
+                                          paste(theta3, paste0("(", a, ")"), sep = "*", collapse = "+"), ")*", mstar, ")-exp((",
                                           paste(theta3, paste0("(", astar, ")"), sep = "*", collapse = "+"),
                                           ")*", mstar, "))*exp(", theta2, "*", mstar, "-(", theta2, "+(",
                                           paste(theta3, paste0("(", astar, ")"), sep = "*", collapse = "+"), "))*(",
